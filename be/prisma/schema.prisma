@@ -89,14 +89,13 @@ model Locations {
 }
 
 model JobBranches {
+  ID                String    @id @default(uuid()) @db.Uuid
   DeletedAt         DateTime?
   CompanyLocationID String    @db.Uuid
   JobID             String    @db.Uuid
 
   CompanyLocation CompanyLocation @relation(fields: [CompanyLocationID], references: [ID], onDelete: Cascade)
   Job             Jobs            @relation(fields: [JobID], references: [ID], onDelete: Cascade)
-
-  @@id([CompanyLocationID, JobID])
 }
 
 model Notification {
