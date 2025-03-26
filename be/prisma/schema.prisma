@@ -1,0 +1,263 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  ID          String     @id @default(uuid()) @db.Uuid
+  Email       String     @unique @db.VarChar(255)
+  Password    String     @db.VarChar(255)
+  FullName    String     @db.Text
+  AvatarUrl   String?    @db.Text
+  PhoneNumber String     @unique @db.VarChar(255)
+  Status      UserStatus @default(ACTIVE)
+  CreatedAt   DateTime   @default(now())
+  UpdatedAt   DateTime   @default(now())
+  Role        Role
+  DeletedAt   DateTime?
+
+  Recruiters Recruiters?
+  Candidates Candidates[]
+}
+
+model Recruiters {
+  ID        String    @id @default(uuid()) @db.Uuid
+  Position  String    @db.VarChar(255)
+  DeletedAt DateTime?
+  UserID    String    @unique @db.Uuid
+  CompanyID String    @db.Uuid
+
+  User    Users     @relation(fields: [UserID], references: [ID], onDelete: Cascade)
+  Company Companies @relation(fields: [CompanyID], references: [ID], onDelete: Cascade)
+  Jobs    Jobs[]
+}
+
+model Candidates {
+  ID             String    @id @default(uuid()) @db.Uuid
+  ResumeUrl      String?   @db.Text
+  Certifications String[]
+  Bio            String?   @db.Text
+  Level          Level
+  DeletedAt      DateTime?
+  UserID         String    @unique @db.Uuid
+
+  User         Users          @relation(fields: [UserID], references: [ID], onDelete: Cascade)
+  JobFavorites JobFavorites[]
+  Applications Applications[]
+}
+
+model Companies {
+  ID          String   @id @default(uuid()) @db.Uuid
+  Name        String   @db.Text
+  WebsiteUrl  String?  @db.Text
+  LogoUrl     String?  @db.Text
+  Description String?  @db.Text
+  CreatedAt   DateTime @default(now())
+  UpdatedAt   DateTime @default(now())
+
+  Recruiters       Recruiters[]
+  CompanyLocations CompanyLocation[]
+}
+
+model CompanyLocation {
+  ID         String    @id @default(uuid()) @db.Uuid
+  BranchName String    @db.VarChar(255)
+  Address    String    @db.VarChar(255)
+  CreatedAt  DateTime  @default(now())
+  UpdatedAt  DateTime  @default(now())
+  DeletedAt  DateTime?
+
+  CompanyID  String @db.Uuid
+  LocationID String @db.Uuid
+
+  Location    Locations     @relation(fields: [LocationID], references: [ID], onDelete: Cascade)
+  Company     Companies     @relation(fields: [CompanyID], references: [ID], onDelete: Cascade)
+  JobBranches JobBranches[]
+}
+
+model Locations {
+  ID        String    @id @default(uuid()) @db.Uuid
+  Name      String    @db.Text
+  Country   String    @db.VarChar(255)
+  DeletedAt DateTime?
+
+  CompanyLocations CompanyLocation[]
+}
+
+model JobBranches {
+  ID                String    @id @default(uuid()) @db.Uuid
+  DeletedAt         DateTime?
+  CompanyLocationID String    @db.Uuid
+  JobID             String    @db.Uuid
+
+  CompanyLocation CompanyLocation @relation(fields: [CompanyLocationID], references: [ID], onDelete: Cascade)
+  Job             Jobs            @relation(fields: [JobID], references: [ID], onDelete: Cascade)
+}
+
+model Notification {
+  ID        String           @id @default(uuid()) @db.Uuid
+  Title     String           @db.Text
+  Type      NotificationType
+  DeletedAt DateTime?
+}
+
+model UserNotification {
+  ID        String    @id @default(uuid()) @db.Uuid
+  Content   String[]
+  IsRead    Boolean   @default(false)
+  CreatedAt DateTime  @default(now())
+  DeletedAt DateTime?
+}
+
+model Jobs {
+  ID           String      @id @default(uuid()) @db.Uuid
+  Title        String      @db.Text
+  Description  String?     @db.Text
+  Address      String      @db.VarChar(255)
+  Salary       String      @db.Text
+  Vacancies    Int
+  Type         JobType
+  WorkingTimes String      @db.Text
+  Status       JobStatus   @default(PENDING)
+  PostedAt     DateTime    @default(now())
+  ExpiredAt    DateTime
+  Benefits     String[]
+  Level        Level
+  Category     JobCategory
+  DeletedAt    DateTime?
+  RecruiterID  String      @db.Uuid
+
+  JobBranches     JobBranches[]
+  JobFavorites    JobFavorites[]
+  Applications    Applications[]
+  Recruiter       Recruiters        @relation(fields: [RecruiterID], references: [ID], onDelete: Cascade)
+  JobDescriptions JobDescription[]
+  JobRequirements JobRequirements[]
+}
+
+model Applications {
+  ID        String            @id @default(uuid()) @db.Uuid
+  ResumeUrl String            @db.Text
+  Status    ApplicationStatus
+  AppliedAt DateTime          @default(now())
+  DeletedAt DateTime?
+
+  CandidateID String @db.Uuid
+  JobID       String @db.Uuid
+
+  Candidate Candidates @relation(fields: [CandidateID], references: [ID], onDelete: Cascade)
+  Job       Jobs       @relation(fields: [JobID], references: [ID], onDelete: Cascade)
+}
+
+model JobDescription {
+  ID          String    @id @default(uuid()) @db.Uuid
+  Description String    @db.Text
+  DeletedAt   DateTime?
+
+  JobID String @db.Uuid
+
+  Job Jobs @relation(fields: [JobID], references: [ID], onDelete: Cascade)
+}
+
+model JobRequirements {
+  ID          String    @id @default(uuid()) @db.Uuid
+  Requirement String    @db.Text
+  DeletedAt   DateTime?
+
+  JobID String @db.Uuid
+
+  Job Jobs @relation(fields: [JobID], references: [ID], onDelete: Cascade)
+}
+
+model WorkExperiences {
+  ID             String    @id @default(uuid()) @db.Uuid
+  CompanyName    String    @db.VarChar(255)
+  CompanyLogoUrl String    @db.Text
+  Position       String    @db.VarChar(255)
+  StartDate      DateTime
+  EndDate        DateTime?
+  Descriptions   String[]
+  Location       String
+  JobType        JobType
+}
+
+model JobFavorites {
+  ID        String    @id @default(uuid()) @db.Uuid
+  SavedAt   DateTime  @default(now())
+  DeletedAt DateTime?
+
+  CandidateID String @db.Uuid
+  JobID       String @db.Uuid
+
+  Job       Jobs       @relation(fields: [JobID], references: [ID], onDelete: Cascade)
+  Candidate Candidates @relation(fields: [CandidateID], references: [ID], onDelete: Cascade)
+}
+
+enum UserStatus {
+  ACTIVE   @map("active")
+  INACTIVE @map("inactive")
+}
+
+enum Role {
+  ADMIN     @map("admin")
+  RECRUITER @map("recruiter")
+  CANDIDATE @map("candidate")
+}
+
+enum Level {
+  INTERN  @map("intern")
+  FRESHER @map("fresher")
+  MID     @map("mid")
+  JUNIOR  @map("junior")
+  SENIOR  @map("senior")
+}
+
+enum NotificationType {
+  CANDIDATE_APPLICATION_APPROVED @map("candidate_application_approved")
+  CANDIDATE_APPLICATION_REJECTED @map("candidate_application_rejected")
+  RECRUITER_JOB_APPROVED         @map("recruiter_job_approved")
+  RECRUITER_JOB_REJECTED         @map("recruiter_job_rejected")
+  RECRUITER_NEW_APPLICATION      @map("recruiter_new_application")
+  ADMIN_NEW_JOB_POST             @map("admin_new_job_post")
+}
+
+enum JobType {
+  PART_TIME  @map("part_time")
+  FULL_TIME  @map("full_time")
+  REMOTE     @map("remote")
+  FREE_LANCE @map("free_lance")
+}
+
+enum JobStatus {
+  OPEN     @map("open")
+  CLOSED   @map("closed")
+  PENDING  @map("pending")
+  REJECTED @map("rejected")
+}
+
+enum JobCategory {
+  FULL_STACK        @map("full_stack")
+  FRONT_END         @map("front_end")
+  BACK_END          @map("back_end")
+  MOBILE            @map("mobile")
+  SOFTWARE_ENGINEER @map("software_engineer")
+  DEVOPS            @map("devops")
+  DATA_SCIENTIST    @map("data_scientist")
+  AI_ENGINEER       @map("ai_engineer")
+  GAME_DEVELOPER    @map("game_developer")
+  CYBER_SECURITY    @map("cyber_security")
+  UI_UX_DESIGNER    @map("ui_ux_designer")
+  QA_TESTER         @map("qa_tester")
+  EMBEDDED_ENGINEER @map("embedded_engineer")
+  OTHER             @map("other")
+}
+
+enum ApplicationStatus {
+  PENDING  @map("pending")
+  ACCEPTED @map("accepted")
+  REJECTED @map("rejected")
+}
