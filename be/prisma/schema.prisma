@@ -155,9 +155,9 @@ model Applications {
 }
 
 model JobDescription {
-  ID          String   @id @default(uuid()) @db.Uuid
-  Description String   @db.Text
-  DeletedAt   DateTime
+  ID          String    @id @default(uuid()) @db.Uuid
+  Description String    @db.Text
+  DeletedAt   DateTime?
 
   JobID String @db.Uuid
 
