@@ -8,13 +8,13 @@ CREATE TYPE "Role" AS ENUM ('admin', 'recruiter', 'candidate');
 CREATE TYPE "Level" AS ENUM ('intern', 'fresher', 'mid', 'junior', 'senior');
 
 -- CreateEnum
-CREATE TYPE "NotificationType" AS ENUM ('APPLICATION_STATUS', 'APPLICATION_RECEIVED', 'NEW_JOB_POST');
+CREATE TYPE "NotificationType" AS ENUM ('candidate_application_approved', 'candidate_application_rejected', 'recruiter_job_approved', 'recruiter_job_rejected', 'recruiter_new_application', 'admin_new_job_post');
 
 -- CreateEnum
 CREATE TYPE "JobType" AS ENUM ('part_time', 'full_time', 'remote', 'free_lance');
 
 -- CreateEnum
-CREATE TYPE "JobStatus" AS ENUM ('OPEN', 'CLOSED', 'PENDING', 'REJECTED');
+CREATE TYPE "JobStatus" AS ENUM ('open', 'closed', 'pending', 'rejected');
 
 -- CreateEnum
 CREATE TYPE "JobCategory" AS ENUM ('full_stack', 'front_end', 'back_end', 'mobile', 'software_engineer', 'devops', 'data_scientist', 'ai_engineer', 'game_developer', 'cyber_security', 'ui_ux_designer', 'qa_tester', 'embedded_engineer', 'other');
@@ -101,12 +101,12 @@ CREATE TABLE "Locations" (
 );
 
 -- CreateTable
-CREATE TABLE "JobBranch" (
+CREATE TABLE "JobBranches" (
     "DeletedAt" TIMESTAMP(3),
     "CompanyLocationID" UUID NOT NULL,
     "JobID" UUID NOT NULL,
 
-    CONSTRAINT "JobBranch_pkey" PRIMARY KEY ("CompanyLocationID","JobID")
+    CONSTRAINT "JobBranches_pkey" PRIMARY KEY ("CompanyLocationID","JobID")
 );
 
 -- CreateTable
@@ -122,7 +122,7 @@ CREATE TABLE "Notification" (
 -- CreateTable
 CREATE TABLE "UserNotification" (
     "ID" UUID NOT NULL,
-    "Content" TEXT NOT NULL,
+    "Content" TEXT[],
     "IsRead" BOOLEAN NOT NULL DEFAULT false,
     "CreatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "DeletedAt" TIMESTAMP(3),
@@ -140,7 +140,7 @@ CREATE TABLE "Jobs" (
     "Vacancies" INTEGER NOT NULL,
     "Type" "JobType" NOT NULL,
     "WorkingTimes" TEXT NOT NULL,
-    "Status" "JobStatus" NOT NULL DEFAULT 'PENDING',
+    "Status" "JobStatus" NOT NULL DEFAULT 'pending',
     "PostedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "ExpiredAt" TIMESTAMP(3) NOT NULL,
     "Benefits" TEXT[],
@@ -239,10 +239,10 @@ ALTER TABLE "CompanyLocation" ADD CONSTRAINT "CompanyLocation_LocationID_fkey" F
 ALTER TABLE "CompanyLocation" ADD CONSTRAINT "CompanyLocation_CompanyID_fkey" FOREIGN KEY ("CompanyID") REFERENCES "Companies"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "JobBranch" ADD CONSTRAINT "JobBranch_CompanyLocationID_fkey" FOREIGN KEY ("CompanyLocationID") REFERENCES "CompanyLocation"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "JobBranches" ADD CONSTRAINT "JobBranches_CompanyLocationID_fkey" FOREIGN KEY ("CompanyLocationID") REFERENCES "CompanyLocation"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "JobBranch" ADD CONSTRAINT "JobBranch_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "JobBranches" ADD CONSTRAINT "JobBranches_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Jobs" ADD CONSTRAINT "Jobs_RecruiterID_fkey" FOREIGN KEY ("RecruiterID") REFERENCES "Recruiters"("ID") ON DELETE CASCADE ON UPDATE CASCADE;

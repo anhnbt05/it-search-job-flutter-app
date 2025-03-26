@@ -108,7 +108,7 @@ model Notification {
 
 model UserNotification {
   ID        String    @id @default(uuid()) @db.Uuid
-  Content   String    @db.Text
+  Content   String[]
   IsRead    Boolean   @default(false)
   CreatedAt DateTime  @default(now())
   DeletedAt DateTime?
@@ -218,9 +218,12 @@ enum Level {
 }
 
 enum NotificationType {
-  APPLICATION_STATUS
-  APPLICATION_RECEIVED
-  NEW_JOB_POST
+  CANDIDATE_APPLICATION_APPROVED @map("candidate_application_approved")
+  CANDIDATE_APPLICATION_REJECTED @map("candidate_application_rejected")
+  RECRUITER_JOB_APPROVED         @map("recruiter_job_approved")
+  RECRUITER_JOB_REJECTED         @map("recruiter_job_rejected")
+  RECRUITER_NEW_APPLICATION      @map("recruiter_new_application")
+  ADMIN_NEW_JOB_POST             @map("admin_new_job_post")
 }
 
 enum JobType {
@@ -231,10 +234,10 @@ enum JobType {
 }
 
 enum JobStatus {
-  OPEN
-  CLOSED
-  PENDING
-  REJECTED
+  OPEN     @map("open")
+  CLOSED   @map("closed")
+  PENDING  @map("pending")
+  REJECTED @map("rejected")
 }
 
 enum JobCategory {
