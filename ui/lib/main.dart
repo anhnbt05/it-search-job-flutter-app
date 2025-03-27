@@ -58,8 +58,8 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          selectedIconTheme: IconThemeData(size: 26, color: color),
-          unselectedIconTheme: IconThemeData(size: 22, color: Colors.black),
+          selectedIconTheme: IconThemeData(size: 25, color: color),
+          unselectedIconTheme: IconThemeData(size: 23, color: Colors.black),
           showSelectedLabels: true,
           showUnselectedLabels: false,
           selectedLabelStyle: TextStyle(
@@ -76,6 +76,7 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
         appBar: AppBar(
           toolbarHeight: 45,
           backgroundColor: color,
+          centerTitle: true,
           title: appbarTitle(_role, bottomNavigationProvider.selectedIndex),
           bottom: bottomJobBar(_role, bottomNavigationProvider.selectedIndex, context),
           actions: [

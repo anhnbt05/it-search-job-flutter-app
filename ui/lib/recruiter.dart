@@ -80,7 +80,7 @@ List<BottomNavigationBarItem> bottomNavigationItem_recruiter(BuildContext contex
     tabItem(Icons.article_rounded, Icons.article_outlined, 'Quản lý', 0, context),
     tabItem(Icons.assignment_ind_rounded, Icons.assignment_ind_outlined, 'Ứng viên', 1, context),
     hiddenTabItem(),
-    tabItem(Icons.chat_rounded, Icons.chat_outlined, 'Thông báo', 3, context),
+    tabItem(Icons.notifications_rounded, Icons.notifications_outlined, 'Thông báo', 3, context),
     tabItem(Icons.person_2_rounded, Icons.person_2_outlined, 'Hồ sơ', 4, context),
   ];
 }

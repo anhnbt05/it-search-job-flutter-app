@@ -103,7 +103,7 @@ List<BottomNavigationBarItem> bottomNavigationItem_candidate(
       2,
       context,
     ),
-    tabItem(Icons.chat_rounded, Icons.chat_outlined, 'Thông báo', 3, context),
+    tabItem(Icons.notifications_rounded, Icons.notifications_outlined, 'Thông báo', 3, context),
     tabItem(
       Icons.person_2_rounded,
       Icons.person_2_outlined,
@@ -129,7 +129,7 @@ Widget? appbarTitle_cadidate(int selectedIndex) {
       );
     case 2:
       return Text(
-        'Danh sách',
+        'Danh sách công việc',
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       );
     case 3:
