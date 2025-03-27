@@ -57,12 +57,14 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        fontFamily: 'Poppins',
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           selectedIconTheme: IconThemeData(size: 25, color: color),
           unselectedIconTheme: IconThemeData(size: 23, color: Colors.black),
           showSelectedLabels: true,
           showUnselectedLabels: false,
           selectedLabelStyle: TextStyle(
+            fontSize: 12,
             fontWeight: FontWeight.w900,
             color: Colors.white,
           ),
