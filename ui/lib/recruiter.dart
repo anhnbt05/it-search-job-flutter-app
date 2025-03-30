@@ -8,7 +8,7 @@ List<Widget> pageView_recruiter(BuildContext context) {
   return [
     ManagementScreen(),
     CandidatesAppliedScreen(),
-    PostJobScreen(),
+    PostJobScreen(context),
     NotificationsScreen(),
     ProfileScreen(),
   ];
@@ -36,15 +36,149 @@ Widget CandidatesAppliedScreen() {
   );
 }
 
-Widget PostJobScreen() {
+Widget PostJobScreen(BuildContext context) {
   // TODO: Modify section below
+  var jobLocationProvider = Provider.of<JobLocationProvider>(context);
+
   return Container(
-    color: Colors.green.shade100,
-    child: Center(
-      child: Text(
-        "Thêm mới bài tuyển dụng",
-        style: TextStyle(fontSize: 24),
+    color: Colors.white,
+    child: SingleChildScrollView(
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 10, right: 5),
+                      child: Text(
+                        'Công ty TNHH Phát triển Công nghệ Thông tin và Truyền thông Việt Nam',
+                        softWrap: true,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 19,
+                          fontFamily: 'Anton',
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 7),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(Icons.person_outline, size: 15),
+                          SizedBox(width: 5),
+                          Text(
+                            'Hồ Văn Tên',
+                            style: TextStyle(fontSize: 15),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          titleinJD(title: 'Tên công việc:'),
+          customTextField(hintText: 'Nhập tên công việc...', height: 38, textInputType: TextInputType.text),
+          titleinJD(title: 'Nơi làm việc:'),
+          Column(
+            children: List.generate(locations.length, (index) {
+              return CheckboxListTile(
+                title: Text(
+                  locations[index],
+                  style: TextStyle(
+                    fontSize: 13,
+                  ),),
+                value: selectedLocations[index],
+                onChanged: (bool? value) {
+                  jobLocationProvider.setLocationSelected(index, value);
+                },
+                controlAffinity: ListTileControlAffinity.leading,
+              );
+            }),
+          ),
+          titleinJD(title: 'Mô tả công việc:'),
+          customTextField(hintText: 'Nhập mô tả công việc...', height: 350),
+          titleinJD(title: 'Yêu cầu công việc:'),
+          customTextField(hintText: 'Nhập yêu cầu công việc...', height: 300),
+          Container(height: 400, color: Colors.red),
+          Container(height: 500, color: Colors.green),
+          Container(height: 400, color: Colors.red),
+          Container(height: 500, color: Colors.green),
+        ],
       ),
+    ),
+  );
+
+}
+
+Align titleinJD({required String title}) {
+  return Align(
+    alignment: Alignment.topLeft,
+    child: Padding(
+      padding: EdgeInsets.only(top: 5, left: 10, bottom: 3), // Thêm padding nếu cần
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+  );
+}
+
+Container customTextField({required String? hintText,required double height, TextInputType textInputType = TextInputType.multiline}) {
+  return Container(
+    height: height,
+    padding: EdgeInsets.symmetric(horizontal: 10),
+    child :SizedBox.expand(
+    child: TextField(
+        textAlignVertical: TextAlignVertical.top,
+        keyboardType: textInputType,
+        expands: true,
+        maxLines: null,
+        minLines: null,
+        style: TextStyle(
+            fontSize: 14
+        ),
+        decoration: InputDecoration(
+          hintText: hintText ,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          isDense: true,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+            borderSide: BorderSide(color: Colors.grey, width: 0.1),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+            borderSide: BorderSide(color: Colors.blue, width: 1),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+        )
+
+    ),
     ),
   );
 }

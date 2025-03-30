@@ -13,6 +13,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => BottomNavigationProvider()),
         ChangeNotifierProvider(create: (context) => JoblistNavigationProvider()),
+        ChangeNotifierProvider(create: (context) => JobLocationProvider()),
       ],
       child: MyApp(),
     ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:ui/model.dart';
 class BottomNavigationProvider extends ChangeNotifier {
   int _selectedIndex = 0;
   late AnimationController _animationController;
@@ -51,8 +51,6 @@ class BottomNavigationProvider extends ChangeNotifier {
     }
   }
 
-
-
   @override
   void dispose() {
     _animationController.dispose();
@@ -87,5 +85,12 @@ class JoblistNavigationProvider extends ChangeNotifier{
   void dispose() {
     _joblistController.dispose();
     super.dispose();
+  }
+}
+
+class JobLocationProvider extends ChangeNotifier {
+  void setLocationSelected(int index, bool? value) {
+    selectedLocations[index] = value!;
+    notifyListeners();
   }
 }
