@@ -16,6 +16,7 @@ export enum EmailTemplateNameEnum {
   EMAIL_VERIFICATION = 'email-verification',
   EMAIL_RESET_PASSWORD = 'email-reset-password',
   EMAIL_UPDATE_PASSWORD_SUCCESS = 'email-update-password-success',
+  EMAIL_REGISTER_ACCOUNT_SUCCESS = 'email-register-account-success',
 }
 
 export type SupabaseUserToken = {
@@ -85,6 +86,7 @@ export const SUBJECT_EMAIL_MAP = {
   'email-verification': 'Email Verification',
   'email-reset-password': 'Email Reset Password',
   'email-update-password-success': 'Email Reset Password Successful',
+  'email-register-account-success': 'Email Registration Successful',
 };
 
 export const BULLMQ_RETRY_LIMIT = 3;

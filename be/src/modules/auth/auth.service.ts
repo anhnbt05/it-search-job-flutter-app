@@ -374,6 +374,12 @@ export class AuthService {
           `Failed to update email verified status: ${error.message}`,
         );
 
+      await this.emailsProducer.sendEmail(
+        email,
+        EmailTemplateNameEnum.EMAIL_REGISTER_ACCOUNT_SUCCESS,
+        { FullName: (findUser as Users).FullName },
+      );
+
       return {
         message:
           'Your email has been successfully verified. You can now log in.',
