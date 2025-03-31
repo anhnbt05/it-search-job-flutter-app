@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Users } from '@prisma/client';
+import { omit } from 'lodash';
 import { SupabaseService } from 'src/modules/supabase/supabase.service';
 
 @Injectable()
@@ -14,7 +15,7 @@ export class UsersService {
 
       if (error) throw error;
 
-      return data;
+      return data.map((data: Users) => omit(data, ['Password']));
     } catch (err) {
       console.error(err);
       throw err;
