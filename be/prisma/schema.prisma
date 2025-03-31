@@ -119,7 +119,6 @@ model Jobs {
   Status          JobStatus         @default(PENDING)
   PostedAt        DateTime          @default(now())
   ExpiredAt       DateTime
-  Benefits        String[]
   Level           Level
   Category        JobCategory
   DeletedAt       DateTime?
@@ -129,6 +128,7 @@ model Jobs {
   JobDescriptions JobDescription[]
   JobFavorites    JobFavorites[]
   JobRequirements JobRequirements[]
+  JobBenefits     JobBenefits[]
   Recruiter       Recruiters        @relation(fields: [RecruiterID], references: [ID], onDelete: Cascade)
 }
 
@@ -158,6 +158,14 @@ model JobRequirements {
   DeletedAt   DateTime?
   JobID       String    @db.Uuid
   Job         Jobs      @relation(fields: [JobID], references: [ID], onDelete: Cascade)
+}
+
+model JobBenefits {
+  ID        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Benefit   String
+  DeletedAt DateTime?
+  JobID     String    @db.Uuid
+  Job       Jobs      @relation(fields: [JobID], references: [ID], onDelete: Cascade)
 }
 
 model WorkExperiences {
