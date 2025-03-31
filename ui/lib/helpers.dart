@@ -26,7 +26,8 @@ BottomNavigationBarItem hiddenTabItem() {
 PreferredSize? bottomJobBar(role Role, int index, BuildContext context) {
   var joblistNavigationProvider = Provider.of<JoblistNavigationProvider>(context);
   if (index != 2 && Role == role.candidate || Role != role.candidate) return null;
-  else return
+  else {
+    return
     PreferredSize(
         preferredSize: Size.fromHeight(50),
         child: Container(
@@ -58,4 +59,5 @@ PreferredSize? bottomJobBar(role Role, int index, BuildContext context) {
           ),
         )
     );
+  }
 }

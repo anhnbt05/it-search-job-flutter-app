@@ -88,9 +88,84 @@ class JoblistNavigationProvider extends ChangeNotifier{
   }
 }
 
-class JobLocationProvider extends ChangeNotifier {
+class JobPostProvider extends ChangeNotifier {
+  List<bool> _selectedLocations = List.generate(5, (index) => false);
+  String? _jobTypeSelected = null;
+  String? _jobLevelSelected = null;
+  Color _jobTypeBorderColor = Colors.grey.shade400;
+  Color _jobLevelBorderColor = Colors.grey.shade400;
+  Color _salaryUnitBorderColor = Colors.grey.shade400;
+  Color _salaryTypeBorderColor = Colors.grey.shade400;
+  bool _isAccept = false;
+  String? _salaryTypeSelected = null;
+  String? _salaryUnitSelected = "option 1";
+  DateTime? _selectedDate;
+
+  List<bool> get selectedLocations => _selectedLocations;
+  String? get jobTypeSelected => _jobTypeSelected;
+  String? get jobLevelSelected => _jobLevelSelected;
+  Color get jobLevelBorderColor => _jobLevelBorderColor;
+  Color get jobTypeBorderColor => _jobTypeBorderColor;
+  Color get salaryUnitBorderColor => _salaryUnitBorderColor;
+  Color get salaryTypeBorderColor => _salaryTypeBorderColor;
+  bool get isAccept => _isAccept;
+  String? get salaryTypeSelected => _salaryTypeSelected;
+  String? get salaryUnitSelected => _salaryUnitSelected;
+  DateTime? get selectedDate => _selectedDate;
+
   void setLocationSelected(int index, bool? value) {
-    selectedLocations[index] = value!;
+    _selectedLocations[index] = value!;
+    notifyListeners();
+  }
+
+  void setJobTypeSelected(String? newValue){
+    _jobTypeSelected = newValue;
+    notifyListeners();
+  }
+
+  void setJobTypeBorderColor(Color value) {
+    _jobTypeBorderColor = value;
+    notifyListeners();
+  }
+
+  void setJobLevelBorderColor(Color value) {
+    _jobLevelBorderColor = value;
+    notifyListeners();
+  }
+
+  void setJobLevelSelected(String? newValue) {
+    _jobLevelSelected = newValue;
+    notifyListeners();
+  }
+
+  void setIsAccept() {
+    _isAccept = !_isAccept;
+    notifyListeners();
+  }
+
+  void setSalaryTypeSelected(String? value) {
+    _salaryTypeSelected = value;
+    notifyListeners();
+  }
+
+  void setSalaryUnitSelected(String? value) {
+    _salaryUnitSelected = value;
+    notifyListeners();
+  }
+
+  void setSalaryUnitBorderColor(Color value) {
+    _salaryUnitBorderColor = value;
+    notifyListeners();
+  }
+
+  void setSalaryTypeBorderColor(Color value) {
+    _salaryTypeBorderColor = value;
+    notifyListeners();
+  }
+
+  void setSelectedDate(DateTime? date) {
+    print('Open');
+    _selectedDate = date;
     notifyListeners();
   }
 }

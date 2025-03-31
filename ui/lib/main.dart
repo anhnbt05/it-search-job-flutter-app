@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/providers.dart';
 import 'package:ui/helpers.dart';
@@ -13,7 +14,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => BottomNavigationProvider()),
         ChangeNotifierProvider(create: (context) => JoblistNavigationProvider()),
-        ChangeNotifierProvider(create: (context) => JobLocationProvider()),
+        ChangeNotifierProvider(create: (context) => JobPostProvider()),
       ],
       child: MyApp(),
     ),
@@ -45,8 +46,7 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    final bottomNavigationProvider =
-    Provider.of<BottomNavigationProvider>(context, listen: false);
+    final bottomNavigationProvider = Provider.of<BottomNavigationProvider>(context, listen: false);
     bottomNavigationProvider.animationController.dispose();
     super.dispose();
   }
@@ -55,7 +55,19 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     var bottomNavigationProvider = Provider.of<BottomNavigationProvider>(context);
     var joblistNavigationProvider = Provider.of<JoblistNavigationProvider>(context);
+
     return MaterialApp(
+      locale: Locale('vi', 'VN'),
+      supportedLocales: [
+        Locale('vi', 'VN'),
+        Locale('en', 'US'),
+      ],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Poppins',
@@ -71,11 +83,9 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
           ),
           selectedItemColor: Colors.black,
         ),
-        splashFactory: NoSplash.splashFactory,
         highlightColor: Colors.grey.withOpacity(0.5),
       ),
       home: Scaffold(
-        //extendBodyBehindAppBar: true,
         appBar: AppBar(
           toolbarHeight: 45,
           backgroundColor: color,
