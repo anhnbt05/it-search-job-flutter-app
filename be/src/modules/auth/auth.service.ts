@@ -23,7 +23,6 @@ import {
 import {
   ResetPasswordDto,
   SignUpDto,
-  UpdatePasswordDto,
   VerifyEmailDto,
   VerifyResetPasswordOtpDto,
 } from 'src/modules/auth/dtos';
@@ -47,24 +46,13 @@ export class AuthService {
     private readonly emailsProducer: EmailsProducer,
   ) {}
 
-  async signUp(
-    signUpDto: SignUpDto,
-    avatarFile?: Express.Multer.File,
-    resumeFile?: Express.Multer.File,
-    logoFile?: Express.Multer.File,
-  ) {
+  async signUp(signUpDto: SignUpDto) {
     try {
       const { createCandidateDto, createRecruiterDto, ...res } = signUpDto;
 
       const { Password, Email, PhoneNumber, Role } = res;
 
-      this.validateRoleData(
-        res.Role,
-        resumeFile,
-        createCandidateDto,
-        createRecruiterDto,
-        logoFile,
-      );
+      this.validateRoleData(res.Role, createCandidateDto, createRecruiterDto);
 
       const supabase = this.supabaseService.getClient();
 
@@ -92,28 +80,6 @@ export class AuthService {
           `User with phone number '${PhoneNumber}' has already existed.`,
         );
 
-      let avatarFileUrl = '';
-
-      let resumeFileUrl = '';
-
-      if (avatarFile) {
-        const { url } = await this.uploadsService.uploadFile(
-          avatarFile,
-          'files',
-        );
-
-        avatarFileUrl = url;
-      }
-
-      if (resumeFile) {
-        const { url } = await this.uploadsService.uploadFile(
-          resumeFile,
-          'files',
-        );
-
-        resumeFileUrl = url;
-      }
-
       const hashedPassword = hashPassword(res.Password);
 
       const { data, error } = await supabase.auth.signUp({
@@ -138,10 +104,7 @@ export class AuthService {
             ...res,
             ID: data.user.id,
             Password: hashedPassword,
-            AvatarUrl:
-              avatarFileUrl !== ''
-                ? avatarFileUrl
-                : this.configService.get<string>('default_logo_user', ''),
+            AvatarUrl: this.configService.get<string>('default_logo_user', ''),
           },
         ])
         .select('*')
@@ -154,27 +117,25 @@ export class AuthService {
           (userData as Users).ID,
           createCandidateDto,
           supabaseAdmin,
-          resumeFileUrl,
         );
       }
 
       if (Role === RoleEnum.RECRUITER && createRecruiterDto) {
         const { createCompanyDto, companyID, Position } = createRecruiterDto;
 
+        if (createCompanyDto && companyID)
+          throw new BadRequestException(
+            'You must provide either companyID or createCompanyDto, not both.',
+          );
+
         let createCompanyID = '';
 
         if (companyID) {
           createCompanyID = companyID;
         } else if (createCompanyDto) {
-          if (!logoFile)
-            throw new BadRequestException(
-              `Recruiters create a new company must be provide logo file.`,
-            );
-
           const company = await this.createCompany(
             createCompanyDto as unknown as CreateCompanyDto,
             supabaseAdmin,
-            logoFile,
           );
 
           createCompanyID = company.ID;
@@ -206,6 +167,7 @@ export class AuthService {
       );
 
       return {
+        success: true,
         message:
           'We have sent a verification OTP to your email. Please enter it to complete verification.',
       };
@@ -284,7 +246,7 @@ export class AuthService {
 
       await supabase.auth.signOut();
 
-      return { message: 'Logged out successfully' };
+      return { success: true, message: 'Logged out successfully' };
     } catch (err) {
       console.error(err);
       throw err;
@@ -381,6 +343,7 @@ export class AuthService {
       );
 
       return {
+        success: true,
         message:
           'Your email has been successfully verified. You can now log in.',
       };
@@ -471,6 +434,7 @@ export class AuthService {
       );
 
       return {
+        success: true,
         message: 'Password reset email sent successfully.',
       };
     } catch (err) {
@@ -579,45 +543,6 @@ export class AuthService {
     }
   };
 
-  public handleUpdatePassword = async (
-    updatePasswordDto: UpdatePasswordDto,
-  ) => {
-    try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { newPassword, email } = updatePasswordDto;
-
-      const { data, error } = await supabaseAdmin
-        .from('Users')
-        .select('FullName')
-        .eq('Email', email)
-        .single();
-
-      if (error)
-        throw new NotFoundException(
-          `User with email '${email}' not found in the system.`,
-        );
-
-      await this.updatePassword(supabaseAdmin, email, newPassword);
-
-      await this.emailsProducer.sendEmail(
-        email,
-        EmailTemplateNameEnum.EMAIL_UPDATE_PASSWORD_SUCCESS,
-        {
-          FullName: (data as Users).FullName,
-        },
-      );
-
-      return {
-        success: true,
-        message: 'Your password has been updated successfully.',
-      };
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  };
-
   private updatePassword = async (
     supabaseAdmin: SupabaseClient,
     email: string,
@@ -657,20 +582,9 @@ export class AuthService {
 
   private validateRoleData(
     role: 'candidate' | 'recruiter',
-    resumeFile?: Express.Multer.File,
     createCandidateDto?: CreateCandidateDto,
     createRecruiterDto?: CreateRecruiterDto,
-    logoFile?: Express.Multer.File,
   ) {
-    if (role === RoleEnum.CANDIDATE && logoFile)
-      throw new BadRequestException(`Candidates can't be upload logo file.`);
-
-    if (role === RoleEnum.RECRUITER && resumeFile) {
-      throw new BadRequestException(
-        'Recruiters are not allowed to upload a resume file.',
-      );
-    }
-
     if (role === RoleEnum.CANDIDATE && !createCandidateDto) {
       throw new BadRequestException(
         'Candidate details must be provided when registering as a candidate.',
@@ -696,12 +610,10 @@ export class AuthService {
     userId: string,
     createCandidateDto: CreateCandidateDto,
     supabaseAdmin: SupabaseClient,
-    resumeUrl?: string,
   ) => {
     const { error } = await supabaseAdmin.from('Candidates').insert([
       {
         ...createCandidateDto,
-        ...(resumeUrl && { ResumeUrl: resumeUrl }),
         UserID: userId,
       },
     ]);
@@ -729,20 +641,12 @@ export class AuthService {
   private createCompany = async (
     createCompanyDto: CreateCompanyDto,
     supabaseAdmin: SupabaseClient,
-    logoFile: Express.Multer.File,
   ) => {
     const { createCompanyLocationDto, ...res } = createCompanyDto;
 
-    const { url } = await this.uploadsService.uploadFile(logoFile, 'files');
-
     const { data, error } = await supabaseAdmin
       .from('Companies')
-      .insert([
-        {
-          ...res,
-          LogoUrl: url,
-        },
-      ])
+      .insert([res])
       .select('*')
       .single();
 
