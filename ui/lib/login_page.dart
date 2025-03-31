@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
-                  child: Text("Hello\nWelcome Back", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 30),),
+                  child: Text("Xin chào\nChào mừng bạn trở lại", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 30),),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
@@ -61,9 +61,9 @@ class _LoginPageState extends State<LoginPage> {
                     readOnly: false,
                     style: TextStyle(fontSize: 18,color: Colors.black),
                     decoration: InputDecoration(
-                        labelText: "USERNAME",
+                        labelText: "EMAIL",
                         labelStyle: TextStyle(color: Colors.grey, fontSize: 15),
-                        prefixIcon: Icon(Icons.person),
+                        prefixIcon: Icon(Icons.email),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10)
                         )
@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(fontSize: 18,color: Colors.black),
                         obscureText: true,
                         decoration: InputDecoration(
-                            labelText: "PASSWORD",
+                            labelText: "MẬT KHẨU",
                             labelStyle: TextStyle(color: Colors.grey, fontSize: 15),
                             prefixIcon: Icon(Icons.lock),
                             suffixIcon: IconButton(onPressed: (){},
@@ -103,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue
                         ),
-                        child: Text("SIGN IN", style: TextStyle(color: Colors.white, fontSize: 16),)
+                        child: Text("ĐĂNG NHẬP", style: TextStyle(color: Colors.white, fontSize: 16),)
                     ),
                   ),
                 ),
@@ -115,10 +115,10 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       TextButton(
                         onPressed: () {},
-                        child: Text("NEW USER? SIGN UP", style: TextStyle(fontSize: 15, color: Colors.grey),)
+                        child: Text("ĐĂNG KÝ TÀI KHOẢN MỚI", style: TextStyle(fontSize: 15, color: Colors.grey),)
                       ),
                       TextButton(onPressed: () {},
-                           child:  Text("FORGOT PASSWORD?", style: TextStyle(fontSize: 15, color: Colors.blue),)
+                           child:  Text("QUÊN MẬT KHẨU", style: TextStyle(fontSize: 15, color: Colors.blue),)
                       )
                     ],
                   ),
