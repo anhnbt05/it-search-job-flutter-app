@@ -37,16 +37,17 @@ model Recruiters {
 }
 
 model Candidates {
-  ID             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ResumeUrl      String?
-  Certifications String[]
-  Bio            String?
-  Level          Level
-  DeletedAt      DateTime?
-  UserID         String         @unique @db.Uuid
-  Applications   Applications[]
-  User           Users          @relation(fields: [UserID], references: [ID], onDelete: Cascade)
-  JobFavorites   JobFavorites[]
+  ID              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ResumeUrl       String?
+  Certifications  String[]
+  Bio             String?
+  Level           Level
+  DeletedAt       DateTime?
+  UserID          String            @unique @db.Uuid
+  Applications    Applications[]
+  User            Users             @relation(fields: [UserID], references: [ID], onDelete: Cascade)
+  JobFavorites    JobFavorites[]
+  WorkExperiences WorkExperiences[]
 }
 
 model Companies {
@@ -120,7 +121,6 @@ model Jobs {
   PostedAt        DateTime          @default(now())
   ExpiredAt       DateTime
   Level           Level
-  Category        JobCategory
   DeletedAt       DateTime?
   RecruiterID     String            @db.Uuid
   Applications    Applications[]
@@ -178,6 +178,9 @@ model WorkExperiences {
   Descriptions   String[]
   Location       String
   JobType        JobType
+  CandidateID    String    @db.Uuid
+
+  Candidate Candidates @relation(fields: [CandidateID], references: [ID], onDelete: Cascade)
 }
 
 model JobFavorites {
@@ -188,6 +191,22 @@ model JobFavorites {
   JobID       String     @db.Uuid
   Candidate   Candidates @relation(fields: [CandidateID], references: [ID], onDelete: Cascade)
   Job         Jobs       @relation(fields: [JobID], references: [ID], onDelete: Cascade)
+}
+
+model JobCategories {
+  CategoryID String @db.Uuid
+  JobID      String @db.Uuid
+
+  @@id([CategoryID, JobID])
+  @@index([CategoryID, JobID])
+}
+
+model Categories {
+  ID           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  CategoryName JobCategory @unique
+  CreatedAt    DateTime    @default(now())
+  UpdatedAt    DateTime    @default(now())
+  DeletedAt    DateTime?
 }
 
 enum UserStatus {
@@ -233,20 +252,20 @@ enum JobStatus {
 }
 
 enum JobCategory {
-  FULL_STACK        @map("full_stack")
-  FRONT_END         @map("front_end")
-  BACK_END          @map("back_end")
-  MOBILE            @map("mobile")
-  SOFTWARE_ENGINEER @map("software_engineer")
-  DEVOPS            @map("devops")
-  DATA_SCIENTIST    @map("data_scientist")
-  AI_ENGINEER       @map("ai_engineer")
-  GAME_DEVELOPER    @map("game_developer")
-  CYBER_SECURITY    @map("cyber_security")
-  UI_UX_DESIGNER    @map("ui_ux_designer")
-  QA_TESTER         @map("qa_tester")
-  EMBEDDED_ENGINEER @map("embedded_engineer")
-  OTHER             @map("other")
+  FULL_STACK        @map("Full Stack")
+  FRONT_END         @map("Front End")
+  BACK_END          @map("Back End")
+  MOBILE            @map("Mobile")
+  SOFTWARE_ENGINEER @map("Software Engineer")
+  DEVOPS            @map("DevOps")
+  DATA_SCIENTIST    @map("Data Scientist")
+  AI_ENGINEER       @map("AI Engineer")
+  GAME_DEVELOPER    @map("Game Developer")
+  CYBER_SECURITY    @map("Cyber Security")
+  UI_UX_DESIGNER    @map("UI/UX Designer")
+  QA_TESTER         @map("QA Tester")
+  EMBEDDED_ENGINEER @map("Embedded Engineer")
+  OTHER             @map("Other")
 }
 
 enum ApplicationStatus {

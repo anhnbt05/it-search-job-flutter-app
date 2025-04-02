@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 import { createClient, User } from '@supabase/supabase-js';
 import * as bcryptjs from 'bcryptjs';
+import { Categories } from './seeds';
 
 export type Province = {
   name: string;
@@ -120,6 +121,20 @@ async function main() {
       .insert(provincesToInsert);
 
     if (insertError) throw new Error(insertError.message);
+  }
+
+  if (Categories.length) {
+    await Promise.all(
+      Categories.map(async (category) => {
+        const { error } = await supabaseAdmin
+          .from('Categories')
+          .upsert([{ CategoryName: category }], {
+            onConflict: 'CategoryName',
+          });
+
+        if (error) console.error('Error upserting category:', error);
+      }),
+    );
   }
 }
 

@@ -1,0 +1,16 @@
+export const Categories = [
+  'Full Stack',
+  'Front End',
+  'Back End',
+  'Mobile',
+  'Software Engineer',
+  'DevOps',
+  'Data Scientist',
+  'AI Engineer',
+  'Game Developer',
+  'Cyber Security',
+  'UI/UX Designer',
+  'QA Tester',
+  'Embedded Engineer',
+  'Other',
+];

@@ -17,14 +17,14 @@ CREATE TYPE "JobType" AS ENUM ('part_time', 'full_time', 'remote', 'free_lance')
 CREATE TYPE "JobStatus" AS ENUM ('open', 'closed', 'pending', 'rejected');
 
 -- CreateEnum
-CREATE TYPE "JobCategory" AS ENUM ('full_stack', 'front_end', 'back_end', 'mobile', 'software_engineer', 'devops', 'data_scientist', 'ai_engineer', 'game_developer', 'cyber_security', 'ui_ux_designer', 'qa_tester', 'embedded_engineer', 'other');
+CREATE TYPE "JobCategory" AS ENUM ('Full Stack', 'Front End', 'Back End', 'Mobile', 'Software Engineer', 'DevOps', 'Data Scientist', 'AI Engineer', 'Game Developer', 'Cyber Security', 'UI/UX Designer', 'QA Tester', 'Embedded Engineer', 'Other');
 
 -- CreateEnum
 CREATE TYPE "ApplicationStatus" AS ENUM ('pending', 'accepted', 'rejected');
 
 -- CreateTable
 CREATE TABLE "Users" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Email" VARCHAR(255) NOT NULL,
     "Password" VARCHAR(255) NOT NULL,
     "FullName" TEXT NOT NULL,
@@ -35,13 +35,14 @@ CREATE TABLE "Users" (
     "UpdatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "Role" "Role" NOT NULL,
     "DeletedAt" TIMESTAMP(3),
+    "IsEmailVerified" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("ID")
 );
 
 -- CreateTable
 CREATE TABLE "Recruiters" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Position" VARCHAR(255) NOT NULL,
     "DeletedAt" TIMESTAMP(3),
     "UserID" UUID NOT NULL,
@@ -52,7 +53,7 @@ CREATE TABLE "Recruiters" (
 
 -- CreateTable
 CREATE TABLE "Candidates" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "ResumeUrl" TEXT,
     "Certifications" TEXT[],
     "Bio" TEXT,
@@ -65,7 +66,7 @@ CREATE TABLE "Candidates" (
 
 -- CreateTable
 CREATE TABLE "Companies" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Name" TEXT NOT NULL,
     "WebsiteUrl" TEXT,
     "LogoUrl" TEXT,
@@ -78,7 +79,7 @@ CREATE TABLE "Companies" (
 
 -- CreateTable
 CREATE TABLE "CompanyLocation" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "BranchName" VARCHAR(255) NOT NULL,
     "Address" VARCHAR(255) NOT NULL,
     "CreatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -92,7 +93,7 @@ CREATE TABLE "CompanyLocation" (
 
 -- CreateTable
 CREATE TABLE "Locations" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Name" TEXT NOT NULL,
     "Country" VARCHAR(255) NOT NULL,
     "DeletedAt" TIMESTAMP(3),
@@ -105,13 +106,14 @@ CREATE TABLE "JobBranches" (
     "DeletedAt" TIMESTAMP(3),
     "CompanyLocationID" UUID NOT NULL,
     "JobID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
 
-    CONSTRAINT "JobBranches_pkey" PRIMARY KEY ("CompanyLocationID","JobID")
+    CONSTRAINT "JobBranches_pkey" PRIMARY KEY ("ID")
 );
 
 -- CreateTable
 CREATE TABLE "Notification" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Title" TEXT NOT NULL,
     "Type" "NotificationType" NOT NULL,
     "DeletedAt" TIMESTAMP(3),
@@ -121,7 +123,7 @@ CREATE TABLE "Notification" (
 
 -- CreateTable
 CREATE TABLE "UserNotification" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Content" TEXT[],
     "IsRead" BOOLEAN NOT NULL DEFAULT false,
     "CreatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -132,7 +134,7 @@ CREATE TABLE "UserNotification" (
 
 -- CreateTable
 CREATE TABLE "Jobs" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Title" TEXT NOT NULL,
     "Description" TEXT,
     "Address" VARCHAR(255) NOT NULL,
@@ -143,9 +145,7 @@ CREATE TABLE "Jobs" (
     "Status" "JobStatus" NOT NULL DEFAULT 'pending',
     "PostedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "ExpiredAt" TIMESTAMP(3) NOT NULL,
-    "Benefits" TEXT[],
     "Level" "Level" NOT NULL,
-    "Category" "JobCategory" NOT NULL,
     "DeletedAt" TIMESTAMP(3),
     "RecruiterID" UUID NOT NULL,
 
@@ -154,7 +154,7 @@ CREATE TABLE "Jobs" (
 
 -- CreateTable
 CREATE TABLE "Applications" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "ResumeUrl" TEXT NOT NULL,
     "Status" "ApplicationStatus" NOT NULL,
     "AppliedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -167,9 +167,9 @@ CREATE TABLE "Applications" (
 
 -- CreateTable
 CREATE TABLE "JobDescription" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Description" TEXT NOT NULL,
-    "DeletedAt" TIMESTAMP(3) NOT NULL,
+    "DeletedAt" TIMESTAMP(3),
     "JobID" UUID NOT NULL,
 
     CONSTRAINT "JobDescription_pkey" PRIMARY KEY ("ID")
@@ -177,7 +177,7 @@ CREATE TABLE "JobDescription" (
 
 -- CreateTable
 CREATE TABLE "JobRequirements" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Requirement" TEXT NOT NULL,
     "DeletedAt" TIMESTAMP(3),
     "JobID" UUID NOT NULL,
@@ -186,8 +186,18 @@ CREATE TABLE "JobRequirements" (
 );
 
 -- CreateTable
+CREATE TABLE "JobBenefits" (
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "Benefit" TEXT NOT NULL,
+    "DeletedAt" TIMESTAMP(3),
+    "JobID" UUID NOT NULL,
+
+    CONSTRAINT "JobBenefits_pkey" PRIMARY KEY ("ID")
+);
+
+-- CreateTable
 CREATE TABLE "WorkExperiences" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "CompanyName" VARCHAR(255) NOT NULL,
     "CompanyLogoUrl" TEXT NOT NULL,
     "Position" VARCHAR(255) NOT NULL,
@@ -196,19 +206,39 @@ CREATE TABLE "WorkExperiences" (
     "Descriptions" TEXT[],
     "Location" TEXT NOT NULL,
     "JobType" "JobType" NOT NULL,
+    "CandidateID" UUID NOT NULL,
 
     CONSTRAINT "WorkExperiences_pkey" PRIMARY KEY ("ID")
 );
 
 -- CreateTable
 CREATE TABLE "JobFavorites" (
-    "ID" UUID NOT NULL,
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "SavedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "DeletedAt" TIMESTAMP(3),
     "CandidateID" UUID NOT NULL,
     "JobID" UUID NOT NULL,
 
     CONSTRAINT "JobFavorites_pkey" PRIMARY KEY ("ID")
+);
+
+-- CreateTable
+CREATE TABLE "JobCategories" (
+    "CategoryID" UUID NOT NULL,
+    "JobID" UUID NOT NULL,
+
+    CONSTRAINT "JobCategories_pkey" PRIMARY KEY ("CategoryID","JobID")
+);
+
+-- CreateTable
+CREATE TABLE "Categories" (
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "CategoryName" "JobCategory" NOT NULL,
+    "CreatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "UpdatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "DeletedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Categories_pkey" PRIMARY KEY ("ID")
 );
 
 -- CreateIndex
@@ -223,20 +253,23 @@ CREATE UNIQUE INDEX "Recruiters_UserID_key" ON "Recruiters"("UserID");
 -- CreateIndex
 CREATE UNIQUE INDEX "Candidates_UserID_key" ON "Candidates"("UserID");
 
--- AddForeignKey
-ALTER TABLE "Recruiters" ADD CONSTRAINT "Recruiters_UserID_fkey" FOREIGN KEY ("UserID") REFERENCES "Users"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+-- CreateIndex
+CREATE INDEX "JobCategories_CategoryID_JobID_idx" ON "JobCategories"("CategoryID", "JobID");
 
 -- AddForeignKey
 ALTER TABLE "Recruiters" ADD CONSTRAINT "Recruiters_CompanyID_fkey" FOREIGN KEY ("CompanyID") REFERENCES "Companies"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Recruiters" ADD CONSTRAINT "Recruiters_UserID_fkey" FOREIGN KEY ("UserID") REFERENCES "Users"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Candidates" ADD CONSTRAINT "Candidates_UserID_fkey" FOREIGN KEY ("UserID") REFERENCES "Users"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "CompanyLocation" ADD CONSTRAINT "CompanyLocation_LocationID_fkey" FOREIGN KEY ("LocationID") REFERENCES "Locations"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "CompanyLocation" ADD CONSTRAINT "CompanyLocation_CompanyID_fkey" FOREIGN KEY ("CompanyID") REFERENCES "Companies"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "CompanyLocation" ADD CONSTRAINT "CompanyLocation_CompanyID_fkey" FOREIGN KEY ("CompanyID") REFERENCES "Companies"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "CompanyLocation" ADD CONSTRAINT "CompanyLocation_LocationID_fkey" FOREIGN KEY ("LocationID") REFERENCES "Locations"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "JobBranches" ADD CONSTRAINT "JobBranches_CompanyLocationID_fkey" FOREIGN KEY ("CompanyLocationID") REFERENCES "CompanyLocation"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -260,7 +293,13 @@ ALTER TABLE "JobDescription" ADD CONSTRAINT "JobDescription_JobID_fkey" FOREIGN 
 ALTER TABLE "JobRequirements" ADD CONSTRAINT "JobRequirements_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "JobFavorites" ADD CONSTRAINT "JobFavorites_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "JobBenefits" ADD CONSTRAINT "JobBenefits_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "WorkExperiences" ADD CONSTRAINT "WorkExperiences_CandidateID_fkey" FOREIGN KEY ("CandidateID") REFERENCES "Candidates"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "JobFavorites" ADD CONSTRAINT "JobFavorites_CandidateID_fkey" FOREIGN KEY ("CandidateID") REFERENCES "Candidates"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JobFavorites" ADD CONSTRAINT "JobFavorites_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
