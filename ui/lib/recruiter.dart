@@ -252,7 +252,152 @@ Widget PostJobScreen(BuildContext context) {
             ),
           ),
 
-          titleinJD(title: 'Nơi làm việc', isCompulsory: true),
+        Row(
+          children: [
+            titleinJD(title: 'Lĩnh vực:', isCompulsory: true),
+            Expanded(
+              child: Container(
+                height: 50,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: jobPostProvider.jobCategorySelectedList.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      padding: EdgeInsets.only(left: 13),
+                      height: 50,
+                      margin: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        color: Colors.white,
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            jobPostProvider.jobCategorySelectedList[index],
+                            style: TextStyle(fontSize: 14),
+                          ),
+
+                          IconButton(
+                            onPressed: () {jobPostProvider.deleteSelectedJobCategory(index);},
+                            icon: Icon(Icons.close, size: 20, color: Colors.grey.shade500,),
+                            constraints: BoxConstraints(
+                              minWidth: 30,
+                              minHeight: 30,
+                            ),
+                            padding: EdgeInsets.zero,
+                          )
+
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 7),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton2<String>(
+                isDense: true,
+                hint: Text("Chọn lĩnh vực công việc", style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+                ),
+                value: jobPostProvider.jobCategorySelected,
+                items: jobCategory.where((e) => ((jobPostProvider.jobCategoryList ?? [])).contains(e['key'])).map((item) {
+                  return DropdownMenuItem<String>(
+                    value: item["key"],
+                    child: Text(item["value"]!, style: TextStyle(fontSize: 14)),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  jobPostProvider.setSelectedJobCategory(value);
+                },
+                buttonStyleData: ButtonStyleData(
+                  width: MediaQuery.of(context).size.width,
+                  height: 40,
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 6),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: jobPostProvider.jobCategoryBorderColor
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                dropdownStyleData: DropdownStyleData(
+                  maxHeight: 300,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white
+                  ),
+                ),
+                iconStyleData: IconStyleData(
+                  icon: Icon(Icons.arrow_drop_down),
+                ),
+                onMenuStateChange: (isOpen) {
+                  if (isOpen) {
+                    jobPostProvider.setJobCategoryBorderColor(Colors.blue);
+                  } else {
+                    jobPostProvider.setJobCategoryBorderColor(Colors.grey.shade400);
+                  }
+                },
+                dropdownSearchData: DropdownSearchData(
+                  searchController: jobPostProvider.textEditingController,
+                  searchInnerWidgetHeight: 50,
+                  searchInnerWidget: Container(
+                    height: 50,
+                    padding: const EdgeInsets.only(
+                      top: 8,
+                      bottom: 4,
+                      right: 8,
+                      left: 8,
+                    ),
+                    child: TextFormField(
+                      expands: true,
+                      maxLines: null,
+                      controller: jobPostProvider.textEditingController,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                        hintText: 'Tìm kiếm...',
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade500
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.blue.shade900, width: 1),
+                      ),
+                    ),
+                  ),
+                  ),
+                  searchMatchFn: (item, searchValue) {
+                    return removeVietnameseAccentsRegex(jobCategory[jobCategory.indexWhere((e) => e['key'] == item.value)]['value']!).toString().toLowerCase().trim().contains(removeVietnameseAccentsRegex(searchValue).toLowerCase().trim());
+                  },
+                ),
+              ),
+            ),
+          ),
+
+
+        titleinJD(title: 'Nơi làm việc', isCompulsory: true),
           Column(
             children: List.generate(locations.length, (index) {
               return CheckboxListTile(
@@ -444,8 +589,8 @@ Widget PostJobScreen(BuildContext context) {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   side: BorderSide(
-                    color: Colors.blue, // Màu viền
-                    width: 1, // Độ dày viền
+                    color: Colors.blue,
+                    width: 1,
                   ),
                 ),
                 child: Text(

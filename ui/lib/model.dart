@@ -27,3 +27,9 @@ List<String> jobLevel_value = ["Intern", "Fresher", "Mid", "Junior", "Senior"];
 List<Map<String, String>> jobLevel = List.generate(
   jobLevel_key.length, (index) => {"key": jobLevel_key[index], "value": jobLevel_value[index]}
 );
+
+List<String> jobCategory_key = ['full_stack', 'front_end', 'back_end', 'mobile', 'software_engineer', 'devops', 'data_scientist', 'ai_engineer', 'game_developer', 'cyber_security', 'ui_ux_designer', 'qa_tester', 'embedded_engineer', 'other'];
+List<String>  jobCategory_value = ['Lập trình Full-stack', 'Lập trình Font-end', 'Lập trình Back-end', 'Lập trình Mobile', 'Kỹ sư phần mềm', 'DevOps', 'Khoa học dữ liệu', 'Trí tuệ nhân tạo', 'Lập trình Game', 'An ninh mạng', 'Thiết kế UI/UX', 'Kiểm thử phần mềm', 'Lập trình nhúng', 'Khác'];
+
+List<Map<String, String>> jobCategory = List.generate(
+  jobCategory_key.length, (index) => {'key': jobCategory_key[index], 'value': jobCategory_value[index]});

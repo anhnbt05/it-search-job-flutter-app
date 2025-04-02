@@ -96,10 +96,15 @@ class JobPostProvider extends ChangeNotifier {
   Color _jobLevelBorderColor = Colors.grey.shade400;
   Color _salaryUnitBorderColor = Colors.grey.shade400;
   Color _salaryTypeBorderColor = Colors.grey.shade400;
+  Color _jobCategoryBorderColor = Colors.grey.shade400;
   bool _isAccept = false;
   String? _salaryTypeSelected = null;
   String? _salaryUnitSelected = "option 1";
   DateTime? _selectedDate;
+  List<String>? _jobCategoryList = jobCategory.map((e) => e['key']!).toList();
+  List<String> _jobCategorySelectedList = [];
+  String? _jobCategorySelected = null;
+  final TextEditingController _textEditingController = TextEditingController();
 
   List<bool> get selectedLocations => _selectedLocations;
   String? get jobTypeSelected => _jobTypeSelected;
@@ -108,10 +113,15 @@ class JobPostProvider extends ChangeNotifier {
   Color get jobTypeBorderColor => _jobTypeBorderColor;
   Color get salaryUnitBorderColor => _salaryUnitBorderColor;
   Color get salaryTypeBorderColor => _salaryTypeBorderColor;
+  Color get jobCategoryBorderColor => _jobCategoryBorderColor;
   bool get isAccept => _isAccept;
   String? get salaryTypeSelected => _salaryTypeSelected;
   String? get salaryUnitSelected => _salaryUnitSelected;
   DateTime? get selectedDate => _selectedDate;
+  List<String>? get jobCategoryList => _jobCategoryList;
+  List<String> get jobCategorySelectedList => _jobCategorySelectedList;
+  String? get jobCategorySelected => _jobCategorySelected;
+  TextEditingController get textEditingController => _textEditingController;
 
   void setLocationSelected(int index, bool? value) {
     _selectedLocations[index] = value!;
@@ -163,9 +173,29 @@ class JobPostProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setJobCategoryBorderColor (Color value) {
+    _jobCategoryBorderColor = value;
+    notifyListeners();
+  }
+
   void setSelectedDate(DateTime? date) {
-    print('Open');
     _selectedDate = date;
     notifyListeners();
+  }
+
+  void deleteSelectedJobCategory(int index) {
+    _jobCategoryList?.add(jobCategory[jobCategory.indexWhere((e) => e['value'] == jobCategorySelectedList[index])]['key']!);
+    _jobCategorySelectedList.removeAt(index);
+    notifyListeners();
+  }
+
+  void setSelectedJobCategory(String? value) {
+    if (_jobCategoryList != null) {
+      _jobCategoryList!.removeWhere((e) => e.toString() == value);
+      _jobCategorySelectedList.add(jobCategory[jobCategory.indexWhere((e) => e['key'] == value)]['value']!);
+      notifyListeners();
+      print(_jobCategorySelectedList);
+      print(_jobCategoryList);
+    }
   }
 }
