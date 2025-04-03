@@ -1,8 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ui/providers.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/model.dart';
+import 'package:ui/Models/model.dart';
+
+import '../ViewModels/BottomNavigationViewModel.dart';
+import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
+
+String removeVietnameseAccentsRegex(String text) {
+  return text.replaceAll(RegExp(r'[àáạảãâầấậẩẫăằắặẳẵ]'), 'a')
+      .replaceAll(RegExp(r'[èéẹẻẽêềếệểễ]'), 'e')
+      .replaceAll(RegExp(r'[ìíịỉĩ]'), 'i')
+      .replaceAll(RegExp(r'[òóọỏõôồốộổỗơờớợởỡ]'), 'o')
+      .replaceAll(RegExp(r'[ùúụủũưừứựửữ]'), 'u')
+      .replaceAll(RegExp(r'[ỳýỵỷỹ]'), 'y')
+      .replaceAll(RegExp(r'[đ]'), 'd')
+      .replaceAll(RegExp(r'[ÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴ]'), 'A')
+      .replaceAll(RegExp(r'[ÈÉẸẺẼÊỀẾỆỂỄ]'), 'E')
+      .replaceAll(RegExp(r'[ÌÍỊỈĨ]'), 'I')
+      .replaceAll(RegExp(r'[ÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠ]'), 'O')
+      .replaceAll(RegExp(r'[ÙÚỤỦŨƯỪỨỰỬỮ]'), 'U')
+      .replaceAll(RegExp(r'[ỲÝỴỶỸ]'), 'Y')
+      .replaceAll(RegExp(r'[Đ]'), 'D');
+}
 
 
 BottomNavigationBarItem tabItem(
@@ -12,7 +31,7 @@ BottomNavigationBarItem tabItem(
     int index,
     BuildContext context,
     ) {
-  var selectedIndex = Provider.of<BottomNavigationProvider>(context).selectedIndex;
+  var selectedIndex = Provider.of<BottomNavigationViewModel>(context).selectedIndex;
   return BottomNavigationBarItem(
     icon: Icon(selectedIndex == index ? iconSelected : iconUnselected),
     label: label,
@@ -24,9 +43,10 @@ BottomNavigationBarItem hiddenTabItem() {
 }
 
 PreferredSize? bottomJobBar(role Role, int index, BuildContext context) {
-  var joblistNavigationProvider = Provider.of<JoblistNavigationProvider>(context);
+  var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(context);
   if (index != 2 && Role == role.candidate || Role != role.candidate) return null;
-  else return
+  else {
+    return
     PreferredSize(
         preferredSize: Size.fromHeight(50),
         child: Container(
@@ -58,4 +78,5 @@ PreferredSize? bottomJobBar(role Role, int index, BuildContext context) {
           ),
         )
     );
+  }
 }

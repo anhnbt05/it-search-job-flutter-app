@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ui/model.dart';
-import 'main.dart';
+import 'package:ui/Models/model.dart';
+import '../main.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback onLoginSuccess;

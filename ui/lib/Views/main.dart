@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/providers.dart';
-import 'package:ui/helpers.dart';
-import 'package:ui/recruiter.dart';
-import 'package:ui/candidate.dart';
-import 'package:ui/model.dart';
-import 'package:ui/admin.dart';
-import 'package:ui/login_page.dart';
+import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/Views/recruiter/recruiter.dart';
+import 'package:ui/Views/candidate/candidate.dart';
+import 'package:ui/Models/model.dart';
+import 'package:ui/Views/admin/admin.dart';
+
+import '../ViewModels/BottomNavigationViewModel.dart';
+import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
+import '../ViewModels/recruiter/JobPostViewModel.dart';
+import 'login/login_page.dart';
+
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => BottomNavigationProvider()),
-        ChangeNotifierProvider(create: (context) => JoblistNavigationProvider()),
+        ChangeNotifierProvider(create: (context) => BottomNavigationViewModel()),
+        ChangeNotifierProvider(create: (context) => JoblistNavigationViewModel()),
+        ChangeNotifierProvider(create: (context) => JobPostViewModel()),
       ],
       child: MyApp(),
     ),
@@ -54,7 +60,7 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     final bottomNavigationProvider =
-    Provider.of<BottomNavigationProvider>(context, listen: false);
+    Provider.of<BottomNavigationViewModel>(context, listen: false);
     bottomNavigationProvider.setAnimationController(
       AnimationController(
         vsync: this,
@@ -67,17 +73,28 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    final bottomNavigationProvider =
-    Provider.of<BottomNavigationProvider>(context, listen: false);
+    final bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(context, listen: false);
     bottomNavigationProvider.animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var bottomNavigationProvider = Provider.of<BottomNavigationProvider>(context);
-    var joblistNavigationProvider = Provider.of<JoblistNavigationProvider>(context);
+    var bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(context);
+    var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(context);
+
     return MaterialApp(
+      locale: Locale('vi', 'VN'),
+      supportedLocales: [
+        Locale('vi', 'VN'),
+        Locale('en', 'US'),
+      ],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Poppins',
@@ -93,11 +110,9 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
           ),
           selectedItemColor: Colors.black,
         ),
-        splashFactory: NoSplash.splashFactory,
         highlightColor: Colors.grey.withOpacity(0.5),
       ),
       home: Scaffold(
-        //extendBodyBehindAppBar: true,
         appBar: AppBar(
           toolbarHeight: 45,
           backgroundColor: color,
@@ -160,7 +175,7 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
       return bottomNavigationItem_admin();
   }
 
-  List<Widget> pageView(role Role, JoblistNavigationProvider joblistNavigationProvider) {
+  List<Widget> pageView(role Role, JoblistNavigationViewModel joblistNavigationProvider) {
     if (Role == role.candidate)
       return pageView_candidate(context);
     else if (Role == role.recruiter)
