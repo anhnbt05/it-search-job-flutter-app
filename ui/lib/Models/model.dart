@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+// Chỗ dưới này để test giao diện thôi
+
 enum role { recruiter, candidate, admin }
 final Color _color = Color(0xff071e26);
 

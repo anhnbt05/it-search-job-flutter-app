@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ui/providers.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/model.dart';
+import 'package:ui/Models/model.dart';
+
+import '../ViewModels/BottomNavigationViewModel.dart';
+import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
 
 String removeVietnameseAccentsRegex(String text) {
   return text.replaceAll(RegExp(r'[àáạảãâầấậẩẫăằắặẳẵ]'), 'a')
@@ -29,7 +31,7 @@ BottomNavigationBarItem tabItem(
     int index,
     BuildContext context,
     ) {
-  var selectedIndex = Provider.of<BottomNavigationProvider>(context).selectedIndex;
+  var selectedIndex = Provider.of<BottomNavigationViewModel>(context).selectedIndex;
   return BottomNavigationBarItem(
     icon: Icon(selectedIndex == index ? iconSelected : iconUnselected),
     label: label,
@@ -41,7 +43,7 @@ BottomNavigationBarItem hiddenTabItem() {
 }
 
 PreferredSize? bottomJobBar(role Role, int index, BuildContext context) {
-  var joblistNavigationProvider = Provider.of<JoblistNavigationProvider>(context);
+  var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(context);
   if (index != 2 && Role == role.candidate || Role != role.candidate) return null;
   else {
     return

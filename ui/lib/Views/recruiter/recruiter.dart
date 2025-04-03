@@ -1,9 +1,11 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/helpers.dart';
-import 'package:ui/providers.dart';
-import 'package:ui/model.dart';
+import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/Models/model.dart';
+
+import '../../ViewModels/BottomNavigationViewModel.dart';
+import '../../ViewModels/recruiter/JobPostViewModel.dart';
 
 List<Widget> pageView_recruiter(BuildContext context) {
   return [
@@ -38,7 +40,7 @@ Widget CandidatesAppliedScreen() {
 }
 
 Widget PostJobScreen(BuildContext context) {
-  var jobPostProvider = Provider.of<JobPostProvider>(context);
+  var jobPostProvider = Provider.of<JobPostViewModel>(context);
 
   return Container(
     color: Colors.white,
@@ -626,7 +628,7 @@ Widget PostJobScreen(BuildContext context) {
   );
 }
 
-Widget? salaryInput(String? option, JobPostProvider jobPostProvider, BuildContext context) {
+Widget? salaryInput(String? option, JobPostViewModel jobPostProvider, BuildContext context) {
   if (option == null) return null;
   switch (option) {
     case 'negotiable': return null;
@@ -699,7 +701,7 @@ Widget? salaryInput(String? option, JobPostProvider jobPostProvider, BuildContex
   return null;
 }
 
-Padding salaryUnitComboBox(JobPostProvider jobPostProvider) {
+Padding salaryUnitComboBox(JobPostViewModel jobPostProvider) {
   return Padding(padding: EdgeInsets.symmetric(horizontal: 0),
     child:
     DropdownButtonHideUnderline(
@@ -870,7 +872,7 @@ List<BottomNavigationBarItem> bottomNavigationItem_recruiter(BuildContext contex
 }
 
 Positioned buttonAddJDforRecruiter(role Role, BuildContext context) {
-  var navigationProvider = Provider.of<BottomNavigationProvider>(context);
+  var navigationProvider = Provider.of<BottomNavigationViewModel>(context);
   if (Role == role.recruiter) {
     return Positioned(
       bottom: MediaQuery.of(context).padding.bottom + (kBottomNavigationBarHeight / 2) - 25,
