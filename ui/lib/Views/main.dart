@@ -10,6 +10,8 @@ import 'package:ui/Views/admin/admin.dart';
 import '../ViewModels/BottomNavigationViewModel.dart';
 import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
 import '../ViewModels/recruiter/JobPostViewModel.dart';
+import 'login/login_page.dart';
+
 
 void main() {
   runApp(
@@ -29,7 +31,29 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
+class _MyAppState extends State<MyApp> {
+  bool isLoggedIn = false;
+
+  void loginSuccess() {
+    setState(() {
+      isLoggedIn = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: isLoggedIn ? _MainApp() : LoginPage(onLoginSuccess: loginSuccess),
+    );
+  }
+}
+class _MainApp extends StatefulWidget {
+  @override
+  _MainAppState createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
   role _role = role.candidate;
 
   @override

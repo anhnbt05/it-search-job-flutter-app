@@ -1,8 +1,29 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { createKeyv } from '@keyv/redis';
+import { HttpModule } from '@nestjs/axios';
+import { CacheModule } from '@nestjs/cache-manager';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+  ValidationPipe,
+} from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
 import configurations from 'src/config/configurations';
+import { AuthMiddleware } from 'src/libs/common/middlewares/auth.middleware';
+import {
+  excludes,
+  HTTP_MODULE_MAX_REDIRECT,
+  HTTP_MODULE_TIMEOUT,
+} from 'src/libs/common/utils';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './modules/auth/auth.module';
+import { EmailsModule } from './modules/emails/emails.module';
+import { SupabaseModule } from './modules/supabase/supabase.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -11,8 +32,45 @@ import { AppService } from './app.service';
       envFilePath: '.env',
       load: [configurations],
     }),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      isGlobal: true,
+      useFactory: (configService: ConfigService) => ({
+        stores: [
+          createKeyv(configService.get<string>('redis_url', 'localhost:6379')),
+        ],
+      }),
+    }),
+    HttpModule.register({
+      timeout: HTTP_MODULE_TIMEOUT,
+      maxRedirects: HTTP_MODULE_MAX_REDIRECT,
+    }),
+    AuthModule,
+    UsersModule,
+    SupabaseModule,
+    UploadsModule,
+    EmailsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    return consumer
+      .apply(AuthMiddleware)
+      .exclude(
+        ...excludes.map((route) => ({
+          path: route,
+          method: RequestMethod.ALL,
+        })),
+      )
+      .forRoutes('*');
+  }
+}
