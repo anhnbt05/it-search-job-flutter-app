@@ -115,7 +115,7 @@ Widget PostJobScreen(BuildContext context) {
                   child: customTextField(
                     hintText: '',
                     height: 40,
-                    textInputType: TextInputType.text,
+                    textInputType: TextInputType.number,
                   ),
                 ),
               ),
@@ -153,7 +153,7 @@ Widget PostJobScreen(BuildContext context) {
                         jobPostProvider.setJobTypeSelected(newValue);
                       },
                       buttonStyleData: ButtonStyleData(
-                        width: 180,
+                        width: MediaQuery.of(context).size.width - 170,
                         height: 40,
                         padding: EdgeInsets.symmetric(
                             horizontal: 8, vertical: 6),
@@ -165,7 +165,7 @@ Widget PostJobScreen(BuildContext context) {
                         ),
                       ),
                       dropdownStyleData: DropdownStyleData(
-                        width: 180,
+                        width: MediaQuery.of(context).size.width - 170,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: Colors.white
@@ -217,7 +217,7 @@ Widget PostJobScreen(BuildContext context) {
                         jobPostProvider.setJobLevelSelected(newValue);
                       },
                       buttonStyleData: ButtonStyleData(
-                        width: 180,
+                        width: MediaQuery.of(context).size.width - 185,
                         height: 40,
                         padding: EdgeInsets.symmetric(
                             horizontal: 8, vertical: 6),
@@ -229,7 +229,7 @@ Widget PostJobScreen(BuildContext context) {
                         ),
                       ),
                       dropdownStyleData: DropdownStyleData(
-                        width: 180,
+                        width: MediaQuery.of(context).size.width - 185,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: Colors.white
@@ -257,6 +257,7 @@ Widget PostJobScreen(BuildContext context) {
             titleinJD(title: 'Lĩnh vực:', isCompulsory: true),
             Expanded(
               child: Container(
+                padding: EdgeInsets.only(left: 5, right: 10),
                 height: 50,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -281,7 +282,6 @@ Widget PostJobScreen(BuildContext context) {
                             jobPostProvider.jobCategorySelectedList[index],
                             style: TextStyle(fontSize: 14),
                           ),
-
                           IconButton(
                             onPressed: () {jobPostProvider.deleteSelectedJobCategory(index);},
                             icon: Icon(Icons.close, size: 20, color: Colors.grey.shade500,),
@@ -291,7 +291,6 @@ Widget PostJobScreen(BuildContext context) {
                             ),
                             padding: EdgeInsets.zero,
                           )
-
                         ],
                       ),
                     );
@@ -397,23 +396,45 @@ Widget PostJobScreen(BuildContext context) {
           ),
 
 
-        titleinJD(title: 'Nơi làm việc', isCompulsory: true),
-          Column(
-            children: List.generate(locations.length, (index) {
-              return CheckboxListTile(
-                title: Text(
-                  locations[index],
-                  style: TextStyle(
-                    fontSize: 13,
-                  ),),
-                value: jobPostProvider.selectedLocations[index],
-                onChanged: (bool? value) {
-                  jobPostProvider.setLocationSelected(index, value);
-                },
-                controlAffinity: ListTileControlAffinity.leading,
-                activeColor: Colors.blue,
-              );
-            }),
+        titleinJD(title: 'Nơi làm việc', isCompulsory: false),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 1,
+                  color: Colors.grey,
+                ),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text.rich(
+                      textAlign: TextAlign.justify,
+                      TextSpan(
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: branchName + ": ",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextSpan(
+                            text: location,
+                            style: TextStyle(fontSize: 14,),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
 
           titleinJD(title: 'Mô tả công việc', isCompulsory: true),
@@ -455,7 +476,7 @@ Widget PostJobScreen(BuildContext context) {
                         jobPostProvider.setSalaryTypeSelected(newValue);
                       },
                       buttonStyleData: ButtonStyleData(
-                        width: 300,
+                        width: MediaQuery.of(context).size.width - 83,
                         height: 40,
                         padding: EdgeInsets.symmetric(
                             horizontal: 8, vertical: 6),
@@ -490,14 +511,14 @@ Widget PostJobScreen(BuildContext context) {
             ),
           ),
 
-          salaryInput(jobPostProvider.salaryTypeSelected, jobPostProvider) ?? SizedBox.shrink(),
+          salaryInput(jobPostProvider.salaryTypeSelected, jobPostProvider, context) ?? SizedBox.shrink(),
 
           Row(
             children: [
               titleinJD(title: 'Hạn nộp hồ sơ', isCompulsory: true),
               SizedBox(width: 10,),
               Container(
-                width: 170,
+                width: MediaQuery.of(context).size.width - 200,
                 height: 35,
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
@@ -519,41 +540,37 @@ Widget PostJobScreen(BuildContext context) {
                   ),
                 ),
               ),
-              SizedBox(width: 10,),
               Builder(
                 builder: (context) =>
                     ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          alignment: Alignment.center,
-                          backgroundColor: Color(0xE9E0F7FF),
-                          elevation: 0,
-                          shape: CircleBorder(
-                            side: BorderSide(color: Colors.grey, width: 0.5),
-                          ),
-                          fixedSize: Size(40, 40),
-                          side: BorderSide(
-                            color: Colors.grey,
-                            width: .5,
-                          ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xE9E0F7FF),
+                        elevation: 0,
+                        shape: CircleBorder(
+                          side: BorderSide(color: Colors.grey, width: 0.5),
                         ),
-                        onPressed: () async {
-                          DateTime? pickedDate = await showDatePicker(
-                            locale: Locale('vi', 'VN'),
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2024),
-                            lastDate: DateTime(2100),
-                          );
+                      ),
+                      onPressed: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          locale: Locale('vi', 'VN'),
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2024),
+                          lastDate: DateTime(2100),
+                        );
 
-                          if (pickedDate != null) {
-                            jobPostProvider.setSelectedDate(pickedDate);
-                          }
-                        },
+                        if (pickedDate != null) {
+                          jobPostProvider.setSelectedDate(pickedDate);
+                        }
+                      },
+                      child: Center(
                         child: Icon(
-                          Icons.calendar_month_outlined, color: Colors.black,
+                          Icons.calendar_month_outlined,
+                          color: Colors.black,
                           size: 20,
-                        )
-                    ),
+                        ),
+                      ),
+                    )
               ),
             ],
           ),
@@ -567,18 +584,17 @@ Widget PostJobScreen(BuildContext context) {
               ),
 
               SizedBox(
-                width: 200,
+                width: MediaQuery.of(context).size.width - 190,
                 child:
               Text(
                 'Tôi đồng ý với chính sách & quy định đăng bài đối với nhà tuyển dụng',
                 style: TextStyle(
                   fontSize: 9,
                 ),
-                maxLines: 2,
                 softWrap: true,
               ),
               ),
-              Padding(padding: EdgeInsets.only(left: 5), child:
+              Padding(padding: EdgeInsets.only(left: 10), child:
               ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
@@ -610,7 +626,7 @@ Widget PostJobScreen(BuildContext context) {
   );
 }
 
-Widget? salaryInput(String? option, JobPostProvider jobPostProvider) {
+Widget? salaryInput(String? option, JobPostProvider jobPostProvider, BuildContext context) {
   if (option == null) return null;
   switch (option) {
     case 'negotiable': return null;
@@ -618,13 +634,13 @@ Widget? salaryInput(String? option, JobPostProvider jobPostProvider) {
     case 'upto': return Row(
       children: [
         SizedBox(
-          width: 180,
+          width: MediaQuery.of(context).size.width - 203,
           child: Padding(
             padding: EdgeInsets.only(top: 5),
             child: customTextField(
               hintText: 'Nhập số tiền...',
               height: 40,
-              textInputType: TextInputType.text,
+              textInputType: TextInputType.number,
             ),
           ),
         ),
@@ -642,13 +658,13 @@ Widget? salaryInput(String? option, JobPostProvider jobPostProvider) {
                 child: Text('Từ'),
               ),
               SizedBox(
-                width: 160,
+                width: MediaQuery.of(context).size.width / 2 - 33,
                 child: Padding(
                   padding: EdgeInsets.only(top: 5),
                   child: customTextField(
                     hintText: 'Tối thiểu...',
                     height: 40,
-                    textInputType: TextInputType.text,
+                    textInputType: TextInputType.number,
                   ),
                 ),
               ),
@@ -658,13 +674,13 @@ Widget? salaryInput(String? option, JobPostProvider jobPostProvider) {
                 child: Text('Đến'),
               ),
               SizedBox(
-                width: 160,
+                width: MediaQuery.of(context).size.width / 2 - 33,
                 child: Padding(
                   padding: EdgeInsets.only(top: 5),
                   child: customTextField(
                     hintText: 'Tối đa...',
                     height: 40,
-                    textInputType: TextInputType.text,
+                    textInputType: TextInputType.number,
                   ),
                 ),
               ),
@@ -778,7 +794,7 @@ Align titleinJD({required String title, required bool isCompulsory}) {
   );
 }
 
-Container customTextField({required String? hintText,required double height, TextInputType textInputType = TextInputType.multiline}) {
+Container customTextField({required String? hintText,required double height, TextInputType textInputType = TextInputType.multiline, keyBoard}) {
   return Container(
     height: height,
     padding: EdgeInsets.symmetric(horizontal: 10),
@@ -786,14 +802,14 @@ Container customTextField({required String? hintText,required double height, Tex
     child: TextField(
         textAlignVertical: TextAlignVertical.top,
         keyboardType: textInputType,
-        expands: (textInputType != TextInputType.text),
-        maxLines: (textInputType == TextInputType.text) ? 1 : null,
+        expands: (textInputType != TextInputType.number && textInputType != TextInputType.text),
+        maxLines: (textInputType == TextInputType.text || textInputType == TextInputType.number) ? 1 : null,
         minLines: null,
         style: TextStyle(
           fontSize: 14,
         ),
         decoration: InputDecoration(
-          hintText: hintText ,
+          hintText: hintText,
           hintStyle: TextStyle(
             color: Colors.grey,
           ),
