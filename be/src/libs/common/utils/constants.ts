@@ -80,6 +80,7 @@ export const excludes = [
   '/auth/reset-password',
   '/auth/verify-reset-password-otp',
   '/auth/update-password',
+  '/auth/companies/:companyId/branches',
 ];
 
 export const SUBJECT_EMAIL_MAP = {

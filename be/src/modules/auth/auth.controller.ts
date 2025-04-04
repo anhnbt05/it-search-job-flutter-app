@@ -3,6 +3,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseUUIDPipe,
   Post,
   Req,
   UnauthorizedException,
@@ -25,6 +27,7 @@ import {
   SupabaseUserToken,
 } from 'src/libs/common/utils';
 import {
+  CreateCategoryDto,
   ForgetPasswordDto,
   ResetPasswordDto,
   SignInDto,
@@ -32,6 +35,7 @@ import {
   VerifyEmailDto,
   VerifyResetPasswordOtpDto,
 } from 'src/modules/auth/dtos';
+import { CreateCompanyLocationDto } from 'src/modules/users/dtos';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -449,5 +453,37 @@ export class AuthController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.handleResetPassword(resetPasswordDto);
+  }
+
+  @Get('companies/:companyId/branches')
+  async getBranchesOfCompany(
+    @Param('companyId', ParseUUIDPipe) companyId: string,
+  ) {
+    return this.authService.handleGetBranchesOfCompany(companyId);
+  }
+
+  @Post('companies/:companyId/branches')
+  async createBranchOfCompany(
+    @Param('companyId', ParseUUIDPipe) companyId: string,
+    @Body() createCompanyLocationDto: CreateCompanyLocationDto,
+  ) {
+    return this.authService.handleCreateBranchOfCompany(
+      companyId,
+      createCompanyLocationDto,
+    );
+  }
+
+  @Get('categories')
+  @UseGuards(RoleAuthGuard)
+  @Roles(RoleEnum.ADMIN, RoleEnum.CANDIDATE, RoleEnum.RECRUITER)
+  async getCategories() {
+    return this.authService.handleGetCategories();
+  }
+
+  @Post('categories')
+  @UseGuards(RoleAuthGuard)
+  @Roles(RoleEnum.ADMIN)
+  async createCategory(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.authService.handleCreateCategory(createCategoryDto);
   }
 }

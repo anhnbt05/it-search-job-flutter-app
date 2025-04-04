@@ -8,7 +8,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Companies, Users } from '@prisma/client';
+import { Categories, Companies, CompanyLocation, Users } from '@prisma/client';
 import { SupabaseClient, User } from '@supabase/supabase-js';
 import { omit } from 'lodash';
 import {
@@ -21,12 +21,14 @@ import {
   RoleEnum,
 } from 'src/libs/common/utils';
 import {
+  CreateCategoryDto,
   ResetPasswordDto,
   SignUpDto,
   VerifyEmailDto,
   VerifyResetPasswordOtpDto,
 } from 'src/modules/auth/dtos';
 import { EmailsProducer } from 'src/modules/emails/producers';
+import { JobsService } from 'src/modules/jobs/jobs.service';
 import { SupabaseService } from 'src/modules/supabase/supabase.service';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
 import {
@@ -40,10 +42,10 @@ import {
 export class AuthService {
   constructor(
     private readonly supabaseService: SupabaseService,
-    private readonly uploadsService: UploadsService,
     private readonly configService: ConfigService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly emailsProducer: EmailsProducer,
+    private readonly jobsService: JobsService,
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
@@ -62,7 +64,7 @@ export class AuthService {
         .from('Users')
         .select('*')
         .eq('Email', Email)
-        .single();
+        .single<Users | null>();
 
       if (findUserWithEmail)
         throw new BadRequestException(
@@ -73,7 +75,7 @@ export class AuthService {
         .from('Users')
         .select('*')
         .eq('PhoneNumber', PhoneNumber)
-        .single();
+        .single<Users | null>();
 
       if (findUserWithPhoneNumber)
         throw new BadRequestException(
@@ -108,44 +110,47 @@ export class AuthService {
           },
         ])
         .select('*')
-        .single();
+        .single<Users>();
 
       if (dbError) throw new Error(dbError.message);
 
       if (Role === RoleEnum.CANDIDATE && createCandidateDto) {
         await this.createCandidateUser(
-          (userData as Users).ID,
+          userData.ID,
           createCandidateDto,
           supabaseAdmin,
         );
       }
 
       if (Role === RoleEnum.RECRUITER && createRecruiterDto) {
-        const { createCompanyDto, companyID, Position } = createRecruiterDto;
+        const { createCompanyDto, createExistingCompanyDto, Position } =
+          createRecruiterDto;
 
-        if (createCompanyDto && companyID)
+        if (createCompanyDto && createExistingCompanyDto)
           throw new BadRequestException(
-            'You must provide either companyID or createCompanyDto, not both.',
+            'You must provide either createExistingCompanyDto or createCompanyDto, not both.',
           );
 
-        let createCompanyID = '';
+        let createCompanyLocationId = '';
 
-        if (companyID) {
-          createCompanyID = companyID;
+        if (createExistingCompanyDto) {
+          const { companyLocationID } = createExistingCompanyDto;
+
+          createCompanyLocationId = companyLocationID;
         } else if (createCompanyDto) {
-          const company = await this.createCompany(
-            createCompanyDto as unknown as CreateCompanyDto,
+          const { companyLocationId } = await this.createCompany(
+            createCompanyDto,
             supabaseAdmin,
           );
 
-          createCompanyID = company.ID;
+          createCompanyLocationId = companyLocationId;
         }
 
         await this.createRecruiterUser(
-          (userData as Users).ID,
+          userData.ID,
           Position,
           supabaseAdmin,
-          createCompanyID,
+          createCompanyLocationId,
         );
       }
 
@@ -192,7 +197,7 @@ export class AuthService {
         .from('Users')
         .select('*')
         .eq('ID', data.user.id)
-        .single();
+        .single<Users | null>();
 
       if (!findUser)
         throw new NotFoundException(
@@ -201,22 +206,20 @@ export class AuthService {
 
       if (!findUser.IsEmailVerified) {
         if (
-          !(await this.cacheManager.get(
-            `${(findUser as Users).Email}:otp-verify-email`,
-          ))
+          !(await this.cacheManager.get(`${findUser.Email}:otp-verify-email`))
         ) {
           const otp = generateOTP();
 
           await this.cacheManager.set(
-            `${(findUser as Users).Email}:otp-verify-email`,
+            `${findUser.Email}:otp-verify-email`,
             otp,
             DEFAULT_TTL_OTP_EXPIRED,
           );
 
           await this.emailsProducer.sendEmail(
-            `${(findUser as Users).Email}`,
+            `${findUser.Email}`,
             EmailTemplateNameEnum.EMAIL_VERIFICATION,
-            { otp, FullName: (findUser as Users).FullName },
+            { otp, FullName: findUser.FullName },
           );
 
           return {
@@ -282,7 +285,7 @@ export class AuthService {
         .from('Users')
         .select('*')
         .eq('Email', email)
-        .single();
+        .single<Users | null>();
 
       if (!findUser)
         throw new NotFoundException(
@@ -339,7 +342,7 @@ export class AuthService {
       await this.emailsProducer.sendEmail(
         email,
         EmailTemplateNameEnum.EMAIL_REGISTER_ACCOUNT_SUCCESS,
-        { FullName: (findUser as Users).FullName },
+        { FullName: findUser.FullName },
       );
 
       return {
@@ -361,7 +364,7 @@ export class AuthService {
         .from('Users')
         .select('*')
         .eq('ID', userId)
-        .single();
+        .single<Users | null>();
 
       if (error) throw error;
 
@@ -415,7 +418,7 @@ export class AuthService {
         .from('Users')
         .select('*')
         .eq('Email', email)
-        .single();
+        .single<Users | null>();
 
       if (error)
         throw new NotFoundException(
@@ -503,7 +506,7 @@ export class AuthService {
         .from('Users')
         .select('FullName')
         .eq('Email', email)
-        .single();
+        .single<Users | null>();
 
       if (error) throw new Error(error.message);
 
@@ -600,7 +603,7 @@ export class AuthService {
     if (
       role === RoleEnum.RECRUITER &&
       createRecruiterDto &&
-      !createRecruiterDto?.companyID &&
+      !createRecruiterDto?.createExistingCompanyDto &&
       !createRecruiterDto?.createCompanyDto
     )
       throw new BadRequestException('Missing recruiter company information.');
@@ -625,13 +628,13 @@ export class AuthService {
     userId: string,
     position: string,
     supabaseAdmin: SupabaseClient,
-    companyId: string,
+    companyLocationId: string,
   ) => {
     const { error } = await supabaseAdmin.from('Recruiters').insert([
       {
         Position: position,
         UserID: userId,
-        CompanyID: companyId,
+        CompanyLocationID: companyLocationId,
       },
     ]);
 
@@ -648,17 +651,20 @@ export class AuthService {
       .from('Companies')
       .insert([res])
       .select('*')
-      .single();
+      .single<Companies | null>();
 
     if (error) throw error;
 
-    await this.createCompanyLocation(
+    const companyLocationId = await this.createCompanyLocation(
       createCompanyLocationDto,
       (data as Companies).ID,
       supabaseAdmin,
     );
 
-    return data as Companies;
+    return {
+      company: data as Companies,
+      companyLocationId,
+    };
   };
 
   private createCompanyLocation = async (
@@ -668,14 +674,133 @@ export class AuthService {
   ) => {
     const { LocationID, ...res } = createCompanyLocationDto;
 
-    const { error } = await supabaseAdmin.from('CompanyLocation').insert([
-      {
-        ...res,
-        CompanyID: companyId,
-        LocationID,
-      },
-    ]);
+    const { data, error } = await supabaseAdmin
+      .from('CompanyLocation')
+      .insert([
+        {
+          ...res,
+          CompanyID: companyId,
+          LocationID,
+        },
+      ])
+      .select('*')
+      .maybeSingle<CompanyLocation>();
 
-    if (error) throw new Error(error.message);
+    if (error) throw error;
+
+    if (!data) throw new Error(`Error when creating new company location.`);
+
+    return data.ID;
+  };
+
+  public handleGetBranchesOfCompany = async (companyId: string) => {
+    try {
+      const supabaseAdmin = this.supabaseService.getAdminClient();
+
+      const { data: company } = await supabaseAdmin
+        .from('Companies')
+        .select('*, CompanyLocation(*)')
+        .eq('ID', companyId)
+        .maybeSingle<any>();
+
+      if (!company)
+        throw new NotFoundException(
+          `Không tìm thấy công ty có id '${companyId}'.`,
+        );
+
+      return company?.CompanyLocation;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  public handleCreateBranchOfCompany = async (
+    companyId: string,
+    createCompanyLocationDto: CreateCompanyLocationDto,
+  ) => {
+    try {
+      const supabaseAdmin = this.supabaseService.getAdminClient();
+
+      const { data: company } = await supabaseAdmin
+        .from('Companies')
+        .select('*, CompanyLocation(*)')
+        .eq('ID', companyId)
+        .maybeSingle<any>();
+
+      if (!company)
+        throw new NotFoundException(
+          `Không tìm thấy công ty có id '${companyId}'.`,
+        );
+
+      const { BranchName, Address, LocationID } = createCompanyLocationDto;
+
+      const { error } = await supabaseAdmin.from('CompanyLocation').upsert(
+        [
+          {
+            BranchName,
+            Address,
+            LocationID,
+            CompanyID: companyId,
+          },
+        ],
+        { onConflict: 'BranchName,CompanyID' },
+      );
+
+      if (error) throw error;
+
+      return (
+        await supabaseAdmin
+          .from('Companies')
+          .select('*, CompanyLocation(*)')
+          .eq('ID', companyId)
+          .maybeSingle<any>()
+      ).data.CompanyLocation;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  public handleGetCategories = async () => {
+    return this.jobsService.handleGetCategories();
+  };
+
+  public handleCreateCategory = async (
+    createCategoryDto: CreateCategoryDto,
+  ) => {
+    try {
+      const supabaseAdmin = this.supabaseService.getAdminClient();
+
+      const { CategoryName } = createCategoryDto;
+
+      const { data, error } = await supabaseAdmin
+        .from('Categories')
+        .select('*')
+        .eq('CategoryName', CategoryName)
+        .maybeSingle<Categories>();
+
+      if (error) throw error;
+
+      if (data)
+        throw new BadRequestException(
+          `Danh mục có tên '${CategoryName}' đã tồn tại.`,
+        );
+
+      const { error: insertCategoryError } = await supabaseAdmin
+        .from('Categories')
+        .insert([
+          {
+            CategoryName,
+          },
+        ]);
+
+      if (insertCategoryError) throw insertCategoryError;
+
+      return this.jobsService.handleGetCategories();
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   };
 }

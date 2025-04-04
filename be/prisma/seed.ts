@@ -79,7 +79,7 @@ async function main() {
         'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
       PhoneNumber: '+840393874567',
       FullName: 'John Doe',
-      Role: 'ADMIN',
+      Role: 'admin',
       IsEmailVerified: true,
     },
     create: {
@@ -90,7 +90,7 @@ async function main() {
         'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
       PhoneNumber: '+840393874567',
       FullName: 'John Doe',
-      Role: 'ADMIN',
+      Role: 'admin',
       IsEmailVerified: true,
     },
   });
