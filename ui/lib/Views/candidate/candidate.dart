@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/providers.dart';
-import 'package:ui/helpers.dart';
-import 'package:ui/model.dart';
+import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/Models/model.dart';
+
+import '../../ViewModels/candidate/JoblistNavigationViewModel.dart';
 
 List<Widget> pageView_candidate(BuildContext context) {
   return [
@@ -32,7 +33,7 @@ Widget SearchScreen() {
 }
 
 Widget JobListScreen(BuildContext context) {
-  var joblistNavigationProvider = Provider.of<JoblistNavigationProvider>(
+  var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(
     context,
   );
   // TODO: Modify section below

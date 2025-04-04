@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/animation.dart';
+import 'package:flutter/cupertino.dart';
 
-class BottomNavigationProvider extends ChangeNotifier {
+class BottomNavigationViewModel extends ChangeNotifier {
   int _selectedIndex = 0;
   late AnimationController _animationController;
   final PageController _pageController = PageController();
@@ -51,41 +52,10 @@ class BottomNavigationProvider extends ChangeNotifier {
     }
   }
 
-
-
   @override
   void dispose() {
     _animationController.dispose();
     _pageController.dispose();
-    super.dispose();
-  }
-}
-
-class JoblistNavigationProvider extends ChangeNotifier{
-  int _joblistIndex = 0;
-  final PageController _joblistController = PageController();
-
-  int get joblistIndex => _joblistIndex;
-  PageController get joblistController => _joblistController;
-
-  void onTapAppliedJob_FavJob(int index) {
-    if (_joblistIndex != index) {
-      _joblistIndex = index;
-      notifyListeners();
-    }
-
-    if (_joblistController.hasClients) {
-      _joblistController.animateToPage(
-        index,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    _joblistController.dispose();
     super.dispose();
   }
 }
