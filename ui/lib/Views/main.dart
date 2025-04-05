@@ -12,13 +12,16 @@ import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
 import '../ViewModels/recruiter/JobPostViewModel.dart';
 import 'login/login_page.dart';
 
-
 void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => BottomNavigationViewModel()),
-        ChangeNotifierProvider(create: (context) => JoblistNavigationViewModel()),
+        ChangeNotifierProvider(
+          create: (context) => BottomNavigationViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => JoblistNavigationViewModel(),
+        ),
         ChangeNotifierProvider(create: (context) => JobPostViewModel()),
       ],
       child: MyApp(),
@@ -48,6 +51,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
 class _MainApp extends StatefulWidget {
   @override
   _MainAppState createState() => _MainAppState();
@@ -59,8 +63,10 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    final bottomNavigationProvider =
-    Provider.of<BottomNavigationViewModel>(context, listen: false);
+    final bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(
+      context,
+      listen: false,
+    );
     bottomNavigationProvider.setAnimationController(
       AnimationController(
         vsync: this,
@@ -73,22 +79,26 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    final bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(context, listen: false);
+    final bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(
+      context,
+      listen: false,
+    );
     bottomNavigationProvider.animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(context);
-    var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(context);
+    var bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(
+      context,
+    );
+    var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(
+      context,
+    );
 
     return MaterialApp(
       locale: Locale('vi', 'VN'),
-      supportedLocales: [
-        Locale('vi', 'VN'),
-        Locale('en', 'US'),
-      ],
+      supportedLocales: [Locale('vi', 'VN'), Locale('en', 'US')],
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -118,7 +128,11 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
           backgroundColor: color,
           centerTitle: true,
           title: appbarTitle(_role, bottomNavigationProvider.selectedIndex),
-          bottom: bottomJobBar(_role, bottomNavigationProvider.selectedIndex, context),
+          bottom: bottomJobBar(
+            _role,
+            bottomNavigationProvider.selectedIndex,
+            context,
+          ),
           actions: [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 5),
@@ -127,9 +141,9 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
                 onPressed: () {
                   setState(() {
                     _role =
-                    (_role == role.candidate)
-                        ? role.recruiter
-                        : role.candidate;
+                        (_role == role.candidate)
+                            ? role.recruiter
+                            : role.candidate;
                   });
                 },
                 icon: Icon(Icons.change_circle_outlined, size: 25),
@@ -161,9 +175,12 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
   }
 
   Widget? appbarTitle(role Role, int selectedIndex) {
-    if (Role == role.candidate) return appbarTitle_cadidate(selectedIndex);
-    else if (Role == role.recruiter) return appbarTitle_recruiter(selectedIndex);
-    else return null;
+    if (Role == role.candidate)
+      return appbarTitle_cadidate(selectedIndex);
+    else if (Role == role.recruiter)
+      return appbarTitle_recruiter(selectedIndex);
+    else
+      return null;
   }
 
   List<BottomNavigationBarItem> bottomNavigationItem(role Role) {
@@ -175,7 +192,10 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
       return bottomNavigationItem_admin();
   }
 
-  List<Widget> pageView(role Role, JoblistNavigationViewModel joblistNavigationProvider) {
+  List<Widget> pageView(
+    role Role,
+    JoblistNavigationViewModel joblistNavigationProvider,
+  ) {
     if (Role == role.candidate)
       return pageView_candidate(context);
     else if (Role == role.recruiter)
