@@ -24,6 +24,7 @@ import { EmailsModule } from './modules/emails/emails.module';
 import { SupabaseModule } from './modules/supabase/supabase.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { UsersModule } from './modules/users/users.module';
+import { JobsModule } from './modules/jobs/jobs.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { UsersModule } from './modules/users/users.module';
     SupabaseModule,
     UploadsModule,
     EmailsModule,
+    JobsModule,
   ],
   controllers: [AppController],
   providers: [

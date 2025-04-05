@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Users } from '@prisma/client';
 import { omit } from 'lodash';
 import { SupabaseService } from 'src/modules/supabase/supabase.service';
@@ -26,15 +26,18 @@ export class UsersService {
     try {
       const supabase = this.supabaseService.getClient();
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('Users')
         .select('*')
         .eq('ID', userId)
-        .single();
+        .single<Users | null>();
 
-      if (error) throw error;
+      if (!data)
+        throw new NotFoundException(
+          `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
+        );
 
-      return data as Users;
+      return data;
     } catch (err) {
       console.error(err);
       throw err;

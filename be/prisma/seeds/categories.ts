@@ -12,5 +12,5 @@ export const Categories = [
   'UI/UX Designer',
   'QA Tester',
   'Embedded Engineer',
-  'Other',
+  'Khác',
 ];

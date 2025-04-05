@@ -3,10 +3,12 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
   ValidateNested,
 } from 'class-validator';
-import { CreateCompanyDto } from 'src/modules/users/dtos';
+import {
+  CreateCompanyDto,
+  CreateExistingCompanyDto,
+} from 'src/modules/users/dtos';
 
 export class CreateRecruiterDto {
   @IsString()
@@ -14,9 +16,9 @@ export class CreateRecruiterDto {
   readonly Position!: string;
 
   @IsOptional()
-  @IsUUID()
-  @IsNotEmpty()
-  readonly companyID!: string;
+  @ValidateNested()
+  @Type(() => CreateExistingCompanyDto)
+  readonly createExistingCompanyDto?: CreateExistingCompanyDto;
 
   @IsOptional()
   @ValidateNested()
