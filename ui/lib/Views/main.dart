@@ -31,9 +31,10 @@ void main() {
 
 class MyApp extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _MainAppState createState() => _MainAppState();
 }
 
+/*
 class _MyAppState extends State<MyApp> {
   bool isLoggedIn = false;
 
@@ -56,6 +57,7 @@ class _MainApp extends StatefulWidget {
   @override
   _MainAppState createState() => _MainAppState();
 }
+*/
 
 class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
   role _role = role.candidate;
