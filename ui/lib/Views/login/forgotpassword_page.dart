@@ -66,16 +66,10 @@ class ForgotPasswordPage extends StatelessWidget {
                           String email = viewModel.emailController.text.trim();
                           if (email.isNotEmpty) {
                             await viewModel.sendResetLink(email);
-                            if (viewModel.errorMessage != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(viewModel.errorMessage!)),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Liên kết đặt lại mật khẩu đã gửi!")),
-                              );
+                            final message = viewModel.errorMessage ?? viewModel.serverMessage ?? "Đã gửi yêu cầu đặt lại mật khẩu.";
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)),
+                               );
                             }
-                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,

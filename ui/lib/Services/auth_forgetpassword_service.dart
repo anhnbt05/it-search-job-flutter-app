@@ -4,7 +4,7 @@ import 'dart:convert';
 import '../Models/ResponseModel.dart';
 
 class AuthService {
-  final String _baseUrl = "https://aac0-14-169-56-27.ngrok-free.app";
+  final String _baseUrl = "https://it-searcj-job-app-be.onrender.com";
 
   Future<ResponseModel> forgotPassword(String email) async {
     print("Sending to: $_baseUrl/auth/forget-password");
@@ -15,11 +15,7 @@ class AuthService {
       headers: {'Content-Type': 'application/json'},
       body: json.encode({"email": email}),
     );
-
-    if (response.statusCode == 201) {
-      return ResponseModel.fromJson(json.decode(response.body));
-    } else {
-      throw Exception('Gửi liên kết đặt lại mật khẩu thất bại');
-    }
+    final responseData = json.decode(response.body);
+    return ResponseModel.fromJson(responseData);
   }
 }
