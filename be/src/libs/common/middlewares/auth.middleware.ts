@@ -13,7 +13,10 @@ export class AuthMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) throw new UnauthorizedException('No token provided.');
+    if (!authHeader)
+      throw new UnauthorizedException(
+        'Bạn cần cung cấp access token để truy cập vào tài nguyên của đường dẫn này.',
+      );
 
     const token = authHeader.split(' ')[1];
 
@@ -21,7 +24,10 @@ export class AuthMiddleware implements NestMiddleware {
 
     const { data, error } = await supabase.auth.getUser(token);
 
-    if (error) throw new UnauthorizedException('Invalid token.');
+    if (error)
+      throw new UnauthorizedException(
+        'Bạn đã cung cấp acess token không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.',
+      );
 
     req['user'] = data.user;
 

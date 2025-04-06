@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from 'src/modules/supabase/supabase.service';
 
@@ -21,7 +21,10 @@ export class UploadsService {
           contentType: file.mimetype,
         });
 
-      if (error) throw new Error(error.message);
+      if (error)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi trong quá trình tải file lên cloud.',
+        );
 
       return {
         url: `${this.configService.get<string>('supabase.url', '')}/storage/v1/object/public/${bucket}/${fileName}`,
