@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import {
@@ -38,12 +39,7 @@ export class JobsService {
         .eq('ID', userId)
         .maybeSingle<Users>();
 
-      if (error) {
-        console.error(error);
-        return;
-      }
-
-      if (!user)
+      if (!user || error)
         throw new NotFoundException(
           `Không tìm thấy người dùng có id '${userId}'`,
         );
@@ -53,7 +49,7 @@ export class JobsService {
       const query = supabaseAdmin
         .from('Jobs')
         .select(
-          '*, Recruiters(*, Users(FullName), CompanyLocation(*, Companies(*)))',
+          '*, Recruiters(*, Users(FullName), CompanyLocations(*, Companies(*)))',
         );
 
       if (isRecruiter) {
@@ -63,9 +59,7 @@ export class JobsService {
           .eq('UserID', userId)
           .maybeSingle<Recruiters>();
 
-        if (error) throw error;
-
-        if (!data)
+        if (!data || error)
           throw new NotFoundException(
             `Không tìm thấy nhà tuyển dụng liên kết với người dùng có id '${userId}'`,
           );
@@ -83,7 +77,10 @@ export class JobsService {
         .is('DeletedAt', null)
         .overrideTypes<any[], { merge: false }>();
 
-      if (jobsError) throw jobsError;
+      if (jobsError)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy danh sách các công việc.',
+        );
 
       return jobs?.map((job) => ({
         ...omit(job, ['RecruiterID', 'Recruiters']),
@@ -92,10 +89,10 @@ export class JobsService {
             'Users',
             'UserID',
             'CompanyLocationID',
-            'CompanyLocation',
+            'CompanyLocations',
           ]),
           FullName: job.Recruiters.Users.FullName,
-          Company: job.Recruiters.CompanyLocation.Companies,
+          Company: job.Recruiters.CompanyLocations.Companies,
         },
       }));
     } catch (err) {
@@ -123,7 +120,9 @@ export class JobsService {
 
       const query = supabaseAdmin
         .from('Jobs')
-        .select('*, Recruiters(*, Users(*) ,CompanyLocation(*, Companies(*)))');
+        .select(
+          '*, Recruiters(*, Users(*) ,CompanyLocations(*, Companies(*)))',
+        );
 
       if (isRecruiter) {
         const { data, error } = await supabaseAdmin
@@ -132,9 +131,7 @@ export class JobsService {
           .eq('UserID', userId)
           .maybeSingle<Recruiters>();
 
-        if (error) throw error;
-
-        if (!data)
+        if (!data || error)
           throw new NotFoundException(
             `Không tìm thấy nhà tuyển dụng liên kết với người dùng có id '${userId}'`,
           );
@@ -146,9 +143,7 @@ export class JobsService {
 
       const { data: job, error: jobError } = await query.maybeSingle<any>();
 
-      if (jobError) throw jobError;
-
-      if (!job) {
+      if (!job || jobError) {
         if (isRecruiter)
           throw new NotFoundException(
             `Công việc có id '${jobId}' không phải do bạn đăng.`,
@@ -177,13 +172,13 @@ export class JobsService {
         ...(await this.handleFormattedJob(jobId, supabaseAdmin)),
         Recruiter: {
           ...omit(job.Recruiters, [
-            'CompanyLocation',
+            'CompanyLocations',
             'CompanyLocationID',
             'UserID',
             'Users',
           ]),
           FullName: job.Recruiters.Users.FullName,
-          Company: job.Recruiters.CompanyLocation.Companies,
+          Company: job.Recruiters.CompanyLocations.Companies,
         },
       };
     } catch (err) {
@@ -226,7 +221,10 @@ export class JobsService {
         .match({ Title, RecruiterID: user.ID })
         .maybeSingle<Jobs>();
 
-      if (findJobError) throw findJobError;
+      if (findJobError)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy công việc.',
+        );
 
       if (
         job &&
@@ -254,10 +252,13 @@ export class JobsService {
         .select('*')
         .single<Jobs>();
 
-      if (error) throw error;
+      if (error)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi thêm mới công việc.',
+        );
 
       const { error: insertDescriptionError } = await supabaseAdmin
-        .from('JobDescription')
+        .from('JobDescriptions')
         .insert(
           Descriptions.map((description) => ({
             Description: description,
@@ -265,7 +266,13 @@ export class JobsService {
           })),
         );
 
-      if (insertDescriptionError) throw insertDescriptionError;
+      if (insertDescriptionError) {
+        console.error(insertDescriptionError);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi thêm các mô tả cho công việc.',
+        );
+      }
 
       const { error: insertBenefitsError } = await supabaseAdmin
         .from('JobBenefits')
@@ -276,7 +283,13 @@ export class JobsService {
           })),
         );
 
-      if (insertBenefitsError) throw insertBenefitsError;
+      if (insertBenefitsError) {
+        console.error(insertBenefitsError);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi thêm các lợi ích cho công việc.',
+        );
+      }
 
       const { error: errorCreateRequirements } = await supabaseAdmin
         .from('JobRequirements')
@@ -287,7 +300,13 @@ export class JobsService {
           })),
         );
 
-      if (errorCreateRequirements) throw errorCreateRequirements;
+      if (errorCreateRequirements) {
+        console.error(errorCreateRequirements);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi thêm các yêu cầu cho công việc.',
+        );
+      }
 
       const categoryIds: string[] = [];
 
@@ -298,7 +317,13 @@ export class JobsService {
           .eq('CategoryName', categoryName)
           .single<Categories>();
 
-        if (error) throw error;
+        if (error) {
+          console.error(error);
+
+          throw new InternalServerErrorException(
+            'Đã xảy ra lỗi khi tìm tên danh mục của công việc.',
+          );
+        }
 
         categoryIds.push(data.ID);
       }
@@ -312,7 +337,10 @@ export class JobsService {
           })),
         );
 
-      if (errorCategoriesInsert) throw errorCategoriesInsert;
+      if (errorCategoriesInsert)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi thêm danh mục cho công việc.',
+        );
 
       return (
         await supabaseAdmin
@@ -384,13 +412,14 @@ export class JobsService {
         .update(res)
         .eq('ID', jobId);
 
-      if (error) {
-        console.error('Upsert Error:', error);
-      }
+      if (error)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi cập nhật công việc.',
+        );
 
       if (Descriptions && Descriptions.length) {
         await this.handleSyncJobDetails(
-          'JobDescription',
+          'JobDescriptions',
           'Description',
           Descriptions,
           jobId,
@@ -479,9 +508,7 @@ export class JobsService {
         .eq('ID', userId)
         .maybeSingle<Users>();
 
-      if (error) throw error;
-
-      if (!user)
+      if (!user || error)
         throw new NotFoundException(
           `Không tìm thấy người dùng có id '${userId}'`,
         );
@@ -492,9 +519,7 @@ export class JobsService {
         .eq('ID', jobId)
         .maybeSingle<Jobs>();
 
-      if (jobError) throw jobError;
-
-      if (!job)
+      if (!job || jobError)
         throw new NotFoundException(
           `Không tìm thấy công việc có id '${jobId}'.`,
         );
@@ -581,9 +606,10 @@ export class JobsService {
       .update({ Status: status })
       .in('ID', items);
 
-    if (error) {
-      console.error('Failed to update jobs:', error);
-    }
+    if (error)
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi cập nhật trạng thái của công việc.',
+      );
   };
 
   public handleCreateJobFavorites = async (
@@ -599,9 +625,7 @@ export class JobsService {
         .eq('UserID', userId)
         .maybeSingle<Candidates>();
 
-      if (error) throw error;
-
-      if (!data)
+      if (!data || error)
         throw new NotFoundException(
           `Không tìm thấy ứng cử viên có id '${userId}'`,
         );
@@ -621,7 +645,10 @@ export class JobsService {
         )
         .select('*');
 
-      if (insertJobFavortiesData) throw insertJobFavortiesData;
+      if (insertJobFavortiesData)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi thêm mới công việc ưa thích của ứng viên.',
+        );
 
       return {
         success: true,
@@ -646,9 +673,7 @@ export class JobsService {
         .eq('UserID', userId)
         .maybeSingle<Candidates>();
 
-      if (error) throw error;
-
-      if (!data)
+      if (!data || error)
         throw new NotFoundException(
           `Không tìm thấy ứng viên nào mà liên kết với người dùng có id '${userId}'`,
         );
@@ -662,7 +687,10 @@ export class JobsService {
             .delete()
             .match({ JobID: jobId, CandidateID: data.ID });
 
-          if (error) throw error;
+          if (error)
+            throw new InternalServerErrorException(
+              'Đã xảy ra lỗi khi xoá công việc đã lưu.',
+            );
         }),
       );
 
@@ -686,9 +714,7 @@ export class JobsService {
         .eq('CategoryName', categoryName)
         .maybeSingle<Categories>();
 
-      if (error) throw error;
-
-      if (!data)
+      if (!data || error)
         throw new NotFoundException(
           `Danh mục có tên ${categoryName} không tìm thấy.`,
         );
@@ -700,7 +726,7 @@ export class JobsService {
           *,
           Jobs (
             *,
-            JobDescription(*),
+            JobDescriptions(*),
             JobRequirements(*),
             JobBenefits(*)
           )
@@ -709,12 +735,17 @@ export class JobsService {
         .eq('CategoryID', data.ID)
         .is('DeletedAt', null);
 
-      if (response?.error) throw response?.error;
+      if (response?.error)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy danh sách các danh mục của công việc.',
+        );
 
       return response?.data?.map((d) => ({
         ...d.Jobs,
         JobBenefits: d.Jobs.JobBenefits.map((jb: any) => jb.Benefit),
-        JobDescription: d.Jobs.JobDescription.map((jd: any) => jd.Description),
+        JobDescriptions: d.Jobs.JobDescriptions.map(
+          (jd: any) => jd.Description,
+        ),
         JobRequirements: d.Jobs.JobRequirements.map(
           (jr: any) => jr.Requirement,
         ),
@@ -735,9 +766,7 @@ export class JobsService {
         .eq('UserID', userId)
         .maybeSingle<Candidates>();
 
-      if (error) throw error;
-
-      if (!data)
+      if (!data || error)
         throw new NotFoundException(
           `Không tìm thấy ứng viên mà liên kết với người dùng có id '${userId}'`,
         );
@@ -749,7 +778,10 @@ export class JobsService {
         },
       );
 
-      if (jobsError) throw jobsError;
+      if (jobsError)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy ra các công việc gợi ý cho ứng viên.',
+        );
 
       return jobs;
     } catch (err) {
@@ -765,20 +797,18 @@ export class JobsService {
       const { data, error } = await supabaseAdmin
         .from('Locations')
         .select(
-          'ID, Name, Country, CompanyLocation(*, Recruiters(*, Jobs(*, Recruiters(*, Users(FullName, Email, PhoneNumber) ,CompanyLocation(*, Companies(*))))))',
+          'ID, Name, Country, CompanyLocations(*, Recruiters(*, Jobs(*, Recruiters(*, Users(FullName, Email, PhoneNumber) ,CompanyLocations(*, Companies(*))))))',
         )
         .eq('ID', locationId)
         .maybeSingle<any>();
 
-      if (error) throw error;
-
-      if (!data)
+      if (!data || error)
         throw new NotFoundException(
           `Không tìm thấy địa điểm có id '${locationId}'`,
         );
 
       const jobs =
-        data.CompanyLocation?.flatMap(
+        data.CompanyLocations?.flatMap(
           (location: any) =>
             location.Recruiters?.flatMap((recruiter: any) =>
               recruiter.Jobs.filter((job: any) => job.Status === JobStatus.open)
@@ -790,15 +820,15 @@ export class JobsService {
                       'CompanyLocationID',
                       'Users',
                       'DeletedAt',
-                      'CompanyLocation',
+                      'CompanyLocations',
                     ]),
                     FullName: item.Recruiters.Users.FullName,
                     PhoneNumber: item.Recruiters.Users.PhoneNumber,
                     Email: item.Recruiters.Users.Email,
                     Company: {
-                      Name: item.Recruiters.CompanyLocation.Companies.Name,
+                      Name: item.Recruiters.CompanyLocations.Companies.Name,
                       LogoUrl:
-                        item.Recruiters.CompanyLocation.Companies.LogoUrl,
+                        item.Recruiters.CompanyLocations.Companies.LogoUrl,
                     },
                   },
                 }))
@@ -824,15 +854,15 @@ export class JobsService {
     const { data: jobData, error: jobError } = await supabaseAdmin
       .from('Jobs')
       .select(
-        '*, JobDescription(ID, Description, DeletedAt), JobBenefits(ID, Benefit, DeletedAt), JobRequirements(ID, Requirement, DeletedAt), JobCategories(CategoryID)',
+        '*, JobDescriptions(ID, Description, DeletedAt), JobBenefits(ID, Benefit, DeletedAt), JobRequirements(ID, Requirement, DeletedAt), JobCategories(CategoryID)',
       )
       .eq('ID', jobId)
       .maybeSingle<any>();
 
-    if (jobError) {
-      console.error('Error fetching job:', jobError);
-      return;
-    }
+    if (jobError)
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi lấy thông tin của công việc.',
+      );
 
     const categoryIDs: string[] =
       jobData?.JobCategories.map((category: any) => category.CategoryID) ?? [];
@@ -842,14 +872,16 @@ export class JobsService {
       .select('ID, CategoryName')
       .in('ID', categoryIDs);
 
-    if (categoriesError) {
-      console.error('Error fetching categories:', categoriesError);
-      return;
-    }
+    if (categoriesError)
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi lấy các danh mục công việc.',
+      );
 
     const jobWithCategories = {
       ...omit(jobData, ['JobCategories']),
-      JobDescription: jobData?.JobDescription.map((jd: any) => jd.Description),
+      JobDescriptions: jobData?.JobDescriptions.map(
+        (jd: any) => jd.Description,
+      ),
       JobBenefits: jobData?.JobBenefits.map((jb: any) => jb.Benefit),
       JobRequirements: jobData?.JobRequirements.map(
         (jr: any) => jr.Requirement,

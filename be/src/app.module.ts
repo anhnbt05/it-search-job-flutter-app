@@ -6,10 +6,8 @@ import {
   Module,
   NestModule,
   RequestMethod,
-  ValidationPipe,
 } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_PIPE } from '@nestjs/core';
 import configurations from 'src/config/configurations';
 import { AuthMiddleware } from 'src/libs/common/middlewares/auth.middleware';
 import {
@@ -21,10 +19,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { EmailsModule } from './modules/emails/emails.module';
+import { JobsModule } from './modules/jobs/jobs.module';
 import { SupabaseModule } from './modules/supabase/supabase.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { UsersModule } from './modules/users/users.module';
-import { JobsModule } from './modules/jobs/jobs.module';
+import { WorkExperiencesModule } from './modules/work-experiences/work-experiences.module';
+import { CompaniesModule } from './modules/companies/companies.module';
 
 @Module({
   imports: [
@@ -53,15 +53,11 @@ import { JobsModule } from './modules/jobs/jobs.module';
     UploadsModule,
     EmailsModule,
     JobsModule,
+    WorkExperiencesModule,
+    CompaniesModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_PIPE,
-      useClass: ValidationPipe,
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

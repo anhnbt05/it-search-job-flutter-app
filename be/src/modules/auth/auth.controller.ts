@@ -6,8 +6,6 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
-  Req,
-  UnauthorizedException,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -15,17 +13,13 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
-import { Request } from 'express';
 import { Roles } from 'src/libs/common/decorators';
 import { RoleAuthGuard } from 'src/libs/common/guards';
-import {
-  DEFAULT_TTL_PROVINCES_CACHE,
-  RoleEnum,
-  SupabaseUserToken,
-} from 'src/libs/common/utils';
+import { DEFAULT_TTL_PROVINCES_CACHE, RoleEnum } from 'src/libs/common/utils';
 import {
   CreateCategoryDto,
   ForgetPasswordDto,
@@ -44,28 +38,27 @@ export class AuthController {
 
   @Post('sign-in')
   @ApiOperation({
-    summary: 'User sign-in',
-    description:
-      'This endpoint allows a user to sign in using their credentials and returns an access token and refresh token for authentication.',
+    summary: 'Đăng nhập',
+    description: 'Đường dẫn dành cho việc đăng nhập.',
   })
   @ApiBody({
     type: SignInDto,
     examples: {
       example1: {
-        summary: 'Valid Sign in dto',
+        summary: 'Dữ liệu đăng nhập đầu vào hợp lệ.',
         value: {
           email: 'lengocanhpyne363@gamil.com',
           password: 'user123',
         },
       },
       example2: {
-        summary: 'Invalid Sign in dto',
+        summary: 'Dữ liệu đăng nhập đầu vào không hợp lệ.',
         value: {
           email: 'lengocanhpyne363@gamil.com',
         },
       },
       example3: {
-        summary: 'Invalid Sign in dto',
+        summary: 'Dữ liệu đăng nhập đầu vào không hợp lệ.',
         value: {
           password: 'pass123',
         },
@@ -86,8 +79,8 @@ export class AuthController {
     description: '',
     schema: {
       example: {
-        message: 'Invalid login credentials',
-        error: 'Unauthorized',
+        message: 'Thông tin đăng nhập không chính xác.',
+        error: 'Không xác thực được người dùng.',
         statusCode: 401,
       },
     },
@@ -98,46 +91,43 @@ export class AuthController {
 
   @Post('sign-up')
   @ApiOperation({
-    summary: 'User sign-up',
-    description:
-      'This endpoint allows a new user to register as either a recruiter or a candidate. Recruiters can optionally provide company details.',
+    summary: 'Đăng ký',
+    description: 'Đường dẫn dành cho việc việc đăng ký tài khoản mới.',
   })
   @ApiBody({
     type: SignUpDto,
-    description:
-      'User registration details. The role field determines whether additional recruiter or candidate information is required.',
+    description: 'Các thông tin cần gửi để đăng ký tài khoản',
   })
   @ApiResponse({
     status: 400,
     description:
-      'Bad request (e.g., missing required fields or invalid data format).',
+      'Không hiểu yêu cầu (vd, thiếu trường dữ liệu, dữ liệu gửi đi không đúng kiểu dữ liệu.)',
     schema: {
       example: {
-        message: "User with phone number '+84393873630' has already existed.",
-        error: 'Bad Request',
+        message: "Người dùng có số điện thoại '+84393873630' đã tồn tại.",
+        error: 'Không hiểu yêu cầu.',
         statusCode: 400,
       },
     },
   })
   @ApiResponse({
     status: 500,
-    description: 'Internal server error.',
+    description: 'Lỗi từ hệ thống.',
   })
   @ApiBody({
     type: SignUpDto,
-    description:
-      'This request body is used for user registration. The "Role" field determines whether additional recruiter or candidate details are required.',
+    description: `Phần thân của yêu cầu này được sử dụng để đăng ký người dùng. Trường 'Role' sẽ quyết định xem có cần thêm thông tin chi tiết về nhà tuyển dụng hoặc ứng viên hay không.`,
     examples: {
       candidate: {
-        summary: 'Candidate Sign-up Example',
+        summary: 'Dữ liệu mẫu cho việc đăng ký ứng viên mới.',
         value: {
-          Email: 'candidate@example.com',
+          Email: 'lengocanhpyne363@gmail.com',
           Password: 'StrongPassword123',
-          FullName: 'John Doe',
+          FullName: 'Lê Ngọc Anh',
           PhoneNumber: '+84393873630',
           Role: 'candidate',
           createCandidateDto: {
-            Bio: 'Software developer with 3 years of experience in frontend development.',
+            Bio: 'Kỹ sư phần mềm với hơn 3 năm kinh nghiệm với React.js',
             Level: 'mid',
             Certifications: [
               'AWS Certified Developer',
@@ -147,36 +137,37 @@ export class AuthController {
         },
       },
       recruiter: {
-        summary: 'Recruiter Sign-up Example 1',
+        summary: 'Dữ liệu mẫu 1 cho việc đăng ký nhà tuyển dụng mới.',
         value: {
-          Email: 'recruiter@example.com',
+          Email: 'recruiter@gmail.com',
           Password: 'StrongPassword123',
-          FullName: 'Jane Smith',
-          PhoneNumber: '+84393873630',
+          FullName: 'Lê Văn Nam',
+          PhoneNumber: '+84393873631',
           Role: 'recruiter',
           createRecruiterDto: {
-            Position: 'HR Manager',
+            Position: 'Nhân sự',
             companyID: '550e8400-e29b-41d4-a716-446655440000',
           },
         },
       },
       recruiter1: {
-        summary: 'Recruiter Sign-up Example 2',
+        summary: 'Dữ liệu mẫu 2 cho việc đăng ký nhà tuyển dụng mới.',
         value: {
           Email: 'recruiter@example.com',
           Password: 'StrongPassword123',
-          FullName: 'Jane Smith',
-          PhoneNumber: '+84393873630',
+          FullName: 'Lê Văn Nam',
+          PhoneNumber: '+84393873632',
           Role: 'recruiter',
           createRecruiterDto: {
-            Position: 'HR Manager',
+            Position: 'Trưởng phòng nhân sự',
             createCompanyDto: {
-              Name: 'Tech Corp',
+              Name: 'Công ty Công nghệ ABC',
               WebsiteUrl: 'https://techcorp.com',
-              Description: 'A leading tech company',
+              Description: 'Công ty đứng đầu về công nghệ tại Việt Nam',
               createCompanyLocationDto: {
-                BranchName: 'Headquarters',
-                Address: '1234 Silicon Valley, CA, USA',
+                BranchName: 'Trụ sở chính',
+                Address:
+                  '1234 Khu phố 1, Đường Phạm Văn Đồng, Thành phố Hồ Chí Minh, Việt Nam.',
                 LocationID: 'c12a45f7-9b32-4c3d-b589-8dfaa2a2c55e',
               },
             },
@@ -191,7 +182,7 @@ export class AuthController {
       example: {
         success: true,
         message:
-          'We have sent a verification OTP to your email. Please enter it to complete verification.',
+          'Chúng tôi đã gửi mã OTP xác thực đến email của bạn. Vui lòng nhập mã để hoàn tất quá trình xác thực.',
       },
     },
   })
@@ -200,26 +191,26 @@ export class AuthController {
   }
 
   @Post('verify-email')
-  @ApiOperation({ summary: 'Verify email using OTP' })
+  @ApiOperation({ summary: 'Xác thực email người dùng với mã OTP.' })
   @ApiBody({
     type: VerifyEmailDto,
-    description: 'Provide the email and the 6-digit OTP received.',
+    description: 'Cung cấp email và mã OTP nhận được từ email đó.',
     examples: {
       example1: {
-        summary: 'Successful verification',
+        summary: 'Dữ liệu gửi đi hợp lệ.',
         value: {
           email: 'user@example.com',
           otp: '123456',
         },
       },
       example2: {
-        summary: 'Unsuccessful verification',
+        summary: 'Dữ liệu gửi đi không hợp lệ.',
         value: {
           email: 'hello123@gmail.com',
         },
       },
       example3: {
-        summary: 'Unsuccessful verification',
+        summary: 'Dữ liệu gửi đi không hợp lệ.',
         value: {
           otp: '123456',
         },
@@ -231,7 +222,7 @@ export class AuthController {
       example: {
         success: true,
         message:
-          'Your email has been successfully verified. You can now log in.',
+          'Email của bạn đã được xác thực thành công. Bạn có thể đăng nhập ngay bây giờ.',
       },
     },
   })
@@ -240,7 +231,7 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiOperation({ summary: 'Làm mới access token nếu nó hết hạn' })
   @ApiBody({
     schema: {
       type: 'object',
@@ -251,7 +242,7 @@ export class AuthController {
         },
       },
     },
-    description: 'Send a valid refresh token to get a new access token.',
+    description: 'Gửi một refresh token hợp lệ để nhận được access token mới.',
   })
   @ApiResponse({
     status: 201,
@@ -269,67 +260,51 @@ export class AuthController {
   @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.ADMIN, RoleEnum.CANDIDATE, RoleEnum.RECRUITER)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Sign out user' })
+  @ApiOperation({
+    summary: 'Đăng xuất',
+    description:
+      'Đường dẫn này dùng để đăng xuất tài khoản người dùng ra khỏi hệ thống.',
+  })
   @ApiResponse({
     status: 200,
-    description: 'User signed out successfully',
+    description: 'Đăng xuất thành công',
     schema: {
-      example: { success: true, message: 'Logged out successfully' },
+      example: { success: true, message: 'Đăng xuất tài khoản thành công.' },
     },
   })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 401, description: 'Người dùng không xác thực.' })
   async signOut() {
     return this.authService.signOut();
-  }
-
-  @Get('profile')
-  @UseGuards(RoleAuthGuard)
-  @Roles(RoleEnum.ADMIN, RoleEnum.CANDIDATE, RoleEnum.RECRUITER)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get user profile' })
-  @ApiResponse({
-    status: 200,
-    description: 'User profile retrieved successfully',
-    schema: {
-      example: {
-        ID: '550e8400-e29b-41d4-a716-446655440000',
-        Email: 'user@example.com',
-        FullName: 'John Doe',
-        PhoneNumber: '+84393873630',
-        Status: 'active',
-        AvatarUrl: 'https://...',
-        Role: 'candidate',
-        CreatedAt: '2025-03-20T15:15:15Z',
-        UpdatedAt: '2025-03-20T15:15:15Z',
-        DeletedAt: null,
-        IsEmailVerified: false,
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized: User not authenticated',
-  })
-  async getProfile(@Req() request: Request) {
-    if (!request.user)
-      throw new UnauthorizedException(`User not authenticated.`);
-
-    return this.authService.handleGetProfile(
-      (request.user as SupabaseUserToken).id,
-    );
   }
 
   @Get('provinces')
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(DEFAULT_TTL_PROVINCES_CACHE)
-  @ApiOperation({ summary: 'Get list of provinces' })
+  @ApiOperation({
+    summary: 'Danh sách các tỉnh, thành phố',
+    description: 'Đường dẫn này dùng để lấy ra danh sách các tỉnh, thành phố',
+  })
   @ApiResponse({
     status: 200,
-    description: 'List of provinces retrieved successfully',
+    description: 'Danh sách các tỉnh, thành phố',
     schema: {
       example: [
-        { ID: '1', Name: 'Thành phố Hà Nội' },
-        { ID: '2', Name: 'Tỉnh Phú Yên' },
+        {
+          ID: '123f7d52-dfc9-480c-9352-6b57a708f95f',
+          Name: 'Thành phố Hà Nội',
+        },
+        {
+          ID: '4ed34a88-4554-46cd-a0ef-d98194eb86b5',
+          Name: 'Tỉnh Hà Giang',
+        },
+        {
+          ID: '79a7ad67-1a3f-4611-a90b-e9e8f60e30b9',
+          Name: 'Tỉnh Cao Bằng',
+        },
+        {
+          ID: '8a16ae4b-a247-4363-8383-4585e0e0ad2e',
+          Name: 'Tỉnh Bắc Kạn',
+        },
       ],
     },
   })
@@ -339,14 +314,32 @@ export class AuthController {
   }
 
   @Get('companies')
-  @ApiOperation({ summary: 'Get list of companies' })
+  @ApiOperation({
+    summary: 'Danh sách các công ty',
+    description:
+      'Đường dẫn này dùng để lấy ra danh sách các công ty hiện có trong hệ thống.',
+  })
   @ApiResponse({
     status: 200,
-    description: 'List of companies retrieved successfully',
+    description: 'Danh sách các công ty',
     schema: {
       example: [
-        { ID: '1', Name: 'Tech Corp' },
-        { ID: '2', Name: 'Innovate Ltd' },
+        {
+          ID: '123f7d52-dfc9-480c-9352-6b57a708f95f',
+          Name: 'FPT Software',
+        },
+        {
+          ID: '4ed34a88-4554-46cd-a0ef-d98194eb86b5',
+          Name: 'VNG',
+        },
+        {
+          ID: '79a7ad67-1a3f-4611-a90b-e9e8f60e30b9',
+          Name: 'Công ty Công nghệ ABC',
+        },
+        {
+          ID: '8a16ae4b-a247-4363-8383-4585e0e0ad2e',
+          Name: 'Công ty TNHH Technology Việt Nam',
+        },
       ],
     },
   })
@@ -356,13 +349,17 @@ export class AuthController {
   }
 
   @Post('forget-password')
-  @ApiOperation({ summary: 'Request password reset' })
+  @ApiOperation({
+    summary: 'Quên mật khẩu',
+    description:
+      'Đường dẫn này hỗ trợ cấp lại mật khẩu mới nếu như lỡ quên mật khẩu hiện tại.',
+  })
   @ApiBody({
     type: ForgetPasswordDto,
-    description: 'Send an email to reset the password',
+    description: 'Gửi email đã liên kết tài khoản cần đặt mới mật khẩu',
     examples: {
       example1: {
-        summary: 'Valid email request',
+        summary: 'Dữ liệu gửi đi hợp lệ.',
         value: {
           email: 'user@example.com',
         },
@@ -371,15 +368,15 @@ export class AuthController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid email format or missing email',
+    description: 'Email không đúng định dạng hoặc không gửi đi email.',
   })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({ status: 500, description: 'Lỗi từ hệ thống.' })
   @ApiResponse({
     status: 201,
     schema: {
       example: {
         success: true,
-        message: 'Password reset email sent successfully.',
+        message: 'OTP đã được gửi tới email.',
       },
     },
   })
@@ -388,40 +385,41 @@ export class AuthController {
   }
 
   @Post('verify-reset-password-otp')
-  @ApiOperation({ summary: 'Verify OTP for password reset' })
+  @ApiOperation({ summary: 'Xác thực OTP cho email' })
   @ApiBody({
     type: VerifyResetPasswordOtpDto,
-    description: 'Verify the OTP sent to the user’s email for password reset',
+    description:
+      'Xác thực mã OTP đã gửi đến email của người dùng để đặt lại mật khẩu.',
     examples: {
       example1: {
-        summary: 'Valid OTP verification request',
+        summary: 'Dữ liệu gửi đi hợp lệ.',
         value: {
           email: 'user@example.com',
           otp: '123456',
         },
       },
       example2: {
-        summary: 'Invalid OTP verification request',
+        summary: 'Dữ liệu gửi đi không hợp lệ.',
         value: {
           email: 'user@example.com',
         },
       },
       example3: {
-        summary: 'Invalid OTP verification request',
+        summary: 'Dữ liệu gửi đi không hợp lệ.',
         value: {
           otp: '123456',
         },
       },
     },
   })
-  @ApiResponse({ status: 400, description: 'Invalid OTP or email format' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({ status: 400, description: 'Mã OTP hoặc email không hợp lệ' })
+  @ApiResponse({ status: 500, description: 'Lỗi từ hệ thống.' })
   @ApiResponse({
     status: 201,
     schema: {
       example: {
         success: true,
-        message: 'Valid OTP.',
+        message: 'OTP hợp lệ. Bạn có thể chuyển đến bưỡc tiếp theo.',
       },
     },
   })
@@ -434,13 +432,13 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  @ApiOperation({ summary: 'Reset password with a new password' })
+  @ApiOperation({ summary: 'Đặt lại mật khẩu với mật khẩu mới.' })
   @ApiBody({
     type: ResetPasswordDto,
-    description: 'Request to reset password using a new password and email',
+    description: 'Yêu cầu đặt lại mật khẩu bằng mật khẩu mới và email.',
     examples: {
       example1: {
-        summary: 'Valid reset password request',
+        summary: 'Dữ liệu gửi đi hợp lệ.',
         value: {
           email: 'user@example.com',
           newPassword: 'NewSecurePassword123',
@@ -448,14 +446,30 @@ export class AuthController {
       },
     },
   })
-  @ApiResponse({ status: 200, description: 'Password reset successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid email or password format' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({
+    status: 201,
+    description: 'Password reset successfully',
+    example: {
+      success: true,
+      message:
+        'Đặt lại mật khẩu thành công. Bây giờ, bạn có thể dùng mật khẩu mới để đăng nhập.',
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Email hoặc mật khẩu không đúng định dạng.',
+  })
+  @ApiResponse({ status: 500, description: 'Lỗi từ hệ thống.' })
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.handleResetPassword(resetPasswordDto);
   }
 
   @Get('companies/:companyId/branches')
+  @ApiOperation({
+    summary: 'Danh sách các chi nhánh của các công ty trong hệ thống',
+    description:
+      'Đường dẫn này dùng để lấy ra danh sách các chi nhánh của các công ty trong hệ thống.',
+  })
   async getBranchesOfCompany(
     @Param('companyId', ParseUUIDPipe) companyId: string,
   ) {
@@ -463,6 +477,14 @@ export class AuthController {
   }
 
   @Post('companies/:companyId/branches')
+  @ApiOperation({
+    summary: 'Tạo mới chi nhánh cho công ty',
+    description: 'Đường dẫn này dùng để tạo mới một chi nhánh cho công ty.',
+  })
+  @ApiBody({
+    type: CreateCompanyLocationDto,
+    description: 'Dữ liệu cần gửi đi để tạo mới chi nhánh cho công ty.',
+  })
   async createBranchOfCompany(
     @Param('companyId', ParseUUIDPipe) companyId: string,
     @Body() createCompanyLocationDto: CreateCompanyLocationDto,
@@ -475,6 +497,35 @@ export class AuthController {
 
   @Get('categories')
   @UseGuards(RoleAuthGuard)
+  @ApiOperation({
+    summary: 'Danh sách các danh mục công việc',
+    description:
+      'Đường dẫn này dùng để lấy ra danh sách các danh mục của công việc.',
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: [
+        {
+          ID: '944bc899-557e-437c-95c7-556cef67d8bb',
+          CategoryName: 'Front End',
+        },
+        {
+          ID: '0dbad36a-f140-4406-97eb-a85aba15c3ee',
+          CategoryName: 'Embedded Engineer',
+        },
+        {
+          ID: '0f16e89f-ba50-4b16-a37f-584a399a6a2f',
+          CategoryName: 'Cyber Security',
+        },
+        {
+          ID: 'a24032b0-61fc-4918-b3f2-25e4fe0711d7',
+          CategoryName: 'UI/UX Designer',
+        },
+      ],
+    },
+  })
+  @ApiBearerAuth()
   @Roles(RoleEnum.ADMIN, RoleEnum.CANDIDATE, RoleEnum.RECRUITER)
   async getCategories() {
     return this.authService.handleGetCategories();
@@ -482,6 +533,40 @@ export class AuthController {
 
   @Post('categories')
   @UseGuards(RoleAuthGuard)
+  @ApiOperation({
+    summary: 'Tạo mới danh mục công việc',
+    description: 'Đường dẫn này dùng để tạo mới danh mục công việc',
+  })
+  @ApiForbiddenResponse({
+    description: 'Chỉ có quản trị viên mới có quyền tạo mới danh mục',
+  })
+  @ApiResponse({
+    status: 201,
+    schema: {
+      example: [
+        {
+          ID: '944bc899-557e-437c-95c7-556cef67d8bb',
+          CategoryName: 'Front End',
+        },
+        {
+          ID: '0dbad36a-f140-4406-97eb-a85aba15c3ee',
+          CategoryName: 'Embedded Engineer',
+        },
+        {
+          ID: '0f16e89f-ba50-4b16-a37f-584a399a6a2f',
+          CategoryName: 'Cyber Security',
+        },
+        {
+          ID: 'a24032b0-61fc-4918-b3f2-25e4fe0711d7',
+          CategoryName: 'UI/UX Designer',
+        },
+      ],
+    },
+  })
+  @ApiBody({
+    type: CreateCategoryDto,
+    description: 'Dữ liệu cần gửi đi để tạo mới danh mục',
+  })
   @Roles(RoleEnum.ADMIN)
   async createCategory(@Body() createCategoryDto: CreateCategoryDto) {
     return this.authService.handleCreateCategory(createCategoryDto);

@@ -4,11 +4,12 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Categories, Companies, CompanyLocation, Users } from '@prisma/client';
+import { Categories, Companies, CompanyLocations, Users } from '@prisma/client';
 import { SupabaseClient, User } from '@supabase/supabase-js';
 import { omit } from 'lodash';
 import {
@@ -30,7 +31,6 @@ import {
 import { EmailsProducer } from 'src/modules/emails/producers';
 import { JobsService } from 'src/modules/jobs/jobs.service';
 import { SupabaseService } from 'src/modules/supabase/supabase.service';
-import { UploadsService } from 'src/modules/uploads/uploads.service';
 import {
   CreateCandidateDto,
   CreateCompanyDto,
@@ -68,7 +68,7 @@ export class AuthService {
 
       if (findUserWithEmail)
         throw new BadRequestException(
-          `User with email '${Email}' has already existed.`,
+          `Đã có người dùng sử dụng email '${Email}.'`,
         );
 
       const { data: findUserWithPhoneNumber } = await supabaseAdmin
@@ -79,19 +79,20 @@ export class AuthService {
 
       if (findUserWithPhoneNumber)
         throw new BadRequestException(
-          `User with phone number '${PhoneNumber}' has already existed.`,
+          `Đã có người dùng sử dụng số điện thoại '${PhoneNumber}'.`,
         );
 
       const hashedPassword = hashPassword(res.Password);
 
-      const { data, error } = await supabase.auth.signUp({
+      const { data } = await supabase.auth.signUp({
         email: Email,
         password: Password,
       });
 
-      if (!data.user) throw new UnauthorizedException('User creation failed');
-
-      if (error) throw new UnauthorizedException(error.message);
+      if (!data.user)
+        throw new UnauthorizedException(
+          'Tạo mới người dùng không thành công. Vui lòng thử lại.',
+        );
 
       await supabaseAdmin.auth.admin.updateUserById(data.user.id, {
         app_metadata: {
@@ -112,7 +113,10 @@ export class AuthService {
         .select('*')
         .single<Users>();
 
-      if (dbError) throw new Error(dbError.message);
+      if (dbError)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi trong quá trình tạo mới người dùng.',
+        );
 
       if (Role === RoleEnum.CANDIDATE && createCandidateDto) {
         await this.createCandidateUser(
@@ -128,7 +132,7 @@ export class AuthService {
 
         if (createCompanyDto && createExistingCompanyDto)
           throw new BadRequestException(
-            'You must provide either createExistingCompanyDto or createCompanyDto, not both.',
+            'Bạn phải cung cấp hoặc createExistingCompanyDto hoặc createCompanyDto, chứ không phải cả hai.',
           );
 
         let createCompanyLocationId = '';
@@ -174,7 +178,7 @@ export class AuthService {
       return {
         success: true,
         message:
-          'We have sent a verification OTP to your email. Please enter it to complete verification.',
+          'Chúng tôi đã gửi mã OTP xác minh đến email của bạn. Vui lòng nhập mã để hoàn tất quá trình xác minh.',
       };
     } catch (err) {
       console.error(err);
@@ -191,7 +195,10 @@ export class AuthService {
         password,
       });
 
-      if (error) throw new UnauthorizedException(error.message);
+      if (error)
+        throw new BadRequestException(
+          'Thông tin đăng nhập không chính xác. Vui lòng thử lại.',
+        );
 
       const { data: findUser } = await supabase
         .from('Users')
@@ -201,7 +208,12 @@ export class AuthService {
 
       if (!findUser)
         throw new NotFoundException(
-          `User with id: '${data.user.id}' not found.`,
+          `Không tìm thấy người dùng có id '${data.user.id}' trong hệ thống.`,
+        );
+
+      if (findUser.Status === 'inactive')
+        throw new ForbiddenException(
+          'Tài khoản của bạn đã bị khoá bởi quản trị viên trong hệ thống. Vui lòng liên hệ với họ để biết thêm thông tin.',
         );
 
       if (!findUser.IsEmailVerified) {
@@ -224,12 +236,12 @@ export class AuthService {
 
           return {
             message:
-              'We have sent a verification OTP to your email. Please enter it to complete verification.',
+              'Chúng tôi đã gửi mã OTP xác minh đến email của bạn. Vui lòng nhập mã để hoàn tất quá trình xác minh.',
           };
         }
 
         throw new ForbiddenException(
-          'Please check the OTP sent to your email to complete verification before logging in.',
+          'Vui lòng kiểm tra mã OTP đã được gửi đến email của bạn để hoàn tất xác minh trước khi đăng nhập.',
         );
       }
 
@@ -249,7 +261,7 @@ export class AuthService {
 
       await supabase.auth.signOut();
 
-      return { success: true, message: 'Logged out successfully' };
+      return { success: true, message: 'Đăng xuất tài khoản thành công.' };
     } catch (err) {
       console.error(err);
       throw err;
@@ -264,7 +276,10 @@ export class AuthService {
         refresh_token: refreshToken,
       });
 
-      if (error) throw new UnauthorizedException(error.message);
+      if (error)
+        throw new UnauthorizedException(
+          'Bạn đã cung cấp refresh token hết hạn. Vui lòng đăng nhập lại để nhận refresh token mới.',
+        );
 
       return {
         accessToken: data?.session?.access_token,
@@ -289,7 +304,12 @@ export class AuthService {
 
       if (!findUser)
         throw new NotFoundException(
-          `User with email '${email}' not found in the system.`,
+          `Không tìm thấy người dùng có email '${email}' trong hệ thống.`,
+        );
+
+      if (findUser.Status === 'inactive')
+        throw new ForbiddenException(
+          `Tài khoản liên kết với email '${email}' đã bị khoá bởi quản trị viên trong hệ thống.`,
         );
 
       const otpInRedisCache = await this.cacheManager.get(
@@ -298,7 +318,7 @@ export class AuthService {
 
       if (!otpInRedisCache)
         throw new UnauthorizedException(
-          `OTP has expired. Please request a new code.`,
+          `Mã OTP này đã hết hạn. Vui lòng yêu cầu mã OTP mới.`,
         );
 
       const maxAttempts = DEFAULT_MAX_ATTEMPTS;
@@ -310,7 +330,7 @@ export class AuthService {
 
       if (attempts >= maxAttempts)
         throw new ForbiddenException(
-          'Too many failed attempts. Please request a new OTP.',
+          'Mã OTP đã bị vô hiệu hoá do bạn đã nhập sai quá nhiều lần. Vui lòng yêu cầu mã OTP mới.',
         );
 
       if (otpInRedisCache !== otp) {
@@ -321,7 +341,7 @@ export class AuthService {
         );
 
         throw new BadRequestException(
-          `Invalid OTP. You have ${maxAttempts - (attempts + 1)} attempts remaining.`,
+          `Mã OTP không hợp lệ. Bạn còn lại ${maxAttempts - (attempts + 1)} lần thử.`,
         );
       }
 
@@ -335,8 +355,8 @@ export class AuthService {
         .eq('Email', email);
 
       if (error)
-        throw new Error(
-          `Failed to update email verified status: ${error.message}`,
+        throw new InternalServerErrorException(
+          `Đã xảy ra lỗi khi cập nhật trạng thái xác minh cho email '${email}'.`,
         );
 
       await this.emailsProducer.sendEmail(
@@ -348,29 +368,11 @@ export class AuthService {
       return {
         success: true,
         message:
-          'Your email has been successfully verified. You can now log in.',
+          'Email của bạn đã được xác minh thành công. Bây giờ bạn có thể đăng nhập.',
       };
     } catch (err) {
       console.error(err);
       throw err;
-    }
-  };
-
-  public handleGetProfile = async (userId: string) => {
-    try {
-      const supabase = this.supabaseService.getClient();
-
-      const { error, data } = await supabase
-        .from('Users')
-        .select('*')
-        .eq('ID', userId)
-        .single<Users | null>();
-
-      if (error) throw error;
-
-      return omit(data as Users, ['Password']);
-    } catch (err) {
-      console.error(err);
     }
   };
 
@@ -382,7 +384,10 @@ export class AuthService {
         .from('Locations')
         .select('ID, Name');
 
-      if (error) throw new Error(error.message);
+      if (error)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi trong quá trình lấy ra các tỉnh thành. Vui lòng thử lại.',
+        );
 
       return data;
     } catch (err) {
@@ -399,7 +404,10 @@ export class AuthService {
         .from('Companies')
         .select('ID, Name');
 
-      if (error) throw error;
+      if (error)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi trong quá trình lấy ra tên các công ty. Vui lòng thử lại sau.',
+        );
 
       return data;
     } catch (err) {
@@ -414,15 +422,20 @@ export class AuthService {
 
       const supabase = this.supabaseService.getClient();
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('Users')
         .select('*')
         .eq('Email', email)
         .single<Users | null>();
 
-      if (error)
+      if (!data)
         throw new NotFoundException(
-          `User with email '${email}' not found in the system.`,
+          `Không tìm thấy người dùng có email '${email}' trong hệ thống.`,
+        );
+
+      if (data.IsEmailVerified)
+        throw new BadRequestException(
+          `Người dùng có email '${email}' đã xác minh email rồi.`,
         );
 
       await this.cacheManager.set(`${email}:otp-reset-password`, otp);
@@ -432,7 +445,7 @@ export class AuthService {
         EmailTemplateNameEnum.EMAIL_RESET_PASSWORD,
         {
           otp,
-          FullName: (data as Users).FullName,
+          FullName: data.FullName,
         },
       );
 
@@ -457,7 +470,7 @@ export class AuthService {
 
     if (!otpInRedisCache)
       throw new UnauthorizedException(
-        `OTP has expired. Please request a new code.`,
+        `Mã OTP này đã hết hạn. Vui lòng yêu cầu mã OTP mới.`,
       );
 
     const maxAttempts = DEFAULT_MAX_ATTEMPTS;
@@ -469,7 +482,7 @@ export class AuthService {
 
     if (attempts >= maxAttempts)
       throw new ForbiddenException(
-        'Too many failed attempts. Please request a new OTP.',
+        'Mã OTP đã bị vô hiệu hoá do bạn nhập sai quá nhiều. Vui lòng yêu cầu mã OTP mới.',
       );
 
     if (otpInRedisCache !== otp) {
@@ -480,7 +493,7 @@ export class AuthService {
       );
 
       throw new BadRequestException(
-        `Invalid OTP. You have ${maxAttempts - (attempts + 1)} attempts remaining.`,
+        `Mã OTP không hợp lệ. Bạn còn ${maxAttempts - (attempts + 1)} lần thử.`,
       );
     }
 
@@ -492,7 +505,7 @@ export class AuthService {
 
     return {
       success: true,
-      message: 'Valid OTP.',
+      message: 'OTP hợp lệ. Bạn có thể chuyển đến bưỡc tiếp theo.',
     };
   };
 
@@ -538,7 +551,7 @@ export class AuthService {
       return {
         success: true,
         message:
-          'Your password has been reset successfully. You can now log in with your new password.',
+          'Đặt lại mật khẩu thành công. Bây giờ, bạn có thể dùng mật khẩu mới để đăng nhập.',
       };
     } catch (err) {
       console.error(err);
@@ -559,7 +572,7 @@ export class AuthService {
 
     if (!existingUser)
       throw new NotFoundException(
-        `User with email: '${email}' not found in the system.`,
+        `Không tìm thấy người dùng có email '${email}' trong hệ thống.`,
       );
 
     const { error } = await supabaseAdmin.auth.admin.updateUserById(
@@ -569,7 +582,10 @@ export class AuthService {
       },
     );
 
-    if (error) throw new Error(error.message);
+    if (error)
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi cập nhật mật khẩu người dùng.',
+      );
 
     const hashedPassword = hashPassword(newPassword);
 
@@ -590,13 +606,13 @@ export class AuthService {
   ) {
     if (role === RoleEnum.CANDIDATE && !createCandidateDto) {
       throw new BadRequestException(
-        'Candidate details must be provided when registering as a candidate.',
+        'Thông tin ứng viên phải được cung cấp khi đăng ký làm ứng viên.',
       );
     }
 
     if (role === RoleEnum.RECRUITER && !createRecruiterDto) {
       throw new BadRequestException(
-        'Recruiter details must be provided when registering as a recruiter.',
+        'Thông tin nhà tuyển dụng phải được cung cấp khi đăng ký làm nhà tuyển dụng.',
       );
     }
 
@@ -606,7 +622,7 @@ export class AuthService {
       !createRecruiterDto?.createExistingCompanyDto &&
       !createRecruiterDto?.createCompanyDto
     )
-      throw new BadRequestException('Missing recruiter company information.');
+      throw new BadRequestException('Vui lòng cung cấp thông tin về công ty.');
   }
 
   private createCandidateUser = async (
@@ -621,7 +637,10 @@ export class AuthService {
       },
     ]);
 
-    if (error) throw error;
+    if (error)
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi đăng ký tài khoản ứng viên.',
+      );
   };
 
   private createRecruiterUser = async (
@@ -638,7 +657,10 @@ export class AuthService {
       },
     ]);
 
-    if (error) throw error;
+    if (error)
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi đăng ký tài khoản nhà tuyển dụng.',
+      );
   };
 
   private createCompany = async (
@@ -675,7 +697,7 @@ export class AuthService {
     const { LocationID, ...res } = createCompanyLocationDto;
 
     const { data, error } = await supabaseAdmin
-      .from('CompanyLocation')
+      .from('CompanyLocations')
       .insert([
         {
           ...res,
@@ -684,11 +706,12 @@ export class AuthService {
         },
       ])
       .select('*')
-      .maybeSingle<CompanyLocation>();
+      .maybeSingle<CompanyLocations>();
 
-    if (error) throw error;
-
-    if (!data) throw new Error(`Error when creating new company location.`);
+    if (error || !data)
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi tạo mới chi nhánh làm việc của công ty.',
+      );
 
     return data.ID;
   };
@@ -699,7 +722,7 @@ export class AuthService {
 
       const { data: company } = await supabaseAdmin
         .from('Companies')
-        .select('*, CompanyLocation(*)')
+        .select('*, CompanyLocations(*)')
         .eq('ID', companyId)
         .maybeSingle<any>();
 
@@ -708,7 +731,7 @@ export class AuthService {
           `Không tìm thấy công ty có id '${companyId}'.`,
         );
 
-      return company?.CompanyLocation;
+      return company?.CompanyLocations;
     } catch (err) {
       console.error(err);
       throw err;
@@ -724,7 +747,7 @@ export class AuthService {
 
       const { data: company } = await supabaseAdmin
         .from('Companies')
-        .select('*, CompanyLocation(*)')
+        .select('*, CompanyLocations(*)')
         .eq('ID', companyId)
         .maybeSingle<any>();
 
@@ -735,7 +758,7 @@ export class AuthService {
 
       const { BranchName, Address, LocationID } = createCompanyLocationDto;
 
-      const { error } = await supabaseAdmin.from('CompanyLocation').upsert(
+      const { error } = await supabaseAdmin.from('CompanyLocations').upsert(
         [
           {
             BranchName,
@@ -747,15 +770,18 @@ export class AuthService {
         { onConflict: 'BranchName,CompanyID' },
       );
 
-      if (error) throw error;
+      if (error)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi tạo mới địa điểm làm việc của công ty.',
+        );
 
       return (
         await supabaseAdmin
           .from('Companies')
-          .select('*, CompanyLocation(*)')
+          .select('*, CompanyLocations(*)')
           .eq('ID', companyId)
           .maybeSingle<any>()
-      ).data.CompanyLocation;
+      ).data.CompanyLocations;
     } catch (err) {
       console.error(err);
       throw err;
@@ -795,7 +821,10 @@ export class AuthService {
           },
         ]);
 
-      if (insertCategoryError) throw insertCategoryError;
+      if (insertCategoryError)
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi thêm danh mục công việc mới vào hệ thống.',
+        );
 
       return this.jobsService.handleGetCategories();
     } catch (err) {
