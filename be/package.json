@@ -49,6 +49,7 @@
     "handlebars": "^4.7.8",
     "keyv": "^5.3.2",
     "lodash": "^4.17.21",
+    "nestjs-supabase-js": "^1.1.1",
     "nodemailer": "^6.10.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",

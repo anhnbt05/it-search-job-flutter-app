@@ -1,30 +1,23 @@
 import { createKeyv } from '@keyv/redis';
 import { HttpModule } from '@nestjs/axios';
 import { CacheModule } from '@nestjs/cache-manager';
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SupabaseModule } from 'nestjs-supabase-js';
 import configurations from 'src/config/configurations';
-import { AuthMiddleware } from 'src/libs/common/middlewares/auth.middleware';
 import {
-  excludes,
   HTTP_MODULE_MAX_REDIRECT,
   HTTP_MODULE_TIMEOUT,
 } from 'src/libs/common/utils';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
+import { CompaniesModule } from './modules/companies/companies.module';
 import { EmailsModule } from './modules/emails/emails.module';
 import { JobsModule } from './modules/jobs/jobs.module';
-import { SupabaseModule } from './modules/supabase/supabase.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { UsersModule } from './modules/users/users.module';
 import { WorkExperiencesModule } from './modules/work-experiences/work-experiences.module';
-import { CompaniesModule } from './modules/companies/companies.module';
 
 @Module({
   imports: [
@@ -49,7 +42,29 @@ import { CompaniesModule } from './modules/companies/companies.module';
     }),
     AuthModule,
     UsersModule,
-    SupabaseModule,
+    SupabaseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => [
+        {
+          name: 'adminClient',
+          supabaseConfig: {
+            supabaseKey: configService.get<string>(
+              'supabase.service_role_key',
+              '',
+            ),
+            supabaseUrl: configService.get<string>('supabase.url', ''),
+          },
+        },
+        {
+          name: 'anonClient',
+          supabaseConfig: {
+            supabaseKey: configService.get<string>('supabase.anon_key', ''),
+            supabaseUrl: configService.get<string>('supabase.url', ''),
+          },
+        },
+      ],
+    }),
     UploadsModule,
     EmailsModule,
     JobsModule,
@@ -59,16 +74,4 @@ import { CompaniesModule } from './modules/companies/companies.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    return consumer
-      .apply(AuthMiddleware)
-      .exclude(
-        ...excludes.map((route) => ({
-          path: route,
-          method: RequestMethod.ALL,
-        })),
-      )
-      .forRoutes('*');
-  }
-}
+export class AppModule {}

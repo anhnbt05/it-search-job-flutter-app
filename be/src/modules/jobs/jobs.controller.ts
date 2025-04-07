@@ -13,7 +13,7 @@ import {
 import { User } from '@supabase/supabase-js';
 import { Request } from 'express';
 import { Roles } from 'src/libs/common/decorators';
-import { RoleAuthGuard } from 'src/libs/common/guards';
+import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
 import { RoleEnum } from 'src/libs/common/utils';
 import {
   CreateJobDto,
@@ -23,13 +23,15 @@ import {
   UpdateJobDto,
 } from 'src/modules/jobs/dtos';
 import { JobsService } from './jobs.service';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('jobs')
+@UseGuards(SupabaseGuard, RoleAuthGuard)
+@ApiBearerAuth()
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   @Get()
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.ADMIN, RoleEnum.CANDIDATE, RoleEnum.RECRUITER)
   async getJobs(@Req() request: Request) {
     const userId = (request.user as User).id;
@@ -38,21 +40,18 @@ export class JobsController {
   }
 
   @Get('locations/:locationId')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.ADMIN, RoleEnum.CANDIDATE, RoleEnum.RECRUITER)
   async searchJobsByLocations(@Param('locationId') locationId: string) {
     return this.jobsService.handleSearchJobsByLocations(locationId);
   }
 
   @Get('categories/:categoryName')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.CANDIDATE)
   async getJobsByCategory(@Param('categoryName') categoryName: string) {
     return this.jobsService.handleGetJobsByCategoryName(categoryName);
   }
 
   @Get('candidates/:candidateId/recommended-jobs')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.CANDIDATE)
   async getRecommendJobsForCandidate(@Req() request: Request) {
     const userId = (request.user as User).id;
@@ -61,7 +60,6 @@ export class JobsController {
   }
 
   @Get(':id')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.ADMIN, RoleEnum.CANDIDATE, RoleEnum.RECRUITER)
   async getJob(
     @Req() request: Request,
@@ -73,7 +71,6 @@ export class JobsController {
   }
 
   @Post()
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.RECRUITER)
   async createJob(@Body() createJobDto: CreateJobDto, @Req() request: Request) {
     return this.jobsService.handleCreateJob(
@@ -83,7 +80,6 @@ export class JobsController {
   }
 
   @Patch(':id')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.RECRUITER)
   async updateJob(
     @Param('id', ParseUUIDPipe) jobId: string,
@@ -93,7 +89,6 @@ export class JobsController {
   }
 
   @Delete(':id')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.ADMIN, RoleEnum.RECRUITER)
   async deleteJob(
     @Param('id', ParseUUIDPipe) id: string,
@@ -103,7 +98,6 @@ export class JobsController {
   }
 
   @Patch('process/status')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.ADMIN)
   async processStatusOfJobs(
     @Body() processJobStatusDto: ProcessJobStatusDto,
@@ -118,7 +112,6 @@ export class JobsController {
   }
 
   @Post('candidates/favorites')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.CANDIDATE)
   async createJobFavoritesForCandidates(
     @Req() request: Request,
@@ -133,7 +126,6 @@ export class JobsController {
   }
 
   @Delete('candidates/favorites')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.CANDIDATE)
   async deleteJobFavoritesOfCandidates(
     @Body() deleteJobFavoritesDto: DeleteJobFavoritesDto,

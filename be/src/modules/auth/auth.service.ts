@@ -11,7 +11,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Categories, Companies, CompanyLocations, Users } from '@prisma/client';
 import { SupabaseClient, User } from '@supabase/supabase-js';
-import { omit } from 'lodash';
+import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import {
   DEFAULT_MAX_ATTEMPTS,
   DEFAULT_TTL_OTP_EXPIRED,
@@ -30,7 +30,6 @@ import {
 } from 'src/modules/auth/dtos';
 import { EmailsProducer } from 'src/modules/emails/producers';
 import { JobsService } from 'src/modules/jobs/jobs.service';
-import { SupabaseService } from 'src/modules/supabase/supabase.service';
 import {
   CreateCandidateDto,
   CreateCompanyDto,
@@ -41,11 +40,14 @@ import {
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly supabaseService: SupabaseService,
     private readonly configService: ConfigService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly emailsProducer: EmailsProducer,
     private readonly jobsService: JobsService,
+    @InjectSupabaseClient('adminClient')
+    private readonly adminSupabaseClient: SupabaseClient,
+    @InjectSupabaseClient('anonClient')
+    private readonly anonSupabaseClient: SupabaseClient,
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
@@ -56,11 +58,7 @@ export class AuthService {
 
       this.validateRoleData(res.Role, createCandidateDto, createRecruiterDto);
 
-      const supabase = this.supabaseService.getClient();
-
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data: findUserWithEmail } = await supabaseAdmin
+      const { data: findUserWithEmail } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('Email', Email)
@@ -71,7 +69,7 @@ export class AuthService {
           `Đã có người dùng sử dụng email '${Email}.'`,
         );
 
-      const { data: findUserWithPhoneNumber } = await supabaseAdmin
+      const { data: findUserWithPhoneNumber } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('PhoneNumber', PhoneNumber)
@@ -84,7 +82,7 @@ export class AuthService {
 
       const hashedPassword = hashPassword(res.Password);
 
-      const { data } = await supabase.auth.signUp({
+      const { data } = await this.anonSupabaseClient.auth.signUp({
         email: Email,
         password: Password,
       });
@@ -94,13 +92,13 @@ export class AuthService {
           'Tạo mới người dùng không thành công. Vui lòng thử lại.',
         );
 
-      await supabaseAdmin.auth.admin.updateUserById(data.user.id, {
+      await this.adminSupabaseClient.auth.admin.updateUserById(data.user.id, {
         app_metadata: {
           role: Role,
         },
       });
 
-      const { data: userData, error: dbError } = await supabaseAdmin
+      const { data: userData, error: dbError } = await this.adminSupabaseClient
         .from('Users')
         .insert([
           {
@@ -119,11 +117,7 @@ export class AuthService {
         );
 
       if (Role === RoleEnum.CANDIDATE && createCandidateDto) {
-        await this.createCandidateUser(
-          userData.ID,
-          createCandidateDto,
-          supabaseAdmin,
-        );
+        await this.createCandidateUser(userData.ID, createCandidateDto);
       }
 
       if (Role === RoleEnum.RECRUITER && createRecruiterDto) {
@@ -142,10 +136,8 @@ export class AuthService {
 
           createCompanyLocationId = companyLocationID;
         } else if (createCompanyDto) {
-          const { companyLocationId } = await this.createCompany(
-            createCompanyDto,
-            supabaseAdmin,
-          );
+          const { companyLocationId } =
+            await this.createCompany(createCompanyDto);
 
           createCompanyLocationId = companyLocationId;
         }
@@ -153,7 +145,6 @@ export class AuthService {
         await this.createRecruiterUser(
           userData.ID,
           Position,
-          supabaseAdmin,
           createCompanyLocationId,
         );
       }
@@ -188,19 +179,18 @@ export class AuthService {
 
   async signIn(email: string, password: string) {
     try {
-      const supabase = this.supabaseService.getClient();
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data, error } =
+        await this.adminSupabaseClient.auth.signInWithPassword({
+          email,
+          password,
+        });
 
       if (error)
         throw new BadRequestException(
           'Thông tin đăng nhập không chính xác. Vui lòng thử lại.',
         );
 
-      const { data: findUser } = await supabase
+      const { data: findUser } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('ID', data.user.id)
@@ -257,9 +247,7 @@ export class AuthService {
 
   public signOut = async () => {
     try {
-      const supabase = this.supabaseService.getClient();
-
-      await supabase.auth.signOut();
+      await this.adminSupabaseClient.auth.signOut();
 
       return { success: true, message: 'Đăng xuất tài khoản thành công.' };
     } catch (err) {
@@ -270,11 +258,10 @@ export class AuthService {
 
   async refreshToken(refreshToken: string) {
     try {
-      const supabase = this.supabaseService.getClient();
-
-      const { data, error } = await supabase.auth.refreshSession({
-        refresh_token: refreshToken,
-      });
+      const { data, error } =
+        await this.adminSupabaseClient.auth.refreshSession({
+          refresh_token: refreshToken,
+        });
 
       if (error)
         throw new UnauthorizedException(
@@ -292,11 +279,9 @@ export class AuthService {
 
   public handleVerifyEmail = async (verifyEmailDto: VerifyEmailDto) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
       const { email, otp } = verifyEmailDto;
 
-      const { data: findUser } = await supabaseAdmin
+      const { data: findUser } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('Email', email)
@@ -349,7 +334,7 @@ export class AuthService {
 
       await this.cacheManager.del(`${email}:otp-attempts`);
 
-      const { error } = await supabaseAdmin
+      const { error } = await this.adminSupabaseClient
         .from('Users')
         .update({ IsEmailVerified: true })
         .eq('Email', email);
@@ -378,9 +363,7 @@ export class AuthService {
 
   public getProvinces = async () => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await this.anonSupabaseClient
         .from('Locations')
         .select('ID, Name');
 
@@ -398,9 +381,7 @@ export class AuthService {
 
   public getCompanies = async () => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await this.anonSupabaseClient
         .from('Companies')
         .select('ID, Name');
 
@@ -420,9 +401,7 @@ export class AuthService {
     try {
       const otp = generateOTP();
 
-      const supabase = this.supabaseService.getClient();
-
-      const { data } = await supabase
+      const { data } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('Email', email)
@@ -511,17 +490,21 @@ export class AuthService {
 
   public handleResetPassword = async (resetPasswordDto: ResetPasswordDto) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
       const { newPassword, email } = resetPasswordDto;
 
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await this.anonSupabaseClient
         .from('Users')
         .select('FullName')
         .eq('Email', email)
-        .single<Users | null>();
+        .maybeSingle<Users>();
 
-      if (error) throw new Error(error.message);
+      if (!data || error) {
+        console.error(error);
+
+        throw new InternalServerErrorException(
+          `Không tìm thấy người dùng có email '${email}' trong hệ thống.`,
+        );
+      }
 
       const isHavePermissionToResetPassword = (await this.cacheManager.get(
         `${email}:otp-verified-reset-password`,
@@ -532,7 +515,7 @@ export class AuthService {
           'Please verify the OTP sent to your email before proceeding with the password reset.',
         );
 
-      await this.updatePassword(supabaseAdmin, email, newPassword);
+      await this.updatePassword(email, newPassword);
 
       await this.cacheManager.del(`${email}:otp-reset-password`);
 
@@ -544,7 +527,7 @@ export class AuthService {
         email,
         EmailTemplateNameEnum.EMAIL_UPDATE_PASSWORD_SUCCESS,
         {
-          FullName: (data as Users).FullName,
+          FullName: data.FullName,
         },
       );
 
@@ -559,12 +542,9 @@ export class AuthService {
     }
   };
 
-  private updatePassword = async (
-    supabaseAdmin: SupabaseClient,
-    email: string,
-    newPassword: string,
-  ) => {
-    const { data: userData } = await supabaseAdmin.auth.admin.listUsers();
+  private updatePassword = async (email: string, newPassword: string) => {
+    const { data: userData } =
+      await this.adminSupabaseClient.auth.admin.listUsers();
 
     const existingUser = userData.users.find(
       (user: User) => user.email === email,
@@ -575,7 +555,7 @@ export class AuthService {
         `Không tìm thấy người dùng có email '${email}' trong hệ thống.`,
       );
 
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(
+    const { error } = await this.adminSupabaseClient.auth.admin.updateUserById(
       existingUser.id,
       {
         password: newPassword,
@@ -589,7 +569,7 @@ export class AuthService {
 
     const hashedPassword = hashPassword(newPassword);
 
-    await supabaseAdmin
+    await this.adminSupabaseClient
       .from('Users')
       .update([
         {
@@ -628,9 +608,8 @@ export class AuthService {
   private createCandidateUser = async (
     userId: string,
     createCandidateDto: CreateCandidateDto,
-    supabaseAdmin: SupabaseClient,
   ) => {
-    const { error } = await supabaseAdmin.from('Candidates').insert([
+    const { error } = await this.adminSupabaseClient.from('Candidates').insert([
       {
         ...createCandidateDto,
         UserID: userId,
@@ -646,10 +625,9 @@ export class AuthService {
   private createRecruiterUser = async (
     userId: string,
     position: string,
-    supabaseAdmin: SupabaseClient,
     companyLocationId: string,
   ) => {
-    const { error } = await supabaseAdmin.from('Recruiters').insert([
+    const { error } = await this.adminSupabaseClient.from('Recruiters').insert([
       {
         Position: position,
         UserID: userId,
@@ -663,13 +641,10 @@ export class AuthService {
       );
   };
 
-  private createCompany = async (
-    createCompanyDto: CreateCompanyDto,
-    supabaseAdmin: SupabaseClient,
-  ) => {
+  private createCompany = async (createCompanyDto: CreateCompanyDto) => {
     const { createCompanyLocationDto, ...res } = createCompanyDto;
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.adminSupabaseClient
       .from('Companies')
       .insert([res])
       .select('*')
@@ -680,7 +655,6 @@ export class AuthService {
     const companyLocationId = await this.createCompanyLocation(
       createCompanyLocationDto,
       (data as Companies).ID,
-      supabaseAdmin,
     );
 
     return {
@@ -692,11 +666,10 @@ export class AuthService {
   private createCompanyLocation = async (
     createCompanyLocationDto: CreateCompanyLocationDto,
     companyId: string,
-    supabaseAdmin: SupabaseClient,
   ) => {
     const { LocationID, ...res } = createCompanyLocationDto;
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.adminSupabaseClient
       .from('CompanyLocations')
       .insert([
         {
@@ -718,9 +691,7 @@ export class AuthService {
 
   public handleGetBranchesOfCompany = async (companyId: string) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data: company } = await supabaseAdmin
+      const { data: company } = await this.anonSupabaseClient
         .from('Companies')
         .select('*, CompanyLocations(*)')
         .eq('ID', companyId)
@@ -743,9 +714,7 @@ export class AuthService {
     createCompanyLocationDto: CreateCompanyLocationDto,
   ) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data: company } = await supabaseAdmin
+      const { data: company } = await this.anonSupabaseClient
         .from('Companies')
         .select('*, CompanyLocations(*)')
         .eq('ID', companyId)
@@ -758,25 +727,30 @@ export class AuthService {
 
       const { BranchName, Address, LocationID } = createCompanyLocationDto;
 
-      const { error } = await supabaseAdmin.from('CompanyLocations').upsert(
-        [
-          {
-            BranchName,
-            Address,
-            LocationID,
-            CompanyID: companyId,
-          },
-        ],
-        { onConflict: 'BranchName,CompanyID' },
-      );
+      const { error } = await this.adminSupabaseClient
+        .from('CompanyLocations')
+        .upsert(
+          [
+            {
+              BranchName,
+              Address,
+              LocationID,
+              CompanyID: companyId,
+            },
+          ],
+          { onConflict: 'BranchName,CompanyID' },
+        );
 
-      if (error)
+      if (error) {
+        console.error(error);
+
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi khi tạo mới địa điểm làm việc của công ty.',
         );
+      }
 
       return (
-        await supabaseAdmin
+        await this.anonSupabaseClient
           .from('Companies')
           .select('*, CompanyLocations(*)')
           .eq('ID', companyId)
@@ -796,11 +770,9 @@ export class AuthService {
     createCategoryDto: CreateCategoryDto,
   ) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
       const { CategoryName } = createCategoryDto;
 
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await this.anonSupabaseClient
         .from('Categories')
         .select('*')
         .eq('CategoryName', CategoryName)
@@ -813,7 +785,7 @@ export class AuthService {
           `Danh mục có tên '${CategoryName}' đã tồn tại.`,
         );
 
-      const { error: insertCategoryError } = await supabaseAdmin
+      const { error: insertCategoryError } = await this.adminSupabaseClient
         .from('Categories')
         .insert([
           {

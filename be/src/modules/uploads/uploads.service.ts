@@ -1,21 +1,21 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SupabaseService } from 'src/modules/supabase/supabase.service';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { InjectSupabaseClient } from 'nestjs-supabase-js';
 
 @Injectable()
 export class UploadsService {
   constructor(
-    private readonly supabaseService: SupabaseService,
     private readonly configService: ConfigService,
+    @InjectSupabaseClient('adminClient')
+    private readonly adminSupabaseClient: SupabaseClient,
   ) {}
 
   public uploadFile = async (file: Express.Multer.File, bucket: string) => {
     try {
-      const supabase = this.supabaseService.getClient();
-
       const fileName = `${Date.now()}-${file.originalname}`;
 
-      const { error } = await supabase.storage
+      const { error } = await this.adminSupabaseClient.storage
         .from(bucket)
         .upload(fileName, new Uint8Array(file.buffer), {
           contentType: file.mimetype,

@@ -8,22 +8,25 @@ import {
 import { Recruiters, Role, Users, UserStatus } from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { omit } from 'lodash';
-import { SupabaseService } from 'src/modules/supabase/supabase.service';
+import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
 import { UpdateUserDto } from 'src/modules/users/dtos';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly supabaseService: SupabaseService,
     private readonly uploadsService: UploadsService,
+    @InjectSupabaseClient('adminClient')
+    private readonly adminSupabaseClient: SupabaseClient,
+    @InjectSupabaseClient('anonClient')
+    private readonly anonSupabaseClient: SupabaseClient,
   ) {}
 
   public handleGetUsers = async () => {
     try {
-      const supabase = this.supabaseService.getClient();
-
-      const { data, error } = await supabase.from('Users').select('*');
+      const { data, error } = await this.anonSupabaseClient
+        .from('Users')
+        .select('*');
 
       if (error)
         throw new InternalServerErrorException(
@@ -45,9 +48,7 @@ export class UsersService {
 
   public handleGetUser = async (userId: string, currentUserId: string) => {
     try {
-      const supabase = this.supabaseService.getClient();
-
-      const { data } = await supabase
+      const { data } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('ID', userId)
@@ -63,7 +64,7 @@ export class UsersService {
           `Tài khoản của người dùng có tên '${data.FullName}' đã bị khoá bởi quản trị viên của hệ thống.`,
         );
 
-      const { data: currentUser } = await supabase
+      const { data: currentUser } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('ID', currentUserId)
@@ -80,7 +81,7 @@ export class UsersService {
         );
 
       if (currentUser.Role === Role.recruiter && data.Role === Role.candidate) {
-        const { data: candidate } = await supabase
+        const { data: candidate } = await this.anonSupabaseClient
           .from('Candidates')
           .select(
             '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role) ,Applications(*, Jobs(*, Recruiters(*)))',
@@ -93,7 +94,7 @@ export class UsersService {
             `Không tìm thấy bất kỳ thông tin ứng cử viên nào cho người dùng có id '${userId}'.`,
           );
 
-        const { data: recruiter } = await supabase
+        const { data: recruiter } = await this.anonSupabaseClient
           .from('Recruiters')
           .select('*')
           .eq('UserID', currentUserId)
@@ -129,7 +130,7 @@ export class UsersService {
       if (currentUser.Role === Role.admin) return omit(data, ['Password']);
 
       if (currentUser.Role === Role.candidate) {
-        const { data: candidate } = await supabase
+        const { data: candidate } = await this.anonSupabaseClient
           .from('Candidates')
           .select(
             '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role) ,Applications(*)',
@@ -148,7 +149,7 @@ export class UsersService {
         };
       }
 
-      const { data: recruiter } = await supabase
+      const { data: recruiter } = await this.anonSupabaseClient
         .from('Recruiters')
         .select('*, Users(*), CompanyLocations(*, Companies(*))')
         .eq('UserID', currentUserId)
@@ -200,9 +201,7 @@ export class UsersService {
           `Bạn chỉ có thể cập nhật thông tin của chính mình.`,
         );
 
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data: user } = await supabaseAdmin
+      const { data: user } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('ID', currentUserId)
@@ -245,7 +244,7 @@ export class UsersService {
       const { updateCandidateDto, updateRecruiterDto, ...res } = updateUserDto;
 
       if (updateCandidateDto) {
-        const { error } = await supabaseAdmin
+        const { error } = await this.adminSupabaseClient
           .from('Candidates')
           .update([updateCandidateDto])
           .eq('UserID', userId);
@@ -259,7 +258,7 @@ export class UsersService {
         }
       }
 
-      const { error } = await supabaseAdmin
+      const { error } = await this.adminSupabaseClient
         .from('Users')
         .update([res])
         .eq('ID', currentUserId);
@@ -276,7 +275,6 @@ export class UsersService {
         await this.handleUpdateFileUrl(
           avatarFile,
           userId,
-          supabaseAdmin,
           'AvatarUrl',
           'Users',
           'ID',
@@ -286,14 +284,13 @@ export class UsersService {
         await this.handleUpdateFileUrl(
           resumeFile,
           userId,
-          supabaseAdmin,
           'ResumeUrl',
           'Candidates',
           'UserID',
         );
 
       if (updateRecruiterDto) {
-        const { error } = await supabaseAdmin
+        const { error } = await this.adminSupabaseClient
           .from('Recruiters')
           .update([updateRecruiterDto])
           .eq('UserID', currentUserId);
@@ -316,9 +313,7 @@ export class UsersService {
 
   public handleDeleteUser = async (userId: string) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data, error: findUserError } = await supabaseAdmin
+      const { data, error: findUserError } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('ID', userId)
@@ -337,7 +332,7 @@ export class UsersService {
           'Bạn không thể tự khoá chính tài khoản của mình.',
         );
 
-      const { error } = await supabaseAdmin
+      const { error } = await this.adminSupabaseClient
         .from('Users')
         .update([
           {
@@ -385,14 +380,13 @@ export class UsersService {
   private handleUpdateFileUrl = async (
     file: Express.Multer.File,
     value: string,
-    supabaseAdmin: SupabaseClient,
     field: string,
     tableName: string,
     columnName: string,
   ) => {
     const { url } = await this.uploadsService.uploadFile(file, 'files');
 
-    const { error: updateAvatarError } = await supabaseAdmin
+    const { error: updateAvatarError } = await this.adminSupabaseClient
       .from(tableName)
       .update([
         {

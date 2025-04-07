@@ -18,7 +18,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { Roles } from 'src/libs/common/decorators';
-import { RoleAuthGuard } from 'src/libs/common/guards';
+import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
 import { DEFAULT_TTL_PROVINCES_CACHE, RoleEnum } from 'src/libs/common/utils';
 import {
   CreateCategoryDto,
@@ -257,7 +257,7 @@ export class AuthController {
   }
 
   @Post('sign-out')
-  @UseGuards(RoleAuthGuard)
+  @UseGuards(SupabaseGuard, RoleAuthGuard)
   @Roles(RoleEnum.ADMIN, RoleEnum.CANDIDATE, RoleEnum.RECRUITER)
   @ApiBearerAuth()
   @ApiOperation({
@@ -496,7 +496,7 @@ export class AuthController {
   }
 
   @Get('categories')
-  @UseGuards(RoleAuthGuard)
+  @UseGuards(SupabaseGuard, RoleAuthGuard)
   @ApiOperation({
     summary: 'Danh sách các danh mục công việc',
     description:
@@ -532,7 +532,7 @@ export class AuthController {
   }
 
   @Post('categories')
-  @UseGuards(RoleAuthGuard)
+  @UseGuards(SupabaseGuard, RoleAuthGuard)
   @ApiOperation({
     summary: 'Tạo mới danh mục công việc',
     description: 'Đường dẫn này dùng để tạo mới danh mục công việc',
