@@ -17,9 +17,6 @@ CREATE TYPE "JobType" AS ENUM ('part_time', 'full_time', 'remote', 'free_lance')
 CREATE TYPE "JobStatus" AS ENUM ('open', 'closed', 'pending', 'rejected');
 
 -- CreateEnum
-CREATE TYPE "JobCategory" AS ENUM ('Full Stack', 'Front End', 'Back End', 'Mobile', 'Software Engineer', 'DevOps', 'Data Scientist', 'AI Engineer', 'Game Developer', 'Cyber Security', 'UI/UX Designer', 'QA Tester', 'Embedded Engineer', 'Other');
-
--- CreateEnum
 CREATE TYPE "ApplicationStatus" AS ENUM ('pending', 'accepted', 'rejected');
 
 -- CreateTable
@@ -46,7 +43,7 @@ CREATE TABLE "Recruiters" (
     "Position" VARCHAR(255) NOT NULL,
     "DeletedAt" TIMESTAMP(3),
     "UserID" UUID NOT NULL,
-    "CompanyID" UUID NOT NULL,
+    "CompanyLocationID" UUID NOT NULL,
 
     CONSTRAINT "Recruiters_pkey" PRIMARY KEY ("ID")
 );
@@ -78,7 +75,7 @@ CREATE TABLE "Companies" (
 );
 
 -- CreateTable
-CREATE TABLE "CompanyLocation" (
+CREATE TABLE "CompanyLocations" (
     "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "BranchName" VARCHAR(255) NOT NULL,
     "Address" VARCHAR(255) NOT NULL,
@@ -88,7 +85,7 @@ CREATE TABLE "CompanyLocation" (
     "CompanyID" UUID NOT NULL,
     "LocationID" UUID NOT NULL,
 
-    CONSTRAINT "CompanyLocation_pkey" PRIMARY KEY ("ID")
+    CONSTRAINT "CompanyLocations_pkey" PRIMARY KEY ("ID")
 );
 
 -- CreateTable
@@ -102,34 +99,26 @@ CREATE TABLE "Locations" (
 );
 
 -- CreateTable
-CREATE TABLE "JobBranches" (
-    "DeletedAt" TIMESTAMP(3),
-    "CompanyLocationID" UUID NOT NULL,
-    "JobID" UUID NOT NULL,
-    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
-
-    CONSTRAINT "JobBranches_pkey" PRIMARY KEY ("ID")
-);
-
--- CreateTable
-CREATE TABLE "Notification" (
+CREATE TABLE "Notifications" (
     "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Title" TEXT NOT NULL,
     "Type" "NotificationType" NOT NULL,
     "DeletedAt" TIMESTAMP(3),
 
-    CONSTRAINT "Notification_pkey" PRIMARY KEY ("ID")
+    CONSTRAINT "Notifications_pkey" PRIMARY KEY ("ID")
 );
 
 -- CreateTable
-CREATE TABLE "UserNotification" (
+CREATE TABLE "UserNotifications" (
     "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Content" TEXT[],
     "IsRead" BOOLEAN NOT NULL DEFAULT false,
     "CreatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "DeletedAt" TIMESTAMP(3),
+    "UserID" UUID NOT NULL,
+    "NotificationID" UUID NOT NULL,
 
-    CONSTRAINT "UserNotification_pkey" PRIMARY KEY ("ID")
+    CONSTRAINT "UserNotifications_pkey" PRIMARY KEY ("ID")
 );
 
 -- CreateTable
@@ -156,7 +145,7 @@ CREATE TABLE "Jobs" (
 CREATE TABLE "Applications" (
     "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "ResumeUrl" TEXT NOT NULL,
-    "Status" "ApplicationStatus" NOT NULL,
+    "Status" "ApplicationStatus" NOT NULL DEFAULT 'pending',
     "AppliedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "DeletedAt" TIMESTAMP(3),
     "CandidateID" UUID NOT NULL,
@@ -166,13 +155,13 @@ CREATE TABLE "Applications" (
 );
 
 -- CreateTable
-CREATE TABLE "JobDescription" (
+CREATE TABLE "JobDescriptions" (
     "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
     "Description" TEXT NOT NULL,
     "DeletedAt" TIMESTAMP(3),
     "JobID" UUID NOT NULL,
 
-    CONSTRAINT "JobDescription_pkey" PRIMARY KEY ("ID")
+    CONSTRAINT "JobDescriptions_pkey" PRIMARY KEY ("ID")
 );
 
 -- CreateTable
@@ -233,7 +222,7 @@ CREATE TABLE "JobCategories" (
 -- CreateTable
 CREATE TABLE "Categories" (
     "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "CategoryName" "JobCategory" NOT NULL,
+    "CategoryName" TEXT NOT NULL,
     "CreatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "UpdatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "DeletedAt" TIMESTAMP(3),
@@ -251,31 +240,46 @@ CREATE UNIQUE INDEX "Users_PhoneNumber_key" ON "Users"("PhoneNumber");
 CREATE UNIQUE INDEX "Recruiters_UserID_key" ON "Recruiters"("UserID");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Recruiters_CompanyLocationID_key" ON "Recruiters"("CompanyLocationID");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Candidates_UserID_key" ON "Candidates"("UserID");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CompanyLocations_BranchName_CompanyID_key" ON "CompanyLocations"("BranchName", "CompanyID");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "WorkExperiences_CompanyName_Position_CandidateID_key" ON "WorkExperiences"("CompanyName", "Position", "CandidateID");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "JobFavorites_CandidateID_JobID_key" ON "JobFavorites"("CandidateID", "JobID");
 
 -- CreateIndex
 CREATE INDEX "JobCategories_CategoryID_JobID_idx" ON "JobCategories"("CategoryID", "JobID");
 
--- AddForeignKey
-ALTER TABLE "Recruiters" ADD CONSTRAINT "Recruiters_CompanyID_fkey" FOREIGN KEY ("CompanyID") REFERENCES "Companies"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "Categories_CategoryName_key" ON "Categories"("CategoryName");
 
 -- AddForeignKey
 ALTER TABLE "Recruiters" ADD CONSTRAINT "Recruiters_UserID_fkey" FOREIGN KEY ("UserID") REFERENCES "Users"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Recruiters" ADD CONSTRAINT "Recruiters_CompanyLocationID_fkey" FOREIGN KEY ("CompanyLocationID") REFERENCES "CompanyLocations"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Candidates" ADD CONSTRAINT "Candidates_UserID_fkey" FOREIGN KEY ("UserID") REFERENCES "Users"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "CompanyLocation" ADD CONSTRAINT "CompanyLocation_CompanyID_fkey" FOREIGN KEY ("CompanyID") REFERENCES "Companies"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "CompanyLocations" ADD CONSTRAINT "CompanyLocations_CompanyID_fkey" FOREIGN KEY ("CompanyID") REFERENCES "Companies"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "CompanyLocation" ADD CONSTRAINT "CompanyLocation_LocationID_fkey" FOREIGN KEY ("LocationID") REFERENCES "Locations"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "CompanyLocations" ADD CONSTRAINT "CompanyLocations_LocationID_fkey" FOREIGN KEY ("LocationID") REFERENCES "Locations"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "JobBranches" ADD CONSTRAINT "JobBranches_CompanyLocationID_fkey" FOREIGN KEY ("CompanyLocationID") REFERENCES "CompanyLocation"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "UserNotifications" ADD CONSTRAINT "UserNotifications_UserID_fkey" FOREIGN KEY ("UserID") REFERENCES "Users"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "JobBranches" ADD CONSTRAINT "JobBranches_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "UserNotifications" ADD CONSTRAINT "UserNotifications_NotificationID_fkey" FOREIGN KEY ("NotificationID") REFERENCES "Notifications"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Jobs" ADD CONSTRAINT "Jobs_RecruiterID_fkey" FOREIGN KEY ("RecruiterID") REFERENCES "Recruiters"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -287,7 +291,7 @@ ALTER TABLE "Applications" ADD CONSTRAINT "Applications_CandidateID_fkey" FOREIG
 ALTER TABLE "Applications" ADD CONSTRAINT "Applications_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "JobDescription" ADD CONSTRAINT "JobDescription_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "JobDescriptions" ADD CONSTRAINT "JobDescriptions_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "JobRequirements" ADD CONSTRAINT "JobRequirements_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -303,3 +307,9 @@ ALTER TABLE "JobFavorites" ADD CONSTRAINT "JobFavorites_CandidateID_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "JobFavorites" ADD CONSTRAINT "JobFavorites_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JobCategories" ADD CONSTRAINT "JobCategories_JobID_fkey" FOREIGN KEY ("JobID") REFERENCES "Jobs"("ID") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JobCategories" ADD CONSTRAINT "JobCategories_CategoryID_fkey" FOREIGN KEY ("CategoryID") REFERENCES "Categories"("ID") ON DELETE CASCADE ON UPDATE CASCADE;

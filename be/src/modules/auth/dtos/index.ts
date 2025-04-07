@@ -5,3 +5,4 @@ export * from './forget-password.dto';
 export * from './reset-password.dto';
 export * from './verify-reset-password-otp.dto';
 export * from './update-password.dto';
+export * from './create-category.dto';

@@ -32,7 +32,7 @@ export class RoleAuthGuard implements CanActivate {
 
     if (!requiredRoles.includes(role))
       throw new ForbiddenException(
-        "You can't have permission to access this route.",
+        'Bạn không có quyền truy cập vào tài nguyên của đường dẫn này.',
       );
 
     return true;

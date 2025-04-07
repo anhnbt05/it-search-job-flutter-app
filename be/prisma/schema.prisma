@@ -9,31 +9,33 @@ datasource db {
 }
 
 model Users {
-  ID              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  Email           String      @unique @db.VarChar(255)
-  Password        String      @db.VarChar(255)
-  FullName        String
-  AvatarUrl       String?
-  PhoneNumber     String      @unique @db.VarChar(255)
-  Status          UserStatus  @default(ACTIVE)
-  CreatedAt       DateTime    @default(now())
-  UpdatedAt       DateTime    @default(now())
-  Role            Role
-  DeletedAt       DateTime?
-  IsEmailVerified Boolean     @default(false)
-  Candidates      Candidates?
-  Recruiters      Recruiters?
+  ID                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Email             String              @unique @db.VarChar(255)
+  Password          String              @db.VarChar(255)
+  FullName          String
+  AvatarUrl         String?
+  PhoneNumber       String              @unique @db.VarChar(255)
+  Status            UserStatus          @default(active)
+  CreatedAt         DateTime            @default(now())
+  UpdatedAt         DateTime            @default(now())
+  Role              Role
+  DeletedAt         DateTime?
+  IsEmailVerified   Boolean             @default(false)
+  Candidates        Candidates?
+  Recruiters        Recruiters?
+  UserNotifications UserNotifications[]
 }
 
 model Recruiters {
-  ID        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  Position  String    @db.VarChar(255)
-  DeletedAt DateTime?
-  UserID    String    @unique @db.Uuid
-  CompanyID String    @db.Uuid
-  Jobs      Jobs[]
-  Company   Companies @relation(fields: [CompanyID], references: [ID], onDelete: Cascade)
-  User      Users     @relation(fields: [UserID], references: [ID], onDelete: Cascade)
+  ID                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Position          String    @db.VarChar(255)
+  DeletedAt         DateTime?
+  UserID            String    @unique @db.Uuid
+  Jobs              Jobs[]
+  User              Users     @relation(fields: [UserID], references: [ID], onDelete: Cascade)
+  CompanyLocationID String    @unique @db.Uuid
+
+  CompanyLocations CompanyLocations @relation(fields: [CompanyLocationID], references: [ID], onDelete: Cascade)
 }
 
 model Candidates {
@@ -51,61 +53,60 @@ model Candidates {
 }
 
 model Companies {
-  ID               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ID               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   Name             String
   WebsiteUrl       String?
   LogoUrl          String?
   Description      String?
-  CreatedAt        DateTime          @default(now())
-  UpdatedAt        DateTime          @default(now())
-  CompanyLocations CompanyLocation[]
-  Recruiters       Recruiters[]
+  CreatedAt        DateTime           @default(now())
+  UpdatedAt        DateTime           @default(now())
+  CompanyLocations CompanyLocations[]
 }
 
-model CompanyLocation {
-  ID          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  BranchName  String        @db.VarChar(255)
-  Address     String        @db.VarChar(255)
-  CreatedAt   DateTime      @default(now())
-  UpdatedAt   DateTime      @default(now())
-  DeletedAt   DateTime?
-  CompanyID   String        @db.Uuid
-  LocationID  String        @db.Uuid
-  Company     Companies     @relation(fields: [CompanyID], references: [ID], onDelete: Cascade)
-  Location    Locations     @relation(fields: [LocationID], references: [ID], onDelete: Cascade)
-  JobBranches JobBranches[]
+model CompanyLocations {
+  ID         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  BranchName String       @db.VarChar(255)
+  Address    String       @db.VarChar(255)
+  CreatedAt  DateTime     @default(now())
+  UpdatedAt  DateTime     @default(now())
+  DeletedAt  DateTime?
+  CompanyID  String       @db.Uuid
+  LocationID String       @db.Uuid
+  Company    Companies    @relation(fields: [CompanyID], references: [ID], onDelete: Cascade)
+  Location   Locations    @relation(fields: [LocationID], references: [ID], onDelete: Cascade)
+  Recruiters Recruiters[]
+
+  @@unique([BranchName, CompanyID])
 }
 
 model Locations {
-  ID               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ID               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   Name             String
-  Country          String            @db.VarChar(255)
+  Country          String             @db.VarChar(255)
   DeletedAt        DateTime?
-  CompanyLocations CompanyLocation[]
+  CompanyLocations CompanyLocations[]
 }
 
-model JobBranches {
+model Notifications {
+  ID                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Title             String
+  Type              NotificationType
   DeletedAt         DateTime?
-  CompanyLocationID String          @db.Uuid
-  JobID             String          @db.Uuid
-  ID                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  CompanyLocation   CompanyLocation @relation(fields: [CompanyLocationID], references: [ID], onDelete: Cascade)
-  Job               Jobs            @relation(fields: [JobID], references: [ID], onDelete: Cascade)
+  UserNotifications UserNotifications[]
 }
 
-model Notification {
-  ID        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  Title     String
-  Type      NotificationType
-  DeletedAt DateTime?
-}
-
-model UserNotification {
+model UserNotifications {
   ID        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   Content   String[]
   IsRead    Boolean   @default(false)
   CreatedAt DateTime  @default(now())
   DeletedAt DateTime?
+
+  UserID         String @db.Uuid
+  NotificationID String @db.Uuid
+
+  User          Users         @relation(fields: [UserID], references: [ID], onDelete: Cascade)
+  Notifications Notifications @relation(fields: [NotificationID], references: [ID], onDelete: Cascade)
 }
 
 model Jobs {
@@ -117,25 +118,25 @@ model Jobs {
   Vacancies       Int
   Type            JobType
   WorkingTimes    String
-  Status          JobStatus         @default(PENDING)
+  Status          JobStatus         @default(pending)
   PostedAt        DateTime          @default(now())
   ExpiredAt       DateTime
   Level           Level
   DeletedAt       DateTime?
   RecruiterID     String            @db.Uuid
   Applications    Applications[]
-  JobBranches     JobBranches[]
-  JobDescriptions JobDescription[]
+  JobDescriptions JobDescriptions[]
   JobFavorites    JobFavorites[]
   JobRequirements JobRequirements[]
   JobBenefits     JobBenefits[]
   Recruiter       Recruiters        @relation(fields: [RecruiterID], references: [ID], onDelete: Cascade)
+  JobCategories   JobCategories[]
 }
 
 model Applications {
   ID          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ResumeUrl   String
-  Status      ApplicationStatus
+  Status      ApplicationStatus @default(pending)
   AppliedAt   DateTime          @default(now())
   DeletedAt   DateTime?
   CandidateID String            @db.Uuid
@@ -144,7 +145,7 @@ model Applications {
   Job         Jobs              @relation(fields: [JobID], references: [ID], onDelete: Cascade)
 }
 
-model JobDescription {
+model JobDescriptions {
   ID          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   Description String
   DeletedAt   DateTime?
@@ -181,6 +182,8 @@ model WorkExperiences {
   CandidateID    String    @db.Uuid
 
   Candidate Candidates @relation(fields: [CandidateID], references: [ID], onDelete: Cascade)
+
+  @@unique([CompanyName, Position, CandidateID])
 }
 
 model JobFavorites {
@@ -191,85 +194,74 @@ model JobFavorites {
   JobID       String     @db.Uuid
   Candidate   Candidates @relation(fields: [CandidateID], references: [ID], onDelete: Cascade)
   Job         Jobs       @relation(fields: [JobID], references: [ID], onDelete: Cascade)
+
+  @@unique([CandidateID, JobID])
 }
 
 model JobCategories {
   CategoryID String @db.Uuid
   JobID      String @db.Uuid
 
+  Job      Jobs       @relation(fields: [JobID], references: [ID], onDelete: Cascade)
+  Category Categories @relation(fields: [CategoryID], references: [ID], onDelete: Cascade)
+
   @@id([CategoryID, JobID])
   @@index([CategoryID, JobID])
 }
 
 model Categories {
-  ID           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  CategoryName JobCategory @unique
-  CreatedAt    DateTime    @default(now())
-  UpdatedAt    DateTime    @default(now())
-  DeletedAt    DateTime?
+  ID            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  CategoryName  String          @unique
+  CreatedAt     DateTime        @default(now())
+  UpdatedAt     DateTime        @default(now())
+  DeletedAt     DateTime?
+  JobCategories JobCategories[]
 }
 
 enum UserStatus {
-  ACTIVE   @map("active")
-  INACTIVE @map("inactive")
+  active
+  inactive
 }
 
 enum Role {
-  ADMIN     @map("admin")
-  RECRUITER @map("recruiter")
-  CANDIDATE @map("candidate")
+  admin
+  recruiter
+  candidate
 }
 
 enum Level {
-  INTERN  @map("intern")
-  FRESHER @map("fresher")
-  MID     @map("mid")
-  JUNIOR  @map("junior")
-  SENIOR  @map("senior")
+  intern
+  fresher
+  mid
+  junior
+  senior
 }
 
 enum NotificationType {
-  CANDIDATE_APPLICATION_APPROVED @map("candidate_application_approved")
-  CANDIDATE_APPLICATION_REJECTED @map("candidate_application_rejected")
-  RECRUITER_JOB_APPROVED         @map("recruiter_job_approved")
-  RECRUITER_JOB_REJECTED         @map("recruiter_job_rejected")
-  RECRUITER_NEW_APPLICATION      @map("recruiter_new_application")
-  ADMIN_NEW_JOB_POST             @map("admin_new_job_post")
+  candidate_application_approved
+  candidate_application_rejected
+  recruiter_job_approved
+  recruiter_job_rejected
+  recruiter_new_application
+  admin_new_job_post
 }
 
 enum JobType {
-  PART_TIME  @map("part_time")
-  FULL_TIME  @map("full_time")
-  REMOTE     @map("remote")
-  FREE_LANCE @map("free_lance")
+  part_time
+  full_time
+  remote
+  free_lance
 }
 
 enum JobStatus {
-  OPEN     @map("open")
-  CLOSED   @map("closed")
-  PENDING  @map("pending")
-  REJECTED @map("rejected")
-}
-
-enum JobCategory {
-  FULL_STACK        @map("Full Stack")
-  FRONT_END         @map("Front End")
-  BACK_END          @map("Back End")
-  MOBILE            @map("Mobile")
-  SOFTWARE_ENGINEER @map("Software Engineer")
-  DEVOPS            @map("DevOps")
-  DATA_SCIENTIST    @map("Data Scientist")
-  AI_ENGINEER       @map("AI Engineer")
-  GAME_DEVELOPER    @map("Game Developer")
-  CYBER_SECURITY    @map("Cyber Security")
-  UI_UX_DESIGNER    @map("UI/UX Designer")
-  QA_TESTER         @map("QA Tester")
-  EMBEDDED_ENGINEER @map("Embedded Engineer")
-  OTHER             @map("Other")
+  open
+  closed
+  pending
+  rejected
 }
 
 enum ApplicationStatus {
-  PENDING  @map("pending")
-  ACCEPTED @map("accepted")
-  REJECTED @map("rejected")
+  pending
+  accepted
+  rejected
 }

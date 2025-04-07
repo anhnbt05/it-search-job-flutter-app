@@ -8,6 +8,10 @@ import { UploadsModule } from 'src/modules/uploads/uploads.module';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JobsModule } from 'src/modules/jobs/jobs.module';
+import { JobsService } from 'src/modules/jobs/jobs.service';
+import { SupabaseModule } from 'nestjs-supabase-js';
+import { SupabaseGuard } from 'src/libs/common/guards';
 
 @Module({
   imports: [
@@ -24,8 +28,10 @@ import { AuthService } from './auth.service';
     }),
     UploadsModule,
     EmailsModule,
+    JobsModule,
+    SupabaseModule.injectClient('adminClient', 'anonClient'),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UploadsService, EmailsProducer],
+  providers: [AuthService, UploadsService, EmailsProducer, JobsService],
 })
 export class AuthModule {}

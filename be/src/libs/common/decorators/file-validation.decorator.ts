@@ -8,37 +8,47 @@ export const FileValidationDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
 
-    const files = request.files;
+    const files = request.files as Express.Multer.File[];
 
     if (!files) return files;
 
-    if (files.avatar && files.avatar[0]) {
-      const mimeType = files.avatar[0].mimetype;
-      if (!mimeType.startsWith('image/')) {
+    if (files?.find((file) => file.fieldname === 'avatarFile')) {
+      const avatarFile = files?.find((file) => file.fieldname === 'avatarFile');
+
+      const mimeType = avatarFile?.mimetype;
+
+      if (!mimeType?.startsWith('image/')) {
         throw new BadRequestException(
-          'Avatar must be an image (JPG, JPEG, PNG).',
+          'Định dạng của ảnh đại diện phải là JPG, JPEG hoặc PNG.',
         );
       }
     }
 
-    if (files.logoFile && files.logoFile[0]) {
-      const mimeType = files.logoFile[0].mimetype;
+    if (files?.find((file) => file.fieldname === 'logoFile')) {
+      const avatarFile = files?.find((file) => file.fieldname === 'logoFile');
 
-      if (!mimeType.startsWith('image/')) {
+      const mimeType = avatarFile?.mimetype;
+
+      if (!mimeType?.startsWith('image/')) {
         throw new BadRequestException(
-          'Logo file must be an image (JPG, JPEG, PNG).',
+          'Định dạng của logo phải là JPG, JPEG hoặc PNG.',
         );
       }
     }
 
-    if (files.resumeFile && files.resumeFile[0]) {
-      const mimeType = files.resumeFile[0].mimetype;
+    if (files?.find((file) => file.fieldname === 'resumeFile')) {
+      const resumeFile = files?.find((file) => file.fieldname === 'resumeFile');
+
+      const mimeType = resumeFile?.mimetype;
+
       if (
-        !mimeType.match(
+        !mimeType?.match(
           /(pdf|msword|vnd.openxmlformats-officedocument.wordprocessingml.document)$/,
         )
       ) {
-        throw new BadRequestException('Resume file must be a PDF or DOCX.');
+        throw new BadRequestException(
+          'Định dạng của file CV phải là .pdf hoặc .docx',
+        );
       }
     }
 

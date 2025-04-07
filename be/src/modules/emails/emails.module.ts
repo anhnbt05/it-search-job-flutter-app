@@ -19,8 +19,8 @@ import { EmailsService } from './emails.service';
           port: configService.get<number>('mailer.port', 587),
           secure: false,
           auth: {
-            user: configService.get<string>('mailer.user'),
-            pass: configService.get<string>('mailer.password'),
+            user: configService.get<string>('mailer.user', ''),
+            pass: configService.get<string>('mailer.password', ''),
           },
         },
         defaults: {

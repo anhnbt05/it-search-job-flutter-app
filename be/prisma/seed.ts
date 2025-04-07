@@ -3,6 +3,10 @@ import { PrismaClient } from '@prisma/client';
 import { createClient, User } from '@supabase/supabase-js';
 import * as bcryptjs from 'bcryptjs';
 import { Categories } from './seeds';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 export type Province = {
   name: string;
@@ -57,9 +61,10 @@ async function main() {
       password: 'admin123',
     });
 
-    if (error) throw new Error(error.message);
-
-    if (!data.user) throw new Error('User creation failed');
+    if (error || !data.user)
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi tạo mới tài khoản quản trị viên. Vui lòng thử lại.',
+      );
 
     userId = data.user.id;
 
@@ -79,7 +84,7 @@ async function main() {
         'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
       PhoneNumber: '+840393874567',
       FullName: 'John Doe',
-      Role: 'ADMIN',
+      Role: 'admin',
       IsEmailVerified: true,
     },
     create: {
@@ -90,7 +95,7 @@ async function main() {
         'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
       PhoneNumber: '+840393874567',
       FullName: 'John Doe',
-      Role: 'ADMIN',
+      Role: 'admin',
       IsEmailVerified: true,
     },
   });
@@ -104,7 +109,8 @@ async function main() {
     .select('Name')
     .in('Name', provinces);
 
-  if (error) throw new Error(error.message);
+  if (error || !existingRecords)
+    throw new NotFoundException('Khôg tìm thấy các địa điểm tỉnh thành.');
 
   const existingNames = new Set(existingRecords.map((r) => r.Name));
 
@@ -120,7 +126,10 @@ async function main() {
       .from('Locations')
       .insert(provincesToInsert);
 
-    if (insertError) throw new Error(insertError.message);
+    if (insertError)
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi thêm mới tỉnh thành.',
+      );
   }
 
   if (Categories.length) {
@@ -132,7 +141,10 @@ async function main() {
             onConflict: 'CategoryName',
           });
 
-        if (error) console.error('Error upserting category:', error);
+        if (error)
+          throw new InternalServerErrorException(
+            'Đã xảy ra lỗi khi thêm mới các danh mục.',
+          );
       }),
     );
   }
@@ -146,5 +158,5 @@ main()
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   .finally(async () => {
     await prisma.$disconnect();
-    console.log('Seeding done!');
+    console.log('Thêm dữ liệu mẫu vào cơ sở dữ liệu thành công.');
   });
