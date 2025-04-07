@@ -6,7 +6,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Candidates, WorkExperiences } from '@prisma/client';
-import { SupabaseService } from 'src/modules/supabase/supabase.service';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
 import { UsersService } from 'src/modules/users/users.service';
 import {
@@ -17,9 +18,12 @@ import {
 @Injectable()
 export class WorkExperiencesService {
   constructor(
-    private readonly supabaseService: SupabaseService,
     private readonly uploadsService: UploadsService,
     private readonly usersService: UsersService,
+    @InjectSupabaseClient('adminClient')
+    private readonly adminSupabaseClient: SupabaseClient,
+    @InjectSupabaseClient('anonClient')
+    private readonly anonSupabaseClient: SupabaseClient,
   ) {}
 
   public handleCreateWorkExperiencesForCandidate = async (
@@ -28,9 +32,7 @@ export class WorkExperiencesService {
     logoFile: Express.Multer.File,
   ) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data: candidate } = await supabaseAdmin
+      const { data: candidate } = await this.anonSupabaseClient
         .from('Candidates')
         .select('*')
         .eq('UserID', userId)
@@ -63,20 +65,22 @@ export class WorkExperiencesService {
           `Ngày bắt đầu vị trí kinh nghiệm làm việc phải nhỏ hơn so với ngày kết thúc vị trí kinh nghiệm làm việc.`,
         );
 
-      const { error } = await supabaseAdmin.from('WorkExperiences').upsert(
-        [
+      const { error } = await this.adminSupabaseClient
+        .from('WorkExperiences')
+        .upsert(
+          [
+            {
+              ...res,
+              CompanyLogoUrl: url,
+              CandidateID: candidate.ID,
+              StartDate: new Date(StartDate),
+              ...(EndDate && { EndDate: new Date(EndDate) }),
+            },
+          ],
           {
-            ...res,
-            CompanyLogoUrl: url,
-            CandidateID: candidate.ID,
-            StartDate: new Date(StartDate),
-            ...(EndDate && { EndDate: new Date(EndDate) }),
+            onConflict: 'CompanyName,Position,CandidateID',
           },
-        ],
-        {
-          onConflict: 'CompanyName,Position,CandidateID',
-        },
-      );
+        );
 
       if (error) {
         console.error(error);
@@ -95,9 +99,7 @@ export class WorkExperiencesService {
 
   public handleDeleteWorkExperiences = async (id: string, userId: string) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data } = await supabaseAdmin
+      const { data } = await this.anonSupabaseClient
         .from('WorkExperiences')
         .select('*')
         .eq('ID', id)
@@ -113,7 +115,7 @@ export class WorkExperiencesService {
           'Bạn không có quyền xoá kinh nghiệm làm việc của ứng viên khác.',
         );
 
-      const { error } = await supabaseAdmin
+      const { error } = await this.adminSupabaseClient
         .from('WorkExperiences')
         .delete()
         .eq('ID', id);
@@ -140,9 +142,7 @@ export class WorkExperiencesService {
     logoFile?: Express.Multer.File,
   ) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data } = await supabaseAdmin
+      const { data } = await this.anonSupabaseClient
         .from('WorkExperiences')
         .select('*')
         .eq('ID', id)
@@ -185,7 +185,7 @@ export class WorkExperiencesService {
           );
       }
 
-      const { error } = await supabaseAdmin
+      const { error } = await this.adminSupabaseClient
         .from('WorkExperiences')
         .update([
           {

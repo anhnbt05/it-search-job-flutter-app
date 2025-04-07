@@ -1,7 +1,6 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail } from 'class-validator';
 
 export class ForgetPasswordDto {
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Email không hợp lệ, vui lòng nhập đúng định dạng.' })
   readonly email!: string;
 }

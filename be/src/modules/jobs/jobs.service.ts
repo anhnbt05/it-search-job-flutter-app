@@ -16,6 +16,7 @@ import {
 } from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { omit } from 'lodash';
+import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import {
   CreateJobDto,
   CreateJobFavoritesDto,
@@ -23,17 +24,19 @@ import {
   ProcessJobStatusDto,
   UpdateJobDto,
 } from 'src/modules/jobs/dtos';
-import { SupabaseService } from 'src/modules/supabase/supabase.service';
 
 @Injectable()
 export class JobsService {
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    @InjectSupabaseClient('adminClient')
+    private readonly adminSupabaseClient: SupabaseClient,
+    @InjectSupabaseClient('anonClient')
+    private readonly anonSupbaseClient: SupabaseClient,
+  ) {}
 
   public handleGetJobs = async (userId: string) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data: user, error } = await supabaseAdmin
+      const { data: user, error } = await this.anonSupbaseClient
         .from('Users')
         .select('*')
         .eq('ID', userId)
@@ -46,14 +49,14 @@ export class JobsService {
 
       const isRecruiter = user.Role === Role.recruiter ? true : false;
 
-      const query = supabaseAdmin
+      const query = this.anonSupbaseClient
         .from('Jobs')
         .select(
           '*, Recruiters(*, Users(FullName), CompanyLocations(*, Companies(*)))',
         );
 
       if (isRecruiter) {
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await this.anonSupbaseClient
           .from('Recruiters')
           .select('*')
           .eq('UserID', userId)
@@ -103,9 +106,7 @@ export class JobsService {
 
   public handleGetJob = async (jobId: string, userId: string) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data: user } = await supabaseAdmin
+      const { data: user } = await this.anonSupbaseClient
         .from('Users')
         .select('*')
         .eq('ID', userId)
@@ -118,14 +119,14 @@ export class JobsService {
 
       const isRecruiter = user.Role === Role.recruiter ? true : false;
 
-      const query = supabaseAdmin
+      const query = this.anonSupbaseClient
         .from('Jobs')
         .select(
           '*, Recruiters(*, Users(*) ,CompanyLocations(*, Companies(*)))',
         );
 
       if (isRecruiter) {
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await this.anonSupbaseClient
           .from('Recruiters')
           .select('*')
           .eq('UserID', userId)
@@ -169,7 +170,7 @@ export class JobsService {
         );
 
       return {
-        ...(await this.handleFormattedJob(jobId, supabaseAdmin)),
+        ...(await this.handleFormattedJob(jobId)),
         Recruiter: {
           ...omit(job.Recruiters, [
             'CompanyLocations',
@@ -192,9 +193,7 @@ export class JobsService {
     userId: string,
   ) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data: user } = await supabaseAdmin
+      const { data: user } = await this.anonSupbaseClient
         .from('Recruiters')
         .select('*')
         .eq('UserID', userId)
@@ -215,7 +214,7 @@ export class JobsService {
         ...res
       } = createJobDto;
 
-      const { data: job, error: findJobError } = await supabaseAdmin
+      const { data: job, error: findJobError } = await this.anonSupbaseClient
         .from('Jobs')
         .select('*')
         .match({ Title, RecruiterID: user.ID })
@@ -239,7 +238,7 @@ export class JobsService {
           `Thời gian hết hạn của công việc phải lớn hơn thời gian hiện tại.`,
         );
 
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await this.adminSupabaseClient
         .from('Jobs')
         .insert([
           {
@@ -257,7 +256,7 @@ export class JobsService {
           'Đã xảy ra lỗi khi thêm mới công việc.',
         );
 
-      const { error: insertDescriptionError } = await supabaseAdmin
+      const { error: insertDescriptionError } = await this.adminSupabaseClient
         .from('JobDescriptions')
         .insert(
           Descriptions.map((description) => ({
@@ -274,7 +273,7 @@ export class JobsService {
         );
       }
 
-      const { error: insertBenefitsError } = await supabaseAdmin
+      const { error: insertBenefitsError } = await this.adminSupabaseClient
         .from('JobBenefits')
         .insert(
           Benefits.map((benefit) => ({
@@ -291,7 +290,7 @@ export class JobsService {
         );
       }
 
-      const { error: errorCreateRequirements } = await supabaseAdmin
+      const { error: errorCreateRequirements } = await this.adminSupabaseClient
         .from('JobRequirements')
         .insert(
           Requirements.map((requirement) => ({
@@ -311,7 +310,7 @@ export class JobsService {
       const categoryIds: string[] = [];
 
       for (const categoryName of Categories) {
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await this.anonSupbaseClient
           .from('Categories')
           .select('ID')
           .eq('CategoryName', categoryName)
@@ -328,7 +327,7 @@ export class JobsService {
         categoryIds.push(data.ID);
       }
 
-      const { error: errorCategoriesInsert } = await supabaseAdmin
+      const { error: errorCategoriesInsert } = await this.adminSupabaseClient
         .from('JobCategories')
         .insert(
           categoryIds.map((categoryId) => ({
@@ -343,7 +342,7 @@ export class JobsService {
         );
 
       return (
-        await supabaseAdmin
+        await this.anonSupbaseClient
           .from('Jobs')
           .select('*')
           .eq('ID', data.ID)
@@ -356,11 +355,12 @@ export class JobsService {
   };
 
   public handleGetCategories = async () => {
-    const supabaseAdmin = this.supabaseService.getAdminClient();
-
     return (
-      (await supabaseAdmin.from('Categories').select('ID,CategoryName'))
-        ?.data ?? []
+      (
+        await this.anonSupbaseClient
+          .from('Categories')
+          .select('ID,CategoryName')
+      )?.data ?? []
     );
   };
 
@@ -369,9 +369,7 @@ export class JobsService {
     updateJobDto: UpdateJobDto,
   ) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data } = await supabaseAdmin
+      const { data } = await this.anonSupbaseClient
         .from('Jobs')
         .select('*')
         .eq('ID', jobId)
@@ -407,7 +405,7 @@ export class JobsService {
 
       const { Descriptions, Benefits, Requirements, ...res } = updateJobDto;
 
-      const { error } = await supabaseAdmin
+      const { error } = await this.anonSupbaseClient
         .from('Jobs')
         .update(res)
         .eq('ID', jobId);
@@ -423,7 +421,6 @@ export class JobsService {
           'Description',
           Descriptions,
           jobId,
-          supabaseAdmin,
         );
       }
 
@@ -433,7 +430,6 @@ export class JobsService {
           'Benefit',
           Benefits,
           jobId,
-          supabaseAdmin,
         );
       }
 
@@ -443,11 +439,10 @@ export class JobsService {
           'Requirement',
           Requirements,
           jobId,
-          supabaseAdmin,
         );
       }
 
-      return this.handleFormattedJob(jobId, supabaseAdmin);
+      return this.handleFormattedJob(jobId);
     } catch (err) {
       console.error(err);
       throw err;
@@ -459,14 +454,13 @@ export class JobsService {
     fieldName: string,
     newValues: string[],
     jobId: string,
-    supabaseAdmin: SupabaseClient,
   ) => {
     try {
       if (!newValues || !newValues.length) return;
 
       const existingValues: string[] =
         (
-          await supabaseAdmin
+          await this.anonSupbaseClient
             .from(tableName)
             .select(fieldName)
             .eq('JobID', jobId)
@@ -481,11 +475,14 @@ export class JobsService {
       const toRemove = existingValues.filter((val) => !newSet.has(val));
 
       if (toRemove.length) {
-        await supabaseAdmin.from(tableName).delete().in(fieldName, toRemove);
+        await this.adminSupabaseClient
+          .from(tableName)
+          .delete()
+          .in(fieldName, toRemove);
       }
 
       if (toAdd.length) {
-        await supabaseAdmin.from(tableName).insert(
+        await this.adminSupabaseClient.from(tableName).insert(
           toAdd.map((val) => ({
             [fieldName]: val,
             JobID: jobId,
@@ -500,9 +497,7 @@ export class JobsService {
 
   public handleDeleteJob = async (jobId: string, userId: string) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data: user, error } = await supabaseAdmin
+      const { data: user, error } = await this.anonSupbaseClient
         .from('Users')
         .select('*')
         .eq('ID', userId)
@@ -513,7 +508,7 @@ export class JobsService {
           `Không tìm thấy người dùng có id '${userId}'`,
         );
 
-      const { data: job, error: jobError } = await supabaseAdmin
+      const { data: job, error: jobError } = await this.anonSupbaseClient
         .from('Jobs')
         .select('*')
         .eq('ID', jobId)
@@ -527,7 +522,7 @@ export class JobsService {
       const isRecruiter = user.Role === Role.recruiter ? true : false;
 
       if (isRecruiter) {
-        const { data: recruiter, error } = await supabaseAdmin
+        const { data: recruiter, error } = await this.anonSupbaseClient
           .from('Recruiters')
           .select('*')
           .eq('UserID', userId)
@@ -546,7 +541,7 @@ export class JobsService {
           );
       }
 
-      await supabaseAdmin
+      await this.adminSupabaseClient
         .from('Jobs')
         .update({
           DeletedAt: new Date().toISOString(),
@@ -566,8 +561,6 @@ export class JobsService {
     userId: string,
   ) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
       if (!processJobStatusDto || !Object.keys(processJobStatusDto).length)
         throw new BadRequestException(
           `Bạn phải cung cấp các thông tin của các công việc cần cập nhật trạng thái.`,
@@ -576,15 +569,11 @@ export class JobsService {
       const { openJobIds, rejectedJobIds } = processJobStatusDto;
 
       if (openJobIds && openJobIds.length) {
-        await this.generateProcessJobStatus('open', openJobIds, supabaseAdmin);
+        await this.generateProcessJobStatus('open', openJobIds);
       }
 
       if (rejectedJobIds && rejectedJobIds.length) {
-        await this.generateProcessJobStatus(
-          'rejected',
-          rejectedJobIds,
-          supabaseAdmin,
-        );
+        await this.generateProcessJobStatus('rejected', rejectedJobIds);
       }
 
       return this.handleGetJobs(userId);
@@ -597,11 +586,10 @@ export class JobsService {
   private generateProcessJobStatus = async (
     method: 'open' | 'rejected',
     items: string[],
-    supabaseAdmin: SupabaseClient,
   ) => {
     const status = method === 'open' ? JobStatus.open : JobStatus.rejected;
 
-    const { error } = await supabaseAdmin
+    const { error } = await this.adminSupabaseClient
       .from('Jobs')
       .update({ Status: status })
       .in('ID', items);
@@ -617,9 +605,7 @@ export class JobsService {
     createJobFavoritesDto: CreateJobFavoritesDto,
   ) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await this.anonSupbaseClient
         .from('Candidates')
         .select('*')
         .eq('UserID', userId)
@@ -632,7 +618,7 @@ export class JobsService {
 
       const { jobIds } = createJobFavoritesDto;
 
-      const { error: insertJobFavortiesData } = await supabaseAdmin
+      const { error: insertJobFavortiesData } = await this.adminSupabaseClient
         .from('JobFavorites')
         .upsert(
           jobIds.map((jobID) => ({
@@ -665,9 +651,7 @@ export class JobsService {
     deleteJobFavoritesDto: DeleteJobFavoritesDto,
   ) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await this.anonSupbaseClient
         .from('Candidates')
         .select('*')
         .eq('UserID', userId)
@@ -682,7 +666,7 @@ export class JobsService {
 
       await Promise.all(
         jobIds.map(async (jobId) => {
-          const { error } = await supabaseAdmin
+          const { error } = await this.adminSupabaseClient
             .from('JobFavorites')
             .delete()
             .match({ JobID: jobId, CandidateID: data.ID });
@@ -706,9 +690,7 @@ export class JobsService {
 
   public handleGetJobsByCategoryName = async (categoryName: string) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await this.anonSupbaseClient
         .from('Categories')
         .select('*')
         .eq('CategoryName', categoryName)
@@ -719,7 +701,7 @@ export class JobsService {
           `Danh mục có tên ${categoryName} không tìm thấy.`,
         );
 
-      const response = await supabaseAdmin
+      const response = await this.anonSupbaseClient
         .from('JobCategories')
         .select(
           `
@@ -758,9 +740,7 @@ export class JobsService {
 
   public handleGetRecommendedJobsForCandidate = async (userId: string) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await this.anonSupbaseClient
         .from('Candidates')
         .select('*')
         .eq('UserID', userId)
@@ -771,7 +751,7 @@ export class JobsService {
           `Không tìm thấy ứng viên mà liên kết với người dùng có id '${userId}'`,
         );
 
-      const { data: jobs, error: jobsError } = await supabaseAdmin.rpc(
+      const { data: jobs, error: jobsError } = await this.anonSupbaseClient.rpc(
         'get_jobs_sorted_by_level',
         {
           candidate_level: data.Level,
@@ -792,9 +772,7 @@ export class JobsService {
 
   public handleSearchJobsByLocations = async (locationId: string) => {
     try {
-      const supabaseAdmin = this.supabaseService.getAdminClient();
-
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await this.anonSupbaseClient
         .from('Locations')
         .select(
           'ID, Name, Country, CompanyLocations(*, Recruiters(*, Jobs(*, Recruiters(*, Users(FullName, Email, PhoneNumber) ,CompanyLocations(*, Companies(*))))))',
@@ -847,11 +825,8 @@ export class JobsService {
     }
   };
 
-  private handleFormattedJob = async (
-    jobId: string,
-    supabaseAdmin: SupabaseClient,
-  ) => {
-    const { data: jobData, error: jobError } = await supabaseAdmin
+  private handleFormattedJob = async (jobId: string) => {
+    const { data: jobData, error: jobError } = await this.anonSupbaseClient
       .from('Jobs')
       .select(
         '*, JobDescriptions(ID, Description, DeletedAt), JobBenefits(ID, Benefit, DeletedAt), JobRequirements(ID, Requirement, DeletedAt), JobCategories(CategoryID)',
@@ -867,10 +842,11 @@ export class JobsService {
     const categoryIDs: string[] =
       jobData?.JobCategories.map((category: any) => category.CategoryID) ?? [];
 
-    const { data: categoriesData, error: categoriesError } = await supabaseAdmin
-      .from('Categories')
-      .select('ID, CategoryName')
-      .in('ID', categoryIDs);
+    const { data: categoriesData, error: categoriesError } =
+      await this.anonSupbaseClient
+        .from('Categories')
+        .select('ID, CategoryName')
+        .in('ID', categoryIDs);
 
     if (categoriesError)
       throw new InternalServerErrorException(

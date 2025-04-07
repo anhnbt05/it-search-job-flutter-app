@@ -69,21 +69,6 @@ export type Province = {
   districts: string[];
 };
 
-export const excludes = [
-  '/auth/sign-in',
-  '/auth/sign-up',
-  '/auth/refresh-token',
-  '/auth/verify-email',
-  '/auth/provinces',
-  '/auth/companies',
-  '/auth/forget-password',
-  '/auth/reset-password',
-  '/auth/verify-reset-password-otp',
-  '/auth/update-password',
-  '/auth/companies/:companyId/branches',
-  '/',
-];
-
 export const SUBJECT_EMAIL_MAP = {
   'email-verification': 'Email Verification',
   'email-reset-password': 'Email Reset Password',

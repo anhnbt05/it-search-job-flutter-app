@@ -11,21 +11,22 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { User } from '@supabase/supabase-js';
 import { Request } from 'express';
 import { FileValidationDecorator, Roles } from 'src/libs/common/decorators';
-import { RoleAuthGuard } from 'src/libs/common/guards';
+import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
 import { RoleEnum } from 'src/libs/common/utils';
 import { UpdateUserDto } from 'src/modules/users/dtos';
 import { UsersService } from './users.service';
 
 @Controller('users')
+@UseGuards(SupabaseGuard, RoleAuthGuard)
+@ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.ADMIN)
   @ApiOperation({ summary: 'Get list of users (Admin only)' })
   @ApiResponse({
@@ -75,7 +76,6 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.ADMIN, RoleEnum.RECRUITER, RoleEnum.CANDIDATE)
   async getUser(
     @Param('id', ParseUUIDPipe) userId: string,
@@ -87,7 +87,6 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.ADMIN, RoleEnum.CANDIDATE, RoleEnum.RECRUITER)
   @UseInterceptors(AnyFilesInterceptor())
   async updateUser(
@@ -107,7 +106,6 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @UseGuards(RoleAuthGuard)
   @Roles(RoleEnum.ADMIN)
   async deleteUser(@Param('id', ParseUUIDPipe) userId: string) {
     return this.usersService.handleDeleteUser(userId);
