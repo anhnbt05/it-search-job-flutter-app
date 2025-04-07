@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
 import 'package:ui/Views/candidate/candidate.dart';
 import 'package:ui/Models/model.dart';
 import 'package:ui/Views/admin/admin.dart';
 
-import '../ViewModels/BottomNavigationViewModel.dart';
-import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
-import '../ViewModels/recruiter/JobPostViewModel.dart';
-import 'login/login_page.dart';
+import 'ViewModels/BottomNavigationViewModel.dart';
+import 'ViewModels/candidate/JoblistNavigationViewModel.dart';
+import 'ViewModels/recruiter/JobPostViewModel.dart';
+import 'Views/login/login_page.dart';
 
 void main() {
   runApp(
@@ -23,6 +24,7 @@ void main() {
           create: (context) => JoblistNavigationViewModel(),
         ),
         ChangeNotifierProvider(create: (context) => JobPostViewModel()),
+        ChangeNotifierProvider(create: (context) => LoginViewModel()),
       ],
       child: MyApp(),
     ),

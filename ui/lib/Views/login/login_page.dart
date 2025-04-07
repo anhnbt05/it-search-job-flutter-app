@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ui/Models/model.dart';
-import '../main.dart';
+import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
+import '../../main.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback onLoginSuccess;
@@ -117,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () {},
                         child: Text("ĐĂNG KÝ TÀI KHOẢN MỚI", style: TextStyle(fontSize: 15, color: Colors.grey),)
                       ),
-                      TextButton(onPressed: () {},
+                      TextButton(onPressed: () => LoginViewModel().goToForgotPassword(context),
                            child:  Text("QUÊN MẬT KHẨU", style: TextStyle(fontSize: 15, color: Colors.blue),)
                       )
                     ],
