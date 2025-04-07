@@ -1,5 +1,9 @@
 import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import 'package:ui/ViewModels/recruiter/JobPostViewModel.dart';
+
+import '../Services/CategoryService.dart';
 
 class BottomNavigationViewModel extends ChangeNotifier {
   int _selectedIndex = 0;
@@ -21,13 +25,19 @@ class BottomNavigationViewModel extends ChangeNotifier {
     }
   }
 
-  void onCenterButtonTap() {
+  void onCenterButtonTap(BuildContext context) async {
+    final jobPostViewModel = Provider.of<JobPostViewModel>(context, listen: false);
     _animationController.forward().then((_) => _animationController.reverse());
     _selectedIndex = 2;
     notifyListeners();
-
     if (_pageController.hasClients) {
       _pageController.jumpToPage(2);
+    }
+    if (jobPostViewModel.categoriesList!.isEmpty || jobPostViewModel.categoriesList == null) {
+      jobPostViewModel.categoriesList = await CategoryService().getCategory(
+        accessToken: "..."
+      );
+      jobPostViewModel.jobCategoryIDList = jobPostViewModel.categoriesList!.map((e) => e.keys.first).toList();
     }
   }
 

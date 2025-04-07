@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
-
+import '../../Models/Enum.dart';
 import '../../Models/model.dart';
+import 'package:ui/Services/JobService.dart';
+
+List<String> jobType_value = [
+  "Bán thời gian",
+  "Toàn thời gian",
+  "Làm việc từ xa",
+  "Làm việc tự do",
+];
+List<String> jobLevel_value = ["Intern", "Fresher", "Mid", "Junior", "Senior"];
 
 class JobPostViewModel extends ChangeNotifier {
-  List<bool> _selectedLocations = List.generate(5, (index) => false);
-  String? _jobTypeSelected = null;
-  String? _jobLevelSelected = null;
+  String _branchName = "Thành phố Hồ Chí Minh"; //recruiter.branchname
+  String _address = "Số 12 Nguyễn Văn Bảo, Phường 4, Quận Gò Vấp, Thành phố Hồ Chí Minh"; //companyAddress
+
+  eJobType? _jobTypeSelected = null;
+  eLevel? _jobLevelSelected = null;
   Color _jobTypeBorderColor = Colors.grey.shade400;
   Color _jobLevelBorderColor = Colors.grey.shade400;
   Color _salaryUnitBorderColor = Colors.grey.shade400;
@@ -13,36 +24,113 @@ class JobPostViewModel extends ChangeNotifier {
   Color _jobCategoryBorderColor = Colors.grey.shade400;
   bool _isAccept = false;
   String? _salaryTypeSelected = null;
-  String? _salaryUnitSelected = "option 1";
+  String _salaryUnitSelected = "triệu VNĐ/tháng";
   DateTime? _selectedDate;
-  List<String>? _jobCategoryList = jobCategory.map((e) => e['key']!).toList();
+
   List<String> _jobCategorySelectedList = [];
   String? _jobCategorySelected = null;
   final TextEditingController _textEditingController = TextEditingController();
+  final TextEditingController _nameText = TextEditingController();
+  final TextEditingController _descriptionText = TextEditingController();
+  final TextEditingController _vacancyText = TextEditingController();
+  late final TextEditingController _jobDescriptionsText =
+      TextEditingController();
+  late final TextEditingController _jobRequirementsText =
+      TextEditingController();
+  late final TextEditingController _jobBenefitsText = TextEditingController();
+  TextEditingController _salaryNumber1 = TextEditingController();
+  TextEditingController _salaryNumber2 = TextEditingController();
+  final TextEditingController _workingTimeText = TextEditingController();
+  List<Map<String, String>>? _categoriesList = [];
+  List<String>? _jobCategoryIDList;
 
-  List<bool> get selectedLocations => _selectedLocations;
-  String? get jobTypeSelected => _jobTypeSelected;
-  String? get jobLevelSelected => _jobLevelSelected;
+  String get address => _address;
+
+  String get branchName => _branchName;
+  List<String> _jobDescriptionList = [];
+  String? _salary = null;
+
+  final List<Map<String, String>> _jobType = List.generate(
+    eJobType.values.length,
+    (index) => {
+      eJobType.values[index].toString().split('.').last: jobType_value[index],
+    },
+  );
+
+  final List<Map<String, String>> _jobLevel = List.generate(
+    eLevel.values.length,
+    (index) => {
+      eLevel.values[index].toString().split(".").last: jobLevel_value[index],
+    },
+  );
+
+  eJobType? get jobTypeSelected => _jobTypeSelected;
+
+  eLevel? get jobLevelSelected => _jobLevelSelected;
+
   Color get jobLevelBorderColor => _jobLevelBorderColor;
+
   Color get jobTypeBorderColor => _jobTypeBorderColor;
+
   Color get salaryUnitBorderColor => _salaryUnitBorderColor;
+
   Color get salaryTypeBorderColor => _salaryTypeBorderColor;
+
   Color get jobCategoryBorderColor => _jobCategoryBorderColor;
+
   bool get isAccept => _isAccept;
+
   String? get salaryTypeSelected => _salaryTypeSelected;
+
   String? get salaryUnitSelected => _salaryUnitSelected;
+
   DateTime? get selectedDate => _selectedDate;
-  List<String>? get jobCategoryList => _jobCategoryList;
+
+  List<String>? get jobCategoryIDList => _jobCategoryIDList;
+
   List<String> get jobCategorySelectedList => _jobCategorySelectedList;
+
   String? get jobCategorySelected => _jobCategorySelected;
+
   TextEditingController get textEditingController => _textEditingController;
 
-  void setLocationSelected(int index, bool? value) {
-    _selectedLocations[index] = value!;
+  TextEditingController get nameText => _nameText;
+
+  TextEditingController get descriptionText => _descriptionText;
+
+  TextEditingController get vacancyText => _vacancyText;
+
+  TextEditingController get jobRequirementsText => _jobRequirementsText;
+
+  TextEditingController get jobBenefitsText => _jobBenefitsText;
+
+  TextEditingController get jobDescriptionsText => _jobDescriptionsText;
+
+  TextEditingController get salaryNumber2 => _salaryNumber2;
+
+  TextEditingController get salaryNumber1 => _salaryNumber1;
+
+  TextEditingController get workingTimeText => _workingTimeText;
+
+  List<Map<String, String>> get jobType => _jobType;
+
+  List<Map<String, String>> get jobLevel => _jobLevel;
+
+  List<String> get jobDescriptionList => _jobDescriptionList;
+
+  List<Map<String, String>>? get categoriesList => _categoriesList;
+
+  set categoriesList(List<Map<String, String>>? value) {
+    _categoriesList = value;
     notifyListeners();
   }
 
-  void setJobTypeSelected(String? newValue){
+  set jobCategoryIDList(List<String>? value) {
+    _jobCategoryIDList = value;
+    notifyListeners();
+  }
+
+  void setJobTypeSelected(eJobType? newValue) {
     _jobTypeSelected = newValue;
     notifyListeners();
   }
@@ -57,7 +145,7 @@ class JobPostViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setJobLevelSelected(String? newValue) {
+  void setJobLevelSelected(eLevel? newValue) {
     _jobLevelSelected = newValue;
     notifyListeners();
   }
@@ -69,10 +157,12 @@ class JobPostViewModel extends ChangeNotifier {
 
   void setSalaryTypeSelected(String? value) {
     _salaryTypeSelected = value;
+    _salaryNumber1 = TextEditingController();
+    _salaryNumber2 = TextEditingController();
     notifyListeners();
   }
 
-  void setSalaryUnitSelected(String? value) {
+  void setSalaryUnitSelected(String value) {
     _salaryUnitSelected = value;
     notifyListeners();
   }
@@ -87,7 +177,7 @@ class JobPostViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setJobCategoryBorderColor (Color value) {
+  void setJobCategoryBorderColor(Color value) {
     _jobCategoryBorderColor = value;
     notifyListeners();
   }
@@ -98,18 +188,47 @@ class JobPostViewModel extends ChangeNotifier {
   }
 
   void deleteSelectedJobCategory(int index) {
-    _jobCategoryList?.add(jobCategory[jobCategory.indexWhere((e) => e['value'] == jobCategorySelectedList[index])]['key']!);
-    _jobCategorySelectedList.removeAt(index);
+    _jobCategoryIDList!.add(_categoriesList!.firstWhere((e) => e.values.first == _jobCategorySelectedList[index]).keys.first);
+    _jobCategorySelectedList.remove(_jobCategorySelectedList[index]);
     notifyListeners();
   }
 
   void setSelectedJobCategory(String? value) {
-    if (_jobCategoryList != null) {
-      _jobCategoryList!.removeWhere((e) => e.toString() == value);
-      _jobCategorySelectedList.add(jobCategory[jobCategory.indexWhere((e) => e['key'] == value)]['value']!);
+    if (_jobCategoryIDList != null) {
+      _jobCategoryIDList!.removeWhere((e) => e.toString() == value);
+      _jobCategorySelectedList.add(_categoriesList!.firstWhere((e) => e.keys.first == value).values.first);
       notifyListeners();
-      print(_jobCategorySelectedList);
-      print(_jobCategoryList);
     }
+  }
+
+  void post() async {
+    late String salaryText;
+    if (_salaryTypeSelected == "negotiable") {
+      salaryText = "Thỏa thuận";
+    } else if (_salaryTypeSelected == "fixed") {
+      salaryText = "${_salaryNumber1.text} ${_salaryUnitSelected!}";
+    } else if (_salaryTypeSelected == "upto") {
+      salaryText = "Lên đến ${_salaryNumber1.text} ${_salaryUnitSelected!}";
+    } else {
+      salaryText = "Từ ${_salaryNumber1.text} đến ${_salaryNumber2!.text} ${_salaryUnitSelected!}";
+    }
+    await new JobService().postJob(
+      accessToken: "...",
+      jobData: {
+        "Title": _nameText.text,
+        "Description": _descriptionText.text,
+        "Address": _address, //
+        "Salary": salaryText,
+        "Vacancies": int.parse(_vacancyText.text),
+        "Type": _jobTypeSelected.toString().split(".").last,
+        "WorkingTimes": _workingTimeText.text,
+        "ExpiredDate": _selectedDate?.toUtc().toIso8601String(),
+        "Level": _jobLevelSelected.toString().split(".").last,
+        "Descriptions": _jobDescriptionsText.text.split("\n").toList(),
+        "Benefits": _jobBenefitsText.text.split("\n").toList(),
+        "Requirements": _jobRequirementsText.text.split("\n").toList(),
+        "Categories": _jobCategorySelectedList,
+      },
+    );
   }
 }

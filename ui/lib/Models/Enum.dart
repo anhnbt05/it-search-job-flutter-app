@@ -1,15 +1,15 @@
-enum UserStatus {
+enum eUserStatus {
   active,
   inactive,
 }
 
-enum Role {
+enum eRole {
   admin,
   recruiter,
   candidate,
 }
 
-enum Level {
+enum eLevel {
   intern,
   fresher,
   mid,
@@ -17,7 +17,7 @@ enum Level {
   senior,
 }
 
-enum NotificationType {
+enum eNotificationType {
   candidate_application_approved,
   candidate_application_rejected,
   recruiter_job_approved,
@@ -26,21 +26,21 @@ enum NotificationType {
   admin_new_job_post,
 }
 
-enum JobType {
+enum eJobType {
   part_time,
   full_time,
   remote,
   free_lance,
 }
 
-enum JobStatus {
+enum eJobStatus {
   open,
   closed,
   pending,
   rejected,
 }
 
-enum ApplicationStatus {
+enum eApplicationStatus {
   pending,
   accepted,
   rejected,
