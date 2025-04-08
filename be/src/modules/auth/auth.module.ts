@@ -2,16 +2,16 @@ import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import * as multer from 'multer';
+import { SupabaseModule } from 'nestjs-supabase-js';
 import { EmailsModule } from 'src/modules/emails/emails.module';
 import { EmailsProducer } from 'src/modules/emails/producers';
+import { JobsModule } from 'src/modules/jobs/jobs.module';
+import { JobsService } from 'src/modules/jobs/jobs.service';
 import { UploadsModule } from 'src/modules/uploads/uploads.module';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JobsModule } from 'src/modules/jobs/jobs.module';
-import { JobsService } from 'src/modules/jobs/jobs.service';
-import { SupabaseModule } from 'nestjs-supabase-js';
-import { SupabaseGuard } from 'src/libs/common/guards';
+import { UsersModule } from 'src/modules/users/users.module';
 
 @Module({
   imports: [
@@ -30,6 +30,7 @@ import { SupabaseGuard } from 'src/libs/common/guards';
     EmailsModule,
     JobsModule,
     SupabaseModule.injectClient('adminClient', 'anonClient'),
+    UsersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, UploadsService, EmailsProducer, JobsService],

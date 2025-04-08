@@ -18,6 +18,7 @@ import { JobsModule } from './modules/jobs/jobs.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { UsersModule } from './modules/users/users.module';
 import { WorkExperiencesModule } from './modules/work-experiences/work-experiences.module';
+import { ApplicationsModule } from './modules/applications/applications.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { WorkExperiencesModule } from './modules/work-experiences/work-experienc
     JobsModule,
     WorkExperiencesModule,
     CompaniesModule,
+    ApplicationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

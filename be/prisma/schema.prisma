@@ -143,6 +143,8 @@ model Applications {
   JobID       String            @db.Uuid
   Candidate   Candidates        @relation(fields: [CandidateID], references: [ID], onDelete: Cascade)
   Job         Jobs              @relation(fields: [JobID], references: [ID], onDelete: Cascade)
+
+  @@unique([CandidateID, JobID])
 }
 
 model JobDescriptions {

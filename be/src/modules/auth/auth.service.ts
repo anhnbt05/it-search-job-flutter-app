@@ -185,10 +185,13 @@ export class AuthService {
           password,
         });
 
-      if (error)
+      if (error) {
+        console.error(error);
+
         throw new BadRequestException(
           'Thông tin đăng nhập không chính xác. Vui lòng thử lại.',
         );
+      }
 
       const { data: findUser } = await this.anonSupabaseClient
         .from('Users')
@@ -412,11 +415,6 @@ export class AuthService {
           `Không tìm thấy người dùng có email '${email}' trong hệ thống.`,
         );
 
-      if (data.IsEmailVerified)
-        throw new BadRequestException(
-          `Người dùng có email '${email}' đã xác minh email rồi.`,
-        );
-
       await this.cacheManager.set(`${email}:otp-reset-password`, otp);
 
       await this.emailsProducer.sendEmail(
@@ -562,10 +560,13 @@ export class AuthService {
       },
     );
 
-    if (error)
+    if (error) {
+      console.error(error);
+
       throw new InternalServerErrorException(
         'Đã xảy ra lỗi khi cập nhật mật khẩu người dùng.',
       );
+    }
 
     const hashedPassword = hashPassword(newPassword);
 

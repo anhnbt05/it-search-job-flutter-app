@@ -12,5 +12,6 @@ import { SupabaseModule } from 'nestjs-supabase-js';
   ],
   controllers: [UsersController],
   providers: [UsersService, UploadsService],
+  exports: [UsersService],
 })
 export class UsersModule {}
