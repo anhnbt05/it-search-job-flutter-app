@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import '../../ViewModels/login/ForgotPasswordViewModel.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
@@ -70,6 +71,9 @@ class ForgotPasswordPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)),
                                );
                             }
+                          if (viewModel.errorMessage == null) {
+                            LoginViewModel().goToOtp(context, email);
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
