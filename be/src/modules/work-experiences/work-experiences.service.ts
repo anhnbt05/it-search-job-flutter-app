@@ -34,9 +34,9 @@ export class WorkExperiencesService {
     try {
       const { data: candidate } = await this.anonSupabaseClient
         .from('Candidates')
-        .select('*')
+        .select('*, Users(*), WorkExperiences(*)')
         .eq('UserID', userId)
-        .maybeSingle<Candidates>();
+        .maybeSingle<any>();
 
       if (!candidate)
         throw new NotFoundException(
@@ -90,7 +90,17 @@ export class WorkExperiencesService {
         );
       }
 
-      return this.usersService.handleGetUser(userId, userId);
+      return this.usersService.handleFormattedProfileCandidateResponse(
+        (
+          await this.anonSupabaseClient
+            .from('Candidates')
+            .select(
+              '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role) ,Applications(*, Jobs(*, Recruiters(*)))',
+            )
+            .eq('UserID', userId)
+            .maybeSingle<any>()
+        )?.data,
+      );
     } catch (err) {
       console.error(err);
       throw err;
@@ -128,7 +138,17 @@ export class WorkExperiencesService {
         );
       }
 
-      return this.usersService.handleGetUser(userId, userId);
+      return this.usersService.handleFormattedProfileCandidateResponse(
+        (
+          await this.anonSupabaseClient
+            .from('Candidates')
+            .select(
+              '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role) ,Applications(*, Jobs(*, Recruiters(*)))',
+            )
+            .eq('UserID', userId)
+            .maybeSingle<any>()
+        )?.data,
+      );
     } catch (err) {
       console.error(err);
       throw err;

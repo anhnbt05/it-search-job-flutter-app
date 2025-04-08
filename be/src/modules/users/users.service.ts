@@ -357,7 +357,7 @@ export class UsersService {
     }
   };
 
-  private handleFormattedProfileCandidateResponse = (candidate: any) => {
+  public handleFormattedProfileCandidateResponse = (candidate: any) => {
     return {
       ...omit(candidate, [
         'Applications',

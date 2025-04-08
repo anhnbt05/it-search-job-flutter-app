@@ -11,13 +11,24 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiExtraModels,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { User } from '@supabase/supabase-js';
 import { Request } from 'express';
 import { FileValidationDecorator, Roles } from 'src/libs/common/decorators';
 import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
 import { RoleEnum } from 'src/libs/common/utils';
-import { UpdateUserDto } from 'src/modules/users/dtos';
+import {
+  UpdateCandidateDto,
+  UpdateRecruiterDto,
+  UpdateUserDto,
+} from 'src/modules/users/dtos';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -28,48 +39,47 @@ export class UsersController {
 
   @Get()
   @Roles(RoleEnum.ADMIN)
-  @ApiOperation({ summary: 'Get list of users (Admin only)' })
+  @ApiOperation({
+    summary:
+      'Lấy ra danh sách tất cả các người dùng (ứng viên, nhà tuyển dụng) trong hệ thống.',
+    description:
+      'Đường dẫn này dùng để lấy ra danh sách tất cả các người dùng (ứng viên, nhà tuyển dụng) trong hệ thống. Chỉ có quản trị viên mới có quyền truy cập.',
+  })
   @ApiResponse({
     status: 200,
-    description: 'List of users retrieved successfully',
+    description: 'Dữ liệu trả về sau khi lấy danh sách người dùng thành công.',
     schema: {
       example: [
         {
-          ID: '550e8400-e29b-41d4-a716-446655440000',
-          Email: 'user@example.com',
-          FullName: 'John Doe',
-          PhoneNumber: '+84393873630',
+          ID: '674c7204-106e-4d7f-8dc3-3f6389d0aa8e',
+          Email: 'lengocanhpyne363@gmail.com',
+          FullName: 'Lê Văn Nam',
+          AvatarUrl:
+            'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
+          PhoneNumber: '+84393873632',
           Status: 'active',
-          AvatarUrl: 'https://...',
-          Role: 'candidate',
-          CreatedAt: '2025-03-20T15:15:15Z',
-          UpdatedAt: '2025-03-20T15:15:15Z',
+          CreatedAt: '2025-04-06T15:51:31.508',
+          UpdatedAt: '2025-04-06T15:51:31.508',
+          Role: 'recruiter',
           DeletedAt: null,
-          IsEmailVerified: false,
+          IsEmailVerified: true,
         },
         {
-          ID: '550e8400-e29b-41d4-a716-446655440000',
-          Email: 'user@example.com',
-          FullName: 'John Doe',
-          PhoneNumber: '+84393873630',
+          ID: 'ee40a614-0e80-48bf-b69d-7987d6bedc4c',
+          Email: 'lamduannhi0508@gmail.com',
+          FullName: 'Lê Ngọc Anh',
+          AvatarUrl:
+            'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
+          PhoneNumber: '+84393873631',
           Status: 'active',
-          AvatarUrl: 'https://...',
+          CreatedAt: '2025-04-06T15:49:08.349',
+          UpdatedAt: '2025-04-06T15:49:08.349',
           Role: 'candidate',
-          CreatedAt: '2025-03-20T15:15:15Z',
-          UpdatedAt: '2025-03-20T15:15:15Z',
           DeletedAt: null,
-          IsEmailVerified: false,
+          IsEmailVerified: true,
         },
       ],
     },
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden: Insufficient permissions',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized: Missing or invalid token',
   })
   async getUsers() {
     return this.usersService.handleGetUsers();
@@ -77,6 +87,155 @@ export class UsersController {
 
   @Get(':id')
   @Roles(RoleEnum.ADMIN, RoleEnum.RECRUITER, RoleEnum.CANDIDATE)
+  @ApiOperation({
+    summary: 'Lấy thông tin chi tiết người dùng',
+    description:
+      'Đường dẫn này dùng để lấy ra thông tin chi tiết của người dùng.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Mã định danh (Id) duy nhất của người dùng cần lấy thông tin.',
+    example: '674c7204-106e-4d7f-8dc3-3f6389d0aa8e',
+  })
+  @ApiResponse({
+    status: 200,
+    examples: {
+      example1: {
+        summary: 'Thông tin của quản trị viên.',
+        value: {
+          ID: '30e4c46a-9817-486e-966a-f8457aaf5e41',
+          Email: 'admin123@gmail.com',
+          FullName: 'John Doe',
+          AvatarUrl:
+            'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
+          PhoneNumber: '+840393874567',
+          Status: 'active',
+          CreatedAt: '2025-04-06T14:37:40.349',
+          UpdatedAt: '2025-04-06T14:37:40.349',
+          Role: 'admin',
+          DeletedAt: null,
+          IsEmailVerified: true,
+        },
+      },
+      example2: {
+        summary: 'Thông tin của nhà tuyển dụng',
+        value: {
+          ID: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
+          Position: 'Trưởng phòng nhân sự',
+          FullName: 'Lê Văn Nam',
+          Email: 'lengocanhpyne363@gmail.com',
+          AvatarUrl:
+            'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
+          PhoneNumber: '+84393873632',
+          IsEmailVerified: true,
+          Company: {
+            ID: '2180647a-d0e5-4062-a4a1-28de8bdf539e',
+            Name: 'Công ty ABC',
+            LogoUrl: null,
+            CreatedAt: '2025-04-06T15:51:31.73',
+            UpdatedAt: '2025-04-06T15:51:31.73',
+            WebsiteUrl: 'https://techcorp.com',
+            Description: 'Công ty đứng đầu về công nghệ tại Việt Nam',
+          },
+          CompanyLocations: {
+            ID: '3119455f-0091-47f9-8ec4-0f7db3ada5bb',
+            Address:
+              '1234 Khu phố 1, Đường Phạm Văn Đồng, Thành phố Hồ Chí Minh, Việt Nam.',
+            CreatedAt: '2025-04-06T15:51:31.895',
+            UpdatedAt: '2025-04-06T15:51:31.895',
+            BranchName: 'Trụ sở chính',
+          },
+        },
+      },
+      example3: {
+        summary: 'Thông tin của ứng viên',
+        value: {
+          ID: '891addf9-d54d-4c88-852d-fe96cb295536',
+          ResumeUrl: null,
+          Certifications: ['AWS Certified Developer', 'Google Cloud Associate'],
+          Bio: 'Software developer with 3 years of experience in frontend development.',
+          Level: 'senior',
+          FullName: 'Lê Ngọc Anh',
+          Email: 'lamduannhi0508@gmail.com',
+          PhoneNumber: '+84393873631',
+          AvatarUrl:
+            'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
+          Role: 'candidate',
+          WorkExperiences: [
+            {
+              ID: 'fddf389e-a341-46bb-9c52-0a1f818c738f',
+              EndDate: '2025-02-20T00:00:00',
+              JobType: 'remote',
+              Location: 'Phường 7, Quận Thủ Đức, TP. HCM',
+              Position: 'Backend Developer',
+              StartDate: '2024-11-01T08:00:00',
+              CompanyName: 'Công ty KMS Technology',
+              Descriptions: [
+                'Viết API cho hệ thống backend',
+                'Dùng framework NestJS để tăng khả năng mở rộng cho hệ thống',
+              ],
+              CompanyLogoUrl:
+                'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files/1744071950209-kms-tech.png',
+            },
+            {
+              ID: 'f8df1734-259b-4cb1-b33f-dd0e299b7be3',
+              EndDate: '2024-10-01T00:00:00',
+              JobType: 'part_time',
+              Location: 'Phường 7, Quận Thủ Đức, TP. HCM',
+              Position: 'Frontend Developer',
+              StartDate: '2024-05-01T08:00:00',
+              CompanyName: 'Công ty KMS Technology',
+              Descriptions: [
+                'Thiết kế giao diện dùng Figma',
+                'Dùng framework Next.js để viết giao diện',
+              ],
+              CompanyLogoUrl:
+                'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files/1744071580455-kms-tech.png',
+            },
+            {
+              ID: '35910e7c-bcbf-4d0e-a260-cd4d59dd26f8',
+              EndDate: null,
+              JobType: 'part_time',
+              Location: 'Quận Thủ Đức, TP. HCM',
+              Position: 'Kỹ sư phần mềm',
+              StartDate: '2024-05-01T08:00:00',
+              CompanyName: 'Công ty phần mềm ABC',
+              Descriptions: ['Viết NestJS', 'Dùng PostgreSQL'],
+              CompanyLogoUrl:
+                'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files/1744070730106-logo-fpt-software_043151683.png',
+            },
+            {
+              ID: '01c17e17-b4b2-4f5a-a12b-c843f257b586',
+              EndDate: '2021-12-15T00:00:00',
+              JobType: 'part_time',
+              Location: 'Mountain View, California',
+              Position: 'Lập trình viên Frontend',
+              StartDate: '2020-06-01T00:00:00',
+              CompanyName: 'Google',
+              Descriptions: [
+                'Xây dựng giao diện người dùng phản hồi bằng React',
+                'Cải thiện hiệu năng lên 30%',
+                'Hợp tác với các nhà thiết kế UX',
+              ],
+              CompanyLogoUrl: 'https://logo.clearbit.com/google.com',
+            },
+          ],
+          Applications: [
+            {
+              ID: 'b820f7cb-dbf7-4897-8962-f3d2b8e93815',
+              JobID: 'c1f917bf-f4ab-434a-a446-d4dfded60687',
+              Status: 'pending',
+              AppliedAt: '2025-04-07T07:33:55.337',
+              DeletedAt: null,
+              ResumeUrl:
+                'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files/1744011229465-1743210197848-Intern Software Engineer (Backend Developer) Resume - Le Ngoc Anh.pdf',
+              CandidateID: '891addf9-d54d-4c88-852d-fe96cb295536',
+            },
+          ],
+        },
+      },
+    },
+  })
   async getUser(
     @Param('id', ParseUUIDPipe) userId: string,
     @Req() request: Request,
@@ -88,6 +247,183 @@ export class UsersController {
 
   @Patch(':id')
   @Roles(RoleEnum.ADMIN, RoleEnum.CANDIDATE, RoleEnum.RECRUITER)
+  @ApiOperation({
+    summary: 'Thay đổi thông tin người dùng',
+    description: 'Đường dẫn này dùng để thay đổi thông tin người dùng',
+  })
+  @ApiExtraModels(UpdateCandidateDto, UpdateRecruiterDto)
+  @ApiParam({
+    name: 'id',
+    description:
+      'Mã định danh (ID) duy nhất của người dùng cần thay đổi thông tin.',
+    example: 'b820f7cb-dbf7-4897-8962-f3d2b8e93815',
+  })
+  @ApiBody({
+    type: UpdateUserDto,
+    examples: {
+      candidate: {
+        summary: 'Cập nhật ứng viên',
+        value: {
+          FullName: 'Nguyễn Văn A',
+          PhoneNumber: '+84901234567',
+          updateCandidateDto: {
+            Certifications: ['IELTS 7.5', 'Google Developer Certificate'],
+            Bio: 'Sinh viên năm cuối Đại học Bách Khoa',
+            Level: 'junior',
+          },
+        },
+      },
+      recruiter: {
+        summary: 'Cập nhật nhà tuyển dụng',
+        value: {
+          FullName: 'Trần Thị B',
+          PhoneNumber: '+84909876543',
+          updateRecruiterDto: {
+            Postion: 'Trưởng phòng nhân sự',
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    examples: {
+      example1: {
+        summary: 'Thông tin của quản trị viên.',
+        value: {
+          ID: '30e4c46a-9817-486e-966a-f8457aaf5e41',
+          Email: 'admin123@gmail.com',
+          FullName: 'John Doe',
+          AvatarUrl:
+            'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
+          PhoneNumber: '+840393874567',
+          Status: 'active',
+          CreatedAt: '2025-04-06T14:37:40.349',
+          UpdatedAt: '2025-04-06T14:37:40.349',
+          Role: 'admin',
+          DeletedAt: null,
+          IsEmailVerified: true,
+        },
+      },
+      example2: {
+        summary: 'Thông tin của nhà tuyển dụng',
+        value: {
+          ID: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
+          Position: 'Trưởng phòng nhân sự',
+          FullName: 'Lê Văn Nam',
+          Email: 'lengocanhpyne363@gmail.com',
+          AvatarUrl:
+            'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
+          PhoneNumber: '+84393873632',
+          IsEmailVerified: true,
+          Company: {
+            ID: '2180647a-d0e5-4062-a4a1-28de8bdf539e',
+            Name: 'Công ty ABC',
+            LogoUrl: null,
+            CreatedAt: '2025-04-06T15:51:31.73',
+            UpdatedAt: '2025-04-06T15:51:31.73',
+            WebsiteUrl: 'https://techcorp.com',
+            Description: 'Công ty đứng đầu về công nghệ tại Việt Nam',
+          },
+          CompanyLocations: {
+            ID: '3119455f-0091-47f9-8ec4-0f7db3ada5bb',
+            Address:
+              '1234 Khu phố 1, Đường Phạm Văn Đồng, Thành phố Hồ Chí Minh, Việt Nam.',
+            CreatedAt: '2025-04-06T15:51:31.895',
+            UpdatedAt: '2025-04-06T15:51:31.895',
+            BranchName: 'Trụ sở chính',
+          },
+        },
+      },
+      example3: {
+        summary: 'Thông tin của ứng viên',
+        value: {
+          ID: '891addf9-d54d-4c88-852d-fe96cb295536',
+          ResumeUrl: null,
+          Certifications: ['AWS Certified Developer', 'Google Cloud Associate'],
+          Bio: 'Software developer with 3 years of experience in frontend development.',
+          Level: 'senior',
+          FullName: 'Lê Ngọc Anh',
+          Email: 'lamduannhi0508@gmail.com',
+          PhoneNumber: '+84393873631',
+          AvatarUrl:
+            'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
+          Role: 'candidate',
+          WorkExperiences: [
+            {
+              ID: 'fddf389e-a341-46bb-9c52-0a1f818c738f',
+              EndDate: '2025-02-20T00:00:00',
+              JobType: 'remote',
+              Location: 'Phường 7, Quận Thủ Đức, TP. HCM',
+              Position: 'Backend Developer',
+              StartDate: '2024-11-01T08:00:00',
+              CompanyName: 'Công ty KMS Technology',
+              Descriptions: [
+                'Viết API cho hệ thống backend',
+                'Dùng framework NestJS để tăng khả năng mở rộng cho hệ thống',
+              ],
+              CompanyLogoUrl:
+                'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files/1744071950209-kms-tech.png',
+            },
+            {
+              ID: 'f8df1734-259b-4cb1-b33f-dd0e299b7be3',
+              EndDate: '2024-10-01T00:00:00',
+              JobType: 'part_time',
+              Location: 'Phường 7, Quận Thủ Đức, TP. HCM',
+              Position: 'Frontend Developer',
+              StartDate: '2024-05-01T08:00:00',
+              CompanyName: 'Công ty KMS Technology',
+              Descriptions: [
+                'Thiết kế giao diện dùng Figma',
+                'Dùng framework Next.js để viết giao diện',
+              ],
+              CompanyLogoUrl:
+                'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files/1744071580455-kms-tech.png',
+            },
+            {
+              ID: '35910e7c-bcbf-4d0e-a260-cd4d59dd26f8',
+              EndDate: null,
+              JobType: 'part_time',
+              Location: 'Quận Thủ Đức, TP. HCM',
+              Position: 'Kỹ sư phần mềm',
+              StartDate: '2024-05-01T08:00:00',
+              CompanyName: 'Công ty phần mềm ABC',
+              Descriptions: ['Viết NestJS', 'Dùng PostgreSQL'],
+              CompanyLogoUrl:
+                'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files/1744070730106-logo-fpt-software_043151683.png',
+            },
+            {
+              ID: '01c17e17-b4b2-4f5a-a12b-c843f257b586',
+              EndDate: '2021-12-15T00:00:00',
+              JobType: 'part_time',
+              Location: 'Mountain View, California',
+              Position: 'Lập trình viên Frontend',
+              StartDate: '2020-06-01T00:00:00',
+              CompanyName: 'Google',
+              Descriptions: [
+                'Xây dựng giao diện người dùng phản hồi bằng React',
+                'Cải thiện hiệu năng lên 30%',
+                'Hợp tác với các nhà thiết kế UX',
+              ],
+              CompanyLogoUrl: 'https://logo.clearbit.com/google.com',
+            },
+          ],
+          Applications: [
+            {
+              ID: 'b820f7cb-dbf7-4897-8962-f3d2b8e93815',
+              JobID: 'c1f917bf-f4ab-434a-a446-d4dfded60687',
+              Status: 'pending',
+              AppliedAt: '2025-04-07T07:33:55.337',
+              DeletedAt: null,
+              ResumeUrl:
+                'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files/1744011229465-1743210197848-Intern Software Engineer (Backend Developer) Resume - Le Ngoc Anh.pdf',
+              CandidateID: '891addf9-d54d-4c88-852d-fe96cb295536',
+            },
+          ],
+        },
+      },
+    },
+  })
   @UseInterceptors(AnyFilesInterceptor())
   async updateUser(
     @Param('id', ParseUUIDPipe) userId: string,
@@ -106,6 +442,51 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: 'Khoá (Xoá) tài khoản người dùng',
+    description:
+      'Đường dẫn này dùg để khoá (xoá) tài khoản người dùng. Chỉ có quản trị viên mới có quyền truy cập.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Mã định danh (Id) duy nhất của người dùng.',
+    example: 'b820f7cb-dbf7-4897-8962-f3d2b8e93815',
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: [
+        {
+          ID: '674c7204-106e-4d7f-8dc3-3f6389d0aa8e',
+          Email: 'lengocanhpyne363@gmail.com',
+          FullName: 'Lê Văn Nam',
+          AvatarUrl:
+            'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
+          PhoneNumber: '+84393873632',
+          Status: 'active',
+          CreatedAt: '2025-04-06T15:51:31.508',
+          UpdatedAt: '2025-04-06T15:51:31.508',
+          Role: 'recruiter',
+          DeletedAt: null,
+          IsEmailVerified: true,
+        },
+        {
+          ID: 'ee40a614-0e80-48bf-b69d-7987d6bedc4c',
+          Email: 'lamduannhi0508@gmail.com',
+          FullName: 'Lê Ngọc Anh',
+          AvatarUrl:
+            'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
+          PhoneNumber: '+84393873631',
+          Status: 'active',
+          CreatedAt: '2025-04-06T15:49:08.349',
+          UpdatedAt: '2025-04-06T15:49:08.349',
+          Role: 'candidate',
+          DeletedAt: null,
+          IsEmailVerified: true,
+        },
+      ],
+    },
+  })
   @Roles(RoleEnum.ADMIN)
   async deleteUser(@Param('id', ParseUUIDPipe) userId: string) {
     return this.usersService.handleDeleteUser(userId);
