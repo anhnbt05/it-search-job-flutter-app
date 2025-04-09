@@ -5,11 +5,13 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   Candidates,
   Categories,
   Jobs,
   JobStatus,
+  NotificationType,
   Recruiters,
   Role,
   Users,
@@ -18,12 +20,20 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { omit } from 'lodash';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import {
+  AdminNewJobPostMetadata,
+  handleFormatUserNotificationContent,
+  RecruiterJobApprovedMetadata,
+  RecruiterJobRejectedMetadata,
+} from 'src/libs/common/utils';
+import {
   CreateJobDto,
   CreateJobFavoritesDto,
   DeleteJobFavoritesDto,
   ProcessJobStatusDto,
+  RejectedJobStatusDto,
   UpdateJobDto,
 } from 'src/modules/jobs/dtos';
+import { UserNotificationsService } from 'src/modules/user-notifications/user-notifications.service';
 import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
@@ -34,6 +44,8 @@ export class JobsService {
     @InjectSupabaseClient('anonClient')
     private readonly anonSupbaseClient: SupabaseClient,
     private readonly usersService: UsersService,
+    private readonly userNotificationsService: UserNotificationsService,
+    private readonly configService: ConfigService,
   ) {}
 
   public handleGetJobs = async (userId: string) => {
@@ -197,9 +209,9 @@ export class JobsService {
     try {
       const { data: user } = await this.anonSupbaseClient
         .from('Recruiters')
-        .select('*')
+        .select('*, CompanyLocations(*, Companies(*))')
         .eq('UserID', userId)
-        .maybeSingle<Recruiters>();
+        .maybeSingle<any>();
 
       if (!user)
         throw new NotFoundException(
@@ -253,10 +265,13 @@ export class JobsService {
         .select('*')
         .single<Jobs>();
 
-      if (error)
+      if (error) {
+        console.error(error);
+
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi khi thêm mới công việc.',
         );
+      }
 
       const { error: insertDescriptionError } = await this.adminSupabaseClient
         .from('JobDescriptions')
@@ -342,6 +357,38 @@ export class JobsService {
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi khi thêm danh mục cho công việc.',
         );
+
+      const { data: admin } = await this.anonSupbaseClient
+        .from('Users')
+        .select('*')
+        .eq('Email', this.configService.get<string>('ADMIN_EMAIL', ''))
+        .maybeSingle<Users>();
+
+      if (!admin)
+        throw new NotFoundException(
+          `Không tìm thấy quản trị viên trong hệ thống.`,
+        );
+
+      const metadata: AdminNewJobPostMetadata = {
+        jobId: data.ID,
+        jobTitle: data.Title,
+        recruiterId: data.RecruiterID,
+        companyName: user?.CompanyLocations?.Companies?.Name,
+      };
+
+      const { admin_new_job_post } = NotificationType;
+
+      await this.userNotificationsService.handleCreateUserNotification(
+        {
+          Content: handleFormatUserNotificationContent(
+            admin_new_job_post,
+            metadata,
+          ),
+          Type: admin_new_job_post,
+          metadata,
+        },
+        admin.ID,
+      );
 
       return (
         await this.anonSupbaseClient
@@ -574,14 +621,14 @@ export class JobsService {
           `Bạn phải cung cấp các thông tin của các công việc cần cập nhật trạng thái.`,
         );
 
-      const { openJobIds, rejectedJobIds } = processJobStatusDto;
+      const { openJobIds, rejectedJobs } = processJobStatusDto;
 
       if (openJobIds && openJobIds.length) {
         await this.generateProcessJobStatus('open', openJobIds);
       }
 
-      if (rejectedJobIds && rejectedJobIds.length) {
-        await this.generateProcessJobStatus('rejected', rejectedJobIds);
+      if (rejectedJobs && rejectedJobs.length) {
+        await this.generateProcessJobStatus('rejected', rejectedJobs);
       }
 
       return this.handleGetJobs(userId);
@@ -593,14 +640,74 @@ export class JobsService {
 
   private generateProcessJobStatus = async (
     method: 'open' | 'rejected',
-    items: string[],
+    items: string[] | RejectedJobStatusDto[],
   ) => {
     const status = method === 'open' ? JobStatus.open : JobStatus.rejected;
+
+    if (status === 'open') {
+      await Promise.all(
+        (items as string[]).map(async (item) => {
+          const job = await this.handleVerifyJob(item);
+
+          const metadata: RecruiterJobApprovedMetadata = {
+            jobId: job.ID,
+            jobTitle: job.Title,
+          };
+
+          const { recruiter_job_approved } = NotificationType;
+
+          await this.userNotificationsService.handleCreateUserNotification(
+            {
+              Content: handleFormatUserNotificationContent(
+                recruiter_job_approved,
+                metadata,
+              ),
+              Type: recruiter_job_approved,
+              metadata,
+            },
+            job.Recruiters.Users.ID as string,
+          );
+        }),
+      );
+    } else if (status === 'rejected') {
+      await Promise.all(
+        (items as RejectedJobStatusDto[]).map(async (item) => {
+          const { jobId, reason } = item;
+
+          const job = await this.handleVerifyJob(jobId);
+
+          const { recruiter_job_rejected } = NotificationType;
+
+          const metadata: RecruiterJobRejectedMetadata = {
+            jobId: jobId,
+            jobTitle: job.Title,
+            reason: reason ? reason : '',
+          };
+
+          await this.userNotificationsService.handleCreateUserNotification(
+            {
+              Content: handleFormatUserNotificationContent(
+                recruiter_job_rejected,
+                metadata,
+              ),
+              Type: recruiter_job_rejected,
+              metadata,
+            },
+            job.Recruiters.Users.ID as string,
+          );
+        }),
+      );
+    }
 
     const { error } = await this.adminSupabaseClient
       .from('Jobs')
       .update({ Status: status })
-      .in('ID', items);
+      .in(
+        'ID',
+        status === 'open'
+          ? (items as string[])
+          : (items as RejectedJobStatusDto[]).map((j) => j.jobId),
+      );
 
     if (error)
       throw new InternalServerErrorException(
@@ -928,6 +1035,26 @@ export class JobsService {
           ),
         })) ?? []
       );
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  private handleVerifyJob = async (jobId: string) => {
+    try {
+      const { data } = await this.anonSupbaseClient
+        .from('Jobs')
+        .select('*, Recruiters(*, Users(*))')
+        .eq('ID', jobId)
+        .maybeSingle<any>();
+
+      if (!data)
+        throw new NotFoundException(
+          `Không tìm thấy công việc có id '${jobId}' trong hệ thống.`,
+        );
+
+      return data;
     } catch (err) {
       console.error(err);
       throw err;

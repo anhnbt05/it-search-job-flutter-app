@@ -1,22 +1,25 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
   IsNotEmpty,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 
+export class RejectedApplications {
+  @IsString()
+  @IsNotEmpty()
+  readonly applicationId!: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  readonly reason?: string;
+}
+
 export class ProcessApplicationsDto {
-  @ApiProperty({
-    description: 'Danh sách các mã định danh (ID) muốn chấp nhận',
-    type: [String],
-    required: false,
-    example: [
-      'c1f917bf-f4ab-434a-a446-d4dfded60687',
-      'c1f917bf-f4ab-434a-a446-d4dfded60687',
-    ],
-  })
   @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
@@ -24,19 +27,10 @@ export class ProcessApplicationsDto {
   @IsNotEmpty({ each: true })
   readonly acceptedApplicationIds?: string[];
 
-  @ApiProperty({
-    description: 'Danh sách các mã định danh (ID) muốn từ chối',
-    type: [String],
-    required: false,
-    example: [
-      'c1f917bf-f4ab-434a-a446-d4dfded60687',
-      'c1f917bf-f4ab-434a-a446-d4dfded60687',
-    ],
-  })
   @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
-  @IsString({ each: true })
-  @IsNotEmpty({ each: true })
-  readonly rejectedApplicationIds?: string[];
+  @ValidateNested({ each: true })
+  @Type(() => RejectedApplications)
+  readonly rejectedApplications?: RejectedApplications[];
 }

@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
 import { SupabaseModule } from 'nestjs-supabase-js';
+import { EmailsModule } from 'src/modules/emails/emails.module';
+import { EmailsProducer } from 'src/modules/emails/producers';
 import { JobsModule } from 'src/modules/jobs/jobs.module';
 import { JobsService } from 'src/modules/jobs/jobs.service';
 import { UploadsModule } from 'src/modules/uploads/uploads.module';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
+import { UserNotificationsService } from 'src/modules/user-notifications/user-notifications.service';
+import { UsersModule } from 'src/modules/users/users.module';
 import { ApplicationsController } from './applications.controller';
 import { ApplicationsService } from './applications.service';
-import { UsersModule } from 'src/modules/users/users.module';
 
 @Module({
   imports: [
@@ -14,8 +17,15 @@ import { UsersModule } from 'src/modules/users/users.module';
     UploadsModule,
     JobsModule,
     UsersModule,
+    EmailsModule,
   ],
   controllers: [ApplicationsController],
-  providers: [ApplicationsService, UploadsService, JobsService],
+  providers: [
+    ApplicationsService,
+    UploadsService,
+    JobsService,
+    UserNotificationsService,
+    EmailsProducer,
+  ],
 })
 export class ApplicationsModule {}
