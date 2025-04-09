@@ -1,0 +1,80 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Job Application Approved</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f4;
+        text-align: center;
+        padding: 40px;
+        margin: 0;
+      }
+      .container {
+        background: #ffffff;
+        max-width: 480px;
+        margin: auto;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        text-align: left;
+      }
+      h1 {
+        color: #28a745;
+        font-size: 22px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      p {
+        font-size: 15px;
+        color: #555;
+        line-height: 1.6;
+      }
+      .note {
+        font-size: 14px;
+        color: #888;
+        margin-top: 15px;
+      }
+      hr {
+        border: 0;
+        height: 1px;
+        background-color: #f0f0f0;
+        margin: 20px 0;
+      }
+      .footer {
+        font-size: 12px;
+        color: #888;
+        margin-top: 20px;
+        font-style: italic;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <img
+        src='{{companyLogoUrl}}'
+        alt='{{companyName}} Logo'
+        style='max-width: 120px; margin-bottom: 20px;'
+      />
+      <h1>Thông báo kết quả ứng tuyển</h1>
+      <p>Xin chào <strong>{{CandidateName}}</strong>,</p>
+      <p>Cảm ơn bạn đã quan tâm và ứng tuyển cho công việc
+        <strong>{{jobTitle}}</strong>
+        tại
+        <strong>{{companyName}}</strong>.</p>
+      <p>Sau khi xem xét kỹ lưỡng, rất tiếc chúng tôi chưa thể tiếp tục với hồ
+        sơ của bạn cho công việc này.</p>
+      {{#if reason}}
+        <p>Lý do từ chối: <em>{{reason}}</em></p>
+      {{/if}}
+      <p>Chúng tôi rất trân trọng sự quan tâm của bạn và mong rằng sẽ có cơ hội
+        hợp tác trong tương lai.</p>
+      <hr />
+      <p class='footer'>
+        Đây là email tự động, vui lòng không phản hồi lại email này.
+      </p>
+    </div>
+  </body>
+</html>

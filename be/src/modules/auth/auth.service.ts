@@ -428,7 +428,7 @@ export class AuthService {
 
       return {
         success: true,
-        message: 'Password reset email sent successfully.',
+        message: 'OTP đã được gửi tới email.',
       };
     } catch (err) {
       console.error(err);

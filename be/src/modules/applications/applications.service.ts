@@ -9,19 +9,29 @@ import {
   Applications,
   ApplicationStatus,
   Candidates,
-  Jobs,
   JobStatus,
+  NotificationType,
   Recruiters,
 } from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { omit } from 'lodash';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import {
+  CandidateApplicationApprovedMetadata,
+  CandidateApplicationRejectedMetadata,
+  EmailTemplateNameEnum,
+  handleFormatUserNotificationContent,
+  RecruiterNewApplicationMetadata,
+} from 'src/libs/common/utils';
+import {
   CreateApplicationDto,
   ProcessApplicationsDto,
+  RejectedApplications,
 } from 'src/modules/applications/dtos';
+import { EmailsProducer } from 'src/modules/emails/producers';
 import { JobsService } from 'src/modules/jobs/jobs.service';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
+import { UserNotificationsService } from 'src/modules/user-notifications/user-notifications.service';
 
 @Injectable()
 export class ApplicationsService {
@@ -32,6 +42,8 @@ export class ApplicationsService {
     private readonly anonSupabaseClient: SupabaseClient,
     private readonly uploadsService: UploadsService,
     private readonly jobsService: JobsService,
+    private readonly userNotificationsService: UserNotificationsService,
+    private readonly emailsProducer: EmailsProducer,
   ) {}
 
   public handleGetApplications = async (userId: string) => {
@@ -113,9 +125,9 @@ export class ApplicationsService {
     try {
       const { data: candidate } = await this.anonSupabaseClient
         .from('Candidates')
-        .select('*')
+        .select('*, Users(*)')
         .eq('UserID', userId)
-        .maybeSingle<Candidates>();
+        .maybeSingle<any>();
 
       if (!candidate)
         throw new NotFoundException(
@@ -126,16 +138,16 @@ export class ApplicationsService {
 
       const { data: job } = await this.anonSupabaseClient
         .from('Jobs')
-        .select('*')
+        .select('*, Recruiters(*, Users(*))')
         .eq('ID', JobId)
-        .maybeSingle<Jobs>();
+        .maybeSingle<any>();
 
       if (!job || job?.Status !== JobStatus.open)
         throw new NotFoundException(
           `Không tìm thấy công việc có id '${JobId}' trong hệ thống.`,
         );
 
-      if (new Date(job?.ExpiredAt).getTime() < new Date().getTime())
+      if (new Date(job?.ExpiredAt as string).getTime() < new Date().getTime())
         throw new BadRequestException(
           `Công việc có id '${JobId}' đã quá thời gian ứng tuyển.`,
         );
@@ -158,7 +170,7 @@ export class ApplicationsService {
         }
       }
 
-      const { error } = await this.adminSupabaseClient
+      const { data, error } = await this.adminSupabaseClient
         .from('Applications')
         .upsert(
           [
@@ -169,7 +181,9 @@ export class ApplicationsService {
             },
           ],
           { onConflict: 'CandidateID,JobID' },
-        );
+        )
+        .select()
+        .single();
 
       if (error) {
         console.error(error);
@@ -178,6 +192,28 @@ export class ApplicationsService {
           'Đã xảy ra lỗi khi tạo đơn ứng tuyển cho bạn. Vui lòng thử lại.',
         );
       }
+
+      const metadata: RecruiterNewApplicationMetadata = {
+        jobId: job.ID,
+        jobTitle: job.Title,
+        candidateId: candidate.ID,
+        candidateName: candidate.Users.FullName,
+        applicationId: data.ID,
+      };
+
+      const { recruiter_new_application } = NotificationType;
+
+      await this.userNotificationsService.handleCreateUserNotification(
+        {
+          Content: handleFormatUserNotificationContent(
+            recruiter_new_application,
+            metadata,
+          ),
+          Type: recruiter_new_application,
+          metadata,
+        },
+        job.Recruiters.Users.ID as string,
+      );
 
       return this.handleGetApplications(userId);
     } catch (err) {
@@ -259,7 +295,7 @@ export class ApplicationsService {
 
       if (
         !processApplicationsDto?.acceptedApplicationIds &&
-        !processApplicationsDto?.rejectedApplicationIds
+        !processApplicationsDto?.rejectedApplications
       )
         throw new BadRequestException(
           'Bạn phải cung cấp thông tin về các đơn ứng tuyển cần được xử lý.',
@@ -272,10 +308,10 @@ export class ApplicationsService {
           recruiter.ID,
         );
 
-      if (processApplicationsDto?.rejectedApplicationIds)
+      if (processApplicationsDto?.rejectedApplications)
         await this.handleGenerateProcessApplications(
           'rejected',
-          processApplicationsDto.rejectedApplicationIds,
+          processApplicationsDto.rejectedApplications,
           recruiter.ID,
         );
 
@@ -291,39 +327,158 @@ export class ApplicationsService {
 
   private handleGenerateProcessApplications = async (
     type: 'accepted' | 'rejected',
-    applicationIds: string[],
+    items: string[] | RejectedApplications[],
     recruiterId: string,
   ) => {
-    await Promise.all(
-      applicationIds.map(async (applicationId) => {
-        const { data: application } = await this.anonSupabaseClient
-          .from('Applications')
-          .select('*, Jobs(*, Recruiters(*))')
-          .eq('ID', applicationId)
-          .maybeSingle<any>();
-
-        if (!application)
-          throw new NotFoundException(
-            `Không tìm thấy đơn ứng tuyển có id '${applicationId}' trong hệ thống.`,
+    if (type === 'accepted') {
+      await Promise.all(
+        (items as string[]).map(async (item) => {
+          const application = await this.handleVerifyApplication(
+            item,
+            recruiterId,
           );
 
-        if (application.Jobs.Recruiters.ID !== recruiterId)
-          throw new ForbiddenException(
-            `Đơn ứng tuyển có id '${applicationId}' không ứng tuyển cho công việc mà bạn đăng, nên bạn không thể xủ lý chúng.`,
-          );
+          const metadata: CandidateApplicationApprovedMetadata = {
+            recruiterId,
+            companyName:
+              application.Jobs.Recruiters.CompanyLocations.Companies.Name,
+            applicationId: application.ID,
+            jobId: application.JobID,
+            jobTitle: application.Jobs.Title,
+          };
 
-        await this.adminSupabaseClient
-          .from('Applications')
-          .update([
+          const { candidate_application_approved } = NotificationType;
+
+          await this.userNotificationsService.handleCreateUserNotification(
             {
-              Status:
-                type === 'accepted'
-                  ? ApplicationStatus.accepted
-                  : ApplicationStatus.rejected,
+              Content: handleFormatUserNotificationContent(
+                candidate_application_approved,
+                metadata,
+              ),
+              Type: candidate_application_approved,
+              metadata,
             },
-          ])
-          .eq('ID', applicationId);
-      }),
-    );
+            application.Candidates.Users.ID as string,
+          );
+
+          const { EMAIL_APPLICATION_APPROVED } = EmailTemplateNameEnum;
+
+          await this.emailsProducer.sendEmail(
+            application.Candidates.Users.Email as string,
+            EMAIL_APPLICATION_APPROVED,
+            {
+              companyLogoUrl:
+                application.Jobs.Recruiters.CompanyLocations.Companies.LogoUrl,
+              companyName:
+                application.Jobs.Recruiters.CompanyLocations.Companies.Name,
+              CandidateName: application.Candidates.Users.FullName,
+              jobTitle: application.Jobs.Title,
+            },
+          );
+        }),
+      );
+    } else if (type === 'rejected') {
+      await Promise.all(
+        (items as RejectedApplications[]).map(async (item) => {
+          const { applicationId, reason } = item;
+
+          const application = await this.handleVerifyApplication(
+            applicationId,
+            recruiterId,
+          );
+
+          const { candidate_application_rejected } = NotificationType;
+
+          const metadata: CandidateApplicationRejectedMetadata = {
+            jobId: application.jobID,
+            jobTitle: application.Jobs.Title,
+            recruiterId,
+            reason: reason
+              ? reason
+              : 'Liên hệ với nhà tuyển dụng để biết nguyên nhân.',
+            companyName:
+              application.Jobs.Recruiters.CompanyLocations.Companies.Name,
+            applicationId: application.ID,
+          };
+
+          await this.userNotificationsService.handleCreateUserNotification(
+            {
+              Content: handleFormatUserNotificationContent(
+                candidate_application_rejected,
+                metadata,
+              ),
+              Type: candidate_application_rejected,
+              metadata,
+            },
+            application.Candidates.Users.ID as string,
+          );
+
+          const { EMAIL_APPLICATION_REJECTED } = EmailTemplateNameEnum;
+
+          await this.emailsProducer.sendEmail(
+            application.Candidates.Users.Email as string,
+            EMAIL_APPLICATION_REJECTED,
+            {
+              companyLogoUrl:
+                application.Jobs.Recruiters.CompanyLocations.Companies.LogoUrl,
+              companyName:
+                application.Jobs.Recruiters.CompanyLocations.Companies.Name,
+              CandidateName: application.Candidates.Users.FullName,
+              jobTitle: application.Jobs.Title,
+              reason: reason
+                ? reason
+                : 'Liên hệ với nhà tuyển dụng để biết lý do.',
+            },
+          );
+        }),
+      );
+    }
+
+    const { error } = await this.adminSupabaseClient
+      .from('Applications')
+      .update([
+        {
+          Status: type,
+        },
+      ])
+      .in(
+        'ID',
+        type === 'accepted'
+          ? (items as string[])
+          : (items as RejectedApplications[]).map((i) => i.applicationId),
+      );
+
+    if (error) {
+      console.error(error);
+
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi xử lý đơn ứng tuyển. Vui lòng thử lại.',
+      );
+    }
+  };
+
+  private handleVerifyApplication = async (
+    applicationId: string,
+    recruiterId: string,
+  ) => {
+    const { data } = await this.anonSupabaseClient
+      .from('Applications')
+      .select(
+        '*, Candidates(*, Users(*)), Jobs(*, Recruiters(*, CompanyLocations(*, Companies(*))))',
+      )
+      .eq('ID', applicationId)
+      .maybeSingle<any>();
+
+    if (!data)
+      throw new NotFoundException(
+        `Đơn ứng tuyển có id '${applicationId}' không tìm thấy trong hệ thống.`,
+      );
+
+    if (data.Jobs.Recruiters.ID !== recruiterId)
+      throw new ForbiddenException(
+        `Đơn ứng tuyển có id '${applicationId}' không ứng tuyển cho công việc mà bạn đăng, nên bạn không thể xủ lý chúng.`,
+      );
+
+    return data;
   };
 }

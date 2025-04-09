@@ -522,6 +522,7 @@ export class JobsController {
   })
   @ApiResponse({
     status: 200,
+    description: 'Trả về dữ liệu bao gồm những công việc có trạng thái là mở.',
     schema: {
       example: [
         {
@@ -561,6 +562,43 @@ export class JobsController {
   @ApiBody({
     type: ProcessJobStatusDto,
     description: 'Dữ liệu cần gửi đi để xử lý đơn ứng tuyển.',
+    examples: {
+      example1: {
+        summary: 'Trường hợp chỉ gửi đi những công việc mà đồng ý đăng tuyển.',
+        value: {
+          openJobIds: ['e9a4b957-3e7e-48c8-b88e-fd26d83ea76c'],
+        },
+      },
+      example2: {
+        summary: 'Trường hợp chỉ gửi đi những công việc mà từ chối đăng tuyển.',
+        value: {
+          rejectedJobs: [
+            {
+              jobId: '8d3d5fac-fab6-460d-868c-32f73624e9bc',
+              reason:
+                'Bài đăng tuyển của bạn đã vi phạm các chính sách bảo mật của hệ thống.',
+            },
+          ],
+        },
+      },
+      example3: {
+        summary:
+          'Trường hợp gửi đi cả những công việc đồng ý và từ chối đăng tuyển.',
+        value: {
+          rejectedJobs: [
+            {
+              jobId: '8d3d5fac-fab6-460d-868c-32f73624e9bc',
+              reason:
+                'Bài đăng tuyển của bạn đã vi phạm các chính sách bảo mật của hệ thống.',
+            },
+          ],
+          openJobIds: [
+            '15e09a20-11da-416f-a6b7-5789f55c8522',
+            '12bfb97c-a3d1-404c-8002-045e5417ef39',
+          ],
+        },
+      },
+    },
   })
   async processStatusOfJobs(
     @Body() processJobStatusDto: ProcessJobStatusDto,

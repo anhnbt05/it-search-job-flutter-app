@@ -11,14 +11,15 @@ import {
 } from 'src/libs/common/utils';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ApplicationsModule } from './modules/applications/applications.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CompaniesModule } from './modules/companies/companies.module';
 import { EmailsModule } from './modules/emails/emails.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
+import { UserNotificationsModule } from './modules/user-notifications/user-notifications.module';
 import { UsersModule } from './modules/users/users.module';
 import { WorkExperiencesModule } from './modules/work-experiences/work-experiences.module';
-import { ApplicationsModule } from './modules/applications/applications.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { ApplicationsModule } from './modules/applications/applications.module';
     WorkExperiencesModule,
     CompaniesModule,
     ApplicationsModule,
+    UserNotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

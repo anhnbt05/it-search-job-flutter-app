@@ -5,12 +5,19 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Recruiters, Role, Users, UserStatus } from '@prisma/client';
+import {
+  Candidates,
+  Recruiters,
+  Role,
+  UserNotifications,
+  Users,
+  UserStatus,
+} from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { omit } from 'lodash';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
-import { UpdateUserDto } from 'src/modules/users/dtos';
+import { SearchUsersDto, UpdateUserDto } from 'src/modules/users/dtos';
 
 @Injectable()
 export class UsersService {
@@ -22,16 +29,49 @@ export class UsersService {
     private readonly anonSupabaseClient: SupabaseClient,
   ) {}
 
-  public handleGetUsers = async () => {
+  public handleGetUsers = async (searchUsersDto?: SearchUsersDto) => {
     try {
       const { data, error } = await this.anonSupabaseClient
         .from('Users')
         .select('*');
 
-      if (error)
+      if (error) {
+        console.error(error);
+
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi khi lấy danh sách các người dùng.',
         );
+      }
+
+      if (searchUsersDto?.candidateId) {
+        const { data } = await this.anonSupabaseClient
+          .from('Candidates')
+          .select('*')
+          .eq('ID', searchUsersDto.candidateId)
+          .maybeSingle<Candidates>();
+
+        if (!data)
+          throw new NotFoundException(
+            `Không tìm thấy thông tin ứng viên có id '${searchUsersDto.candidateId}'`,
+          );
+
+        return this.handleGetUser(data.UserID, data.UserID);
+      }
+
+      if (searchUsersDto?.recruiterId) {
+        const { data } = await this.anonSupabaseClient
+          .from('Recruiters')
+          .select('*')
+          .eq('ID', searchUsersDto.recruiterId)
+          .maybeSingle<Recruiters>();
+
+        if (!data)
+          throw new NotFoundException(
+            `Không tìm thấy thông tin nhà tuyển dụng có id '${searchUsersDto.recruiterId}'`,
+          );
+
+        return this.handleGetUser(data.UserID, data.UserID);
+      }
 
       return data
         .map((data: Users) => omit(data, ['Password']))
@@ -375,6 +415,158 @@ export class UsersService {
         omit(we, ['CandidateID']),
       ),
     };
+  };
+
+  public handleGetNotificationsOfUser = async (
+    userId: string,
+    currentUserId: string,
+  ) => {
+    try {
+      const { data: user } = await this.anonSupabaseClient
+        .from('Users')
+        .select('*, UserNotifications(*)')
+        .eq('ID', userId)
+        .maybeSingle<any>();
+
+      if (!user)
+        throw new NotFoundException(
+          `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
+        );
+
+      if (userId !== currentUserId)
+        throw new ForbiddenException(
+          'Bạn chỉ có thể xem thông báo của chính mình.',
+        );
+
+      return (
+        user?.UserNotifications.map((un: any) =>
+          omit(un, ['UserID', 'DeletedAt', 'NotificationID']),
+        ).sort(
+          (a: any, b: any) =>
+            new Date(b.CreatedAt as string).getTime() -
+            new Date(a.CreatedAt as string).getTime(),
+        ) ?? []
+      );
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  public handleGetNotificationDetails = async (
+    userId: string,
+    notificationId: string,
+    currentUserId: string,
+  ) => {
+    try {
+      const { data: user } = await this.anonSupabaseClient
+        .from('Users')
+        .select('*')
+        .eq('ID', userId)
+        .maybeSingle<Users>();
+
+      if (!user)
+        throw new NotFoundException(
+          `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
+        );
+
+      const { data: userNotification } = await this.anonSupabaseClient
+        .from('UserNotifications')
+        .select('*')
+        .eq('ID', notificationId)
+        .maybeSingle<UserNotifications>();
+
+      if (!userNotification)
+        throw new NotFoundException(
+          `Không tìm thấy thông báo có id '${notificationId}' trong hệ thống.`,
+        );
+
+      if (user.ID !== currentUserId)
+        throw new ForbiddenException(
+          'Bạn chỉ có thể xem thông báo chi tiết của chính mình.',
+        );
+
+      const { error } = await this.adminSupabaseClient
+        .from('UserNotifications')
+        .update([
+          {
+            IsRead: true,
+          },
+        ])
+        .eq('ID', notificationId);
+
+      if (error) {
+        console.error(error);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi cập nhật trạng thái đã đọc thông báo.',
+        );
+      }
+
+      return (
+        await this.anonSupabaseClient
+          .from('UserNotifications')
+          .select('*')
+          .eq('ID', notificationId)
+          .maybeSingle<UserNotifications>()
+      )?.data;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  public handleDeleteNotification = async (
+    userId: string,
+    notificationId: string,
+    currentUserId: string,
+  ) => {
+    try {
+      const { data: user } = await this.anonSupabaseClient
+        .from('Users')
+        .select('*')
+        .eq('ID', userId)
+        .maybeSingle<Users>();
+
+      if (!user)
+        throw new NotFoundException(
+          `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
+        );
+
+      const { data: userNotification } = await this.anonSupabaseClient
+        .from('UserNotifications')
+        .select('*')
+        .eq('ID', notificationId)
+        .maybeSingle<UserNotifications>();
+
+      if (!userNotification)
+        throw new NotFoundException(
+          `Không tìm thấy thông báo có id '${notificationId}' trong hệ thống.`,
+        );
+
+      if (user.ID !== currentUserId)
+        throw new ForbiddenException(
+          'Bạn chỉ có thể xoá thông báo chi tiết của chính mình.',
+        );
+
+      const { error } = await this.adminSupabaseClient
+        .from('UserNotifications')
+        .delete()
+        .eq('ID', notificationId);
+
+      if (error) {
+        console.error(error);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi xoá thông báo chi tiết. Vui lòng thử lại sau.',
+        );
+      }
+
+      return this.handleGetNotificationsOfUser(userId, currentUserId);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   };
 
   private handleUpdateFileUrl = async (

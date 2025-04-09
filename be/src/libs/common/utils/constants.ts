@@ -17,6 +17,8 @@ export enum EmailTemplateNameEnum {
   EMAIL_RESET_PASSWORD = 'email-reset-password',
   EMAIL_UPDATE_PASSWORD_SUCCESS = 'email-update-password-success',
   EMAIL_REGISTER_ACCOUNT_SUCCESS = 'email-register-account-success',
+  EMAIL_APPLICATION_APPROVED = 'email-application-approved',
+  EMAIL_APPLICATION_REJECTED = 'email-application-rejected',
 }
 
 export type SupabaseUserToken = {
@@ -74,6 +76,40 @@ export const SUBJECT_EMAIL_MAP = {
   'email-reset-password': 'Email Reset Password',
   'email-update-password-success': 'Email Reset Password Successful',
   'email-register-account-success': 'Email Registration Successful',
+  'email-application-approved': 'Email Approved Application',
+  'email-application-rejected': 'Email Rejected Application',
+};
+
+export type AdminNewJobPostMetadata = RecruiterJobApprovedMetadata & {
+  recruiterId: string;
+  companyName: string;
+};
+
+export type CandidateApplicationApprovedMetadata =
+  RecruiterJobApprovedMetadata & {
+    recruiterId: string;
+    companyName: string;
+    applicationId: string;
+  };
+
+export type CandidateApplicationRejectedMetadata =
+  CandidateApplicationApprovedMetadata & {
+    reason?: string;
+  };
+
+export type RecruiterJobApprovedMetadata = {
+  jobId: string;
+  jobTitle: string;
+};
+
+export type RecruiterJobRejectedMetadata = RecruiterJobApprovedMetadata & {
+  reason?: string;
+};
+
+export type RecruiterNewApplicationMetadata = RecruiterJobApprovedMetadata & {
+  candidateId: string;
+  candidateName: string;
+  applicationId: string;
 };
 
 export const BULLMQ_RETRY_LIMIT = 3;
