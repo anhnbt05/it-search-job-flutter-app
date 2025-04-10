@@ -14,7 +14,12 @@ class ForgotPasswordPage extends StatelessWidget {
         builder: (context, viewModel, child) {
           return Scaffold(
             body: Container(
-              padding: EdgeInsets.fromLTRB(30, 80, 30, 0),
+              padding: EdgeInsets.fromLTRB(
+                MediaQuery.of(context).size.width * 0.08,    // left
+                MediaQuery.of(context).size.height * 0.1,    // top
+                MediaQuery.of(context).size.width * 0.08,    // right
+                0,
+              ),
               constraints: BoxConstraints.expand(),
               color: Colors.white,
               child: SingleChildScrollView(

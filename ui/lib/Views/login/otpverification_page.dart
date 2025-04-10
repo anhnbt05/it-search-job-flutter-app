@@ -22,7 +22,12 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(30, 80, 30, 0),
+        padding: EdgeInsets.fromLTRB(
+          MediaQuery.of(context).size.width * 0.08,    // left
+          MediaQuery.of(context).size.height * 0.1,    // top
+          MediaQuery.of(context).size.width * 0.08,    // right
+          0,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

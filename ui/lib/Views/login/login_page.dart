@@ -23,7 +23,12 @@ class _LoginPageState extends State<LoginPage> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Container(
-          padding: EdgeInsets.fromLTRB(30, 50, 30, 0),
+            padding: EdgeInsets.fromLTRB(
+              MediaQuery.of(context).size.width * 0.08,   // left
+              MediaQuery.of(context).size.height * 0.05,  // top
+              MediaQuery.of(context).size.width * 0.08, //right
+              0//                // bottom
+            ),
           constraints: BoxConstraints.expand(),
           color: Colors.white,
           child: SingleChildScrollView(
@@ -33,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
               children: <Widget> [
                 Positioned.fill(
                     child: Image.asset(
-                      'assets/job-search-background.avif',
+                      'assets/job-search-background.jpg',
                       fit: BoxFit.cover,
                     )),
                 Padding(
@@ -119,7 +124,8 @@ class _LoginPageState extends State<LoginPage> {
                         child: Text("ĐĂNG KÝ TÀI KHOẢN MỚI", style: TextStyle(fontSize: 15, color: Colors.grey),)
                       ),
                       TextButton(onPressed: () => LoginViewModel().goToForgotPassword(context),
-                           child:  Text("QUÊN MẬT KHẨU", style: TextStyle(fontSize: 15, color: Colors.blue),)
+                          child:  Text("QUÊN MẬT KHẨU", style: TextStyle(fontSize: 15, color: Colors.blue),
+                          )
                       )
                     ],
                   ),
