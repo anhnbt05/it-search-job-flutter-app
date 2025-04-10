@@ -7,7 +7,6 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
-  Query,
   Req,
   UseGuards,
   UseInterceptors,
@@ -19,12 +18,13 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { User } from '@supabase/supabase-js';
 import { Request } from 'express';
 import { FileValidationDecorator, Roles } from 'src/libs/common/decorators';
 import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
-import { RoleEnum } from 'src/libs/common/utils';
+import { API_TAGS, RoleEnum } from 'src/libs/common/utils';
 import {
   CreateApplicationDto,
   ProcessApplicationsDto,
@@ -34,6 +34,7 @@ import { ApplicationsService } from './applications.service';
 @Controller('applications')
 @UseGuards(SupabaseGuard, RoleAuthGuard)
 @ApiBearerAuth()
+@ApiTags(API_TAGS.APPLICATION)
 export class ApplicationsController {
   constructor(private readonly applicationsService: ApplicationsService) {}
 
@@ -260,6 +261,43 @@ export class ApplicationsController {
   @ApiBody({
     type: ProcessApplicationsDto,
     description: 'Dữ liệu cần gửi đi để xử lý đơn ứng tuyển của các ứng viên.',
+    examples: {
+      example1: {
+        summary: 'Trường hợp chỉ gửi đi những đơn ứng tuyển mà chấp thuận.',
+        value: {
+          openApplicationIds: ['e9a4b957-3e7e-48c8-b88e-fd26d83ea76c'],
+        },
+      },
+      example2: {
+        summary: 'Trường hợp chỉ gửi đi những đơn ứng tuyển mà từ chối.',
+        value: {
+          rejectedApplications: [
+            {
+              applicationId: '8d3d5fac-fab6-460d-868c-32f73624e9bc',
+              reason:
+                'Chưa đáp ứng đầy đủ các tiêu chí kỹ thuật mà công ty đang tìm kiếm cho vị trí Backend Junior.',
+            },
+          ],
+        },
+      },
+      example3: {
+        summary:
+          'Trường hợp gửi đi cả những đơn ứng tuyển vừa có đồng ý và vừa có từ chối.',
+        value: {
+          rejectedApplications: [
+            {
+              applicationId: '8d3d5fac-fab6-460d-868c-32f73624e9bc',
+              reason:
+                'Chưa đáp ứng đầy đủ các tiêu chí kỹ thuật mà công ty đang tìm kiếm cho vị trí Backend Junior.',
+            },
+          ],
+          openApplicationIds: [
+            '15e09a20-11da-416f-a6b7-5789f55c8522',
+            '12bfb97c-a3d1-404c-8002-045e5417ef39',
+          ],
+        },
+      },
+    },
   })
   @Roles(RoleEnum.RECRUITER)
   async processApplications(

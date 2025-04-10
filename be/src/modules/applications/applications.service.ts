@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   Applications,
   ApplicationStatus,
@@ -44,6 +45,7 @@ export class ApplicationsService {
     private readonly jobsService: JobsService,
     private readonly userNotificationsService: UserNotificationsService,
     private readonly emailsProducer: EmailsProducer,
+    private readonly configService: ConfigService,
   ) {}
 
   public handleGetApplications = async (userId: string) => {
@@ -373,6 +375,15 @@ export class ApplicationsService {
                 application.Jobs.Recruiters.CompanyLocations.Companies.Name,
               CandidateName: application.Candidates.Users.FullName,
               jobTitle: application.Jobs.Title,
+              EmailSupport: this.configService.get<string>('admin.email', ''),
+              PhoneSupport: this.configService.get<string>(
+                'admin.phone_number',
+                '',
+              ),
+              ApplicationLogoUrl: this.configService.get<string>(
+                'application.logo_url',
+                '',
+              ),
             },
           );
         }),
@@ -428,6 +439,15 @@ export class ApplicationsService {
               reason: reason
                 ? reason
                 : 'Liên hệ với nhà tuyển dụng để biết lý do.',
+              EmailSupport: this.configService.get<string>('admin.email', ''),
+              PhoneSupport: this.configService.get<string>(
+                'admin.phone_number',
+                '',
+              ),
+              ApplicationLogoUrl: this.configService.get<string>(
+                'application.logo_url',
+                '',
+              ),
             },
           );
         }),
@@ -454,6 +474,52 @@ export class ApplicationsService {
       throw new InternalServerErrorException(
         'Đã xảy ra lỗi khi xử lý đơn ứng tuyển. Vui lòng thử lại.',
       );
+    }
+  };
+
+  public handleCalculateApplicationSummary = async (
+    StartDate?: Date,
+    EndDate?: Date,
+  ) => {
+    try {
+      let query = this.anonSupabaseClient
+        .from('Applications')
+        .select('Status, ID');
+
+      if (StartDate) {
+        query = query.gte('AppliedAt', StartDate.toISOString());
+      }
+
+      if (EndDate) {
+        query = query.lte('AppliedAt', EndDate.toISOString());
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error(error);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy thống kê đơn ứng tuyển trong hệ thống.',
+        );
+      }
+
+      const summary = {
+        total: data.length,
+        pending: data.filter((app) => app.Status === ApplicationStatus.pending)
+          .length,
+        accepted: data.filter(
+          (app) => app.Status === ApplicationStatus.accepted,
+        ).length,
+        rejected: data.filter(
+          (app) => app.Status === ApplicationStatus.rejected,
+        ).length,
+      };
+
+      return summary;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   };
 

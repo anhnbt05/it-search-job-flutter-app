@@ -1,4 +1,4 @@
-import { MailerService } from '@nestjs-modules/mailer';
+import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { SUBJECT_EMAIL_MAP } from 'src/libs/common/utils';
 
@@ -12,12 +12,25 @@ export class EmailsService {
     context: Record<string, any>,
   ) => {
     try {
-      await this.mailerService.sendMail({
+      const mailOptions: ISendMailOptions = {
         to: email,
         subject: SUBJECT_EMAIL_MAP[templateName],
         template: templateName,
         context,
-      });
+      };
+
+      if (context?.DownloadUrl) {
+        const filename = context.DownloadUrl?.split('/').pop();
+
+        mailOptions.attachments = [
+          {
+            filename,
+            path: context.DownloadUrl,
+          },
+        ];
+      }
+
+      await this.mailerService.sendMail(mailOptions);
     } catch (err) {
       console.error(err);
       throw err;

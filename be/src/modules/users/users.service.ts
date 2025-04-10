@@ -569,6 +569,60 @@ export class UsersService {
     }
   };
 
+  public handleCalculateUserSummary = async (
+    StartDate?: Date,
+    EndDate?: Date,
+  ) => {
+    try {
+      let query = this.anonSupabaseClient
+        .from('Users')
+        .select('Role, Status, CreatedAt');
+
+      if (StartDate) {
+        query = query.gte('CreatedAt', StartDate.toISOString());
+      }
+
+      if (EndDate) {
+        query = query.lte('CreatedAt', EndDate.toISOString());
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error(error);
+
+        throw new InternalServerErrorException(
+          'Lỗi khi lấy thống kê thông tin người dùng.',
+        );
+      }
+
+      const total = data.length;
+
+      const candidates = data.filter((u) => u.Role === Role.candidate).length;
+
+      const recruiters = data.filter((u) => u.Role === Role.recruiter).length;
+
+      const activeUsers = data.filter(
+        (u) => u.Status === UserStatus.active,
+      ).length;
+
+      const blockedUsers = data.filter(
+        (u) => u.Status === UserStatus.inactive,
+      ).length;
+
+      return {
+        total,
+        candidates,
+        recruiters,
+        activeUsers,
+        blockedUsers,
+      };
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
   private handleUpdateFileUrl = async (
     file: Express.Multer.File,
     value: string,

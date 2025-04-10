@@ -16,10 +16,15 @@ import {
   ApiForbiddenResponse,
   ApiOperation,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { Roles } from 'src/libs/common/decorators';
 import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
-import { DEFAULT_TTL_PROVINCES_CACHE, RoleEnum } from 'src/libs/common/utils';
+import {
+  API_TAGS,
+  DEFAULT_TTL_PROVINCES_CACHE,
+  RoleEnum,
+} from 'src/libs/common/utils';
 import {
   CreateCategoryDto,
   ForgetPasswordDto,
@@ -33,6 +38,7 @@ import { CreateCompanyLocationDto } from 'src/modules/users/dtos';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
+@ApiTags(API_TAGS.AUTH)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -565,9 +571,10 @@ export class AuthController {
   })
   @ApiBody({
     type: CreateCategoryDto,
-    description: 'Dữ liệu cần gửi đi để tạo mới danh mục',
+    description: 'Dữ liệu cần gửi đi để tạo mới danh mục.',
   })
   @Roles(RoleEnum.ADMIN)
+  @ApiBearerAuth()
   async createCategory(@Body() createCategoryDto: CreateCategoryDto) {
     return this.authService.handleCreateCategory(createCategoryDto);
   }

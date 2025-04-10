@@ -20,6 +20,7 @@ import { UploadsModule } from './modules/uploads/uploads.module';
 import { UserNotificationsModule } from './modules/user-notifications/user-notifications.module';
 import { UsersModule } from './modules/users/users.module';
 import { WorkExperiencesModule } from './modules/work-experiences/work-experiences.module';
+import { DashboardsModule } from './modules/dashboards/dashboards.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { WorkExperiencesModule } from './modules/work-experiences/work-experienc
     CompaniesModule,
     ApplicationsModule,
     UserNotificationsModule,
+    DashboardsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

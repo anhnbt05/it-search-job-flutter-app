@@ -12,5 +12,6 @@ import { UploadsService } from 'src/modules/uploads/uploads.service';
   ],
   controllers: [CompaniesController],
   providers: [CompaniesService, UploadsService],
+  exports: [CompaniesService],
 })
 export class CompaniesModule {}

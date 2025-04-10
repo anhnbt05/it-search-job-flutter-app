@@ -16,17 +16,19 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { User } from '@supabase/supabase-js';
 import { Request } from 'express';
 import { FileValidationDecorator, Roles } from 'src/libs/common/decorators';
 import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
-import { RoleEnum } from 'src/libs/common/utils';
+import { API_TAGS, RoleEnum } from 'src/libs/common/utils';
 import { UpdateCompanyDto } from 'src/modules/companies/dtos';
 import { CompaniesService } from './companies.service';
 
 @Controller('companies')
+@ApiTags(API_TAGS.COMPANY)
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
 

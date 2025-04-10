@@ -16,12 +16,13 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { User } from '@supabase/supabase-js';
 import { Request } from 'express';
 import { Roles } from 'src/libs/common/decorators';
 import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
-import { RoleEnum } from 'src/libs/common/utils';
+import { API_TAGS, RoleEnum } from 'src/libs/common/utils';
 import {
   CreateJobDto,
   CreateJobFavoritesDto,
@@ -34,6 +35,7 @@ import { JobsService } from './jobs.service';
 @Controller('jobs')
 @UseGuards(SupabaseGuard, RoleAuthGuard)
 @ApiBearerAuth()
+@ApiTags(API_TAGS.JOB)
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 

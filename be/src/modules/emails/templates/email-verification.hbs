@@ -1,8 +1,8 @@
-<html lang='en'>
+<html lang='vi'>
   <head>
     <meta charset='UTF-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-    <title>Email Verification</title>
+    <title>Xác Minh Email</title>
     <style>
       body {
         font-family: 'Arial', sans-serif;
@@ -13,7 +13,7 @@
       }
       .container {
         background: #ffffff;
-        max-width: 400px;
+        max-width: 500px;
         margin: auto;
         padding: 30px;
         border-radius: 8px;
@@ -24,6 +24,7 @@
         color: #333;
         font-size: 28px;
         margin-bottom: 20px;
+        text-align: center;
       }
       p {
         font-size: 16px;
@@ -65,22 +66,46 @@
         color: #888;
         margin-top: 20px;
         font-style: italic;
+        text-align: center;
+      }
+      .contact-info {
+        font-size: 10px;
+        color: #666;
+        text-align: right;
+        margin-top: 10px;
+        line-height: 1.4;
       }
     </style>
   </head>
   <body>
     <div class='container'>
-      <h1>Email Verification</h1>
-      <p>Hello, <strong>{{FullName}}</strong>!</p>
-      <p>Your OTP code is: <span class='otp'>{{otp}}</span></p>
-      <p>Please copy this code and enter it in the OTP input interface to verify
-        your email!</p>
-      <p><strong>Note:</strong>
-        Your OTP is valid for the next 10 minutes. Please enter it quickly!</p>
-      <hr />
-      <p class='footer'>
-        This is an automated email. Please do not reply.
+      <h1>Xác Minh Email</h1>
+      <p>Xin chào, <strong>{{FullName}}</strong>!</p>
+      <p>Mã xác minh OTP của bạn là: <span class='otp'>{{otp}}</span></p>
+      <p>Vui lòng sao chép mã này và nhập vào giao diện xác minh OTP để hoàn tất
+        quá trình xác minh email của bạn.</p>
+      <p><strong>Lưu ý:</strong>
+        Mã OTP có hiệu lực trong vòng 10 phút. Vui lòng nhập mã càng sớm càng
+        tốt!</p>
+      <p style='font-size: 14px; color: #666;'>
+        Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ, bạn có thể liên hệ với chúng
+        tôi thông qua địa chỉ email hoặc số điện thoại được cung cấp bên dưới.
       </p>
+      <hr />
+      <div class='footer'>
+        <p>Đây là email được gửi tự động. Vui lòng không trả lời email này.</p>
+        <div class='contact-info'>
+          <p>Trân trọng,</p>
+          <p><strong>Đội ngũ IT Search Job App</strong></p>
+          <p>Email: {{EmailSupport}}</p>
+          <p>Hotline: {{PhoneSupport}}</p>
+        </div>
+        <img
+          src={{ApplicationLogoUrl}}
+          alt='IT Search Job App Logo'
+          style='margin-top: 10px; max-width: 120px;'
+        />
+      </div>
     </div>
   </body>
 </html>

@@ -2,6 +2,9 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as mime from 'mime-types';
 
 @Injectable()
 export class UploadsService {
@@ -21,10 +24,44 @@ export class UploadsService {
           contentType: file.mimetype,
         });
 
-      if (error)
+      if (error) {
+        console.error(error);
+
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi trong quá trình tải file lên cloud.',
         );
+      }
+
+      return {
+        url: `${this.configService.get<string>('supabase.url', '')}/storage/v1/object/public/${bucket}/${fileName}`,
+      };
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  public handleUploadFilePath = async (filePath: string, bucket: string) => {
+    try {
+      const fileBuffer = fs.readFileSync(filePath);
+
+      const fileName = path.basename(filePath);
+
+      const contentType = mime.lookup(filePath) || 'application/octet-stream';
+
+      const { error } = await this.adminSupabaseClient.storage
+        .from(bucket)
+        .upload(fileName, fileBuffer, {
+          contentType,
+        });
+
+      if (error) {
+        console.error(error);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi trong quá trình tải file lên cloud.',
+        );
+      }
 
       return {
         url: `${this.configService.get<string>('supabase.url', '')}/storage/v1/object/public/${bucket}/${fileName}`,

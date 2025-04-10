@@ -13,4 +13,14 @@ export default () => ({
     user: process.env.MAILER_USER,
     password: process.env.MAILER_PASSWORD,
   },
+  application: {
+    name: process.env.APPLICATION_NAME,
+    logo_url: process.env.APPLICATION_LOGO_URL,
+    description: process.env.APPLICATION_DESCRIPTION,
+  },
+  admin: {
+    email: process.env.ADMIN_EMAIL,
+    phone_number: process.env.ADMIN_PHONE_NUMBER,
+    full_name: process.env.ADMIN_FULL_NAME,
+  },
 });

@@ -7,6 +7,7 @@ import { join } from 'path';
 import { EmailsProcessor } from 'src/modules/emails/processors';
 import { EmailsProducer } from 'src/modules/emails/producers';
 import { EmailsService } from './emails.service';
+import { EMAIL_QUEUE_NAME } from 'src/libs/common/utils';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { EmailsService } from './emails.service';
           },
         },
         defaults: {
-          from: '"IT Job Support" <support@yourdomain.com>',
+          from: '"IT Search Job App Support" <lengocanhpyne363@gmail.com>',
         },
         template: {
           dir: join(process.cwd(), 'src', 'modules', 'emails', 'templates'),
@@ -45,7 +46,7 @@ import { EmailsService } from './emails.service';
       }),
     }),
     BullModule.registerQueue({
-      name: 'emails-queue',
+      name: EMAIL_QUEUE_NAME,
     }),
   ],
   providers: [EmailsService, EmailsProducer, EmailsProcessor],

@@ -42,7 +42,7 @@ export class JobsService {
     @InjectSupabaseClient('adminClient')
     private readonly adminSupabaseClient: SupabaseClient,
     @InjectSupabaseClient('anonClient')
-    private readonly anonSupbaseClient: SupabaseClient,
+    private readonly anonSupabaseClient: SupabaseClient,
     private readonly usersService: UsersService,
     private readonly userNotificationsService: UserNotificationsService,
     private readonly configService: ConfigService,
@@ -50,7 +50,7 @@ export class JobsService {
 
   public handleGetJobs = async (userId: string) => {
     try {
-      const { data: user, error } = await this.anonSupbaseClient
+      const { data: user, error } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('ID', userId)
@@ -63,14 +63,14 @@ export class JobsService {
 
       const isRecruiter = user.Role === Role.recruiter ? true : false;
 
-      const query = this.anonSupbaseClient
+      const query = this.anonSupabaseClient
         .from('Jobs')
         .select(
           '*, Recruiters(*, Users(FullName), CompanyLocations(*, Companies(*)))',
         );
 
       if (isRecruiter) {
-        const { data, error } = await this.anonSupbaseClient
+        const { data, error } = await this.anonSupabaseClient
           .from('Recruiters')
           .select('*')
           .eq('UserID', userId)
@@ -120,7 +120,7 @@ export class JobsService {
 
   public handleGetJob = async (jobId: string, userId: string) => {
     try {
-      const { data: user } = await this.anonSupbaseClient
+      const { data: user } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('ID', userId)
@@ -133,14 +133,14 @@ export class JobsService {
 
       const isRecruiter = user.Role === Role.recruiter ? true : false;
 
-      const query = this.anonSupbaseClient
+      const query = this.anonSupabaseClient
         .from('Jobs')
         .select(
           '*, Recruiters(*, Users(*) ,CompanyLocations(*, Companies(*)))',
         );
 
       if (isRecruiter) {
-        const { data, error } = await this.anonSupbaseClient
+        const { data, error } = await this.anonSupabaseClient
           .from('Recruiters')
           .select('*')
           .eq('UserID', userId)
@@ -207,7 +207,7 @@ export class JobsService {
     userId: string,
   ) => {
     try {
-      const { data: user } = await this.anonSupbaseClient
+      const { data: user } = await this.anonSupabaseClient
         .from('Recruiters')
         .select('*, CompanyLocations(*, Companies(*))')
         .eq('UserID', userId)
@@ -228,7 +228,7 @@ export class JobsService {
         ...res
       } = createJobDto;
 
-      const { data: job, error: findJobError } = await this.anonSupbaseClient
+      const { data: job, error: findJobError } = await this.anonSupabaseClient
         .from('Jobs')
         .select('*')
         .match({ Title, RecruiterID: user.ID })
@@ -327,7 +327,7 @@ export class JobsService {
       const categoryIds: string[] = [];
 
       for (const categoryName of Categories) {
-        const { data, error } = await this.anonSupbaseClient
+        const { data, error } = await this.anonSupabaseClient
           .from('Categories')
           .select('ID')
           .eq('CategoryName', categoryName)
@@ -358,7 +358,7 @@ export class JobsService {
           'Đã xảy ra lỗi khi thêm danh mục cho công việc.',
         );
 
-      const { data: admin } = await this.anonSupbaseClient
+      const { data: admin } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('Email', this.configService.get<string>('ADMIN_EMAIL', ''))
@@ -391,7 +391,7 @@ export class JobsService {
       );
 
       return (
-        await this.anonSupbaseClient
+        await this.anonSupabaseClient
           .from('Jobs')
           .select('*')
           .eq('ID', data.ID)
@@ -406,7 +406,7 @@ export class JobsService {
   public handleGetCategories = async () => {
     return (
       (
-        await this.anonSupbaseClient
+        await this.anonSupabaseClient
           .from('Categories')
           .select('ID,CategoryName')
       )?.data ?? []
@@ -418,7 +418,7 @@ export class JobsService {
     updateJobDto: UpdateJobDto,
   ) => {
     try {
-      const { data } = await this.anonSupbaseClient
+      const { data } = await this.anonSupabaseClient
         .from('Jobs')
         .select('*')
         .eq('ID', jobId)
@@ -455,7 +455,7 @@ export class JobsService {
       const { Descriptions, Benefits, Requirements, ExpiredDate, ...res } =
         updateJobDto;
 
-      const { error } = await this.anonSupbaseClient
+      const { error } = await this.anonSupabaseClient
         .from('Jobs')
         .update({
           ...res,
@@ -515,7 +515,7 @@ export class JobsService {
 
       const existingValues: string[] =
         (
-          await this.anonSupbaseClient
+          await this.anonSupabaseClient
             .from(tableName)
             .select(fieldName)
             .eq('JobID', jobId)
@@ -552,7 +552,7 @@ export class JobsService {
 
   public handleDeleteJob = async (jobId: string, userId: string) => {
     try {
-      const { data: user, error } = await this.anonSupbaseClient
+      const { data: user, error } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
         .eq('ID', userId)
@@ -563,7 +563,7 @@ export class JobsService {
           `Không tìm thấy người dùng có id '${userId}'`,
         );
 
-      const { data: job, error: jobError } = await this.anonSupbaseClient
+      const { data: job, error: jobError } = await this.anonSupabaseClient
         .from('Jobs')
         .select('*')
         .eq('ID', jobId)
@@ -577,7 +577,7 @@ export class JobsService {
       const isRecruiter = user.Role === Role.recruiter ? true : false;
 
       if (isRecruiter) {
-        const { data: recruiter, error } = await this.anonSupbaseClient
+        const { data: recruiter, error } = await this.anonSupabaseClient
           .from('Recruiters')
           .select('*')
           .eq('UserID', userId)
@@ -720,7 +720,7 @@ export class JobsService {
     createJobFavoritesDto: CreateJobFavoritesDto,
   ) => {
     try {
-      const { data, error } = await this.anonSupbaseClient
+      const { data, error } = await this.anonSupabaseClient
         .from('Candidates')
         .select('*')
         .eq('UserID', userId)
@@ -766,7 +766,7 @@ export class JobsService {
     deleteJobFavoritesDto: DeleteJobFavoritesDto,
   ) => {
     try {
-      const { data, error } = await this.anonSupbaseClient
+      const { data, error } = await this.anonSupabaseClient
         .from('Candidates')
         .select('*')
         .eq('UserID', userId)
@@ -805,7 +805,7 @@ export class JobsService {
 
   public handleGetJobsByCategoryName = async (categoryName: string) => {
     try {
-      const { data, error } = await this.anonSupbaseClient
+      const { data, error } = await this.anonSupabaseClient
         .from('Categories')
         .select('*')
         .eq('CategoryName', categoryName)
@@ -816,7 +816,7 @@ export class JobsService {
           `Danh mục có tên ${categoryName} không tìm thấy.`,
         );
 
-      const response = await this.anonSupbaseClient
+      const response = await this.anonSupabaseClient
         .from('JobCategories')
         .select(
           `
@@ -860,7 +860,7 @@ export class JobsService {
     userId: string,
   ) => {
     try {
-      const { data, error } = await this.anonSupbaseClient
+      const { data, error } = await this.anonSupabaseClient
         .from('Candidates')
         .select('*')
         .eq('UserID', userId)
@@ -876,12 +876,10 @@ export class JobsService {
           'Bạn chỉ có thể lấy các công việc phù hợp với trình độ của chính bạn.',
         );
 
-      const { data: jobs, error: jobsError } = await this.anonSupbaseClient.rpc(
-        'get_jobs_sorted_by_level',
-        {
+      const { data: jobs, error: jobsError } =
+        await this.anonSupabaseClient.rpc('get_jobs_sorted_by_level', {
           candidate_level: data.Level,
-        },
-      );
+        });
 
       if (jobsError) {
         console.error(jobsError);
@@ -900,7 +898,7 @@ export class JobsService {
 
   public handleSearchJobsByLocations = async (locationId: string) => {
     try {
-      const { data, error } = await this.anonSupbaseClient
+      const { data, error } = await this.anonSupabaseClient
         .from('Locations')
         .select(
           'ID, Name, Country, CompanyLocations(*, Recruiters(*, Jobs(*, Recruiters(*, Users(FullName, Email, PhoneNumber) ,CompanyLocations(*, Companies(*))))))',
@@ -954,7 +952,7 @@ export class JobsService {
   };
 
   public handleFormattedJob = async (jobId: string) => {
-    const { data: jobData, error: jobError } = await this.anonSupbaseClient
+    const { data: jobData, error: jobError } = await this.anonSupabaseClient
       .from('Jobs')
       .select(
         '*, JobDescriptions(ID, Description, DeletedAt), JobBenefits(ID, Benefit, DeletedAt), JobRequirements(ID, Requirement, DeletedAt), JobCategories(CategoryID)',
@@ -971,7 +969,7 @@ export class JobsService {
       jobData?.JobCategories.map((category: any) => category.CategoryID) ?? [];
 
     const { data: categoriesData, error: categoriesError } =
-      await this.anonSupbaseClient
+      await this.anonSupabaseClient
         .from('Categories')
         .select('ID, CategoryName')
         .in('ID', categoryIDs);
@@ -998,7 +996,7 @@ export class JobsService {
 
   public handleGetApplicationsOfJob = async (jobId: string, userId: string) => {
     try {
-      const { data: recruiter } = await this.anonSupbaseClient
+      const { data: recruiter } = await this.anonSupabaseClient
         .from('Recruiters')
         .select('*')
         .eq('UserID', userId)
@@ -1009,7 +1007,7 @@ export class JobsService {
           `Không tìm thấy thông tin nhà tuyển dụng nào liên kết với người dùng có id '${userId}' trong hệ thống.`,
         );
 
-      const { data: job } = await this.anonSupbaseClient
+      const { data: job } = await this.anonSupabaseClient
         .from('Jobs')
         .select(
           '*, Applications(*, Candidates(*, Users(*), WorkExperiences(*)))',
@@ -1043,7 +1041,7 @@ export class JobsService {
 
   private handleVerifyJob = async (jobId: string) => {
     try {
-      const { data } = await this.anonSupbaseClient
+      const { data } = await this.anonSupabaseClient
         .from('Jobs')
         .select('*, Recruiters(*, Users(*))')
         .eq('ID', jobId)
@@ -1055,6 +1053,53 @@ export class JobsService {
         );
 
       return data;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  public handleCalculateJobSummary = async (
+    startDate?: Date,
+    endDate?: Date,
+  ) => {
+    try {
+      let query = this.anonSupabaseClient
+        .from('Jobs')
+        .select('Status, ExpiredAt', { count: 'exact' });
+
+      if (startDate) {
+        query = query.gte('PostedAt', startDate.toISOString());
+      }
+
+      if (endDate) {
+        query = query.lte('PostedAt', endDate.toISOString());
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error(error);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy thống kê công việc.',
+        );
+      }
+
+      const summary = {
+        total: data.length,
+        open: data.filter((job) => job.Status === JobStatus.open).length,
+        pending: data.filter((job) => job.Status === JobStatus.pending).length,
+        closed: data.filter((job) => job.Status === JobStatus.closed).length,
+        rejected: data.filter((job) => job.Status === JobStatus.rejected)
+          .length,
+        expired: data.filter(
+          (job) =>
+            new Date(job.ExpiredAt as string).getTime() < new Date().getTime(),
+        ).length,
+      };
+
+      return summary;
     } catch (err) {
       console.error(err);
       throw err;

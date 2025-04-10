@@ -1,6 +1,7 @@
 import { NotificationType } from '@prisma/client';
 import * as bcryptjs from 'bcryptjs';
 import { format } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
 
 export const hashPassword = (password: string) => {
   const salt = bcryptjs.genSaltSync();
@@ -67,4 +68,20 @@ export const handleFormatUserNotificationContent = (
         'Bạn có một thông báo mới, vui lòng kiểm tra để biết thêm chi tiết.',
       ];
   }
+};
+
+export const handleFormatDateTime = (date: Date) => {
+  return format(date, 'yyyy/MM/dd');
+};
+
+export const handleGenerateTimestamp = () => {
+  const now = new Date();
+
+  const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1)
+    .toString()
+    .padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+
+  const uuid = uuidv4();
+
+  return `${timestamp}_${uuid}`;
 };
