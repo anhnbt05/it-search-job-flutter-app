@@ -1,8 +1,8 @@
-<html lang='en'>
+<html lang='vi'>
   <head>
     <meta charset='UTF-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-    <title>Account Registration Successful</title>
+    <title>Đăng ký tài khoản thành công</title>
     <style>
       body {
         font-family: 'Arial', sans-serif;
@@ -13,7 +13,7 @@
       }
       .container {
         background: #ffffff;
-        max-width: 400px;
+        max-width: 500px;
         margin: auto;
         padding: 30px;
         border-radius: 8px;
@@ -21,9 +21,10 @@
         text-align: left;
       }
       h1 {
-        color: #28a745; /* Changed to green */
+        color: #333;
         font-size: 24px;
         margin-bottom: 20px;
+        text-align: center;
       }
       p {
         font-size: 16px;
@@ -46,22 +47,55 @@
         color: #888;
         margin-top: 20px;
         font-style: italic;
+        text-align: center;
+      }
+      .contact-info {
+        font-size: 10px;
+        color: #666;
+        text-align: right;
+        margin-top: 10px;
+        line-height: 1.4;
       }
     </style>
   </head>
   <body>
     <div class='container'>
-      <h1>Welcome to IT Search Job App!</h1>
-      <p>Hello, <strong>{{FullName}}</strong>!</p>
-      <p>Congratulations! Your account has been successfully created on
-        <strong>IT Search Job App</strong>. You can now explore job
-        opportunities, connect with employers, and manage your job applications.</p>
-      <p>To get started, log in to your account and complete your profile for
-        better job recommendations.</p>
-      <hr />
-      <p class='footer'>
-        This is an automated email. Please do not reply.
+      <h1>Chào mừng đến với IT Search Job App!</h1>
+      <p>Xin chào, <strong>{{FullName}}</strong>!</p>
+      {{#if (eq Role 'candidate')}}
+        <p>Chúc mừng bạn! Tài khoản của bạn đã được tạo thành công trên
+          <strong>IT Search Job App</strong>. Bây giờ bạn có thể khám phá các cơ
+          hội việc làm, kết nối với nhà tuyển dụng và quản lý hồ sơ ứng tuyển
+          của mình.</p>
+        <p>Để bắt đầu, vui lòng đăng nhập và hoàn thiện hồ sơ của bạn để nhận
+          được gợi ý việc làm phù hợp hơn.</p>
+      {{else if (eq Role 'recruiter')}}
+        <p>Chúc mừng bạn! Tài khoản nhà tuyển dụng của bạn đã được tạo thành
+          công trên
+          <strong>IT Search Job App</strong>. Bây giờ bạn có thể đăng tin tuyển
+          dụng, quản lý ứng viên và kết nối với nhân tài.</p>
+        <p>Để bắt đầu, vui lòng đăng nhập và tạo bài đăng tuyển dụng đầu tiên
+          của bạn.</p>
+      {{/if}}
+      <p style='font-size: 14px; color: #666;'>
+        Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ, bạn có thể liên hệ với chúng
+        tôi thông qua địa chỉ email hoặc số điện thoại được cung cấp bên dưới.
       </p>
+      <hr />
+      <div class='footer'>
+        <p>Đây là email được gửi tự động. Vui lòng không trả lời email này.</p>
+        <div class='contact-info'>
+          <p>Trân trọng</p>
+          <p><strong>Đội ngũ IT Search Job App</strong></p>
+          <p>Email: {{EmailSupport}}</p>
+          <p>Hotline: {{PhoneSupport}}</p>
+        </div>
+        <img
+          src={{ApplicationLogoUrl}}
+          alt='IT Search Job App Logo'
+          style='margin-top: 10px; max-width: 120px;'
+        />
+      </div>
     </div>
   </body>
 </html>

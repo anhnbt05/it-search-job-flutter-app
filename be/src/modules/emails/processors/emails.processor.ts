@@ -1,10 +1,15 @@
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
+import { ConfigService } from '@nestjs/config';
 import { Job } from 'bullmq';
+import { EMAIL_QUEUE_NAME, EmailTemplateNameEnum } from 'src/libs/common/utils';
 import { EmailsService } from 'src/modules/emails/emails.service';
 
-@Processor('emails-queue')
+@Processor(EMAIL_QUEUE_NAME)
 export class EmailsProcessor extends WorkerHost {
-  constructor(private readonly emailsService: EmailsService) {
+  constructor(
+    private readonly emailsService: EmailsService,
+    private readonly configService: ConfigService,
+  ) {
     super();
   }
 
@@ -19,7 +24,34 @@ export class EmailsProcessor extends WorkerHost {
       `Processing job '${job.name}': Sending email to '${job.data.email}'...`,
     );
 
-    const { email, templateName, context } = job.data;
+    const { email } = job.data;
+
+    let context = job.data.context || {};
+
+    let templateName = job.data?.templateName;
+
+    const children = await job.getChildrenValues().catch(() => null);
+
+    if (children && Object.keys(children).length > 0) {
+      const uploadResultEntry = Object.entries(children).find(([key]) =>
+        key.startsWith('bull:upload-report-queue:'),
+      );
+
+      if (uploadResultEntry) {
+        const [, uploadResult] = uploadResultEntry;
+
+        templateName = EmailTemplateNameEnum.EMAIL_REPORT;
+
+        context = {
+          AdminName: this.configService.get<string>('admin.full_name', ''),
+          DownloadUrl: uploadResult.url,
+          ApplicationLogoUrl: this.configService.get<string>(
+            'application.logo_url',
+            '',
+          ),
+        };
+      }
+    }
 
     return this.emailsService.sendEmail(email, templateName, context);
   }

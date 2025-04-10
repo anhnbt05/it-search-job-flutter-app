@@ -9,7 +9,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Categories, Companies, CompanyLocations, Users } from '@prisma/client';
+import {
+  Categories,
+  Companies,
+  CompanyLocations,
+  Role,
+  Users,
+} from '@prisma/client';
 import { SupabaseClient, User } from '@supabase/supabase-js';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import {
@@ -163,6 +169,15 @@ export class AuthService {
         {
           otp,
           FullName: signUpDto.FullName,
+          EmailSupport: this.configService.get<string>('admin.email', ''),
+          PhoneSupport: this.configService.get<string>(
+            'admin.phone_number',
+            '',
+          ),
+          ApplicationLogoUrl: this.configService.get<string>(
+            'application.logo_url',
+            '',
+          ),
         },
       );
 
@@ -224,7 +239,19 @@ export class AuthService {
           await this.emailsProducer.sendEmail(
             `${findUser.Email}`,
             EmailTemplateNameEnum.EMAIL_VERIFICATION,
-            { otp, FullName: findUser.FullName },
+            {
+              otp,
+              FullName: findUser.FullName,
+              EmailSupport: this.configService.get<string>('admin.email', ''),
+              PhoneSupport: this.configService.get<string>(
+                'admin.phone_number',
+                '',
+              ),
+              ApplicationLogoUrl: this.configService.get<string>(
+                'application.logo_url',
+                '',
+              ),
+            },
           );
 
           return {
@@ -342,15 +369,41 @@ export class AuthService {
         .update({ IsEmailVerified: true })
         .eq('Email', email);
 
-      if (error)
+      if (error) {
+        console.error(error);
+
         throw new InternalServerErrorException(
           `Đã xảy ra lỗi khi cập nhật trạng thái xác minh cho email '${email}'.`,
+        );
+      }
+
+      const { data: user } = await this.anonSupabaseClient
+        .from('Users')
+        .select('*')
+        .eq('Email', email)
+        .maybeSingle<Users>();
+
+      if (!user)
+        throw new NotFoundException(
+          `Không tìm thấy người dùng có email '${email}' trong hệ thống.`,
         );
 
       await this.emailsProducer.sendEmail(
         email,
         EmailTemplateNameEnum.EMAIL_REGISTER_ACCOUNT_SUCCESS,
-        { FullName: findUser.FullName },
+        {
+          FullName: findUser.FullName,
+          EmailSupport: this.configService.get<string>('admin.email', ''),
+          PhoneSupport: this.configService.get<string>(
+            'admin.phone_number',
+            '',
+          ),
+          ApplicationLogoUrl: this.configService.get<string>(
+            'application.logo_url',
+            '',
+          ),
+          Role: user.Role === Role.candidate ? 'candidate' : 'recruiter',
+        },
       );
 
       return {
@@ -423,6 +476,15 @@ export class AuthService {
         {
           otp,
           FullName: data.FullName,
+          EmailSupport: this.configService.get<string>('admin.email', ''),
+          PhoneSupport: this.configService.get<string>(
+            'admin.phone_number',
+            '',
+          ),
+          ApplicationLogoUrl: this.configService.get<string>(
+            'application.logo_url',
+            '',
+          ),
         },
       );
 
@@ -526,6 +588,15 @@ export class AuthService {
         EmailTemplateNameEnum.EMAIL_UPDATE_PASSWORD_SUCCESS,
         {
           FullName: data.FullName,
+          EmailSupport: this.configService.get<string>('admin.email', ''),
+          PhoneSupport: this.configService.get<string>(
+            'admin.phone_number',
+            '',
+          ),
+          ApplicationLogoUrl: this.configService.get<string>(
+            'application.logo_url',
+            '',
+          ),
         },
       );
 

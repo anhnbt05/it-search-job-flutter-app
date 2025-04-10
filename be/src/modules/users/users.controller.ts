@@ -19,12 +19,13 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { User } from '@supabase/supabase-js';
 import { Request } from 'express';
 import { FileValidationDecorator, Roles } from 'src/libs/common/decorators';
 import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
-import { RoleEnum } from 'src/libs/common/utils';
+import { API_TAGS, RoleEnum } from 'src/libs/common/utils';
 import {
   SearchUsersDto,
   UpdateCandidateDto,
@@ -36,6 +37,7 @@ import { UsersService } from './users.service';
 @Controller('users')
 @UseGuards(SupabaseGuard, RoleAuthGuard)
 @ApiBearerAuth()
+@ApiTags(API_TAGS.USER)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

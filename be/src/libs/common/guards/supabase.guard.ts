@@ -32,7 +32,7 @@ export class SupabaseGuard extends BaseSupabaseAuthGuard {
 
     if (error)
       throw new UnauthorizedException(
-        'Token không hợp lệ. Vui lòng cung cấp token hợp lệ.',
+        'Token không hợp lệ hoặc đã hết hạn. Vui lòng cung cấp token hợp lệ.',
       );
 
     return token;

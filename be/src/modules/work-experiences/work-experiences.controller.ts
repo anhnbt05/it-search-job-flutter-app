@@ -19,12 +19,13 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { User } from '@supabase/supabase-js';
 import { Request } from 'express';
 import { FileValidationDecorator, Roles } from 'src/libs/common/decorators';
 import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
-import { RoleEnum } from 'src/libs/common/utils';
+import { API_TAGS, RoleEnum } from 'src/libs/common/utils';
 import {
   CreateWorkExperiencesDto,
   UpdateWorkExperiencesDto,
@@ -34,6 +35,7 @@ import { WorkExperiencesService } from './work-experiences.service';
 @Controller('work-experiences')
 @UseGuards(SupabaseGuard, RoleAuthGuard)
 @Roles(RoleEnum.CANDIDATE)
+@ApiTags(API_TAGS.WORK_EXPERIENCE)
 @ApiBearerAuth()
 export class WorkExperiencesController {
   constructor(

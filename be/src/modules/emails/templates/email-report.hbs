@@ -1,0 +1,109 @@
+<html lang='vi'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Báo cáo tổng quan việc làm</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f4;
+        text-align: center;
+        padding: 40px;
+        margin: 0;
+      }
+      .container {
+        background: #ffffff;
+        max-width: 500px;
+        margin: auto;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        text-align: left;
+      }
+      h1 {
+        color: #333;
+        font-size: 22px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      p,
+      li {
+        font-size: 15px;
+        color: #333;
+        line-height: 1.6;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      a.download-link {
+        display: inline-block;
+        margin-top: 10px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        padding: 10px 16px;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+      .footer {
+        font-size: 12px;
+        color: #888;
+        margin-top: 20px;
+        font-style: italic;
+      }
+      hr {
+        border: 0;
+        height: 1px;
+        background-color: #f0f0f0;
+        margin: 20px 0;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        margin: 0 auto;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <h1>Báo cáo tổng quan việc làm</h1>
+      <p>Xin chào, <strong>{{AdminName}}</strong>!</p>
+      <p>File đính kèm là báo cáo tổng quan về tình hình tuyển dụng của các công
+        ty trên nền tảng
+        <strong>IT Search Job App</strong>.</p>
+
+      <p>Báo cáo bao gồm:</p>
+      <ul>
+        <li>Tổng số tin tuyển dụng của từng công ty</li>
+        <li>Số lượng đơn ứng tuyển và tỷ lệ chấp nhận</li>
+        <li>Công việc có nhiều đơn ứng tuyển nhất</li>
+        <li>Xu hướng ứng tuyển theo tháng</li>
+      </ul>
+
+      <p>
+        Bạn có thể tải xuống
+        <a
+          href='{{DownloadUrl}}'
+          download
+          style='color: #007bff; text-decoration: underline;'
+        >
+          tại đây</a>.
+      </p>
+
+      <table width='100%' cellpadding='0' cellspacing='0'>
+        <tr>
+          <td align='center' style='padding-top: 10px;'>
+            <img
+              src='{{ApplicationLogoUrl}}'
+              alt='IT Search Job App Logo'
+              style='max-width: 120px; display: block;'
+            />
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

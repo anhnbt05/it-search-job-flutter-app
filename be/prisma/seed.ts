@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 import { createClient, User } from '@supabase/supabase-js';
 import * as bcryptjs from 'bcryptjs';
-import { RoleEnum } from 'src/libs/common/utils';
+import { RoleEnum } from '../src/libs/common/utils';
 import { Categories, Notifications } from './seeds';
 
 export type Province = {
