@@ -19,8 +19,8 @@ export class UpdateJobDto {
     example: 'Thực tập sinh Web Developer',
   })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Tiêu đề của công việc phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Tiêu đề của công việc không được là chuỗi rỗng.' })
   readonly Title?: string;
 
   @ApiPropertyOptional({
@@ -30,8 +30,8 @@ export class UpdateJobDto {
       'Chúng tôi đang tìm kiếm thực tập sinh đam mê lập trình web để tham gia các dự án thực tế và phát triển kỹ năng chuyên môn',
   })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Mô tả của công việc phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Mô tả của công việc không được là chuỗi rỗng.' })
   readonly Description?: string;
 
   @ApiPropertyOptional({
@@ -40,8 +40,10 @@ export class UpdateJobDto {
     example: 'Quận Tân Bình, TP. Hồ Chí Minh, Việt Nam',
   })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Địa chỉ làm việc của công việc phải là dạng chuỗi.' })
+  @IsNotEmpty({
+    message: 'Địa chỉ làm việc của công việc phải là chuỗi không rỗng.',
+  })
   readonly Address?: string;
 
   @ApiPropertyOptional({
@@ -50,8 +52,10 @@ export class UpdateJobDto {
     example: 'Hỗ trợ 3,000,000 - 5,000,000 VND/tháng',
   })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Mức lương của công việc phải là dạng chuỗi.' })
+  @IsNotEmpty({
+    message: 'Mức lương của công việc phải là dạng chuỗi không rỗng.',
+  })
   readonly Salary?: string;
 
   @ApiPropertyOptional({
@@ -61,8 +65,8 @@ export class UpdateJobDto {
     type: Number,
   })
   @IsOptional()
-  @IsNumber()
-  @IsPositive()
+  @IsNumber({}, { message: 'Số lượng ứng viên cần tuyển phải là dạng số.' })
+  @IsPositive({ message: 'Số lượng ứng viên cần tuyển phải là số dương.' })
   readonly Vacancies?: number;
 
   @ApiPropertyOptional({
@@ -72,7 +76,9 @@ export class UpdateJobDto {
     enum: JobType,
   })
   @IsOptional()
-  @IsEnum(JobType)
+  @IsEnum(JobType, {
+    message: 'Loại hình công việc phải nằm trong danh sách đã liệt kê.',
+  })
   readonly Type?: JobType;
 
   @ApiPropertyOptional({
@@ -81,8 +87,8 @@ export class UpdateJobDto {
     example: 'Thứ 2 - Thứ 6, 8:30 - 17:30',
   })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Thời gian làm việc phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Thời gian làm việc phải là chuỗi không rỗng.' })
   readonly WorkingTimes?: string;
 
   @ApiPropertyOptional({
@@ -91,8 +97,14 @@ export class UpdateJobDto {
     example: '2025-06-15T23:59:59.000Z',
   })
   @IsOptional()
-  @IsNotEmpty()
-  @IsISO8601()
+  @IsNotEmpty({ message: 'Ngày hết hạn của công việc không được để trống' })
+  @IsISO8601(
+    {},
+    {
+      message:
+        'EndDate phải đúng định dạng ISO8601 (yyyy-mm-dd hoặc yyyy-mm-ddThh:mm:ssZ)',
+    },
+  )
   readonly ExpiredDate?: string;
 
   @ApiPropertyOptional({
@@ -102,7 +114,10 @@ export class UpdateJobDto {
     example: Level.fresher,
   })
   @IsOptional()
-  @IsEnum(Level)
+  @IsEnum(Level, {
+    message:
+      'Vị trí mong muốn cho công việc phải nằm trong danh sách đã liệt kê.',
+  })
   readonly Level?: Level;
 
   @ApiPropertyOptional({
@@ -115,10 +130,15 @@ export class UpdateJobDto {
     ],
   })
   @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
-  @IsNotEmpty({ each: true })
+  @IsArray({ message: 'Danh sách các mô tả cho công việc phải là dạng mảng.' })
+  @ArrayNotEmpty({
+    message: 'Danh sách các mô tả cho công việc phỉ là mảng không rỗng.',
+  })
+  @IsString({ each: true, message: 'Mô tả cho công việc phải là dạng chuỗi.' })
+  @IsNotEmpty({
+    each: true,
+    message: 'Mô tả cho công việc không được là chuỗi rỗng.',
+  })
   readonly Descriptions?: string[];
 
   @ApiPropertyOptional({
@@ -131,10 +151,20 @@ export class UpdateJobDto {
     ],
   })
   @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
-  @IsNotEmpty({ each: true })
+  @IsArray({
+    message: 'Danh sách các lợi ích của công việc phải là dạng mảng.',
+  })
+  @ArrayNotEmpty({
+    message: 'Danh sách các lợi ích của công việc phải là mảng không rỗng.',
+  })
+  @IsString({
+    each: true,
+    message: 'Lợi ích của công việc phải là dạng chuỗi.',
+  })
+  @IsNotEmpty({
+    each: true,
+    message: 'Lợi ích của công việc phải là chuỗi không rỗng.',
+  })
   readonly Benefits?: string[];
 
   @ApiPropertyOptional({
@@ -147,9 +177,19 @@ export class UpdateJobDto {
     ],
   })
   @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
-  @IsNotEmpty({ each: true })
+  @IsArray({
+    message: 'Danh sách các yêu cầu của công việc phải là dạng mảng.',
+  })
+  @ArrayNotEmpty({
+    message: 'Danh sách các yêu cầu của công việc phải là mảng không rỗng.',
+  })
+  @IsString({
+    each: true,
+    message: 'Yêu cầu của công việc phải là dạng chuỗi.',
+  })
+  @IsNotEmpty({
+    each: true,
+    message: 'Yêu cầu của công việc phải là chuỗi không rỗng.',
+  })
   readonly Requirements?: string[];
 }

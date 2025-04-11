@@ -7,7 +7,7 @@ export class UpdateRecruiterDto {
     example: 'Trưởng phòng tuyển dụng',
   })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Vị trí công việc phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Vị trí công việc phải là chuỗi không rỗng.' })
   readonly Postion?: string;
 }

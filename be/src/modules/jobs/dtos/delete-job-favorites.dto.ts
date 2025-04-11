@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsUUID } from 'class-validator';
 
 export class DeleteJobFavoritesDto {
   @ApiProperty({
@@ -12,9 +12,12 @@ export class DeleteJobFavoritesDto {
       '2180647a-d0e5-4062-a4a1-28de8bdf539e',
     ],
   })
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
-  @IsNotEmpty({ each: true })
+  @IsArray({
+    message: 'Danh sách các công việc cần xoá phải có dạng một mảng.',
+  })
+  @ArrayNotEmpty({
+    message: 'Danh sách các công việc cần xoá phải là mảng không rỗng.',
+  })
+  @IsUUID('4', { message: 'Mã định danh của công việc phải là dạng UUID.' })
   readonly jobIds!: string[];
 }

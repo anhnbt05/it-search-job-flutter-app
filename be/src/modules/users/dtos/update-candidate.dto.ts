@@ -18,10 +18,17 @@ export class UpdateCandidateDto {
   })
   @Expose()
   @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
-  @IsNotEmpty({ each: true })
+  @IsArray({
+    message: 'Danh sách các chứng chỉ của ứng viên phải ở dạng mảng.',
+  })
+  @ArrayNotEmpty({
+    message: 'Danh sách các chứng chỉ của ứng viên phải là mảng không rỗng.',
+  })
+  @IsString({ each: true, message: 'Tên của chứng chỉ phải là dạng chuỗi.' })
+  @IsNotEmpty({
+    each: true,
+    message: 'Tên của chứng chỉ không đuọc là chuỗi rỗng.',
+  })
   readonly Certifications?: string[];
 
   @ApiPropertyOptional({
@@ -30,8 +37,8 @@ export class UpdateCandidateDto {
       'Sinh viên năm cuối Đại học Bách Khoa, yêu thích lập trình backend.',
   })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Tiểu sử của bản thân phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Tiểu sử của bản thân không được là chuỗi rỗng.' })
   readonly Bio?: string;
 
   @ApiPropertyOptional({
@@ -40,6 +47,9 @@ export class UpdateCandidateDto {
     example: Level.mid,
   })
   @IsOptional()
-  @IsEnum(Level)
+  @IsEnum(Level, {
+    message:
+      'Cấp độ kinh nghiệm của ứng viên phải nằm trong danh sách liệt kê.',
+  })
   readonly Level?: Level;
 }

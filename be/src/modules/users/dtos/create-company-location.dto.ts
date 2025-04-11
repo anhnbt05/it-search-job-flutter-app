@@ -7,8 +7,8 @@ export class CreateCompanyLocationDto {
     description: 'Tên của chi nhánh',
     example: 'Chi nhánh 1',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Tên của chi nhánh phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Tên của chi nhánh không được là chuỗi rỗng.' })
   readonly BranchName!: string;
 
   @ApiProperty({
@@ -16,8 +16,10 @@ export class CreateCompanyLocationDto {
     description: 'Địa chỉ chi tiết của chi nhánh',
     example: '123 Đường A, Huyện B, Tỉnh C',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Địa chỉ chi tiết của chi nhánh phải là dạng chuỗi.' })
+  @IsNotEmpty({
+    message: 'Địa chỉ chi tiết của chi nhánh không được là chuỗi rỗng.',
+  })
   readonly Address!: string;
 
   @ApiProperty({
@@ -25,7 +27,8 @@ export class CreateCompanyLocationDto {
     description: 'ID của tỉnh thành mà chi nhánh này thuộc về.',
     example: 'id-2e234234-423423-dad',
   })
-  @IsUUID()
-  @IsNotEmpty()
+  @IsUUID('4', {
+    message: 'Mã định danh của tỉnh, thành phố phải có dạng là UUID.',
+  })
   readonly LocationID!: string;
 }

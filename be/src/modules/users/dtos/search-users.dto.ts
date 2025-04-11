@@ -8,9 +8,7 @@ export class SearchUsersDto {
     example: '891addf9-d54d-4c88-852d-fe96cb295536',
   })
   @IsOptional()
-  @IsString()
-  @IsUUID()
-  @IsNotEmpty()
+  @IsUUID('4', { message: 'Mã định danh của ứng viên phải ở dạng UUID.' })
   readonly candidateId?: string;
 
   @ApiPropertyOptional({
@@ -19,8 +17,6 @@ export class SearchUsersDto {
     example: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
   })
   @IsOptional()
-  @IsString()
-  @IsUUID()
-  @IsNotEmpty()
+  @IsUUID('4', { message: 'Mã định danh của nhà tuyển dụng phải ở dạng UUID.' })
   readonly recruiterId?: string;
 }

@@ -11,8 +11,8 @@ import {
 } from 'src/modules/users/dtos';
 
 export class CreateRecruiterDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Vị trí của bạn phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Vị trí của bạn không được để trống.' })
   readonly Position!: string;
 
   @IsOptional()

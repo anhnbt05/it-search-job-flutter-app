@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsUUID } from 'class-validator';
 
 export class CreateExistingCompanyDto {
-  @IsUUID()
-  @IsNotEmpty()
+  @IsUUID('4', { message: 'Mã định danh của công ty phải ở dạng UUID.' })
   readonly companyID!: string;
 
-  @IsUUID()
-  @IsNotEmpty()
+  @IsUUID('4', {
+    message: 'Mã định danh của địa điểm công ty phải ở dạng UUID.',
+  })
   readonly companyLocationID!: string;
 }

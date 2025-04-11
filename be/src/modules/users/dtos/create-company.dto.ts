@@ -8,22 +8,26 @@ import {
 import { CreateCompanyLocationDto } from 'src/modules/users/dtos';
 
 export class CreateCompanyDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Tên của công ty phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Tên của công ty phải là chuỗi không rỗng.' })
   readonly Name!: string;
 
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Địa chỉ website của công ty phải là dạng chuỗi.' })
+  @IsNotEmpty({
+    message: 'Địa chỉ website của công ty phải là chuỗi không rỗng.',
+  })
   readonly WebsiteUrl?: string;
 
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Mô tả cho công ty phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Mô tả cho công ty phải là chuỗi không rỗng.' })
   readonly Description?: string;
 
   @ValidateNested()
   @Type(() => CreateCompanyLocationDto)
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: 'Dữ liệu cần để tạo chi tiết chi nhánh không được để trống.',
+  })
   readonly createCompanyLocationDto!: CreateCompanyLocationDto;
 }
