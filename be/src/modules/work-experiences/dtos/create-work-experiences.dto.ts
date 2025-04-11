@@ -12,25 +12,46 @@ import {
 } from 'class-validator';
 
 export class CreateWorkExperiencesDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Tên công ty phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Tên công ty không được là chuỗi rỗng.' })
   readonly CompanyName!: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Tên vị trí phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Tên vị trí phải là chuỗi không rỗng.' })
   readonly Position!: string;
 
-  @IsISO8601()
+  @IsISO8601(
+    {},
+    {
+      message:
+        'Ngày bắt đầu kinh nghiệm làm việc phải là một chuỗi ISO8601 hợp lệ.',
+    },
+  )
   readonly StartDate!: string;
 
   @IsOptional()
-  @IsISO8601()
+  @IsISO8601(
+    {},
+    {
+      message:
+        'Ngày kết thúc kinh nghiệm làm việc phải là một chuỗi ISO8601 hợp lệ.',
+    },
+  )
   readonly EndDate?: string;
 
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
-  @IsNotEmpty({ each: true })
+  @IsArray({
+    message:
+      'Danh sách các đảm nhiệm của bạn trong kinh nghiệm làm việc phải là dạng mảng.',
+  })
+  @ArrayNotEmpty({
+    message:
+      'Danh sách các đảm nhiệm của bạn trong king nghiệm làm việc không được là mảng rỗng.',
+  })
+  @IsString({ each: true, message: 'Mô tả đảm nhiệm phải là dạng chuỗi.' })
+  @IsNotEmpty({
+    each: true,
+    message: 'Mô tả đảm nhiệm phải là chuỗi không rỗng.',
+  })
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       try {
@@ -46,10 +67,16 @@ export class CreateWorkExperiencesDto {
   })
   readonly Descriptions!: string[];
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({
+    message: 'Địa điểm của kinh nghiệm làm việc phải có dạng chuỗi.',
+  })
+  @IsNotEmpty({
+    message: 'Địa điểm của kinh nghiệm làm việc phải là chuỗi không rỗng.',
+  })
   readonly Location!: string;
 
-  @IsEnum(JobType)
+  @IsEnum(JobType, {
+    message: 'Hình thức làm việc phải nằm trong danh sách đã được liệt kê.',
+  })
   readonly JobType!: JobType;
 }

@@ -7,6 +7,6 @@ export class CreateApplicationDto {
     description: 'Mã định dạng (ID) của công việc',
     example: '2180647a-d0e5-4062-a4a1-28de8bdf539e',
   })
-  @IsUUID()
+  @IsUUID('4', { message: 'Mã định danh của công việc phải có dạng là UUID.' })
   readonly JobId!: string;
 }

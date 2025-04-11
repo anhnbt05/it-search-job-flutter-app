@@ -16,8 +16,8 @@ export class UpdateUserDto {
     example: 'Nguyễn Văn A',
   })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Họ và tên phải là dạng chuỗi.' })
+  @IsNotEmpty({ message: 'Họ và tên không được là chuỗi rỗng.' })
   readonly FullName?: string;
 
   @ApiPropertyOptional({
@@ -25,7 +25,9 @@ export class UpdateUserDto {
     example: '+84901234567',
   })
   @IsOptional()
-  @IsPhoneNumber()
+  @IsPhoneNumber('VN', {
+    message: 'Số điện thoại phải là ở Việt Nam và là hợp lệ.',
+  })
   readonly PhoneNumber?: string;
 
   @ApiPropertyOptional({

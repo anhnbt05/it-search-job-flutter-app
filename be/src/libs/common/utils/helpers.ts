@@ -85,3 +85,29 @@ export const handleGenerateTimestamp = () => {
 
   return `${timestamp}_${uuid}`;
 };
+
+export function collectMessages(
+  error: any,
+): { field: string; message: string }[] {
+  const messages: { field: string; message: string }[] = [];
+
+  if (error.constraints) {
+    for (const msg of Object.values(
+      error.constraints as Record<string, string>,
+    )) {
+      messages.push({ field: error.property, message: msg });
+    }
+  }
+
+  if (error.children && error.children.length > 0) {
+    for (const child of error.children) {
+      const nestedMessages = collectMessages(child).map((m) => ({
+        field: `${error.property}.${m.field}`,
+        message: m.message,
+      }));
+      messages.push(...nestedMessages);
+    }
+  }
+
+  return messages;
+}
