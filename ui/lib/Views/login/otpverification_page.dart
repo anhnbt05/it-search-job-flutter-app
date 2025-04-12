@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/Views/login/resetpassword_page.dart';
-
+import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import '../../ViewModels/login/VerifyResetPasswordOtpViewModel.dart';
 
 class OtpVerificationPage extends StatelessWidget {
@@ -87,12 +86,7 @@ class OtpVerificationPage extends StatelessWidget {
                       );
 
                       if (response.success) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ResetPasswordPage(email: email),
-                          ),
-                        );
+                        LoginNavigationViewModel().goToResetPassword(context, email);
                       }
                     },
                     style: ElevatedButton.styleFrom(

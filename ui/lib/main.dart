@@ -24,7 +24,7 @@ void main() {
           create: (context) => JoblistNavigationViewModel(),
         ),
         ChangeNotifierProvider(create: (context) => JobPostViewModel()),
-        ChangeNotifierProvider(create: (context) => LoginViewModel()),
+        ChangeNotifierProvider(create: (context) => LoginNavigationViewModel()),
       ],
       child: MyApp(),
     ),

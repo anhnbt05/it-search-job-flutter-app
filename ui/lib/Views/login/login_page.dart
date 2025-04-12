@@ -123,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () {},
                         child: Text("ĐĂNG KÝ TÀI KHOẢN MỚI", style: TextStyle(fontSize: 15, color: Colors.grey),)
                       ),
-                      TextButton(onPressed: () => LoginViewModel().goToForgotPassword(context),
+                      TextButton(onPressed: () => LoginNavigationViewModel().goToForgotPassword(context),
                           child:  Text("QUÊN MẬT KHẨU", style: TextStyle(fontSize: 15, color: Colors.blue),
                           )
                       )

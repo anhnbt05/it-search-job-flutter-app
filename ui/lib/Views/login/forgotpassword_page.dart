@@ -77,7 +77,7 @@ class ForgotPasswordPage extends StatelessWidget {
                                );
                             }
                           if (viewModel.errorMessage == null) {
-                            LoginViewModel().goToOtp(context, email);
+                            LoginNavigationViewModel().goToOtp(context, email);
                           }
                         },
                         style: ElevatedButton.styleFrom(
