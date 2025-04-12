@@ -4,7 +4,7 @@ import '../../Services/auth_forgetpassword_service.dart';
 
 class ForgotPasswordViewModel extends ChangeNotifier {
   final TextEditingController emailController = TextEditingController();
-  final AuthService _authService = AuthService();
+  final AuthForgetPasswordService _authService = AuthForgetPasswordService();
   bool _isLoading = false;
   String? _errorMessage;
   String? _serverMessage;
