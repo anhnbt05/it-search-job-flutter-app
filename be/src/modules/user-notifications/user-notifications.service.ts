@@ -3,10 +3,11 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Notifications } from '@prisma/client';
+import { Notifications, UserNotifications, Users } from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import { CreateUserNotificationDto } from 'src/modules/user-notifications/dtos';
+import { UserNotificationsGateway } from 'src/modules/user-notifications/gateways';
 
 @Injectable()
 export class UserNotificationsService {
@@ -15,6 +16,7 @@ export class UserNotificationsService {
     private readonly adminSupabaseClient: SupabaseClient,
     @InjectSupabaseClient('anonClient')
     private readonly anonSupabaseClient: SupabaseClient,
+    private readonly userNotificationsGateway: UserNotificationsGateway,
   ) {}
 
   public handleCreateUserNotification = async (
@@ -22,6 +24,17 @@ export class UserNotificationsService {
     userId: string,
   ) => {
     try {
+      const { data: user } = await this.anonSupabaseClient
+        .from('Users')
+        .select('*')
+        .eq('ID', userId)
+        .maybeSingle<Users>();
+
+      if (!user)
+        throw new NotFoundException(
+          `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
+        );
+
       const { Type, Content, metadata } = createUserNotificationDto;
 
       const { data: notification } = await this.anonSupabaseClient
@@ -35,7 +48,7 @@ export class UserNotificationsService {
           `Không tìm thấy thông báo có kiểu là '${Type}' trong hệ thống.`,
         );
 
-      const { error } = await this.adminSupabaseClient
+      const { data, error } = await this.adminSupabaseClient
         .from('UserNotifications')
         .insert([
           {
@@ -44,7 +57,9 @@ export class UserNotificationsService {
             UserID: userId,
             NotificationID: notification.ID,
           },
-        ]);
+        ])
+        .select()
+        .single<UserNotifications>();
 
       if (error) {
         console.error(error);
@@ -53,6 +68,12 @@ export class UserNotificationsService {
           'Đã xảy ra lỗi khi tạo mới thông báo cho người dùng.',
         );
       }
+
+      this.userNotificationsGateway.sendNotificationToUser(
+        user,
+        createUserNotificationDto.Type,
+        data,
+      );
     } catch (err) {
       console.error(err);
       throw err;

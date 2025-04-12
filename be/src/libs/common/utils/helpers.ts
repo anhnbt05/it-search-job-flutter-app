@@ -111,3 +111,13 @@ export function collectMessages(
 
   return messages;
 }
+
+export const handleGetNotificationEventByType = (type: NotificationType) => {
+  if (type.startsWith('candidate_')) return 'candidate_notification';
+
+  if (type.startsWith('recruiter_')) return 'recruiter_notification';
+
+  if (type.startsWith('admin_')) return 'admin_notification';
+
+  return 'user_notification';
+};
