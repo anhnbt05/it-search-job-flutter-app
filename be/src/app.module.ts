@@ -84,13 +84,6 @@ import { WorkExperiencesModule } from './modules/work-experiences/work-experienc
       pinoHttp: {
         transport: {
           target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-            ignore: 'pid,hostname',
-            singleLine: true,
-            levelFirst: true,
-          },
         },
       },
     }),
