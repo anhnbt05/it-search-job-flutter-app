@@ -1,13 +1,21 @@
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Notifications, UserNotifications, Users } from '@prisma/client';
+import {
+  Notifications,
+  UserDevices,
+  UserNotifications,
+  Users,
+} from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import { CreateUserNotificationDto } from 'src/modules/user-notifications/dtos';
-import { UserNotificationsGateway } from 'src/modules/user-notifications/gateways';
+import { PushNotificaitonProducer } from 'src/modules/user-notifications/producers';
+import { WebsocketGateway } from 'src/modules/websockets/websockets.gateway';
 
 @Injectable()
 export class UserNotificationsService {
@@ -16,7 +24,9 @@ export class UserNotificationsService {
     private readonly adminSupabaseClient: SupabaseClient,
     @InjectSupabaseClient('anonClient')
     private readonly anonSupabaseClient: SupabaseClient,
-    private readonly userNotificationsGateway: UserNotificationsGateway,
+    private readonly websocketsGateway: WebsocketGateway,
+    private readonly pushNotificationProducer: PushNotificaitonProducer,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   public handleCreateUserNotification = async (
@@ -34,6 +44,12 @@ export class UserNotificationsService {
         throw new NotFoundException(
           `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
         );
+
+      const { data: userDevices } = await this.anonSupabaseClient
+        .from('UserDevices')
+        .select('*')
+        .eq('UserID', userId)
+        .overrideTypes<UserDevices[], { merge: false }>();
 
       const { Type, Content, metadata } = createUserNotificationDto;
 
@@ -69,11 +85,25 @@ export class UserNotificationsService {
         );
       }
 
-      this.userNotificationsGateway.sendNotificationToUser(
-        user,
-        createUserNotificationDto.Type,
-        data,
-      );
+      const statusOfUser = await this.cacheManager.get(`user:${userId}:status`);
+
+      if (
+        statusOfUser &&
+        typeof statusOfUser === 'string' &&
+        statusOfUser === 'online'
+      ) {
+        this.websocketsGateway.sendNotificationToUserRealTime(
+          user,
+          createUserNotificationDto.Type,
+          data,
+        );
+      } else if (userDevices?.length)
+        await this.pushNotificationProducer.handleAddPushNotificationToQueue({
+          playerIds: userDevices.map((ud) => ud.PlayerID),
+          title: notification.Title,
+          type: Type,
+          metadata,
+        });
     } catch (err) {
       console.error(err);
       throw err;

@@ -14,13 +14,14 @@ import { AppService } from './app.service';
 import { ApplicationsModule } from './modules/applications/applications.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CompaniesModule } from './modules/companies/companies.module';
+import { DashboardsModule } from './modules/dashboards/dashboards.module';
 import { EmailsModule } from './modules/emails/emails.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { UserNotificationsModule } from './modules/user-notifications/user-notifications.module';
 import { UsersModule } from './modules/users/users.module';
+import { WebsocketsModule } from './modules/websockets/websockets.module';
 import { WorkExperiencesModule } from './modules/work-experiences/work-experiences.module';
-import { DashboardsModule } from './modules/dashboards/dashboards.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { DashboardsModule } from './modules/dashboards/dashboards.module';
     ApplicationsModule,
     UserNotificationsModule,
     DashboardsModule,
+    WebsocketsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

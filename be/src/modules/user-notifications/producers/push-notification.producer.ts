@@ -4,23 +4,23 @@ import { Queue } from 'bullmq';
 import {
   BULLMQ_RETRY_DELAY,
   BULLMQ_RETRY_LIMIT,
-  EMAIL_QUEUE_NAME,
+  PUSH_NOTIFICATION_QUEUE_NAME,
+  PushNotificationData,
 } from 'src/libs/common/utils';
 
 @Injectable()
-export class EmailsProducer {
+export class PushNotificaitonProducer {
   constructor(
-    @InjectQueue(EMAIL_QUEUE_NAME) private readonly emailsQueue: Queue,
+    @InjectQueue(PUSH_NOTIFICATION_QUEUE_NAME)
+    private readonly pushNotificationQueue: Queue,
   ) {}
 
-  public sendEmail = async (
-    email: string,
-    templateName: string,
-    context: Record<string, any>,
+  public handleAddPushNotificationToQueue = async (
+    pushNotificationData: PushNotificationData,
   ) => {
-    await this.emailsQueue.add(
-      `send-${templateName}`,
-      { email, templateName, context },
+    await this.pushNotificationQueue.add(
+      'push-notification-for-user',
+      { pushNotificationData },
       {
         attempts: BULLMQ_RETRY_LIMIT,
         backoff: {
