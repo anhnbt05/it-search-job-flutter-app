@@ -1,10 +1,12 @@
 import { createKeyv } from '@keyv/redis';
 import { HttpModule } from '@nestjs/axios';
 import { CacheModule } from '@nestjs/cache-manager';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { LoggerModule } from 'nestjs-pino';
 import { SupabaseModule } from 'nestjs-supabase-js';
 import configurations from 'src/config/configurations';
+import { LoggerMiddleware } from 'src/libs/common/middlewares';
 import {
   HTTP_MODULE_MAX_REDIRECT,
   HTTP_MODULE_TIMEOUT,
@@ -78,8 +80,26 @@ import { WorkExperiencesModule } from './modules/work-experiences/work-experienc
     UserNotificationsModule,
     DashboardsModule,
     WebsocketsModule,
+    LoggerModule.forRoot({
+      pinoHttp: {
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            translateTime: 'SYS:standard',
+            ignore: 'pid,hostname',
+            singleLine: true,
+            levelFirst: true,
+          },
+        },
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
