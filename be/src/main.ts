@@ -1,10 +1,29 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { collectMessages } from 'src/libs/common/utils';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      exceptionFactory: (errors) => {
+        const messages = errors.flatMap((err) => collectMessages(err));
+
+        return new BadRequestException({
+          message: messages,
+          error: 'Bad Request',
+          status: 400,
+        });
+      },
+    }),
+  );
 
   const configService = app.get(ConfigService);
 

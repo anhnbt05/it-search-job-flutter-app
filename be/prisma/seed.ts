@@ -1,8 +1,10 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 import { createClient, User } from '@supabase/supabase-js';
 import * as bcryptjs from 'bcryptjs';
-import { Categories } from './seeds';
+import { RoleEnum } from '../src/libs/common/utils';
+import { Categories, Notifications } from './seeds';
 
 export type Province = {
   name: string;
@@ -31,9 +33,11 @@ const supabaseAdmin = createClient(
 );
 
 async function main() {
-  const hashedPassword = await hashPassword('admin123');
+  const hashedPassword = await hashPassword(
+    configService.get<string>('ADMIN_PASSWORD', ''),
+  );
 
-  const email = 'admin123@gmail.com';
+  const email = configService.get<string>('ADMIN_EMAIL', '');
 
   const { data: userData } = await supabaseAdmin.auth.admin.listUsers();
 
@@ -48,24 +52,25 @@ async function main() {
 
     await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
       app_metadata: {
-        role: 'admin',
+        role: configService.get<string>('ADMIN_ROLE_NAME', ''),
       },
     });
   } else {
     const { data, error } = await supabaseAdmin.auth.signUp({
       email,
-      password: 'admin123',
+      password: configService.get<string>('ADMIN_PASSWORD', ''),
     });
 
-    if (error) throw new Error(error.message);
-
-    if (!data.user) throw new Error('User creation failed');
+    if (error || !data.user)
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi tạo mới tài khoản quản trị viên. Vui lòng thử lại.',
+      );
 
     userId = data.user.id;
 
     await supabaseAdmin.auth.admin.updateUserById(data.user.id, {
       app_metadata: {
-        role: 'admin',
+        role: configService.get<string>('ADMIN_ROLE_NAME', ''),
       },
     });
   }
@@ -75,65 +80,76 @@ async function main() {
     update: {
       ID: userId,
       Password: hashedPassword,
-      AvatarUrl:
-        'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
-      PhoneNumber: '+840393874567',
-      FullName: 'John Doe',
-      Role: 'admin',
+      AvatarUrl: configService.get<string>('DEFAULT_LOGO_USER', ''),
+      PhoneNumber: configService.get<string>('ADMIN_PHONE_NUMBER', ''),
+      FullName: configService.get<string>('ADMIN_FULL_NAME', ''),
+      Role: RoleEnum.ADMIN,
       IsEmailVerified: true,
     },
     create: {
       ID: userId,
       Email: email,
       Password: hashedPassword,
-      AvatarUrl:
-        'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
-      PhoneNumber: '+840393874567',
-      FullName: 'John Doe',
-      Role: 'admin',
+      AvatarUrl: configService.get<string>('DEFAULT_LOGO_USER', ''),
+      PhoneNumber: configService.get<string>('ADMIN_PHONE_NUMBER', ''),
+      FullName: configService.get<string>('ADMIN_FULL_NAME', ''),
+      Role: RoleEnum.ADMIN,
       IsEmailVerified: true,
     },
   });
 
-  const response = await fetch('https://provinces.open-api.vn/api/p');
+  const response = await fetch(configService.get<string>('API_PROVINCES', ''));
 
-  const provinces = ((await response.json()) as Province[]).map((p) => p.name);
+  const provinces = ((await response.json()) as Province[]).map((p) => ({
+    Name: p.name,
+    Country: 'Việt Nam',
+  }));
 
-  const { data: existingRecords, error } = await supabaseAdmin
-    .from('Locations')
-    .select('Name')
-    .in('Name', provinces);
-
-  if (error) throw new Error(error.message);
-
-  const existingNames = new Set(existingRecords.map((r) => r.Name));
-
-  const provincesToInsert = provinces
-    .filter((province) => !existingNames.has(province))
-    .map((province) => ({
-      Name: province,
-      Country: 'Việt Nam',
-    }));
-
-  if (provincesToInsert.length > 0) {
-    const { error: insertError } = await supabaseAdmin
-      .from('Locations')
-      .insert(provincesToInsert);
-
-    if (insertError) throw new Error(insertError.message);
+  if (provinces.length) {
+    await Promise.all(
+      provinces.map((province) =>
+        prisma.locations.upsert({
+          where: { Name: province.Name },
+          update: { Country: province.Country },
+          create: {
+            Name: province.Name,
+            Country: province.Country,
+          },
+        }),
+      ),
+    );
   }
 
   if (Categories.length) {
     await Promise.all(
-      Categories.map(async (category) => {
-        const { error } = await supabaseAdmin
-          .from('Categories')
-          .upsert([{ CategoryName: category }], {
-            onConflict: 'CategoryName',
-          });
+      Categories.map(async (category) =>
+        prisma.categories.upsert({
+          where: { CategoryName: category },
+          update: {},
+          create: {
+            CategoryName: category,
+          },
+        }),
+      ),
+    );
+  }
 
-        if (error) console.error('Error upserting category:', error);
-      }),
+  if (Notifications.length) {
+    await Promise.all(
+      Notifications.map(async ({ Title, Type }) =>
+        prisma.notifications.upsert({
+          where: {
+            Type,
+          },
+          update: {
+            Title,
+          },
+          create: {
+            Title,
+            Type,
+          },
+        }),
+      ),
     );
   }
 }
@@ -146,5 +162,5 @@ main()
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   .finally(async () => {
     await prisma.$disconnect();
-    console.log('Seeding done!');
+    console.log('Thêm dữ liệu mẫu vào cơ sở dữ liệu thành công.');
   });

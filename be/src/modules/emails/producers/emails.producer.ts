@@ -1,12 +1,16 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';
-import { BULLMQ_RETRY_DELAY, BULLMQ_RETRY_LIMIT } from 'src/libs/common/utils';
+import {
+  BULLMQ_RETRY_DELAY,
+  BULLMQ_RETRY_LIMIT,
+  EMAIL_QUEUE_NAME,
+} from 'src/libs/common/utils';
 
 @Injectable()
 export class EmailsProducer {
   constructor(
-    @InjectQueue('emails-queue') private readonly emailsQueue: Queue,
+    @InjectQueue(EMAIL_QUEUE_NAME) private readonly emailsQueue: Queue,
   ) {}
 
   public sendEmail = async (

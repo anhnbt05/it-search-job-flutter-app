@@ -4,19 +4,154 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fe0e3dc2-a93b-4790-9341-5d1a77bfd024" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/ui/lib/ Constants/api_constants.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui/lib/Helpers/toastification.dart" afterDir="false" />
+    <list default="true" id="f9312053-9e5e-49bf-8451-898f90d1f6f0" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/it-search-job-app.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/prisma/migrations/20250407070546_add_unique_constraint/migration.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/prisma/migrations/20250407070654_change_unique_constraint/migration.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/prisma/migrations/20250408121903_add_unique_constraint/migration.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/prisma/migrations/20250408122208_add_unique_constraint/migration.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/prisma/migrations/20250408143330_change_unique_constraint/migration.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/prisma/seeds/notifications.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/libs/common/assets/fonts/NotoSans.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/libs/common/decorators/is-real-date.decorator.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/libs/common/guards/supabase.guard.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/libs/common/middlewares/logger.middleware.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/libs/common/providers/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/libs/common/providers/onesignal.provider.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/applications/applications.controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/applications/applications.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/applications/applications.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/applications/dtos/create-application.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/applications/dtos/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/applications/dtos/process-applications.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/companies/companies.controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/companies/companies.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/companies/companies.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/companies/dtos/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/companies/dtos/update-company.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/contexts/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/contexts/report.context.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/dashboards.controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/dashboards.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/dashboards.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/dtos/create-report.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/dtos/filter-summary.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/dtos/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/interfaces/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/interfaces/report.interface.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/processors/generate-report.processor.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/processors/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/processors/upload-report.processor.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/producers/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/producers/report.producer.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/strategies/excel-report.strategy.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/strategies/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/dashboards/strategies/pdf-report.strategy.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/emails/templates/email-application-approved.hbs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/emails/templates/email-application-rejected.hbs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/emails/templates/email-report.hbs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/user-notifications/dtos/create-user-notification.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/user-notifications/dtos/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/user-notifications/processors/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/user-notifications/processors/push-notification.processor.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/user-notifications/producers/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/user-notifications/producers/push-notification.producer.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/user-notifications/user-notifications.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/user-notifications/user-notifications.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/users/dtos/search-users.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/users/dtos/update-candidate.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/users/dtos/update-recruiter.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/users/dtos/update-user.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/websockets/websockets.gateway.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/websockets/websockets.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/work-experiences/dtos/create-work-experiences.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/work-experiences/dtos/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/work-experiences/dtos/update-work-experiences.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/work-experiences/work-experiences.controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/work-experiences/work-experiences.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/be/src/modules/work-experiences/work-experiences.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui/lib/Models/ResponseModel.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui/lib/Services/auth_forgetpassword_service.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui/lib/ViewModels/login/ForgotPasswordViewModel.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui/lib/ViewModels/login/LoginNavigationViewModel.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui/lib/Views/login/forgotpassword_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/main_dart.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/main_dart.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Services/CategoryService.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/CategoryService.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Services/JobService.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/JobService.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Services/api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/api_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/BottomNavigationViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/BottomNavigationViewModel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/JobPostViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/JobPostViewModel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/PostJobView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/PostJobView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/ui/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/.env.example" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/be/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/be/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/prisma/migrations/20250403032107_create_database/migration.sql" beforeDir="false" afterPath="$PROJECT_DIR$/be/prisma/migrations/20250406143730_reset_database/migration.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/prisma/migrations/20250403032724_update_database/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/prisma/migrations/20250403055724_add_unique_constraint/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/prisma/migrations/20250403163400_add_unique_constraint/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/be/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/prisma/seed.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/prisma/seeds/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/prisma/seeds/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/app.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/app.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/app.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/app.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/app.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/config/configurations.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/config/configurations.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/libs/common/decorators/file-validation.decorator.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/libs/common/decorators/file-validation.decorator.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/libs/common/decorators/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/libs/common/decorators/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/libs/common/guards/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/libs/common/guards/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/libs/common/guards/role.guard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/libs/common/guards/role.guard.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/libs/common/middlewares/auth.middleware.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/libs/common/middlewares/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/libs/common/middlewares/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/libs/common/utils/constants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/libs/common/utils/constants.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/libs/common/utils/helpers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/libs/common/utils/helpers.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/auth/auth.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/auth/auth.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/auth/auth.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/auth/auth.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/auth/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/auth/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/auth/dtos/create-category.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/auth/dtos/create-category.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/auth/dtos/forget-password.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/auth/dtos/forget-password.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/auth/dtos/reset-password.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/auth/dtos/reset-password.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/auth/dtos/sign-in.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/auth/dtos/sign-in.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/auth/dtos/sign-up.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/auth/dtos/sign-up.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/auth/dtos/update-password.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/auth/dtos/update-password.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/auth/dtos/verify-email.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/auth/dtos/verify-email.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/auth/dtos/verify-reset-password-otp.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/auth/dtos/verify-reset-password-otp.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/emails/emails.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/emails/emails.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/emails/emails.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/emails/emails.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/emails/processors/emails.processor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/emails/processors/emails.processor.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/emails/producers/emails.producer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/emails/producers/emails.producer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/emails/templates/email-register-account-success.hbs" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/emails/templates/email-register-account-success.hbs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/emails/templates/email-reset-password.hbs" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/emails/templates/email-reset-password.hbs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/emails/templates/email-update-password-success.hbs" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/emails/templates/email-update-password-success.hbs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/emails/templates/email-verification.hbs" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/emails/templates/email-verification.hbs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/jobs/dtos/create-job-favorites.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/jobs/dtos/create-job-favorites.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/jobs/dtos/create-job.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/jobs/dtos/create-job.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/jobs/dtos/delete-job-favorites.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/jobs/dtos/delete-job-favorites.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/jobs/dtos/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/jobs/dtos/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/jobs/dtos/process-job-status.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/jobs/dtos/process-job-status.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/jobs/dtos/search-jobs.dto.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/jobs/dtos/update-job.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/jobs/dtos/update-job.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/jobs/jobs.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/jobs/jobs.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/jobs/jobs.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/jobs/jobs.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/jobs/jobs.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/jobs/jobs.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/supabase/supabase.module.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/supabase/supabase.service.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/uploads/uploads.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/uploads/uploads.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/uploads/uploads.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/uploads/uploads.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/users/dtos/create-candidate.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/users/dtos/create-candidate.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/users/dtos/create-company-location.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/users/dtos/create-company-location.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/users/dtos/create-company.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/users/dtos/create-company.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/users/dtos/create-existing-company.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/users/dtos/create-existing-company.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/users/dtos/create-recruiter.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/users/dtos/create-recruiter.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/users/dtos/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/users/dtos/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/users/users.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/users/users.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/users/users.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/users/users.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/be/src/modules/users/users.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/be/src/modules/users/users.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/android/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/ui/android/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Views/login/login_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/login/login_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Views/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ui/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/pubspec.lock" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/ui/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/test/widget_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/test/widget_test.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,30 +161,23 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Dart File" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 5
+  &quot;associatedIndex&quot;: 2
 }</component>
-  <component name="ProjectId" id="2utOuqQQ3lCLk8bpHPa99Iw2Ppu" />
+  <component name="ProjectId" id="2veSp1TkDMSrWkD8CRfQIUEbM1y" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Flutter.main.dart.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
@@ -57,42 +185,22 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "feat/add-job-view",
-    "io.flutter.reload.alreadyRun": "true",
+    "git-widget-placeholder": "Merging feat/add-job-view",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/HK4/NM_UDDD/Do_an/it-search-job-app/ui/lib/Models",
-    "settings.editor.selected.configurable": "flutter.settings",
+    "last_opened_file_path": "E:/flutter",
+    "settings.editor.selected.configurable": "configurable.group.appearance",
     "show.migrate.to.gradle.popup": "false"
   }
 }]]></component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\HK4\NM_UDDD\Do_an\it-search-job-app\ui\lib\Models" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\HK4\NM_UDDD\Do_an\it-search-job-app\ui\lib\Views\login" />
-      <recent name="D:\HK4\NM_UDDD\Do_an\it-search-job-app\ui\lib\Helpers" />
-      <recent name="D:\HK4\NM_UDDD\Do_an\it-search-job-app\ui\lib\Views" />
-      <recent name="D:\HK4\NM_UDDD\Do_an\it-search-job-app\ui\lib\Views\recruiter" />
-      <recent name="D:\HK4\NM_UDDD\Do_an\it-search-job-app\ui\lib\Views\candidate" />
-    </key>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="fe0e3dc2-a93b-4790-9341-5d1a77bfd024" name="Changes" comment="" />
-      <created>1743064630621</created>
+      <changelist id="f9312053-9e5e-49bf-8451-898f90d1f6f0" name="Changes" comment="" />
+      <created>1744504225407</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1743064630621</updated>
+      <updated>1744504225407</updated>
     </task>
     <servers />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <default-breakpoints>
-        <breakpoint type="dart-exception" />
-      </default-breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
