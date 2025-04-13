@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:ui/%20Constants/api_constants.dart';
+
 import 'api_service.dart';
 
 class CategoryService {
@@ -9,9 +11,8 @@ class CategoryService {
     required String accessToken,
   }) async {
     try {
-      final endpoint = 'auth/categories';
       final response = await _apiService.getWithToken(
-        endpoint: endpoint,
+        endpoint: APIConstants.getCategories_endpoint,
         accessToken: accessToken,
       );
 

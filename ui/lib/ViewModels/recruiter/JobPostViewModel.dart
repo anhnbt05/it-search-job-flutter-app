@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:toastification/toastification.dart';
+import 'package:ui/Helpers/toastification.dart';
 import '../../Models/Enum.dart';
-import '../../Models/model.dart';
 import 'package:ui/Services/JobService.dart';
 
 List<String> jobType_value = [
@@ -12,16 +13,19 @@ List<String> jobType_value = [
 List<String> jobLevel_value = ["Intern", "Fresher", "Mid", "Junior", "Senior"];
 
 class JobPostViewModel extends ChangeNotifier {
-  String _branchName = "Thành phố Hồ Chí Minh"; //recruiter.branchname
-  String _address = "Số 12 Nguyễn Văn Bảo, Phường 4, Quận Gò Vấp, Thành phố Hồ Chí Minh"; //companyAddress
+  bool _check = false;
+  final String _branchName = "Thành phố Hồ Chí Minh"; //recruiter.branchname
+  final String _address =
+      "Số 12 Nguyễn Văn Bảo, Phường 4, Quận Gò Vấp, Thành phố Hồ Chí Minh"; //companyAddress
 
-  eJobType? _jobTypeSelected = null;
-  eLevel? _jobLevelSelected = null;
+  eJobType? _jobTypeSelected;
+  eLevel? _jobLevelSelected;
   Color _jobTypeBorderColor = Colors.grey.shade400;
   Color _jobLevelBorderColor = Colors.grey.shade400;
   Color _salaryUnitBorderColor = Colors.grey.shade400;
   Color _salaryTypeBorderColor = Colors.grey.shade400;
   Color _jobCategoryBorderColor = Colors.grey.shade400;
+  Color _expiredDateBorderColor = Colors.grey.shade400;
   bool _isAccept = false;
   String? _salaryTypeSelected = null;
   String _salaryUnitSelected = "triệu VNĐ/tháng";
@@ -47,8 +51,6 @@ class JobPostViewModel extends ChangeNotifier {
   String get address => _address;
 
   String get branchName => _branchName;
-  List<String> _jobDescriptionList = [];
-  String? _salary = null;
 
   final List<Map<String, String>> _jobType = List.generate(
     eJobType.values.length,
@@ -66,17 +68,44 @@ class JobPostViewModel extends ChangeNotifier {
 
   eJobType? get jobTypeSelected => _jobTypeSelected;
 
-  eLevel? get jobLevelSelected => _jobLevelSelected;
+  eLevel? get jobLevelSelected {
+    if (_check == true && _jobLevelSelected == null) {
+      _jobLevelBorderColor = Colors.red;
+    }
+    return _jobLevelSelected;
+  }
 
   Color get jobLevelBorderColor => _jobLevelBorderColor;
 
-  Color get jobTypeBorderColor => _jobTypeBorderColor;
+  Color get jobTypeBorderColor {
+    if (_check == true && _jobTypeSelected == null) {
+      _jobTypeBorderColor = Colors.red;
+    }
+    return _jobTypeBorderColor;
+  }
 
   Color get salaryUnitBorderColor => _salaryUnitBorderColor;
 
-  Color get salaryTypeBorderColor => _salaryTypeBorderColor;
+  Color get salaryTypeBorderColor {
+    if (_check == true && _salaryTypeSelected == null) {
+      _salaryTypeBorderColor = Colors.red;
+    }
+    return _salaryTypeBorderColor;
+  }
 
-  Color get jobCategoryBorderColor => _jobCategoryBorderColor;
+  Color get jobCategoryBorderColor {
+    if (_check == true && _jobCategorySelectedList.isEmpty) {
+      _jobCategoryBorderColor = Colors.red;
+    }
+    return _jobCategoryBorderColor;
+  }
+
+  Color get expiredDateBorderColor {
+    if (_check == true && _selectedDate == null) {
+      _expiredDateBorderColor = Colors.red;
+    }
+    return _expiredDateBorderColor;
+  }
 
   bool get isAccept => _isAccept;
 
@@ -116,9 +145,9 @@ class JobPostViewModel extends ChangeNotifier {
 
   List<Map<String, String>> get jobLevel => _jobLevel;
 
-  List<String> get jobDescriptionList => _jobDescriptionList;
-
   List<Map<String, String>>? get categoriesList => _categoriesList;
+
+  bool get check => _check;
 
   set categoriesList(List<Map<String, String>>? value) {
     _categoriesList = value;
@@ -130,8 +159,15 @@ class JobPostViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  set check(bool value) {
+    _check = true;
+    notifyListeners();
+  }
+
   void setJobTypeSelected(eJobType? newValue) {
     _jobTypeSelected = newValue;
+    if (_jobTypeBorderColor == Colors.red)
+      _jobTypeBorderColor = Colors.grey.shade400;
     notifyListeners();
   }
 
@@ -147,6 +183,8 @@ class JobPostViewModel extends ChangeNotifier {
 
   void setJobLevelSelected(eLevel? newValue) {
     _jobLevelSelected = newValue;
+    if (_jobLevelBorderColor == Colors.red)
+      _jobLevelBorderColor = Colors.grey.shade400;
     notifyListeners();
   }
 
@@ -159,6 +197,8 @@ class JobPostViewModel extends ChangeNotifier {
     _salaryTypeSelected = value;
     _salaryNumber1 = TextEditingController();
     _salaryNumber2 = TextEditingController();
+    if (_salaryTypeBorderColor == Colors.red)
+      _salaryTypeBorderColor = Colors.grey.shade400;
     notifyListeners();
   }
 
@@ -184,11 +224,18 @@ class JobPostViewModel extends ChangeNotifier {
 
   void setSelectedDate(DateTime? date) {
     _selectedDate = date;
+    if (_expiredDateBorderColor == Colors.red)
+      _expiredDateBorderColor = Colors.grey.shade400;
     notifyListeners();
   }
 
   void deleteSelectedJobCategory(int index) {
-    _jobCategoryIDList!.add(_categoriesList!.firstWhere((e) => e.values.first == _jobCategorySelectedList[index]).keys.first);
+    _jobCategoryIDList!.add(
+      _categoriesList!
+          .firstWhere((e) => e.values.first == _jobCategorySelectedList[index])
+          .keys
+          .first,
+    );
     _jobCategorySelectedList.remove(_jobCategorySelectedList[index]);
     notifyListeners();
   }
@@ -196,21 +243,59 @@ class JobPostViewModel extends ChangeNotifier {
   void setSelectedJobCategory(String? value) {
     if (_jobCategoryIDList != null) {
       _jobCategoryIDList!.removeWhere((e) => e.toString() == value);
-      _jobCategorySelectedList.add(_categoriesList!.firstWhere((e) => e.keys.first == value).values.first);
+      _jobCategorySelectedList.add(
+        _categoriesList!.firstWhere((e) => e.keys.first == value).values.first,
+      );
+      if (_jobCategoryBorderColor == Colors.red)
+        _jobCategoryBorderColor = Colors.grey.shade400;
       notifyListeners();
     }
   }
 
   void post() async {
+    if (_check == false) _check = true;
+    notifyListeners();
+    if (_nameText.text.isEmpty ||
+        _jobCategorySelectedList.isEmpty ||
+        _jobLevelSelected == null ||
+        _jobDescriptionsText.text.isEmpty ||
+        _jobRequirementsText.text.isEmpty ||
+        _jobBenefitsText.text.isEmpty ||
+        _vacancyText.text.isEmpty ||
+        _jobTypeSelected == null ||
+        jobCategorySelectedList.isEmpty ||
+        _workingTimeText.text.isEmpty ||
+        _selectedDate == null
+    // salary check
+    ) {
+      showTopToastification(
+        content: 'Vui lòng nhập đầy đủ thông tin.',
+        title: 'Lỗi!',
+        color: Colors.red,
+        icon: Icons.error,
+      );
+      return;
+    }
+    if (!_isAccept) {
+      showTopToastification(
+        content: 'Vui lòng đồng ý với điều khoản và chính sách đăng bài',
+        title: 'Lỗi!',
+        color: Colors.red,
+        icon: Icons.error,
+      );
+      return;
+    }
+    print(nameText.text);
     late String salaryText;
     if (_salaryTypeSelected == "negotiable") {
       salaryText = "Thỏa thuận";
     } else if (_salaryTypeSelected == "fixed") {
-      salaryText = "${_salaryNumber1.text} ${_salaryUnitSelected!}";
+      salaryText = "${_salaryNumber1.text} ${_salaryUnitSelected}";
     } else if (_salaryTypeSelected == "upto") {
-      salaryText = "Lên đến ${_salaryNumber1.text} ${_salaryUnitSelected!}";
+      salaryText = "Lên đến ${_salaryNumber1.text} ${_salaryUnitSelected}";
     } else {
-      salaryText = "Từ ${_salaryNumber1.text} đến ${_salaryNumber2!.text} ${_salaryUnitSelected!}";
+      salaryText =
+          "Từ ${_salaryNumber1.text} đến ${_salaryNumber2.text} ${_salaryUnitSelected}";
     }
     await new JobService().postJob(
       accessToken: "...",
@@ -222,7 +307,7 @@ class JobPostViewModel extends ChangeNotifier {
         "Vacancies": int.parse(_vacancyText.text),
         "Type": _jobTypeSelected.toString().split(".").last,
         "WorkingTimes": _workingTimeText.text,
-        "ExpiredDate": _selectedDate?.toUtc().toIso8601String(),
+        "ExpiredDate": _selectedDate!.toUtc().toIso8601String(),
         "Level": _jobLevelSelected.toString().split(".").last,
         "Descriptions": _jobDescriptionsText.text.split("\n").toList(),
         "Benefits": _jobBenefitsText.text.split("\n").toList(),

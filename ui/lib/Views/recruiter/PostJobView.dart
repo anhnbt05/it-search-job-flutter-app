@@ -1,11 +1,11 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../Helpers/helpers.dart';
 import '../../Models/Enum.dart';
-import '../../Models/model.dart';
 import '../../ViewModels/recruiter/JobPostViewModel.dart';
 
 Widget PostJobScreen(BuildContext context) {
@@ -71,10 +71,23 @@ Widget PostJobScreen(BuildContext context) {
           ),
 
           titleinJD(title: 'Tên công việc', isCompulsory: true),
-          customTextField(hintText: 'Nhập tên công việc...', height: 40, textInputType: TextInputType.text, controller: viewModel.nameText),
+          customTextField(
+            hintText: 'Nhập tên công việc...',
+            height: 40,
+            textInputType: TextInputType.text,
+            controller: viewModel.nameText,
+            isCompulsory: true,
+            context: context,
+          ),
 
           titleinJD(title: 'Thông tin mô tả', isCompulsory: false),
-          customTextField(hintText: 'Chúng tôi đang tìm kiếm...', height: 120, controller: viewModel.descriptionText),
+          customTextField(
+            hintText: 'Chúng tôi đang tìm kiếm...',
+            height: 120,
+            controller: viewModel.descriptionText,
+            isCompulsory: false,
+            context: context
+          ),
 
           Row(
             children: [
@@ -88,6 +101,11 @@ Widget PostJobScreen(BuildContext context) {
                     height: 40,
                     textInputType: TextInputType.number,
                     controller: viewModel.vacancyText,
+                    isCompulsory: true,
+                    format: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    context: context
                   ),
                 ),
               ),
@@ -152,7 +170,9 @@ Widget PostJobScreen(BuildContext context) {
                         if (isOpen) {
                           viewModel.setJobTypeBorderColor(Colors.blue);
                         } else {
-                          viewModel.setJobTypeBorderColor(Colors.grey.shade400);
+                          if (viewModel.check == false || viewModel.jobTypeSelected != null)
+                            viewModel.setJobTypeBorderColor(Colors.grey.shade400);
+                          else viewModel.setJobTypeBorderColor(Colors.red);
                         }
                       },
                     ),
@@ -218,7 +238,9 @@ Widget PostJobScreen(BuildContext context) {
                         if (isOpen) {
                           viewModel.setJobLevelBorderColor(Colors.blue);
                         } else {
-                          viewModel.setJobLevelBorderColor(Colors.grey.shade400);
+                          if (viewModel.check == false || viewModel.jobLevelSelected != null)
+                            viewModel.setJobLevelBorderColor(Colors.grey.shade400);
+                          else viewModel.setJobLevelBorderColor(Colors.red);
                         }
                       },
                     ),
@@ -329,7 +351,11 @@ Widget PostJobScreen(BuildContext context) {
                   if (isOpen) {
                     viewModel.setJobCategoryBorderColor(Colors.blue);
                   } else {
-                    viewModel.setJobCategoryBorderColor(Colors.grey.shade400);
+                    if (viewModel.check == false || viewModel.jobCategorySelectedList.isNotEmpty) {
+                      viewModel.setJobCategoryBorderColor(Colors.grey.shade400);
+                    } else {
+                      viewModel.setJobCategoryBorderColor(Colors.red);
+                    }
                   }
                 },
                 dropdownSearchData: DropdownSearchData(
@@ -368,9 +394,14 @@ Widget PostJobScreen(BuildContext context) {
                       ),
                     ),
                   ),
-                  /*searchMatchFn: (item, searchValue) {
-                    return removeVietnameseAccentsRegex(viewModel.jobCategoryIDList[viewModel.jobCategoryIDList.indexWhere((e) => e['key'] == item.value)]['value']!).toString().toLowerCase().trim().contains(removeVietnameseAccentsRegex(searchValue).toLowerCase().trim());
-                  },*/
+                  searchMatchFn: (DropdownMenuItem<String> item, String searchValue) {
+                    final search = removeVietnameseAccentsRegex(searchValue.toLowerCase().trim());
+                    final String itemText = item.child is Text
+                        ? (item.child as Text).data?.toLowerCase() ?? ''
+                        : '';
+                    final normalizedItemText = removeVietnameseAccentsRegex(itemText);
+                    return normalizedItemText.contains(search);
+                  },
                 ),
               ),
             ),
@@ -418,26 +449,47 @@ Widget PostJobScreen(BuildContext context) {
             ),
           ),
 
+          SizedBox(height: 5,),
           titleinJD(title: 'Mô tả công việc', isCompulsory: true),
           customTextField(
             hintText: 'Nhập mô tả công việc...',
             height: 350,
             controller: viewModel.jobDescriptionsText,
+            isCompulsory: true,
+            context: context
           ),
 
+          SizedBox(height: 10,),
           titleinJD(title: 'Yêu cầu công việc', isCompulsory: true),
-          customTextField(hintText: 'Nhập yêu cầu công việc...', height: 300, controller: viewModel.jobRequirementsText),
+          customTextField(
+            hintText: 'Nhập yêu cầu công việc...',
+            height: 300,
+            controller: viewModel.jobRequirementsText,
+            isCompulsory: true,
+            context: context
+          ),
 
+          SizedBox(height: 10,),
           titleinJD(title: 'Phúc lợi', isCompulsory: true),
-          customTextField(hintText: 'Nhập phúc lợi...', height: 250, controller: viewModel.jobBenefitsText),
+          customTextField(
+            hintText: 'Nhập phúc lợi...',
+            height: 250,
+            controller: viewModel.jobBenefitsText,
+            isCompulsory: true,
+            context: context
+          ),
 
+          SizedBox(height: 10,),
           titleinJD(title: 'Thời gian làm việc', isCompulsory: true),
           customTextField(
             hintText: 'Nhập thời gian làm việc...',
             height: 120,
             controller: viewModel.workingTimeText,
+            isCompulsory: true,
+            context: context
           ),
 
+          SizedBox(height: 5,),
           Padding(padding: EdgeInsets.only(top: 5),
             child:
             Row(
@@ -493,7 +545,11 @@ Widget PostJobScreen(BuildContext context) {
                         if (isOpen) {
                           viewModel.setSalaryTypeBorderColor(Colors.blue);
                         } else {
-                          viewModel.setSalaryTypeBorderColor(Colors.grey.shade400);
+                          if (viewModel.check == false || viewModel.salaryTypeSelected == null) {
+                            viewModel.setSalaryTypeBorderColor(Colors.red);
+                          } else {
+                            viewModel.setSalaryTypeBorderColor(Colors.grey.shade400);
+                          }
                         }
                       },
                     ),
@@ -514,7 +570,7 @@ Widget PostJobScreen(BuildContext context) {
                 height: 35,
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey, width: 0.5),
+                  border: Border.all(color: viewModel.expiredDateBorderColor, width: 1),
                   borderRadius: BorderRadius.circular(5),
                 ),
                 alignment: Alignment.bottomCenter,
@@ -559,7 +615,7 @@ Widget PostJobScreen(BuildContext context) {
                         child: Center(
                           child: Icon(
                             Icons.calendar_month_outlined,
-                            color: Colors.black,
+                            color: Colors.blue.shade700,
                             size: 20,
                           ),
                         ),
@@ -574,6 +630,10 @@ Widget PostJobScreen(BuildContext context) {
                 value: viewModel.isAccept,
                 onChanged: (_) {viewModel.setIsAccept();},
                 activeColor: Colors.blue,
+                side: BorderSide(
+                  color: Colors.grey,
+                  width: 2
+                )
               ),
 
               SizedBox(
@@ -637,6 +697,8 @@ Widget? salaryInput(String? option, JobPostViewModel jobPostProvider, BuildConte
               height: 40,
               textInputType: TextInputType.number,
               controller: viewModel.salaryNumber1,
+              isCompulsory: true,
+              context: context
             ),
           ),
         ),
@@ -661,7 +723,9 @@ Widget? salaryInput(String? option, JobPostViewModel jobPostProvider, BuildConte
                     hintText: 'Tối thiểu...',
                     height: 40,
                     textInputType: TextInputType.number,
-                    controller: viewModel.salaryNumber1!,
+                    controller: viewModel.salaryNumber1,
+                    isCompulsory: true,
+                    context: context
                   ),
                 ),
               ),
@@ -678,7 +742,9 @@ Widget? salaryInput(String? option, JobPostViewModel jobPostProvider, BuildConte
                     hintText: 'Tối đa...',
                     height: 40,
                     textInputType: TextInputType.number,
-                    controller: viewModel.salaryNumber2!,
+                    controller: viewModel.salaryNumber2,
+                    isCompulsory: true,
+                    context: context
                   ),
                 ),
               ),
@@ -792,12 +858,15 @@ Align titleinJD({required String title, required bool isCompulsory}) {
   );
 }
 
-Container customTextField({required String? hintText,required double height, required TextEditingController controller,TextInputType textInputType = TextInputType.multiline, Function(String)? change}) {
+Container customTextField({required String? hintText,required double height, required TextEditingController controller,TextInputType textInputType = TextInputType.multiline, Function(String)? change, required BuildContext context, required bool isCompulsory, List<TextInputFormatter>? format}) {
+  var viewModel = Provider.of<JobPostViewModel>(context);
+  var isValid = (viewModel.check == false || isCompulsory == false || (isCompulsory == true && controller.text.isNotEmpty));
   return Container(
     height: height,
     padding: EdgeInsets.symmetric(horizontal: 10),
     child :SizedBox.expand(
       child: TextField(
+        inputFormatters: format,
         onChanged: change,
           controller: controller,
           textAlignVertical: TextAlignVertical.top,
@@ -819,7 +888,14 @@ Container customTextField({required String? hintText,required double height, req
             isDense: true,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(5),
-              borderSide: BorderSide(color: Colors.grey, width: 0.5),
+              borderSide: BorderSide(
+                  color: isValid
+                      ? Colors.grey
+                      : Colors.red,
+                  width: isValid
+                      ? 0.5
+                      : 1
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(5),

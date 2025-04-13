@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:ui/%20Constants/api_constants.dart';
 
 class ApiService {
-  final String baseUrl = 'https://it-searcj-job-app-be.onrender.com';
 
   Future<http.Response> postWithToken({
     required String endpoint,
     required Map<String, dynamic> body,
     required String accessToken,
   }) async {
-    final url = Uri.parse('$baseUrl/$endpoint');
+    final url = Uri.parse('${APIConstants.baseUrl}/$endpoint');
 
     return await http.post(
       url,
@@ -25,7 +25,7 @@ class ApiService {
     required String endpoint,
     required String accessToken,
   }) async {
-    final url = Uri.parse('$baseUrl/$endpoint');
+    final url = Uri.parse('${APIConstants.baseUrl}/$endpoint');
 
     return await http.get(
       url,

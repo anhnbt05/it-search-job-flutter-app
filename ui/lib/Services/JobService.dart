@@ -1,3 +1,5 @@
+import 'package:ui/%20Constants/api_constants.dart';
+
 import 'api_service.dart';
 
 class JobService {
@@ -9,7 +11,7 @@ class JobService {
   }) async {
     try {
       final response = await _apiService.postWithToken(
-        endpoint: 'jobs',
+        endpoint: APIConstants.postJob_endpoint,
         body: jobData,
         accessToken: accessToken,
       );
