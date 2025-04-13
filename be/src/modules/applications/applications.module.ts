@@ -10,6 +10,8 @@ import { UserNotificationsService } from 'src/modules/user-notifications/user-no
 import { UsersModule } from 'src/modules/users/users.module';
 import { ApplicationsController } from './applications.controller';
 import { ApplicationsService } from './applications.service';
+import { OneSignalProvider } from 'src/libs/common/providers';
+import { WebsocketsModule } from 'src/modules/websockets/websockets.module';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { ApplicationsService } from './applications.service';
     JobsModule,
     UsersModule,
     EmailsModule,
+    WebsocketsModule,
   ],
   controllers: [ApplicationsController],
   providers: [
@@ -26,6 +29,7 @@ import { ApplicationsService } from './applications.service';
     JobsService,
     UserNotificationsService,
     EmailsProducer,
+    OneSignalProvider,
   ],
 })
 export class ApplicationsModule {}

@@ -1,3 +1,5 @@
+import { NotificationType } from '@prisma/client';
+
 export enum RoleEnum {
   CANDIDATE = 'candidate',
   ADMIN = 'admin',
@@ -114,6 +116,13 @@ export type RecruiterNewApplicationMetadata = RecruiterJobApprovedMetadata & {
   applicationId: string;
 };
 
+export type PushNotificationData = {
+  playerIds: string[];
+  title: string;
+  type: NotificationType;
+  metadata: Record<string, any>;
+};
+
 export enum ReportType {
   PDF = 'pdf',
   EXCEL = 'xlsx',
@@ -146,3 +155,6 @@ export const REPORT_FLOW_PRODUCER = 'reportFlowProducer';
 export const UPLOAD_REPORT_QUEUE_NAME = 'upload-report-queue';
 export const GENERATE_REPORT_QUEUE_NAME = 'generate-report-queue';
 export const EMAIL_QUEUE_NAME = 'emails-queue';
+export const PUSH_NOTIFICATION_QUEUE_NAME = 'push-notification-queue';
+export const DEFAULT_TTL_PUSH_NOTIFICATION = 3600;
+export const DEFAULT_STATUS_USER_ONLINE = 3600000;

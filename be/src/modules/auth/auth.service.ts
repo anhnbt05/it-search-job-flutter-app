@@ -30,6 +30,7 @@ import {
 import {
   CreateCategoryDto,
   ResetPasswordDto,
+  SignInDto,
   SignUpDto,
   VerifyEmailDto,
   VerifyResetPasswordOtpDto,
@@ -58,7 +59,14 @@ export class AuthService {
 
   async signUp(signUpDto: SignUpDto) {
     try {
-      const { createCandidateDto, createRecruiterDto, ...res } = signUpDto;
+      const {
+        createCandidateDto,
+        createRecruiterDto,
+        playerId,
+        platform,
+        deviceInfo,
+        ...res
+      } = signUpDto;
 
       const { Password, Email, PhoneNumber, Role } = res;
 
@@ -181,6 +189,14 @@ export class AuthService {
         },
       );
 
+      if (playerId && platform && deviceInfo)
+        await this.handleVerifyDeviceOfUser(
+          playerId,
+          platform,
+          deviceInfo,
+          userData.ID,
+        );
+
       return {
         success: true,
         message:
@@ -192,8 +208,10 @@ export class AuthService {
     }
   }
 
-  async signIn(email: string, password: string) {
+  async signIn(signInDto: SignInDto) {
     try {
+      const { email, password, playerId, platform, deviceInfo } = signInDto;
+
       const { data, error } =
         await this.adminSupabaseClient.auth.signInWithPassword({
           email,
@@ -264,6 +282,14 @@ export class AuthService {
           'Vui lòng kiểm tra mã OTP đã được gửi đến email của bạn để hoàn tất xác minh trước khi đăng nhập.',
         );
       }
+
+      if (playerId && platform && deviceInfo)
+        await this.handleVerifyDeviceOfUser(
+          playerId,
+          platform,
+          deviceInfo,
+          data.user.id,
+        );
 
       return {
         accessToken: data?.session?.access_token,
@@ -874,6 +900,33 @@ export class AuthService {
     } catch (err) {
       console.error(err);
       throw err;
+    }
+  };
+
+  private handleVerifyDeviceOfUser = async (
+    playerId: string,
+    platform: string,
+    deviceInfo: string,
+    userId: string,
+  ) => {
+    const { error } = await this.anonSupabaseClient.from('UserDevices').upsert(
+      [
+        {
+          UserID: userId,
+          PlayerID: playerId,
+          Platform: platform,
+          DeviceInfo: deviceInfo,
+        },
+      ],
+      { onConflict: 'UserID, PlayerID' },
+    );
+
+    if (error) {
+      console.error(error);
+
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi trong quá trình kiểm tra thiết bị của người dùng đăng nhập.',
+      );
     }
   };
 }

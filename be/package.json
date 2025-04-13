@@ -23,7 +23,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "db:push": "npx prisma db push",
     "db:migrate": "npx prisma migrate dev",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "db:pull": "npx prisma db pull",
+    "db:reset": "npx prisma migrate reset"
   },
   "dependencies": {
     "@keyv/redis": "^4.3.2",
@@ -41,6 +43,7 @@
     "@nestjs/platform-socket.io": "^11.0.16",
     "@nestjs/swagger": "^11.1.0",
     "@nestjs/websockets": "^11.0.16",
+    "@onesignal/node-onesignal": "^5.0.0-alpha-02",
     "@prisma/client": "^6.5.0",
     "@supabase/supabase-js": "^2.49.3",
     "bcryptjs": "^3.0.2",
@@ -54,6 +57,7 @@
     "lodash": "^4.17.21",
     "nestjs-supabase-js": "^1.1.1",
     "nodemailer": "^6.10.0",
+    "onesignal-node": "^3.4.0",
     "passport-jwt": "^4.0.1",
     "pdfkit": "^0.16.0",
     "reflect-metadata": "^0.2.2",

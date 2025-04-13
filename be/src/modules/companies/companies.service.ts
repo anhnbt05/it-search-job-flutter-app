@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ApplicationStatus, Companies, Recruiters } from '@prisma/client';
+import { ApplicationStatus, Recruiters } from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import { UpdateCompanyDto } from 'src/modules/companies/dtos';

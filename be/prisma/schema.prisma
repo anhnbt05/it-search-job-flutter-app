@@ -23,6 +23,7 @@ model Users {
   IsEmailVerified   Boolean             @default(false)
   Candidates        Candidates?
   Recruiters        Recruiters?
+  UserDevices       UserDevices[]
   UserNotifications UserNotifications[]
 }
 
@@ -214,6 +215,19 @@ model Categories {
   UpdatedAt     DateTime        @default(now())
   DeletedAt     DateTime?
   JobCategories JobCategories[]
+}
+
+model UserDevices {
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Platform   String
+  DeviceInfo String
+  CreatedAt  DateTime? @default(now()) @db.Timestamptz(6)
+  UpdatedAt  DateTime? @default(now()) @db.Timestamptz(6)
+  UserID     String    @db.Uuid
+  PlayerID   String
+  Users      Users     @relation(fields: [UserID], references: [ID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([UserID, PlayerID], map: "UserDevices_userid_playerid_unique")
 }
 
 enum UserStatus {

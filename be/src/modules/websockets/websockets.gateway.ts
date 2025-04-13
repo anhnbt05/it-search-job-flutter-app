@@ -1,4 +1,5 @@
-import { NotFoundException } from '@nestjs/common';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -9,26 +10,29 @@ import { NotificationType, UserNotifications, Users } from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import { Server, Socket } from 'socket.io';
-import { handleGetNotificationEventByType } from 'src/libs/common/utils';
+import {
+  DEFAULT_STATUS_USER_ONLINE,
+  handleGetNotificationEventByType,
+} from 'src/libs/common/utils';
 
 @WebSocketGateway({
-  namespace: '/notifications',
+  namespace: '/websockets/gateway',
   cors: {
     origin: '*',
   },
 })
-export class UserNotificationsGateway
+@Injectable()
+export class WebsocketGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
   private readonly server: Server;
 
   constructor(
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @InjectSupabaseClient('anonClient')
     private readonly anonSupabaseClient: SupabaseClient,
   ) {}
-
-  private connectedUsers: Map<string, string> = new Map();
 
   async handleConnection(client: Socket) {
     const userId = client.handshake.query.userId as string;
@@ -45,16 +49,18 @@ export class UserNotificationsGateway
           `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
         );
 
-      this.connectedUsers.set(userId, client.id);
+      await this.cacheManager.set(
+        `user:${userId}:status`,
+        'online',
+        DEFAULT_STATUS_USER_ONLINE,
+      );
 
       console.log(`Người dùng có tên '${user.FullName}' đã online.`);
     }
   }
 
   async handleDisconnect(client: Socket) {
-    const userId = [...this.connectedUsers.entries()].find(
-      ([, socketId]) => socketId === client.id,
-    )?.[0];
+    const userId = client.handshake.query.userId as string;
 
     if (userId) {
       const { data: user } = await this.anonSupabaseClient
@@ -68,29 +74,23 @@ export class UserNotificationsGateway
           `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
         );
 
-      this.connectedUsers.delete(userId);
+      await this.cacheManager.del(`user:${userId}:status`);
 
       console.log(`Người dùng có tên '${user.FullName}' đã offline.`);
     }
   }
 
-  public sendNotificationToUser = (
+  public sendNotificationToUserRealTime = (
     user: Users,
     type: NotificationType,
     notification: UserNotifications,
   ) => {
-    const socketId = this.connectedUsers.get(user.ID);
+    const event = handleGetNotificationEventByType(type);
 
-    if (socketId) {
-      const event = handleGetNotificationEventByType(type);
+    this.server.to(user.ID).emit(event, notification);
 
-      this.server.to(socketId).emit(event, notification);
-
-      console.log(
-        `Đã gửi thông báo real time đến người dùng có tên '${user.FullName}'`,
-      );
-    } else {
-      console.log(`Người dùng '${user.FullName}' đã ofline.`);
-    }
+    console.log(
+      `Đã gửi thông báo real time đến người dùng có tên '${user.FullName}'`,
+    );
   };
 }
