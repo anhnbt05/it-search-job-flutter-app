@@ -35,7 +35,7 @@ class BottomNavigationViewModel extends ChangeNotifier {
     }
     if (jobPostViewModel.categoriesList!.isEmpty || jobPostViewModel.categoriesList == null) {
       jobPostViewModel.categoriesList = await CategoryService().getCategory(
-        accessToken: "eyJhbGciOiJIUzI1NiIsImtpZCI6ImVJclVSTTROUldPb3FDS2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3F3aWxkZGFxbnJ6bnFiaHVza3p4LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI2NzRjNzIwNC0xMDZlLTRkN2YtOGRjMy0zZjYzODlkMGFhOGUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ0NTU2NDU5LCJpYXQiOjE3NDQ1NTI4NTksImVtYWlsIjoibGVuZ29jYW5ocHluZTM2M0BnbWFpbC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl0sInJvbGUiOiJyZWNydWl0ZXIifSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6ImxlbmdvY2FuaHB5bmUzNjNAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiNjc0YzcyMDQtMTA2ZS00ZDdmLThkYzMtM2Y2Mzg5ZDBhYThlIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDQ1NTI4NTl9XSwic2Vzc2lvbl9pZCI6IjFmYzhlODY1LTBmNDEtNDkyNS05MTUxLTMzZTcyZDY0ZTJmMiIsImlzX2Fub255bW91cyI6ZmFsc2V9.pTdspdCdWumsm8wI2FMHzogoomsXPyJwDRXiwOZ1yd4"
+        accessToken: "..."
       );
       jobPostViewModel.jobCategoryIDList = jobPostViewModel.categoriesList!.map((e) => e.keys.first).toList();
     }

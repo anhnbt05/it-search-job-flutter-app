@@ -252,21 +252,34 @@ class JobPostViewModel extends ChangeNotifier {
     }
   }
 
+  bool _isSalarySelected() {
+    if (_salaryTypeSelected == null) return false;
+    if (_salaryTypeSelected == "negotiable") {
+      return true;
+    }
+    if (_salaryTypeSelected == "fixed" || _salaryTypeSelected == "upto") {
+      return (_salaryNumber1.text.isNotEmpty);
+    }
+    if (_salaryTypeSelected == "range")
+      return (_salaryNumber1.text.isNotEmpty && _salaryNumber2.text.isNotEmpty);
+    return false;
+  }
+
   void post() async {
     if (_check == false) _check = true;
     notifyListeners();
     if (_nameText.text.isEmpty ||
-        _jobCategorySelectedList.isEmpty ||
-        _jobLevelSelected == null ||
-        _jobDescriptionsText.text.isEmpty ||
-        _jobRequirementsText.text.isEmpty ||
-        _jobBenefitsText.text.isEmpty ||
-        _vacancyText.text.isEmpty ||
-        _jobTypeSelected == null ||
-        jobCategorySelectedList.isEmpty ||
-        _workingTimeText.text.isEmpty ||
-        _selectedDate == null
-    // salary check
+      _jobCategorySelectedList.isEmpty ||
+      _jobLevelSelected == null ||
+      _jobDescriptionsText.text.isEmpty ||
+      _jobRequirementsText.text.isEmpty ||
+      _jobBenefitsText.text.isEmpty ||
+      _vacancyText.text.isEmpty ||
+      _jobTypeSelected == null ||
+      jobCategorySelectedList.isEmpty ||
+      _workingTimeText.text.isEmpty ||
+      _selectedDate == null ||
+      !_isSalarySelected()
     ) {
       showTopToastification(
         content: 'Vui lòng nhập đầy đủ thông tin.',
