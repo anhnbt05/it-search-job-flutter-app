@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:toastification/toastification.dart';
 import 'package:ui/Helpers/helpers.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
@@ -14,7 +15,9 @@ import 'ViewModels/recruiter/JobPostViewModel.dart';
 import 'Views/login/login_page.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
+    ToastificationWrapper(child:
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
@@ -28,14 +31,16 @@ void main() {
       ],
       child: MyApp(),
     ),
+  )
   );
 }
 
 class MyApp extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _MainAppState createState() => _MainAppState();
 }
 
+/*
 class _MyAppState extends State<MyApp> {
   bool isLoggedIn = false;
 
@@ -58,6 +63,7 @@ class _MainApp extends StatefulWidget {
   @override
   _MainAppState createState() => _MainAppState();
 }
+*/
 
 class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
   role _role = role.candidate;
