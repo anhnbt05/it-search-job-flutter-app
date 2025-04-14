@@ -19,7 +19,11 @@ class ResetPasswordViewModel extends ChangeNotifier {
       final response = await _authService.resetPassword(email, newPassword);
       return response;
     } catch (e) {
-      return ResponseModel(success: false, message: "Lỗi không xác định: $e");
+      return ResponseModel(
+        success: false,
+        message: "Lỗi không xác định: $e",
+        messageList: ["Lỗi không xác định: $e"],
+      );
     } finally {
       setLoading(false);
     }
