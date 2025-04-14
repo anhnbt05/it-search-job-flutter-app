@@ -14,13 +14,15 @@ void showTopToastification({
       style: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 17,
+        color: Colors.white,
       ),
     ),
     description: RichText(
         text: TextSpan(
             text: content,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
+              color: Colors.white,
             )
         )
     ),
