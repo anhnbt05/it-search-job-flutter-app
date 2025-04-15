@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/ViewModels/login/ResetPasswordViewModel.dart';
 
+import '../../Helpers/toastification.dart';
+
 class ResetPasswordPage extends StatefulWidget {
   final String email;
 
@@ -89,9 +91,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           final newPassword = passwordController.text.trim();
                           final response = await viewModel.verifyOtp(widget.email, newPassword);
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(response.message)),
+                          showTopToastification(
+                            content: response.message,
+                            title: response.success ? "Thành công" : "Thất bại",
+                            color: response.success ? Colors.green : Colors.red,
+                            icon: response.success ? Icons.check_circle_outline : Icons.error_outline,
                           );
+
 
                           if (response.success) {
                             Future.delayed(Duration(seconds: 2), () {

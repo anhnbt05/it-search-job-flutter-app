@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
+import '../../Helpers/toastification.dart';
 import '../../ViewModels/login/VerifyResetPasswordOtpViewModel.dart';
 
 class OtpVerificationPage extends StatelessWidget {
@@ -73,16 +74,22 @@ class OtpVerificationPage extends StatelessWidget {
                       final otp = otpController.text.trim();
 
                       if (otp.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Vui lòng nhập OTP")),
+                        showTopToastification(
+                          content: "Vui lòng nhập OTP",
+                          title: "Thiếu thông tin",
+                          color: Colors.orange,
+                          icon: Icons.warning_amber_rounded,
                         );
                         return;
                       }
 
                       final response = await viewModel.verifyOtp(email, otp);
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(response.message)),
+                      showTopToastification(
+                        content: response.message,
+                        title: response.success ? "Thành công" : "Lỗi",
+                        color: response.success ? Colors.green : Colors.red,
+                        icon: response.success ? Icons.check_circle_outline : Icons.error_outline,
                       );
 
                       if (response.success) {
