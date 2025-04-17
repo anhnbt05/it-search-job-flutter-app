@@ -1,9 +1,12 @@
 import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:ui/%20Constants/api_constants.dart';
+import 'package:ui/Services/application_recruiter_service.dart';
+import 'package:ui/Services/job_service.dart';
 import 'package:ui/ViewModels/recruiter/JobPostViewModel.dart';
 
-import '../Services/CategoryService.dart';
+import '../Services/category_service.dart';
 
 class BottomNavigationViewModel extends ChangeNotifier {
   int _selectedIndex = 0;
@@ -33,11 +36,11 @@ class BottomNavigationViewModel extends ChangeNotifier {
     if (_pageController.hasClients) {
       _pageController.jumpToPage(2);
     }
-    if (jobPostViewModel.categoriesList!.isEmpty || jobPostViewModel.categoriesList == null) {
+    if (jobPostViewModel.categoriesList == null || jobPostViewModel.categoriesList!.isEmpty) {
       jobPostViewModel.categoriesList = await CategoryService().getCategory(
-        accessToken: "..."
+        accessToken: APIConstants.token
       );
-      jobPostViewModel.jobCategoryIDList = jobPostViewModel.categoriesList!.map((e) => e.keys.first).toList();
+      jobPostViewModel.jobCategoryIDList = jobPostViewModel.categoriesList?.map((e) => e.keys.first).toList();
     }
   }
 

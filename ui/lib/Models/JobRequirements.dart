@@ -5,5 +5,5 @@ class cJobRequirements {
   String? Requirement;
   DateTime? DeletedAt;
   String? JobID;
-  cJobs? Job;
+  //cJobs? Job;
 }

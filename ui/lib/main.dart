@@ -3,12 +3,18 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/Services/application_recruiter_service.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
+import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
 import 'package:ui/Views/candidate/candidate.dart';
 import 'package:ui/Models/model.dart';
 import 'package:ui/Views/admin/admin.dart';
 
+import ' Constants/api_constants.dart';
+import 'Models/Applications.dart';
+import 'Models/Jobs.dart';
+import 'Services/job_service.dart';
 import 'ViewModels/BottomNavigationViewModel.dart';
 import 'ViewModels/candidate/JoblistNavigationViewModel.dart';
 import 'ViewModels/recruiter/JobPostViewModel.dart';
@@ -20,14 +26,11 @@ void main() {
     ToastificationWrapper(child:
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (context) => BottomNavigationViewModel(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => JoblistNavigationViewModel(),
-        ),
+        ChangeNotifierProvider(create: (context) => BottomNavigationViewModel(),),
+        ChangeNotifierProvider(create: (context) => JoblistNavigationViewModel(),),
         ChangeNotifierProvider(create: (context) => JobPostViewModel()),
         ChangeNotifierProvider(create: (context) => LoginNavigationViewModel()),
+        ChangeNotifierProvider(create: (context) => CandidatesAppliesViewModel()),
       ],
       child: MyApp(),
     ),
@@ -68,6 +71,11 @@ class _MainApp extends StatefulWidget {
 class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
   role _role = role.candidate;
 
+  //------RECRUITER----------
+  late Future<List<cJobs_recruiter?>> _jobsFuture;
+  late Future<List<List<cApplications_recruiter>?>> _applicationsFuture;
+  //-------------------------
+
   @override
   void initState() {
     super.initState();
@@ -83,6 +91,18 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
         upperBound: 1.05,
       ),
     );
+    _jobsFuture = JobService().getJobs(accessToken: APIConstants.token);
+    _applicationsFuture = _jobsFuture.then((jobs) async {
+      List<List<cApplications_recruiter>?> appList = [];
+        for (var job in jobs) {
+          var applications = await ApplicationService().getApplicationsList(
+            accessToken: APIConstants.token,
+            jobID: job!.ID.toString(),
+          );
+          appList.add(applications);
+        }
+      return appList;
+    });
   }
 
   @override
@@ -207,7 +227,7 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
     if (Role == role.candidate)
       return pageView_candidate(context);
     else if (Role == role.recruiter)
-      return pageView_recruiter(context);
+      return pageView_recruiter(context, _jobsFuture, _applicationsFuture);
     else
       return pageView_admin(context);
   }

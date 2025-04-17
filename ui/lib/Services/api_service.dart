@@ -35,4 +35,21 @@ class ApiService {
       },
     );
   }
+
+  Future<http.Response> getByIDWithToken2({
+    required String endpoint1,
+    required String endpoint2,
+    required String accessToken,
+    required String id,
+  }) async {
+    final url = Uri.parse('${APIConstants.baseUrl}/$endpoint1/$id/$endpoint2');
+
+    return await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+  }
 }
