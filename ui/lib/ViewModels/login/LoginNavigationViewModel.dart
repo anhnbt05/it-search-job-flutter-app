@@ -2,11 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/ViewModels/login/ResetPasswordViewModel.dart';
+import 'package:ui/Views/login/register_page.dart';
 import 'package:ui/Views/login/resetpassword_page.dart';
 
 import '../../Views/login/forgotpassword_page.dart';
 import '../../Views/login/otpverification_page.dart';
 import 'VerifyResetPasswordOtpViewModel.dart';
+import '../../Views/login/register_page.dart';
 
 class LoginNavigationViewModel extends ChangeNotifier {
   void goToForgotPassword(BuildContext context) {
@@ -38,6 +40,12 @@ class LoginNavigationViewModel extends ChangeNotifier {
               child: ResetPasswordPage(email: email),
             ),
       ),
+    );
+  }
+  void goToRegister(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => RegisterPage()),
     );
   }
 }
