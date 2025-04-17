@@ -3,11 +3,19 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as hbs from 'handlebars';
 import { join } from 'path';
+import { EMAIL_QUEUE_NAME } from 'src/libs/common/utils';
 import { EmailsProcessor } from 'src/modules/emails/processors';
 import { EmailsProducer } from 'src/modules/emails/producers';
 import { EmailsService } from './emails.service';
-import { EMAIL_QUEUE_NAME } from 'src/libs/common/utils';
+
+hbs.registerHelper('eq', (a, b) => a === b);
+hbs.registerHelper('ne', (a, b) => a !== b);
+hbs.registerHelper('lt', (a, b) => a < b);
+hbs.registerHelper('gt', (a, b) => a > b);
+hbs.registerHelper('and', (a, b) => a && b);
+hbs.registerHelper('or', (a, b) => a || b);
 
 @Module({
   imports: [
