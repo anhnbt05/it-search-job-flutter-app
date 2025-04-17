@@ -17,21 +17,21 @@ import 'Views/login/login_page.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    ToastificationWrapper(child:
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => BottomNavigationViewModel(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => JoblistNavigationViewModel(),
-        ),
-        ChangeNotifierProvider(create: (context) => JobPostViewModel()),
-        ChangeNotifierProvider(create: (context) => LoginViewModel()),
-      ],
-      child: MyApp(),
+    ToastificationWrapper(
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => BottomNavigationViewModel(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => JoblistNavigationViewModel(),
+          ),
+          ChangeNotifierProvider(create: (context) => JobPostViewModel()),
+          ChangeNotifierProvider(create: (context) => LoginViewModel()),
+        ],
+        child: MyApp(),
+      ),
     ),
-  )
   );
 }
 
