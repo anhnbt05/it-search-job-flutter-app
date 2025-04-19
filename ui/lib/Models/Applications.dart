@@ -30,4 +30,16 @@ class cApplications_recruiter {
       Candidate: cCandidates_cApplication_recruiter.fromJson(json['Candidate']),
     );
   }
+
+  cApplications_recruiter copyWith({String? status}) {
+    return cApplications_recruiter(
+      ID: this.ID,
+      Status: status ?? this.Status,
+      JobID: this.JobID,
+      AppliedAt: this.AppliedAt,
+      DeletedAt: this.DeletedAt,
+      ResumeUrl: this.ResumeUrl,
+      Candidate: this.Candidate,
+    );
+  }
 }

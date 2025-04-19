@@ -30,6 +30,7 @@ class JobService {
       return false;
     }
   }
+
   Future<List<cJobs_recruiter?>> getJobs({
     required String accessToken,
   }) async {

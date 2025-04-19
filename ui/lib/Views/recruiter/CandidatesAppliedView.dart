@@ -1,52 +1,54 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Models/Jobs.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 
 import '../../Models/Applications.dart';
+import 'ReadResumeScreen.dart';
 
-Widget CandidatesAppliedScreen(BuildContext context, Future<List<cJobs_recruiter?>> jobsFuture, Future<List<List<cApplications_recruiter>?>> applicationsFuture) {
+Widget CandidatesAppliedScreen(BuildContext context, CandidatesAppliesViewModel viewModel) {
   var viewModel = Provider.of<CandidatesAppliesViewModel>(context);
 
   return Container(
-    color: Colors.white,
-    child: Center(
-      child: FutureBuilder<List<cJobs_recruiter?>?>(
-        future: jobsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(
-              color: Colors.blue,
-            ));
-          }
-          var jobs = snapshot.data ?? [];
-          
-          if (jobs.isEmpty) {
-            return const Center(child: Text('Bạn chưa có bài đăng nào'));
-          }
-          
-          return FutureBuilder(
-            future: applicationsFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator(
-                  color: Colors.blue,
-                ));
-              }
-
-              var applications = snapshot.data ?? [];
-              return ListView.builder(
-                  itemCount: jobs.length,
-                  itemBuilder: (context, index) {
-                    return JobItem(context, index, jobs, applications[index]);
-                  }
-              );
+      color: Colors.white,
+      child: Center(
+        child: FutureBuilder<List<cJobs_recruiter?>?>(
+          future: viewModel.jobsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(
+                color: Colors.blue,
+              ));
             }
-          );
-        }
+
+            if (viewModel.jobs.isEmpty) {
+              return const Center(child: Text('Bạn chưa có bài đăng nào'));
+            }
+
+            return FutureBuilder(
+              future: viewModel.applicationsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator(
+                    color: Colors.blue,
+                  ));
+                }
+
+                return ListView.builder(
+                    itemCount: viewModel.jobs.length,
+                    itemBuilder: (context, index) {
+                      return JobItem(context, index, viewModel.jobs, viewModel.applications[index]);
+                    }
+                );
+              }
+            );
+          }
+        ),
       ),
-    ),
   );
 }
 
@@ -121,10 +123,14 @@ Widget CandidateApplied(int index, cApplications_recruiter application, BuildCon
       child: Container(
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: (application.Status == 'pending') ? Color(0x109E9E9E) : Colors.white,
           border: Border(
             left: BorderSide(
-              color: Colors.red,
+              color: (application.Status == 'pending')
+                  ? Colors.transparent
+                  : (application.Status == 'accepted')
+                  ? Colors.green
+                  : Colors.red,
               width: 3,
             ),
 
@@ -159,7 +165,7 @@ Widget CandidateApplied(int index, cApplications_recruiter application, BuildCon
                           fontSize: 15,
                         ),
                       ),
-      
+
                       Container(
                         decoration: BoxDecoration(
                           color: Color(0x60bbdefb),
@@ -184,13 +190,23 @@ Widget CandidateApplied(int index, cApplications_recruiter application, BuildCon
                 ],
               ),
             ),
-      
+
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                    context, MaterialPageRoute(
+                    builder: (context) => ReadResumeScreen(
+                        application.Candidate.FullName, application.ResumeUrl, application.ID, application.Status, Provider.of<CandidatesAppliesViewModel>(context)
+                    )
+                )
+                );
+
+
+              },
               icon: Icon(Icons.article_outlined),
               padding: EdgeInsets.zero,
             ),
-      
+
             IconButton(
               onPressed: () {},
               icon: Icon(Icons.remove_red_eye_outlined),

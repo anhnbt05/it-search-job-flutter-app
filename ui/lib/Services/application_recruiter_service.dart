@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:ui/Helpers/toastification.dart';
 import 'package:ui/Models/Applications.dart';
 
 import '../ Constants/api_constants.dart';
@@ -34,6 +36,67 @@ class ApplicationService {
     } catch (e) {
       print("Error fetching applications list: $e");
       return null;
+    }
+  }
+
+  Future<bool> acceptApplication({
+    required String accessToken,
+    required List<String> openApplicationIds,
+  }) async {
+    try {
+      final response = await _apiService.acceptApplicationsWithToken(
+        endpoint: APIConstants.responseJobApplication_endpoint,
+        body: {"acceptedApplicationIds" : openApplicationIds},
+        accessToken: accessToken,
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        showSuccessToastification_applicationProcess(message: data['message']);
+        return true;
+      } else {
+        var data = jsonDecode(response.body);
+        showErrorToastification_applicationProcess(message: data['message']);
+        return false;
+      }
+    } catch (e) {
+      showErrorToastification_applicationProcess(message: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> rejectApplication({
+    required String accessToken,
+    required String applicationId,
+    required String reason,
+  }) async {
+    try {
+      final response = await _apiService.rejectApplicationsWithToken(
+        endpoint: APIConstants.responseJobApplication_endpoint,
+        body: {
+          "rejectedApplications": [
+            {
+              "applicationId": applicationId,
+              "reason": reason
+            }
+          ]
+        },
+        accessToken: accessToken,
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        showSuccessToastification_applicationProcess(message: data['message']);
+        return true;
+      }
+      else {
+        var data = jsonDecode(response.body);
+        showErrorToastification_applicationProcess(message: data['message']);
+        return false;
+      }
+    } catch (e) {
+      showErrorToastification_applicationProcess(message: e.toString());
+      return false;
     }
   }
 }

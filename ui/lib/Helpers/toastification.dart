@@ -43,3 +43,11 @@ void showTopToastification({
     applyBlurEffect: true,
   );
 }
+
+void showSuccessToastification_applicationProcess({required String message}) {
+  showTopToastification(content: message, title: 'Hoàn tất', color: successColor, icon: Icons.check_circle_outline);
+}
+
+void showErrorToastification_applicationProcess({required String message}) {
+  showTopToastification(content: message, title: 'Lỗi', color: errorColor, icon: Icons.error_outline);
+}

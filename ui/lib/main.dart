@@ -71,11 +71,6 @@ class _MainApp extends StatefulWidget {
 class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
   role _role = role.candidate;
 
-  //------RECRUITER----------
-  late Future<List<cJobs_recruiter?>> _jobsFuture;
-  late Future<List<List<cApplications_recruiter>?>> _applicationsFuture;
-  //-------------------------
-
   @override
   void initState() {
     super.initState();
@@ -83,6 +78,11 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
       context,
       listen: false,
     );
+    final candidateAppliesViewModel = Provider.of<CandidatesAppliesViewModel>(
+      context,
+      listen: false,
+    );
+    candidateAppliesViewModel.initFutures();
     bottomNavigationProvider.setAnimationController(
       AnimationController(
         vsync: this,
@@ -91,18 +91,6 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
         upperBound: 1.05,
       ),
     );
-    _jobsFuture = JobService().getJobs(accessToken: APIConstants.token);
-    _applicationsFuture = _jobsFuture.then((jobs) async {
-      List<List<cApplications_recruiter>?> appList = [];
-        for (var job in jobs) {
-          var applications = await ApplicationService().getApplicationsList(
-            accessToken: APIConstants.token,
-            jobID: job!.ID.toString(),
-          );
-          appList.add(applications);
-        }
-      return appList;
-    });
   }
 
   @override
@@ -117,12 +105,14 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    var bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(
+    var bottomNavigationViewModel = Provider.of<BottomNavigationViewModel>(
       context,
     );
-    var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(
+    var joblistNavigationViewModel = Provider.of<JoblistNavigationViewModel>(
       context,
     );
+
+    var candidateAppliesViewModel = Provider.of<CandidatesAppliesViewModel>(context);
 
     return MaterialApp(
       locale: Locale('vi', 'VN'),
@@ -155,10 +145,10 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
           toolbarHeight: 45,
           backgroundColor: color,
           centerTitle: true,
-          title: appbarTitle(_role, bottomNavigationProvider.selectedIndex),
+          title: appbarTitle(_role, bottomNavigationViewModel.selectedIndex),
           bottom: bottomJobBar(
             _role,
-            bottomNavigationProvider.selectedIndex,
+            bottomNavigationViewModel.selectedIndex,
             context,
           ),
           actions: [
@@ -182,15 +172,15 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
         ),
         body: PageView(
           physics: NeverScrollableScrollPhysics(),
-          controller: bottomNavigationProvider.pageController,
-          children: pageView(_role, joblistNavigationProvider),
+          controller: bottomNavigationViewModel.pageController,
+          children: pageView(_role, joblistNavigationViewModel, candidateAppliesViewModel),
         ),
         bottomNavigationBar: Stack(
           children: [
             BottomNavigationBar(
-              currentIndex: bottomNavigationProvider.selectedIndex,
+              currentIndex: bottomNavigationViewModel.selectedIndex,
               backgroundColor: Colors.white,
-              onTap: bottomNavigationProvider.onItemTapped,
+              onTap: bottomNavigationViewModel.onItemTapped,
               type: BottomNavigationBarType.fixed,
               items: bottomNavigationItem(_role),
             ),
@@ -223,11 +213,12 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
   List<Widget> pageView(
     role Role,
     JoblistNavigationViewModel joblistNavigationProvider,
+      CandidatesAppliesViewModel candidateAppliesViewModel,
   ) {
     if (Role == role.candidate)
       return pageView_candidate(context);
     else if (Role == role.recruiter)
-      return pageView_recruiter(context, _jobsFuture, _applicationsFuture);
+      return pageView_recruiter(context, candidateAppliesViewModel);
     else
       return pageView_admin(context);
   }
