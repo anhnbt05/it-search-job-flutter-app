@@ -5,6 +5,7 @@ import 'package:toastification/toastification.dart';
 import 'package:ui/Helpers/helpers.dart';
 import 'package:ui/ViewModels/login/CompaniesViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
+import 'package:ui/ViewModels/login/SignUpViewModel.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
 import 'package:ui/Views/candidate/candidate.dart';
 import 'package:ui/Models/model.dart';
@@ -30,6 +31,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => JobPostViewModel()),
         ChangeNotifierProvider(create: (context) => LoginNavigationViewModel()),
         ChangeNotifierProvider(create: (context) => CompaniesViewModel()),
+        ChangeNotifierProvider(create: (context) => SignUpViewModel()),
       ],
       child: MyApp(),
     ),

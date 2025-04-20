@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ui/Views/login/recruiterregister_page.dart';
 
+import 'candidateregister_page.dart';
+
 class RegisterPage extends StatefulWidget {
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -29,10 +31,21 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
         );
+      } else if (selectedRole == 'candidate') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CandidateRegisterPage(
+              email: _emailController.text,
+              password: _passwordController.text,
+              fullName: _fullNameController.text,
+              phone: _phoneController.text,
+            ),
+          ),
+        );
       } else {
-        // TODO: Điều hướng cho ứng viên
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Chức năng ứng viên chưa triển khai")),
+          SnackBar(content: Text("Vui lòng chọn vai trò")),
         );
       }
     }
