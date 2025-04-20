@@ -43,7 +43,7 @@ class JobService {
       if (response.statusCode == 200) {
         print("Successfully fetched jobs list.");
         List<dynamic>? data = jsonDecode(response.body);
-        var result = data?.map((e) => cJobs_recruiter.fromJson(e)).toList() ?? [];
+        var result = data?.map((e) => cJobs_recruiter.fromJson(e)).where((e) => e.DeletedAt == null && e.ExpiredAt.isAfter(DateTime.now())).toList() ?? [];
         result.sort((a, b) => b.PostedAt.compareTo(a.PostedAt));
         return result;
       } else {

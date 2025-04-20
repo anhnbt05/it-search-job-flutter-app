@@ -5,27 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9312053-9e5e-49bf-8451-898f90d1f6f0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/ReadResumeScreen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/it-search-job-app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/it-search-job-app.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/ Constants/api_constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ Constants/api_constants.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Helpers/toastification.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Helpers/toastification.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Models/Applications.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Models/Applications.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Services/api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/api_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Services/application_recruiter_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/application_recruiter_service.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/Services/job_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/job_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/CandidatesAppliesViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/CandidatesAppliesViewModel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/CandidatesAppliedView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/CandidatesAppliedView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/recruiter.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/recruiter.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/ui/linux/flutter/generated_plugins.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ui/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/ui/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/ui/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/ReadResumeScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/ReadResumeScreen.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +42,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Flutter.main.dart.executor": "Run",
+    "Flutter.main.dart.executor": "Debug",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",

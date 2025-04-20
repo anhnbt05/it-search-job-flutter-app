@@ -53,38 +53,84 @@ Widget CandidatesAppliedScreen(BuildContext context, CandidatesAppliesViewModel 
 }
 
 Widget JobItem(BuildContext context, int index, List<cJobs_recruiter?> jobs, List<cApplications_recruiter>? applications) {
+  bool hasNewApplications = (applications == null || applications.isEmpty) ? false : applications.any((application) => application.Status == 'pending');
   return Padding(
     padding: const EdgeInsets.only(top: 12.0, left: 8.0, right: 8.0),
     child: Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: Colors.grey.shade100,
-          width: 2,
+          color: (hasNewApplications) ? Colors.grey.shade500 : Colors.grey.shade100,
+          width: (hasNewApplications) ? 1 : 2,
         ),
         borderRadius: BorderRadius.circular(8),
-        color: (applications == null || applications.isEmpty) ? Colors.grey.shade100 : Colors.white,
+        color: Colors.white,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+        ),
+        child: ExpansionTile(
+          title: Padding(
+            padding: const EdgeInsets.all(0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  jobs[index]!.Title.toString(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16
+                  ),
+                ),
+
+                Text(
+                  "${jobs[index]!.PostedAt.day.toString().padLeft(2, '0')}/${jobs[index]!.PostedAt.month.toString().padLeft(2, '0')}/${jobs[index]!.PostedAt.year} - ${jobs[index]!.ExpiredAt.day.toString().padLeft(2, '0')}/${jobs[index]!.ExpiredAt.month.toString().padLeft(2, '0')}/${jobs[index]!.ExpiredAt.year}",
+                  style: TextStyle(
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          initiallyExpanded: hasNewApplications,
+          shape: Border.all(style: BorderStyle.none),
+          controlAffinity: ListTileControlAffinity.leading,
+          iconColor: Colors.black,
+          collapsedIconColor: Colors.black,
           children: [
-            Text(
-              jobs[index]!.Title.toString(),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 17
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text.rich(
+                TextSpan(
+                  text: "Số ứng viên được duyệt: ",
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: "${(applications == null || applications.isEmpty)
+                          ? "0"
+                          : applications
+                          .where((application) => application.Status == 'accepted')
+                          .length}/${jobs[index]!.Vacancies}",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' người ',
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-
-            Text(
-              "${jobs[index]!.PostedAt.day.toString().padLeft(2, '0')}/${jobs[index]!.PostedAt.month.toString().padLeft(2, '0')}/${jobs[index]!.PostedAt.year}"
-            ),
-
-            SizedBox(
-              height: (applications == null || applications.isEmpty) ? 0 : 10,
-            ),
-
+            SizedBox(height: 5,),
             CandidateApplied_list(index, applications),
           ],
         ),
@@ -95,16 +141,13 @@ Widget JobItem(BuildContext context, int index, List<cJobs_recruiter?> jobs, Lis
 
 Widget CandidateApplied_list(int index, List<cApplications_recruiter>? applications) {
   if (applications == null || applications.isEmpty) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Center(
+    return Center(
         child: Text(
           'Chưa có ứng viên nào ứng tuyển vào vị trí này',
           style: TextStyle(
             fontSize: 12,
           ),
         )
-      ),
     );
   }
   return ListView.builder(
@@ -117,103 +160,103 @@ Widget CandidateApplied_list(int index, List<cApplications_recruiter>? applicati
 }
 
 Widget CandidateApplied(int index, cApplications_recruiter application, BuildContext context) {
-  return
-    ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: (application.Status == 'pending') ? Color(0x109E9E9E) : Colors.white,
-          border: Border(
-            left: BorderSide(
-              color: (application.Status == 'pending')
-                  ? Colors.transparent
-                  : (application.Status == 'accepted')
-                  ? Colors.green
-                  : Colors.red,
-              width: 3,
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 5, left: 5, right: 5),
+    child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: (application.Status == 'pending') ? Color(0x109E9E9E) : Colors.white,
+            border: Border(
+              left: BorderSide(
+                color: (application.Status == 'pending')
+                    ? Colors.transparent
+                    : (application.Status == 'accepted')
+                    ? Colors.green
+                    : Colors.red,
+                width: 3,
+              ),
+
+
             ),
-
-
           ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Image.network(application.Candidate.AvatarUrl, width: MediaQuery
-                .of(context)
-                .size
-                .width / 10, height: MediaQuery
-                .of(context)
-                .size
-                .width / 10),
-            SizedBox(width: MediaQuery
-                .of(context)
-                .size
-                .width / 60),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        application.Candidate.FullName.toString(),
-                        style: TextStyle(
-                          fontSize: 15,
-                        ),
-                      ),
-
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Color(0x60bbdefb),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 1),
-                          child: Text(
-                            '${application.AppliedAt.day.toString().padLeft(
-                                2, '0')}/${application.AppliedAt.month
-                                .toString().padLeft(2, '0')}/${application
-                                .AppliedAt.year}',
-                            style: TextStyle(
-                              fontSize: 12,
-                            ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Image.network(application.Candidate.AvatarUrl, width: MediaQuery
+                  .of(context)
+                  .size
+                  .width / 10, height: MediaQuery
+                  .of(context)
+                  .size
+                  .width / 10),
+              SizedBox(width: MediaQuery
+                  .of(context)
+                  .size
+                  .width / 60),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          application.Candidate.FullName.toString(),
+                          style: TextStyle(
+                            fontSize: 15,
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                ],
+
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Color(0x60bbdefb),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 1),
+                            child: Text(
+                              '${application.AppliedAt.day.toString().padLeft(
+                                  2, '0')}/${application.AppliedAt.month
+                                  .toString().padLeft(2, '0')}/${application
+                                  .AppliedAt.year}',
+                              style: TextStyle(
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(
-                    builder: (context) => ReadResumeScreen(
-                        application.Candidate.FullName, application.ResumeUrl, application.ID, application.Status, Provider.of<CandidatesAppliesViewModel>(context)
-                    )
-                )
-                );
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context, MaterialPageRoute(
+                      builder: (context) => ReadResumeScreen(
+                          application.Candidate.FullName, application.ResumeUrl, application.ID, application.Status, Provider.of<CandidatesAppliesViewModel>(context)
+                      )
+                  )
+                  );
+                },
+                icon: Icon(Icons.article_outlined),
+                padding: EdgeInsets.zero,
+              ),
 
-
-              },
-              icon: Icon(Icons.article_outlined),
-              padding: EdgeInsets.zero,
-            ),
-
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.remove_red_eye_outlined),
-              padding: EdgeInsets.zero,
-            )
-          ],
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.remove_red_eye_outlined),
+                padding: EdgeInsets.zero,
+              )
+            ],
+          ),
         ),
       ),
-    );
+  );
 }

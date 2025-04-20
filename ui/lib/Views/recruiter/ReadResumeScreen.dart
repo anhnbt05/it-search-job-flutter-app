@@ -51,7 +51,9 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
 
 
 PreferredSize? displaySelection({required BuildContext context, required CandidatesAppliesViewModel viewModel, required String Id, required String status}) {
-  if (status != 'pending') return null; else {
+  if (status != 'pending') {
+    return null;
+  } else {
     return PreferredSize(
     preferredSize: Size.fromHeight(40),
     child: Container(
