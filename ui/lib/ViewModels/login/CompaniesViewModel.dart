@@ -16,13 +16,8 @@ class CompaniesViewModel extends ChangeNotifier {
     notifyListeners();
 
     final result = await _service.companies();
-
     if (result.success) {
-      companies = result.data != null
-          ? (result.data as List)
-          .map((item) => cCompanies.fromJson(item))
-          .toList()
-          : [];
+      companies = result.data as List<cCompanies>;
       errorMessage = null;
     } else {
       errorMessage = result.message;
@@ -37,13 +32,8 @@ class CompaniesViewModel extends ChangeNotifier {
     notifyListeners();
 
     final result = await _service.fetchBranches(companyId);
-
     if (result.success) {
-      branches = result.data != null
-          ? (result.data as List)
-          .map((e) => cCompanyLocations.fromJson(e))
-          .toList()
-          : [];
+      branches = result.data as List<cCompanyLocations>;
       errorMessage = null;
     } else {
       errorMessage = result.message;

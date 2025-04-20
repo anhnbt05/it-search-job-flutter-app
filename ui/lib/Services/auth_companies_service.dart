@@ -15,20 +15,14 @@ class AuthCompaniesService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
-
-        List<cCompanies> companyList =
+        final List<cCompanies> companyList =
         jsonData.map((item) => cCompanies.fromJson(item)).toList();
-
-        print("Danh sách công ty:");
-        for (var company in companyList) {
-          print("- ID: ${company.ID}, Name: ${company.Name}");
-        }
 
         return ResponseModel(
           success: true,
           message: "Thành công",
           messageList: ["Thành công"],
-          data: companyList, // trả về danh sách object luôn
+          data: companyList,
         );
       } else {
         return ResponseModel(
@@ -47,15 +41,13 @@ class AuthCompaniesService {
   }
 
   Future<ResponseModel> fetchBranches(String companyId) async {
-    print("Đang lấy chi nhánh cho companyId = $companyId");
     try {
       final response =
       await http.get(Uri.parse("$_baseUrl/auth/companies/$companyId/branches"));
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
-
-        List<cCompanyLocations> branches =
+        final List<cCompanyLocations> branches =
         jsonData.map((item) => cCompanyLocations.fromJson(item)).toList();
 
         return ResponseModel(

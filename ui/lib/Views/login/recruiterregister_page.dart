@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../Models/CompanyLocations.dart';
 import '../../Models/Companies.dart';
 import '../../ViewModels/login/CompaniesViewModel.dart';
@@ -25,13 +24,11 @@ class RecruiterRegisterPage extends StatefulWidget {
 class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
   final TextEditingController _positionController = TextEditingController();
   final TextEditingController _companyNameController = TextEditingController();
-  final TextEditingController _companyWebsiteController =
-  TextEditingController();
+  final TextEditingController _companyWebsiteController = TextEditingController();
 
   List<cCompanyLocations> locations = [];
   String? selectedCompanyId;
   String? selectedLocationId;
-
   bool showAddCompanyForm = false;
 
   @override
@@ -45,20 +42,22 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
     await vm.fetchBranches(companyId);
     setState(() {
       locations = vm.branches;
+      selectedLocationId = null;
     });
   }
 
   void addCompany() async {
-    final newCompanyId = "999";
+    final newCompanyId = "999"; // Dummy ID
     setState(() {
       selectedCompanyId = newCompanyId;
       showAddCompanyForm = false;
+      locations = [];
+      selectedLocationId = null;
     });
-    fetchLocations(newCompanyId);
   }
 
-  void createBranch() async {
-    final newLocationId = "555";
+  void createBranch() {
+    final newLocationId = "555"; // Dummy ID
     setState(() {
       selectedLocationId = newLocationId;
     });
@@ -75,7 +74,6 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
       "companyId": selectedCompanyId,
       "companyLocationId": selectedLocationId,
     };
-
     print("Gửi đăng ký: $payload");
   }
 
@@ -87,16 +85,16 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
 
     return Column(
       children: vm.companies.map((company) {
-        final idStr = company.ID ?? "";
+        final id = company.ID ?? "";
         return RadioListTile<String>(
-          value: idStr,
+          value: id,
           groupValue: selectedCompanyId,
           title: Text(company.Name ?? "Không tên"),
           onChanged: (value) {
             setState(() {
               selectedCompanyId = value;
-              if (value != null) fetchLocations(value);
             });
+            if (value != null) fetchLocations(value);
           },
         );
       }).toList(),
@@ -105,6 +103,8 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final showBranchDropdown = selectedCompanyId != null && locations.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(title: Text("Đăng ký nhà tuyển dụng")),
       body: SingleChildScrollView(
@@ -112,10 +112,7 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: _positionController,
-              decoration: InputDecoration(labelText: 'Vị trí công việc'),
-            ),
+            TextField(controller: _positionController, decoration: InputDecoration(labelText: 'Vị trí công việc')),
             SizedBox(height: 20),
             Text("Chọn công ty"),
             buildCompaniesList(),
@@ -132,18 +129,20 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
                 children: [
                   TextField(controller: _companyNameController, decoration: InputDecoration(labelText: "Tên công ty")),
                   TextField(controller: _companyWebsiteController, decoration: InputDecoration(labelText: "Website")),
-                  ElevatedButton(onPressed: addCompany, child: Text("Tạo công ty"))
+                  ElevatedButton(onPressed: addCompany, child: Text("Tạo công ty")),
                 ],
               ),
             SizedBox(height: 20),
-            if (selectedCompanyId != null) ...[
+            if (showBranchDropdown) ...[
               Text("Chọn chi nhánh"),
               DropdownButton<String>(
                 value: selectedLocationId,
                 hint: Text("Chọn chi nhánh"),
+                isExpanded: true,
                 items: locations.map((loc) {
+                  final id = loc.LocationID ?? "";
                   return DropdownMenuItem<String>(
-                    value: loc.LocationID ?? "",
+                    value: id,
                     child: Text(loc.BranchName ?? "Không tên"),
                   );
                 }).toList(),
@@ -153,7 +152,7 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
                   });
                 },
               ),
-              TextButton(onPressed: createBranch, child: Text("Tạo chi nhánh mới"))
+              TextButton(onPressed: createBranch, child: Text("Tạo chi nhánh mới")),
             ],
             SizedBox(height: 30),
             ElevatedButton(
