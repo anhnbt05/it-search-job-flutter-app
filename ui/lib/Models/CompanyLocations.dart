@@ -21,14 +21,14 @@ class cCompanyLocations {
 
   factory cCompanyLocations.fromJson(Map<String, dynamic> json) {
     return cCompanyLocations(
-      ID: json['ID'],
+      ID: json['ID']?.toString(),
       BranchName: json['BranchName'],
       Address: json['Address'],
       CreatedAt: json['CreatedAt'] != null ? DateTime.parse(json['CreatedAt']) : null,
       UpdatedAt: json['UpdatedAt'] != null ? DateTime.parse(json['UpdatedAt']) : null,
       DeletedAt: json['DeletedAt'] != null ? DateTime.tryParse(json['DeletedAt']) : null,
-      CompanyID: json['CompanyID'],
-      LocationID: json['LocationID'],
+      CompanyID: json['CompanyID']?.toString(),
+      LocationID: json['LocationID']?.toString(),
     );
   }
 }

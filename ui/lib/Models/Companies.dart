@@ -23,7 +23,7 @@ class cCompanies {
 
   factory cCompanies.fromJson(Map<String, dynamic> json) {
     return cCompanies(
-      ID: json['ID'],
+      ID: json['ID']?.toString(),
       Name: json['Name'],
       WebsiteUrl: json['WebsiteUrl'],
       LogoUrl: json['LogoUrl'],
