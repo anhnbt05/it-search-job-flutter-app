@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../Models/Companies.dart';
 import '../../Models/CompanyLocations.dart';
 import '../../Services/auth_companies_service.dart';
+import '../../Models/ResponseModel.dart';
 
 class CompaniesViewModel extends ChangeNotifier {
   final AuthCompaniesService _service = AuthCompaniesService();
@@ -41,5 +42,17 @@ class CompaniesViewModel extends ChangeNotifier {
 
     isLoading = false;
     notifyListeners();
+  }
+
+  Future<ResponseModel> addBranch({
+    required String companyId,
+    required String branchName,
+    required String address,
+  }) async {
+    return await _service.addBranch(
+      companyId: companyId,
+      branchName: branchName,
+      address: address,
+    );
   }
 }

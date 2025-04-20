@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../Models/CompanyLocations.dart';
 import '../../Models/Companies.dart';
 import '../../ViewModels/login/CompaniesViewModel.dart';
+import 'createbranch_page.dart';
 
 class RecruiterRegisterPage extends StatefulWidget {
   final String email;
@@ -56,11 +57,21 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
     });
   }
 
-  void createBranch() {
-    final newLocationId = "555"; // Dummy ID
-    setState(() {
-      selectedLocationId = newLocationId;
-    });
+  void createBranch() async {
+    if (selectedCompanyId == null) return;
+
+    final newBranch = await Navigator.push<cCompanyLocations>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CreateBranchPage(companyId: selectedCompanyId!),
+      ),
+    );
+    if (newBranch != null) {
+      setState(() {
+        locations.add(newBranch);
+        selectedLocationId = newBranch.LocationID;
+      });
+    }
   }
 
   void registerRecruiter() {

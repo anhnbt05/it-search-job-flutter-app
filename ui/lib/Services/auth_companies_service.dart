@@ -71,4 +71,22 @@ class AuthCompaniesService {
       );
     }
   }
+  Future<ResponseModel> addBranch({
+    required String companyId,
+    required String branchName,
+    required String address,
+  }) async {
+    final response = await http.post(
+      Uri.parse("$_baseUrl/auth/companies/$companyId/branches"),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        "BranchName": branchName,
+        "Address": address,
+      }),
+    );
+
+    final responseData = json.decode(response.body);
+    return ResponseModel.fromJson(responseData);
+  }
+
 }

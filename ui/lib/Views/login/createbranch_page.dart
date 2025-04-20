@@ -1,0 +1,78 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../ViewModels/login/CompaniesViewModel.dart';
+
+class CreateBranchPage extends StatefulWidget {
+  final String companyId;
+
+  const CreateBranchPage({required this.companyId});
+
+  @override
+  State<CreateBranchPage> createState() => _CreateBranchPageState();
+}
+
+class _CreateBranchPageState extends State<CreateBranchPage> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _branchNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+
+  bool isSubmitting = false;
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => isSubmitting = true);
+
+    final vm = Provider.of<CompaniesViewModel>(context, listen: false);
+    final response = await vm.addBranch(
+      companyId: widget.companyId,
+      branchName: _branchNameController.text,
+      address: _addressController.text,
+    );
+
+    setState(() => isSubmitting = false);
+
+    if (response.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Tạo chi nhánh thành công")),
+      );
+      Navigator.pop(context, true); // Trả về true để trigger reload danh sách
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Lỗi: ${response.message}")),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Tạo chi nhánh mới")),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _branchNameController,
+                decoration: InputDecoration(labelText: "Tên chi nhánh"),
+                validator: (value) => value!.isEmpty ? "Không được để trống" : null,
+              ),
+              TextFormField(
+                controller: _addressController,
+                decoration: InputDecoration(labelText: "Địa chỉ"),
+                validator: (value) => value!.isEmpty ? "Không được để trống" : null,
+              ),
+              SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: isSubmitting ? null : _submit,
+                child: isSubmitting ? CircularProgressIndicator() : Text("Tạo"),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
