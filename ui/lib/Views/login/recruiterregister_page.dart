@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../ViewModels/login/CompaniesViewModel.dart';
+import '../../Models/Companies.dart';
 
 class RecruiterRegisterPage extends StatefulWidget {
   final String email;
@@ -22,9 +26,7 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
   final TextEditingController _companyNameController = TextEditingController();
   final TextEditingController _companyWebsiteController = TextEditingController();
 
-  List<Map<String, dynamic>> companies = []; // [{id: , name: }]
-  List<Map<String, dynamic>> locations = []; // [{id: , name: }]
-
+  List<Map<String, dynamic>> locations = [];
   int? selectedCompanyId;
   int? selectedLocationId;
 
@@ -33,23 +35,10 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
   @override
   void initState() {
     super.initState();
-    fetchCompanies();
-  }
-
-  void fetchCompanies() async {
-    // Gọi API để lấy danh sách công ty
-    // fake sample
-    await Future.delayed(Duration(seconds: 1));
-    setState(() {
-      companies = [
-        {"id": 1, "name": "Công ty ABC"},
-        {"id": 2, "name": "Công ty XYZ"},
-      ];
-    });
+    Provider.of<CompaniesViewModel>(context, listen: false).fetchCompanies();
   }
 
   void fetchLocations(int companyId) async {
-    // Gọi API lấy danh sách chi nhánh theo công ty
     await Future.delayed(Duration(seconds: 1));
     setState(() {
       locations = [
@@ -60,9 +49,7 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
   }
 
   void addCompany() async {
-    // Gửi API tạo công ty mới
-    // sau khi tạo xong thì gán selectedCompanyId = newId và gọi lại fetchLocations
-    final newCompanyId = 999; // giả định gọi API trả về
+    final newCompanyId = 999;
     setState(() {
       selectedCompanyId = newCompanyId;
       showAddCompanyForm = false;
@@ -71,15 +58,13 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
   }
 
   void createBranch() async {
-    // Gọi API tạo chi nhánh → sau đó lấy lại danh sách chi nhánh
-    final newLocationId = 555; // giả định
+    final newLocationId = 555;
     setState(() {
       selectedLocationId = newLocationId;
     });
   }
 
   void registerRecruiter() {
-    // Tổng hợp dữ liệu và gửi API
     final payload = {
       "email": widget.email,
       "password": widget.password,
@@ -95,6 +80,35 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
     // Gọi API ở đây
   }
 
+  Widget buildCompaniesList() {
+    final companiesVM = Provider.of<CompaniesViewModel>(context);
+
+    if (companiesVM.isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (companiesVM.errorMessage != null) {
+      return Text("Lỗi: ${companiesVM.errorMessage}");
+    }
+
+    return Column(
+      children: companiesVM.companies.map((cCompanies company) {
+        return CheckboxListTile(
+          value: selectedCompanyId == int.tryParse(company.ID ?? ''),
+          title: Text(company.Name ?? "Không tên"),
+          onChanged: (_) {
+            setState(() {
+              selectedCompanyId = int.tryParse(company.ID ?? '');
+              if (selectedCompanyId != null) {
+                fetchLocations(selectedCompanyId!);
+              }
+            });
+          },
+        );
+      }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,20 +119,9 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(controller: _positionController, decoration: InputDecoration(labelText: 'Vị trí công việc')),
-
             const SizedBox(height: 20),
             Text("Chọn công ty"),
-            ...companies.map((company) => CheckboxListTile(
-              value: selectedCompanyId == company["id"],
-              title: Text(company["name"]),
-              onChanged: (_) {
-                setState(() {
-                  selectedCompanyId = company["id"];
-                  fetchLocations(company["id"]);
-                });
-              },
-            )),
-
+            buildCompaniesList(),
             TextButton(
               onPressed: () {
                 setState(() {
@@ -127,7 +130,6 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
               },
               child: Text(showAddCompanyForm ? "Ẩn form thêm công ty" : "Thêm công ty mới"),
             ),
-
             if (showAddCompanyForm)
               Column(
                 children: [
@@ -136,24 +138,22 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
                   ElevatedButton(onPressed: addCompany, child: Text("Tạo công ty"))
                 ],
               ),
-
             const SizedBox(height: 20),
             if (selectedCompanyId != null) ...[
               Text("Chọn chi nhánh"),
               DropdownButton<int>(
                 value: selectedLocationId,
                 hint: Text("Chọn chi nhánh"),
-                items: locations
-                    .map((loc) => DropdownMenuItem<int>(
-                  value: loc["id"],
-                  child: Text(loc["name"]),
-                ))
-                    .toList(),
+                items: locations.map((loc) {
+                  return DropdownMenuItem<int>(
+                    value: loc["id"],
+                    child: Text(loc["name"]),
+                  );
+                }).toList(),
                 onChanged: (value) => setState(() => selectedLocationId = value),
               ),
               TextButton(onPressed: createBranch, child: Text("Tạo chi nhánh mới"))
             ],
-
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: registerRecruiter,

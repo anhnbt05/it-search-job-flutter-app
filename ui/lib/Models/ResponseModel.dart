@@ -2,11 +2,13 @@ class ResponseModel {
   final bool success;
   final String message;
   final List<String> messageList;
+  final dynamic data;
 
   ResponseModel({
     required this.success,
     required this.message,
     required this.messageList,
+    this.data,
   });
 
   factory ResponseModel.fromJson(Map<String, dynamic> json) {
@@ -33,6 +35,7 @@ class ResponseModel {
       success: json['success'] == true,
       message: finalMessage,
       messageList: messages,
+      data: json['data'],
     );
   }
 }
