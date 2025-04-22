@@ -1,28 +1,15 @@
-import { Type } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-import {
-  CreateCompanyDto,
-  CreateExistingCompanyDto,
-} from 'src/modules/users/dtos';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class CreateRecruiterDto {
   @IsString({ message: 'Vị trí của bạn phải là dạng chuỗi.' })
   @IsNotEmpty({ message: 'Vị trí của bạn không được để trống.' })
   readonly Position!: string;
 
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => CreateExistingCompanyDto)
-  readonly createExistingCompanyDto?: CreateExistingCompanyDto;
+  @IsUUID('4', { message: 'Mã định danh của công ty phải ở dạng UUID.' })
+  readonly companyID!: string;
 
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => CreateCompanyDto)
-  @IsNotEmpty()
-  readonly createCompanyDto?: CreateCompanyDto;
+  @IsUUID('4', {
+    message: 'Mã định danh của địa điểm công ty phải ở dạng UUID.',
+  })
+  readonly companyLocationID!: string;
 }

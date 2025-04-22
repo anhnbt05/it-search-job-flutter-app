@@ -583,10 +583,13 @@ export class JobsService {
         })
         .eq('ID', jobId);
 
-      if (error)
+      if (error) {
+        console.error(error);
+
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi khi cập nhật công việc.',
         );
+      }
 
       if (Descriptions && Descriptions.length) {
         await this.handleSyncJobDetails(
@@ -701,7 +704,13 @@ export class JobsService {
           .eq('UserID', userId)
           .maybeSingle<Recruiters>();
 
-        if (error) throw error;
+        if (error) {
+          console.error(error);
+
+          throw new InternalServerErrorException(
+            'Đã xảy ra lỗi khi lấy thông tin nhà tuyển dụng.',
+          );
+        }
 
         if (!recruiter)
           throw new NotFoundException(
@@ -827,10 +836,13 @@ export class JobsService {
           : (items as RejectedJobStatusDto[]).map((j) => j.jobId),
       );
 
-    if (error)
+    if (error) {
+      console.error(error);
+
       throw new InternalServerErrorException(
         'Đã xảy ra lỗi khi cập nhật trạng thái của công việc.',
       );
+    }
   };
 
   public handleCreateJobFavorites = async (
@@ -904,10 +916,13 @@ export class JobsService {
             .delete()
             .match({ JobID: jobId, CandidateID: data.ID });
 
-          if (error)
+          if (error) {
+            console.error(error);
+
             throw new InternalServerErrorException(
               'Đã xảy ra lỗi khi xoá công việc đã lưu.',
             );
+          }
         }),
       );
 
