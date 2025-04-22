@@ -13,3 +13,4 @@ class cCompanyLocations {
   cLocations? Location;
   List<cRecruiterPost>? Recruiters;
 }
+

@@ -33,8 +33,8 @@ void main() {
         ChangeNotifierProvider(create: (context) => CandidatesAppliesViewModel()),
       ],
       child: MyApp(),
+      ),
     ),
-  )
   );
 }
 
