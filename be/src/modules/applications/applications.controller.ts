@@ -265,7 +265,7 @@ export class ApplicationsController {
       example1: {
         summary: 'Trường hợp chỉ gửi đi những đơn ứng tuyển mà chấp thuận.',
         value: {
-          openApplicationIds: ['e9a4b957-3e7e-48c8-b88e-fd26d83ea76c'],
+          acceptedApplicationIds: ['e9a4b957-3e7e-48c8-b88e-fd26d83ea76c'],
         },
       },
       example2: {
@@ -291,7 +291,7 @@ export class ApplicationsController {
                 'Chưa đáp ứng đầy đủ các tiêu chí kỹ thuật mà công ty đang tìm kiếm cho vị trí Backend Junior.',
             },
           ],
-          openApplicationIds: [
+          acceptedApplicationIds: [
             '15e09a20-11da-416f-a6b7-5789f55c8522',
             '12bfb97c-a3d1-404c-8002-045e5417ef39',
           ],
