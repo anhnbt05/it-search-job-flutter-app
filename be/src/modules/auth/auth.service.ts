@@ -9,13 +9,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  Categories,
-  Companies,
-  CompanyLocations,
-  Role,
-  Users,
-} from '@prisma/client';
+import { Categories, CompanyLocations, Role, Users } from '@prisma/client';
 import { SupabaseClient, User } from '@supabase/supabase-js';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import {
@@ -114,14 +108,22 @@ export class AuthService {
 
       const { data: userData, error: dbError } = await this.adminSupabaseClient
         .from('Users')
-        .insert([
+        .upsert(
+          [
+            {
+              ...res,
+              ID: data.user.id,
+              Password: hashedPassword,
+              AvatarUrl: this.configService.get<string>(
+                'default_logo_user',
+                '',
+              ),
+            },
+          ],
           {
-            ...res,
-            ID: data.user.id,
-            Password: hashedPassword,
-            AvatarUrl: this.configService.get<string>('default_logo_user', ''),
+            onConflict: 'Email',
           },
-        ])
+        )
         .select('*')
         .single<Users>();
 
@@ -135,31 +137,43 @@ export class AuthService {
       }
 
       if (Role === RoleEnum.RECRUITER && createRecruiterDto) {
-        const { createCompanyDto, createExistingCompanyDto, Position } =
-          createRecruiterDto;
+        const { Position, companyID, companyLocationID } = createRecruiterDto;
 
-        if (createCompanyDto && createExistingCompanyDto)
-          throw new BadRequestException(
-            'Bạn phải cung cấp hoặc createExistingCompanyDto hoặc createCompanyDto, chứ không phải cả hai.',
+        const { data: company } = await this.anonSupabaseClient
+          .from('Companies')
+          .select('*, CompanyLocations(*)')
+          .eq('ID', companyID)
+          .maybeSingle<any>();
+
+        if (!company)
+          throw new NotFoundException(
+            `Không tìm thấy công ty có id '${companyID}' trong hệ thống.`,
           );
 
-        let createCompanyLocationId = '';
+        const { data: companyLocation } = await this.anonSupabaseClient
+          .from('CompanyLocations')
+          .select('*')
+          .eq('ID', companyLocationID)
+          .maybeSingle<CompanyLocations>();
 
-        if (createExistingCompanyDto) {
-          const { companyLocationID } = createExistingCompanyDto;
+        if (!companyLocation)
+          throw new NotFoundException(
+            `Không tìm thấy chi nhánh công ty có id '${companyLocationID}' trong hệ thống.`,
+          );
 
-          createCompanyLocationId = companyLocationID;
-        } else if (createCompanyDto) {
-          const { companyLocationId } =
-            await this.createCompany(createCompanyDto);
-
-          createCompanyLocationId = companyLocationId;
-        }
+        if (
+          company.CompanyLocations.map((cl: any) => cl.ID)?.includes(
+            companyLocationID,
+          )
+        )
+          throw new BadRequestException(
+            `Chi nhánh '${companyLocation.BranchName}' không thuộc về công ty '${company.Name}'`,
+          );
 
         await this.createRecruiterUser(
           userData.ID,
           Position,
-          createCompanyLocationId,
+          companyLocationID,
         );
       }
 
@@ -319,10 +333,13 @@ export class AuthService {
           refresh_token: refreshToken,
         });
 
-      if (error)
+      if (error) {
+        console.error(error);
+
         throw new UnauthorizedException(
           'Bạn đã cung cấp refresh token hết hạn. Vui lòng đăng nhập lại để nhận refresh token mới.',
         );
+      }
 
       return {
         accessToken: data?.session?.access_token,
@@ -449,10 +466,13 @@ export class AuthService {
         .from('Locations')
         .select('ID, Name');
 
-      if (error)
+      if (error) {
+        console.error(error);
+
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi trong quá trình lấy ra các tỉnh thành. Vui lòng thử lại.',
         );
+      }
 
       return data;
     } catch (err) {
@@ -467,10 +487,13 @@ export class AuthService {
         .from('Companies')
         .select('ID, Name');
 
-      if (error)
+      if (error) {
+        console.error(error);
+
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi trong quá trình lấy ra tên các công ty. Vui lòng thử lại sau.',
         );
+      }
 
       return data;
     } catch (err) {
@@ -693,31 +716,31 @@ export class AuthService {
         'Thông tin nhà tuyển dụng phải được cung cấp khi đăng ký làm nhà tuyển dụng.',
       );
     }
-
-    if (
-      role === RoleEnum.RECRUITER &&
-      createRecruiterDto &&
-      !createRecruiterDto?.createExistingCompanyDto &&
-      !createRecruiterDto?.createCompanyDto
-    )
-      throw new BadRequestException('Vui lòng cung cấp thông tin về công ty.');
   }
 
   private createCandidateUser = async (
     userId: string,
     createCandidateDto: CreateCandidateDto,
   ) => {
-    const { error } = await this.adminSupabaseClient.from('Candidates').insert([
+    const { error } = await this.adminSupabaseClient.from('Candidates').upsert(
+      [
+        {
+          ...createCandidateDto,
+          UserID: userId,
+        },
+      ],
       {
-        ...createCandidateDto,
-        UserID: userId,
+        onConflict: 'UserID',
       },
-    ]);
+    );
 
-    if (error)
+    if (error) {
+      console.error(error);
+
       throw new InternalServerErrorException(
         'Đã xảy ra lỗi khi đăng ký tài khoản ứng viên.',
       );
+    }
   };
 
   private createRecruiterUser = async (
@@ -725,40 +748,58 @@ export class AuthService {
     position: string,
     companyLocationId: string,
   ) => {
-    const { error } = await this.adminSupabaseClient.from('Recruiters').insert([
+    const { error } = await this.adminSupabaseClient.from('Recruiters').upsert(
+      [
+        {
+          Position: position,
+          UserID: userId,
+          CompanyLocationID: companyLocationId,
+        },
+      ],
       {
-        Position: position,
-        UserID: userId,
-        CompanyLocationID: companyLocationId,
+        onConflict: 'UserID',
       },
-    ]);
+    );
 
-    if (error)
+    if (error) {
+      console.error(error);
+
       throw new InternalServerErrorException(
         'Đã xảy ra lỗi khi đăng ký tài khoản nhà tuyển dụng.',
       );
+    }
   };
 
-  private createCompany = async (createCompanyDto: CreateCompanyDto) => {
+  public createCompany = async (createCompanyDto: CreateCompanyDto) => {
     const { createCompanyLocationDto, ...res } = createCompanyDto;
 
     const { data, error } = await this.adminSupabaseClient
       .from('Companies')
-      .insert([res])
-      .select('*')
-      .single<Companies | null>();
+      .upsert([res], {
+        onConflict: 'Name',
+      })
+      .select('*, CompanyLocations(*)')
+      .single<any>();
 
-    if (error) throw error;
+    if (error || !data) {
+      console.error(error);
 
-    const companyLocationId = await this.createCompanyLocation(
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi tạo mới công ty.',
+      );
+    }
+
+    await this.createCompanyLocation(
       createCompanyLocationDto,
-      (data as Companies).ID,
+      data.ID as string,
     );
 
-    return {
-      company: data as Companies,
-      companyLocationId,
-    };
+    return (
+      await this.anonSupabaseClient
+        .from('Companies')
+        .select('*, CompanyLocations(*)')
+        .eq('Name', res.Name)
+    )?.data;
   };
 
   private createCompanyLocation = async (
@@ -767,24 +808,28 @@ export class AuthService {
   ) => {
     const { LocationID, ...res } = createCompanyLocationDto;
 
-    const { data, error } = await this.adminSupabaseClient
+    const { error } = await this.adminSupabaseClient
       .from('CompanyLocations')
-      .insert([
+      .upsert(
+        [
+          {
+            ...res,
+            CompanyID: companyId,
+            LocationID,
+          },
+        ],
         {
-          ...res,
-          CompanyID: companyId,
-          LocationID,
+          onConflict: 'BranchName, CompanyID',
         },
-      ])
-      .select('*')
-      .maybeSingle<CompanyLocations>();
+      );
 
-    if (error || !data)
+    if (error) {
+      console.error(error);
+
       throw new InternalServerErrorException(
         'Đã xảy ra lỗi khi tạo mới chi nhánh làm việc của công ty.',
       );
-
-    return data.ID;
+    }
   };
 
   public handleGetBranchesOfCompany = async (companyId: string) => {
@@ -876,7 +921,13 @@ export class AuthService {
         .eq('CategoryName', CategoryName)
         .maybeSingle<Categories>();
 
-      if (error) throw error;
+      if (error) {
+        console.error(error);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy thông tin các danh mục công việc.',
+        );
+      }
 
       if (data)
         throw new BadRequestException(
@@ -891,10 +942,13 @@ export class AuthService {
           },
         ]);
 
-      if (insertCategoryError)
+      if (insertCategoryError) {
+        console.error(insertCategoryError);
+
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi khi thêm danh mục công việc mới vào hệ thống.',
         );
+      }
 
       return this.jobsService.handleGetCategories();
     } catch (err) {

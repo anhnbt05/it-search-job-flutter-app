@@ -34,7 +34,10 @@ import {
   VerifyEmailDto,
   VerifyResetPasswordOtpDto,
 } from 'src/modules/auth/dtos';
-import { CreateCompanyLocationDto } from 'src/modules/users/dtos';
+import {
+  CreateCompanyDto,
+  CreateCompanyLocationDto,
+} from 'src/modules/users/dtos';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -143,7 +146,7 @@ export class AuthController {
         },
       },
       recruiter: {
-        summary: 'Dữ liệu mẫu 1 cho việc đăng ký nhà tuyển dụng mới.',
+        summary: 'Dữ liệu mẫu cho việc đăng ký nhà tuyển dụng mới.',
         value: {
           Email: 'recruiter@gmail.com',
           Password: 'StrongPassword123',
@@ -153,30 +156,7 @@ export class AuthController {
           createRecruiterDto: {
             Position: 'Nhân sự',
             companyID: '550e8400-e29b-41d4-a716-446655440000',
-          },
-        },
-      },
-      recruiter1: {
-        summary: 'Dữ liệu mẫu 2 cho việc đăng ký nhà tuyển dụng mới.',
-        value: {
-          Email: 'recruiter@example.com',
-          Password: 'StrongPassword123',
-          FullName: 'Lê Văn Nam',
-          PhoneNumber: '+84393873632',
-          Role: 'recruiter',
-          createRecruiterDto: {
-            Position: 'Trưởng phòng nhân sự',
-            createCompanyDto: {
-              Name: 'Công ty Công nghệ ABC',
-              WebsiteUrl: 'https://techcorp.com',
-              Description: 'Công ty đứng đầu về công nghệ tại Việt Nam',
-              createCompanyLocationDto: {
-                BranchName: 'Trụ sở chính',
-                Address:
-                  '1234 Khu phố 1, Đường Phạm Văn Đồng, Thành phố Hồ Chí Minh, Việt Nam.',
-                LocationID: 'c12a45f7-9b32-4c3d-b589-8dfaa2a2c55e',
-              },
-            },
+            companyLocationID: '550e8400-e29b-41d4-a716-446655440000',
           },
         },
       },
@@ -480,6 +460,62 @@ export class AuthController {
     @Param('companyId', ParseUUIDPipe) companyId: string,
   ) {
     return this.authService.handleGetBranchesOfCompany(companyId);
+  }
+
+  @Post('companies')
+  @ApiOperation({
+    summary: 'Tạo mới công ty',
+    description: 'Đường dẫn này dùng để tạo mới một công ty trong hệ thống.',
+  })
+  @ApiBody({
+    description: 'Dữ liệu cần gửi đi để tạo mới một công ty.',
+    schema: {
+      example: {
+        Name: 'Công ty Phát triển Phần mềm XYZ',
+        WebsiteUrl: 'https://www.xyzsoftware.vn',
+        Description:
+          'Cung cấp dịch vụ phát triển phần mềm và giải pháp công nghệ thông tin cho doanh nghiệp.',
+        createCompanyLocationDto: {
+          BranchName: 'Chi nhánh Hà Nội',
+          Address:
+            'Tầng 10, Tòa nhà IT Center, 45 Đường Trần Thái Tông, Quận Cầu Giấy, Hà Nội',
+          LocationID: '123f7d52-dfc9-480c-9352-6b57a708f95f',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: [
+        {
+          ID: 'ba21cc34-bc28-464e-b1d2-0e0943869ef4',
+          Name: 'Công ty Phát triển Phần mềm XYZ',
+          WebsiteUrl: 'https://www.xyzsoftware.vn',
+          LogoUrl: null,
+          Description:
+            'Cung cấp dịch vụ phát triển phần mềm và giải pháp công nghệ thông tin cho doanh nghiệp.',
+          CreatedAt: '2025-04-22T17:58:13.75',
+          UpdatedAt: '2025-04-22T17:58:13.75',
+          CompanyLocations: [
+            {
+              ID: '6a0b5391-d73f-4090-aa79-081e5645f52b',
+              Address:
+                'Tầng 10, Tòa nhà IT Center, 45 Đường Trần Thái Tông, Quận Cầu Giấy, Hà Nội',
+              CompanyID: 'ba21cc34-bc28-464e-b1d2-0e0943869ef4',
+              CreatedAt: '2025-04-22T17:58:13.85',
+              DeletedAt: null,
+              UpdatedAt: '2025-04-22T17:58:13.85',
+              BranchName: 'Chi nhánh Hà Nội',
+              LocationID: '123f7d52-dfc9-480c-9352-6b57a708f95f',
+            },
+          ],
+        },
+      ],
+    },
+  })
+  async createCompany(@Body() createCompanyDto: CreateCompanyDto) {
+    return this.authService.createCompany(createCompanyDto);
   }
 
   @Post('companies/:companyId/branches')
