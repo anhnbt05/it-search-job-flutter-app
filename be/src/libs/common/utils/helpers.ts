@@ -63,6 +63,31 @@ export const handleFormatUserNotificationContent = (
       ];
     }
 
+    case NotificationType.recruiter_job_expiring_soon: {
+      const expiredAtFormatted = metadata.jobExpiredAt
+        ? format(new Date(metadata.jobExpiredAt as string), 'dd/MM/yyyy')
+        : 'không xác định';
+
+      return [
+        `Công việc "${metadata.jobTitle || 'không rõ'}" của bạn sẽ hết hạn vào ngày ${expiredAtFormatted}.`,
+        `Bạn có thể kéo dài thêm thời gian hết hạn hoặc đóng công việc lại nếu cần thiết.`,
+      ];
+    }
+
+    case NotificationType.recruiter_job_expired: {
+      return [
+        `Công việc "${metadata.jobTitle || 'không rõ'}" của bạn đã bị đóng do hết hạn đăng tuyển.`,
+        `Bạn có thể cân nhắc xoá công việc này nếu cần thiết.`,
+      ];
+    }
+
+    case NotificationType.candidate_job_closed: {
+      return [
+        `Công việc "${metadata.jobTitle || 'không rõ'}" mà bạn đã ứng tuyển hiện đã ngừng hiển thị do đã tuyển đủ số lượng ứng viên.`,
+        `Bạn có thể khám phá thêm các công việc khác phù hợp trên hệ thống.`,
+      ];
+    }
+
     default:
       return [
         'Bạn có một thông báo mới, vui lòng kiểm tra để biết thêm chi tiết.',

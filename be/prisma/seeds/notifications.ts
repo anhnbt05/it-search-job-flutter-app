@@ -25,4 +25,16 @@ export const Notifications: Array<{ Title: string; Type: NotificationType }> = [
     Title: 'Có ứng viên mới ứng tuyển bài đăng của bạn',
     Type: NotificationType.recruiter_new_application,
   },
+  {
+    Title: 'Tin tuyển dụng của bạn sắp hết hạn',
+    Type: NotificationType.recruiter_job_expiring_soon,
+  },
+  {
+    Title: 'Tin tuyển dụng của bạn đã hết hạn',
+    Type: NotificationType.recruiter_job_expired,
+  },
+  {
+    Title: 'Công việc bạn đã ứng tuyển hiện không còn hoạt động',
+    Type: NotificationType.candidate_job_closed,
+  },
 ];

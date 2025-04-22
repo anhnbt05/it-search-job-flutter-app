@@ -136,8 +136,8 @@ async function main() {
 
   if (Notifications.length) {
     await Promise.all(
-      Notifications.map(async ({ Title, Type }) =>
-        prisma.notifications.upsert({
+      Notifications.map(async ({ Title, Type }) => {
+        return await prisma.notifications.upsert({
           where: {
             Type,
           },
@@ -148,8 +148,8 @@ async function main() {
             Title,
             Type,
           },
-        }),
-      ),
+        });
+      }),
     );
   }
 }
