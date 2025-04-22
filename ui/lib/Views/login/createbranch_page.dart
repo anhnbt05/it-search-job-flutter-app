@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../Models/Provinces.dart';
 import '../../ViewModels/login/CompaniesViewModel.dart';
+import '../../ViewModels/login/ProvincesViewModel.dart';
 
 class CreateBranchPage extends StatefulWidget {
   final String companyId;
@@ -16,10 +18,17 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
   final TextEditingController _branchNameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
 
+  String? _selectedProvinceId;
   bool isSubmitting = false;
 
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<ProvincesViewModel>(context, listen: false).fetchProvinces();
+  }
+
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate() || _selectedProvinceId == null) return;
 
     setState(() => isSubmitting = true);
 
@@ -36,7 +45,7 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Tạo chi nhánh thành công")),
       );
-      Navigator.pop(context, true); // Trả về true để trigger reload danh sách
+      Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Lỗi: ${response.message}")),
@@ -46,6 +55,7 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final provinceVM = Provider.of<ProvincesViewModel>(context);
     return Scaffold(
       appBar: AppBar(title: Text("Tạo chi nhánh mới")),
       body: Padding(
@@ -63,6 +73,26 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
                 controller: _addressController,
                 decoration: InputDecoration(labelText: "Địa chỉ"),
                 validator: (value) => value!.isEmpty ? "Không được để trống" : null,
+              ),
+              SizedBox(height: 16),
+              provinceVM.isLoading
+                  ? CircularProgressIndicator()
+                  : DropdownButtonFormField<String>(
+                value: _selectedProvinceId,
+                decoration: InputDecoration(labelText: "Chọn Tỉnh/Thành"),
+                items: provinceVM.provinces
+                    .map((cProvinces provinces) => DropdownMenuItem<String>(
+                  value: provinces.id,
+                  child: Text(provinces.name),
+                ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedProvinceId = value;
+                  });
+                },
+                validator: (value) =>
+                value == null ? "Vui lòng chọn tỉnh/thành" : null,
               ),
               SizedBox(height: 24),
               ElevatedButton(

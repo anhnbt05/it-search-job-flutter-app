@@ -4,6 +4,7 @@ import '../../Models/CompanyLocations.dart';
 import '../../Models/Companies.dart';
 import '../../ViewModels/login/CompaniesViewModel.dart';
 import 'createbranch_page.dart';
+import 'createcompany_page.dart';
 
 class RecruiterRegisterPage extends StatefulWidget {
   final String email;
@@ -24,13 +25,10 @@ class RecruiterRegisterPage extends StatefulWidget {
 
 class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
   final TextEditingController _positionController = TextEditingController();
-  final TextEditingController _companyNameController = TextEditingController();
-  final TextEditingController _companyWebsiteController = TextEditingController();
 
   List<cCompanyLocations> locations = [];
   String? selectedCompanyId;
   String? selectedLocationId;
-  bool showAddCompanyForm = false;
 
   @override
   void initState() {
@@ -48,13 +46,23 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
   }
 
   void addCompany() async {
-    final newCompanyId = "999"; // Dummy ID
-    setState(() {
-      selectedCompanyId = newCompanyId;
-      showAddCompanyForm = false;
-      locations = [];
-      selectedLocationId = null;
-    });
+    final newCompany = await Navigator.push<cCompanies>(
+      context,
+      MaterialPageRoute(builder: (_) => CreateCompanyPage()),
+    );
+
+    if (newCompany != null && newCompany.ID != null) {
+      final newCompanyId = newCompany.ID!;
+      final newBranch = newCompany.CompanyLocations?.isNotEmpty == true
+          ? newCompany.CompanyLocations!.first
+          : null;
+
+      setState(() {
+        selectedCompanyId = newCompanyId;
+        selectedLocationId = newBranch?.LocationID;
+        locations = newBranch != null ? [newBranch] : [];
+      });
+    }
   }
 
   void createBranch() async {
@@ -86,6 +94,7 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
       "companyLocationId": selectedLocationId,
     };
     print("Gửi đăng ký: $payload");
+    // TODO: Gọi API tại đây nếu cần
   }
 
   Widget buildCompaniesList() {
@@ -123,26 +132,17 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(controller: _positionController, decoration: InputDecoration(labelText: 'Vị trí công việc')),
+            TextField(
+              controller: _positionController,
+              decoration: InputDecoration(labelText: 'Vị trí công việc'),
+            ),
             SizedBox(height: 20),
             Text("Chọn công ty"),
             buildCompaniesList(),
             TextButton(
-              onPressed: () {
-                setState(() {
-                  showAddCompanyForm = !showAddCompanyForm;
-                });
-              },
-              child: Text(showAddCompanyForm ? "Ẩn form thêm công ty" : "Thêm công ty mới"),
+              onPressed: addCompany,
+              child: Text("Thêm công ty mới"),
             ),
-            if (showAddCompanyForm)
-              Column(
-                children: [
-                  TextField(controller: _companyNameController, decoration: InputDecoration(labelText: "Tên công ty")),
-                  TextField(controller: _companyWebsiteController, decoration: InputDecoration(labelText: "Website")),
-                  ElevatedButton(onPressed: addCompany, child: Text("Tạo công ty")),
-                ],
-              ),
             SizedBox(height: 20),
             if (showBranchDropdown) ...[
               Text("Chọn chi nhánh"),
@@ -163,7 +163,10 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
                   });
                 },
               ),
-              TextButton(onPressed: createBranch, child: Text("Tạo chi nhánh mới")),
+              TextButton(
+                onPressed: createBranch,
+                child: Text("Tạo chi nhánh mới"),
+              ),
             ],
             SizedBox(height: 30),
             ElevatedButton(
