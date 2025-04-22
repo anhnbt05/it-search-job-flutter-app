@@ -131,7 +131,7 @@ Widget JobItem(BuildContext context, int index, List<cJobs_recruiter?> jobs, Lis
               ),
             ),
             SizedBox(height: 5,),
-            CandidateApplied_list(index, applications),
+            CandidateApplied_list(index, applications, jobs[index]!),
           ],
         ),
       ),
@@ -139,7 +139,7 @@ Widget JobItem(BuildContext context, int index, List<cJobs_recruiter?> jobs, Lis
   );
 }
 
-Widget CandidateApplied_list(int index, List<cApplications_recruiter>? applications) {
+Widget CandidateApplied_list(int index, List<cApplications_recruiter>? applications, cJobs_recruiter job) {
   if (applications == null || applications.isEmpty) {
     return Center(
         child: Text(
@@ -155,11 +155,11 @@ Widget CandidateApplied_list(int index, List<cApplications_recruiter>? applicati
       physics: NeverScrollableScrollPhysics(),
       itemCount: applications.length,
       itemBuilder: (context, index) {
-        return CandidateApplied(index, applications[index], context);
+        return CandidateApplied(index, applications[index], applications, job, context);
       });
 }
 
-Widget CandidateApplied(int index, cApplications_recruiter application, BuildContext context) {
+Widget CandidateApplied(int index, cApplications_recruiter application, List<cApplications_recruiter> applications, cJobs_recruiter job, BuildContext context) {
   return Padding(
     padding: const EdgeInsets.only(bottom: 5, left: 5, right: 5),
     child: ClipRRect(
@@ -240,7 +240,7 @@ Widget CandidateApplied(int index, cApplications_recruiter application, BuildCon
                   Navigator.push(
                       context, MaterialPageRoute(
                       builder: (context) => ReadResumeScreen(
-                          application.Candidate.FullName, application.ResumeUrl, application.ID, application.Status, Provider.of<CandidatesAppliesViewModel>(context)
+                          application.Candidate.FullName, application.ResumeUrl, application.ID, job, applications, application.Status, Provider.of<CandidatesAppliesViewModel>(context)
                       )
                   )
                   );

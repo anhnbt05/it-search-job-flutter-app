@@ -1,5 +1,11 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:fl_downloader/fl_downloader.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:ui/Services/application_recruiter_service.dart';
 import '../../ Constants/api_constants.dart';
 import '../../Models/Applications.dart';
@@ -34,6 +40,7 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _rejectReason.dispose();
+    _progressSubscription?.cancel();
     super.dispose();
   }
 
@@ -59,6 +66,38 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
 
       return appList;
     });
+  }
+
+  double _progress = 0.0;
+  double get progress => _progress;
+  StreamSubscription? _progressSubscription;
+
+  DownloadViewModel() {
+    _initialize();
+  }
+
+  void _initialize() {
+    FlDownloader.initialize();
+  }
+
+  Future<bool> isFileExist(String url, {String? fileName}) async {
+    Directory? downloadsDir;
+    if (Platform.isAndroid) {
+      downloadsDir = Directory('/storage/emulated/0/Download');
+    } else {
+      downloadsDir = await getApplicationDocumentsDirectory();
+    }
+    final filePath = '${downloadsDir.path}/$fileName';
+    final file = File(filePath);
+    if (file.existsSync()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<void> startDownload(String url, {String? fileName}) async {
+    await FlDownloader.download(url, fileName: fileName);
   }
 
   Future<void> approveApplication(String applicationId) async {

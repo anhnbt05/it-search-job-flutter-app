@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:ui/Helpers/toastification.dart';
+import 'package:ui/Models/Applications.dart';
+import 'package:ui/Models/Jobs.dart';
 import 'package:ui/Models/model.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 
@@ -9,11 +12,15 @@ class ReadResumeScreen extends StatefulWidget {
     this.name,
     this.resumeUrl,
     this.Id,
+    this.job,
+    this.applications,
     this.status,
     this.viewModel, {
     super.key,
   });
 
+  cJobs_recruiter job;
+  List<cApplications_recruiter> applications;
   String Id;
   String status;
   String name;
@@ -27,17 +34,133 @@ class ReadResumeScreen extends StatefulWidget {
 class _ReadResumeScreenState extends State<ReadResumeScreen> {
   @override
   Widget build(BuildContext context) {
+    var viewModel = Provider.of<CandidatesAppliesViewModel>(context);
+    bool hasSlot = widget.job.Vacancies > widget.applications.where((e) => e.Status == "accepted").length;
+
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: (widget.status == 'pending') ? Size.fromHeight(90) : Size.fromHeight(50),
+        preferredSize: (widget.status == 'pending' && hasSlot) ? Size.fromHeight(90) : Size.fromHeight(50),
         child: AppBar(
           iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: color,
-          title: Text(
-            widget.name,
-            style: TextStyle(color: Colors.white, fontSize: 20),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.name,
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              IconButton(
+                onPressed: () async {
+                  if (await viewModel.isFileExist(widget.resumeUrl, fileName: "${widget.name}-${widget.job.Title}.pdf") == true) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          backgroundColor: Colors.white,
+                          title: Text(
+                            "Xác nhận",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          content: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(text: "Bạn đã tải "),
+                                TextSpan(
+                                  text: "${widget.name}-${widget.job.Title}.pdf.",
+                                  style: TextStyle(fontStyle: FontStyle.italic,
+                                  decoration: TextDecoration.underline,),
+                                ),
+                                TextSpan(text: "\nBạn có muốn tải lại không?"),
+                              ],
+                            ),
+                          ),
+
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              style: TextButton.styleFrom(
+                                overlayColor: Colors.transparent,
+                              ),
+                              child: Text(
+                                'Thoát',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                showDialog(
+                                  context: context,
+                                  barrierColor: Colors.black.withOpacity(0.5),
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.blue,
+                                      ),
+                                    );
+                                  },
+                                );
+
+                                await viewModel.startDownload(widget.resumeUrl,
+                                    fileName: "${widget.name}-${widget.job.Title}.pdf");
+                                Navigator.of(context).pop();
+                                Navigator.pop(context);
+                                showTopToastification(content: "Đã tải thành công ${widget.name}-${widget.job.Title}.pdf", title: "Thành công", color: Colors.green, icon: Icons.save_alt);
+                              },
+                              style: TextButton.styleFrom(
+                                backgroundColor: Color(0xee65c29c),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                'Tải lại',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    showDialog(
+                      context: context,
+                      barrierColor: Colors.black.withOpacity(0.5),
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.blue,
+                          ),
+                        );
+                      },
+                    );
+
+                    await viewModel.startDownload(widget.resumeUrl,
+                        fileName: "${widget.name}-${widget.job.Title}.pdf");
+                    Navigator.of(context).pop();
+                    showTopToastification(content: "Đã tải thành công ${widget.name}-${widget.job.Title}.pdf", title: "Thành công", color: Colors.green, icon: Icons.save_alt);
+                  }
+                },
+                icon: Icon(Icons.save_alt_outlined, color: Colors.white,)
+              )
+            ],
           ),
-          bottom: displaySelection(context: context, viewModel: widget.viewModel, Id: widget.Id, status: widget.status),
+          bottom: displaySelection(context: context, viewModel: widget.viewModel, Id: widget.Id, status: widget.status, hasSlot: hasSlot),
         ),
       ),
       body: SfPdfViewer.network(
@@ -50,8 +173,8 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
 }
 
 
-PreferredSize? displaySelection({required BuildContext context, required CandidatesAppliesViewModel viewModel, required String Id, required String status}) {
-  if (status != 'pending') {
+PreferredSize? displaySelection({required BuildContext context, required CandidatesAppliesViewModel viewModel, required String Id, required String status, required bool hasSlot}) {
+  if (status != 'pending' || !hasSlot) {
     return null;
   } else {
     return PreferredSize(
@@ -190,8 +313,7 @@ PreferredSize? displaySelection({required BuildContext context, required Candida
                                     Navigator.of(context).pop();
                                   }
                                   else {
-                                    final result = await viewModel
-                                        .rejectApplication(
+                                    final result = await viewModel.rejectApplication(
                                       applicationId: Id,
                                       reason: viewModel
                                           .rejectReason
@@ -253,7 +375,7 @@ PreferredSize? displaySelection({required BuildContext context, required Candida
                       "Xác nhận",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 25,
+                        fontSize: 22,
                       ),
                       textAlign: TextAlign.center,
                     ),

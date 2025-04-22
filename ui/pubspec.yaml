@@ -34,6 +34,7 @@ dependencies:
   path_provider: ^2.1.1
   dio: ^5.4.0
   toastification: ^3.0.2
+  fl_downloader: ^2.0.2
   flutter:
     sdk: flutter
   dropdown_button2: ^2.3.9
