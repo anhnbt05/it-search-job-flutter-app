@@ -319,7 +319,7 @@ export class ApplicationsService {
 
       return {
         success: true,
-        message: 'Xử lý các đơn ứng tuyển thành công.',
+        message: 'Xử lý đơn ứng tuyển thành công.',
       };
     } catch (err) {
       console.error(err);
