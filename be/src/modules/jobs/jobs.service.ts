@@ -3,10 +3,14 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Cron } from '@nestjs/schedule';
 import {
+  Applications,
+  ApplicationStatus,
   Candidates,
   Categories,
   Jobs,
@@ -17,6 +21,7 @@ import {
   Users,
 } from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { differenceInCalendarDays } from 'date-fns';
 import { omit } from 'lodash';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import {
@@ -38,6 +43,8 @@ import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
 export class JobsService {
+  private readonly logger = new Logger(JobsService.name);
+
   constructor(
     @InjectSupabaseClient('adminClient')
     private readonly adminSupabaseClient: SupabaseClient,
@@ -47,6 +54,117 @@ export class JobsService {
     private readonly userNotificationsService: UserNotificationsService,
     private readonly configService: ConfigService,
   ) {}
+
+  @Cron('0 0 * * *')
+  async handleCheckJobsExpired() {
+    this.logger.log(
+      'Đang kiểm tra các công việc đã hết hạn hoặc sắp hết hạn...',
+    );
+
+    const { data: jobs } = await this.anonSupabaseClient
+      .from('Jobs')
+      .select('*, Recruiters(*)')
+      .overrideTypes<any[], { merge: false }>();
+
+    if (!jobs) {
+      this.logger.log('Không tìm thấy công việc nào cần kiểm tra, bỏ qua...');
+      return;
+    }
+
+    this.logger.log(`Tìm thấy ${jobs.length} công việc cần kiểm tra.`);
+
+    const { recruiter_job_expiring_soon, recruiter_job_expired } =
+      NotificationType;
+
+    for (const job of jobs) {
+      const now = new Date();
+
+      const expiredDay = new Date(job.ExpiredAt as string);
+
+      const diffDays = differenceInCalendarDays(expiredDay, now);
+
+      const recruiterId = job.Recruiters?.UserID as string;
+
+      const jobTitle = job.Title;
+
+      const jobId = job.ID;
+
+      let metadata = {};
+
+      if (diffDays === 2) {
+        metadata = { jobExpiredAt: job.ExpiredAt, jobId, jobTitle };
+
+        this.logger.log(
+          `Công việc sắp hết hạn: "${jobTitle}" (ID: ${jobId}), còn ${diffDays} ngày.`,
+        );
+
+        await this.userNotificationsService.handleCreateUserNotification(
+          {
+            Content: handleFormatUserNotificationContent(
+              recruiter_job_expiring_soon,
+              metadata,
+            ),
+            Type: recruiter_job_expiring_soon,
+            metadata,
+          },
+          recruiterId,
+        );
+
+        this.logger.log(
+          `Đã gửi thông báo sắp hết hạn cho nhà tuyển dụng có id '${recruiterId}'`,
+        );
+      } else if (diffDays <= 0) {
+        metadata = {
+          jobTitle,
+          jobId,
+        };
+
+        this.logger.log(
+          `Công việc đã hết hạn: "${jobTitle}" (ID: ${jobId}), cập nhật trạng thái...`,
+        );
+
+        const { error } = await this.adminSupabaseClient
+          .from('Jobs')
+          .update([
+            {
+              status: JobStatus.closed,
+            },
+          ])
+          .eq('ID', job.ID);
+
+        if (error) {
+          this.logger.error(
+            `Lỗi khi cập nhật trạng thái công việc có id '${jobId}'`,
+            error,
+          );
+
+          throw new InternalServerErrorException(
+            'Đã xảy ra lỗi khi cập nhật trạng thái của công việc.',
+          );
+        }
+
+        this.logger.log(
+          `Đã đóng công việc "${jobTitle}" (ID: ${jobId}) thành công.`,
+        );
+
+        await this.userNotificationsService.handleCreateUserNotification(
+          {
+            Content: handleFormatUserNotificationContent(
+              recruiter_job_expired,
+              metadata,
+            ),
+            Type: recruiter_job_expired,
+            metadata,
+          },
+          recruiterId,
+        );
+
+        this.logger.log(
+          `Đã gửi thông báo hết hạn cho nhà tuyển dụng có id '${recruiterId}'`,
+        );
+      }
+    }
+  }
 
   public handleGetJobs = async (userId: string) => {
     try {
@@ -1104,5 +1222,25 @@ export class JobsService {
       console.error(err);
       throw err;
     }
+  };
+
+  public handleCountApplicationsOfJob = async (
+    jobId: string,
+    status: ApplicationStatus,
+  ) => {
+    const { data: job } = await this.anonSupabaseClient
+      .from('Jobs')
+      .select('*, Applications(*)')
+      .eq('ID', jobId)
+      .maybeSingle<any>();
+
+    if (!job)
+      throw new NotFoundException(
+        `Không tìm thấy công việc có id '${jobId}' trong hệ thống.`,
+      );
+
+    return job.Applications.filter(
+      (application: Applications) => application.Status === status,
+    )?.length;
   };
 }

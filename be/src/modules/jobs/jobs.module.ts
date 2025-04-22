@@ -9,6 +9,7 @@ import { UsersService } from 'src/modules/users/users.service';
 import { JobsController } from './jobs.controller';
 import { JobsService } from './jobs.service';
 import { WebsocketsModule } from 'src/modules/websockets/websockets.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { WebsocketsModule } from 'src/modules/websockets/websockets.module';
     UploadsModule,
     UserNotificationsModule,
     WebsocketsModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [JobsController],
   providers: [

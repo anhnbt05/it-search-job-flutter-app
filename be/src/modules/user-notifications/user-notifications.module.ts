@@ -5,8 +5,8 @@ import { OneSignalProvider } from 'src/libs/common/providers';
 import { PUSH_NOTIFICATION_QUEUE_NAME } from 'src/libs/common/utils';
 import { PushNotificationProcessor } from 'src/modules/user-notifications/processors';
 import { PushNotificaitonProducer } from 'src/modules/user-notifications/producers';
-import { UserNotificationsService } from './user-notifications.service';
 import { WebsocketsModule } from 'src/modules/websockets/websockets.module';
+import { UserNotificationsService } from './user-notifications.service';
 
 @Global()
 @Module({
