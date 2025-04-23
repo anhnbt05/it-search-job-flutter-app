@@ -4,6 +4,6 @@ import 'Jobs.dart';
 class cJobCategories {
   String? CategoryID;
   String? JobID;
-  cJobs? Job;
+  //cJobs? Job;
   cCategories? Category;
 }

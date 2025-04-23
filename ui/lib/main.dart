@@ -3,12 +3,18 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/Services/application_recruiter_service.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
+import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
 import 'package:ui/Views/candidate/candidate.dart';
 import 'package:ui/Models/model.dart';
 import 'package:ui/Views/admin/admin.dart';
 
+import ' Constants/api_constants.dart';
+import 'Models/Applications.dart';
+import 'Models/Jobs.dart';
+import 'Services/job_service.dart';
 import 'ViewModels/BottomNavigationViewModel.dart';
 import 'ViewModels/candidate/JoblistNavigationViewModel.dart';
 import 'ViewModels/recruiter/JobPostViewModel.dart';
@@ -17,21 +23,16 @@ import 'Views/login/login_page.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    ToastificationWrapper(
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => BottomNavigationViewModel(),
-          ),
-          ChangeNotifierProvider(
-            create: (context) => JoblistNavigationViewModel(),
-          ),
-          ChangeNotifierProvider(create: (context) => JobPostViewModel()),
-          ChangeNotifierProvider(
-            create: (context) => LoginNavigationViewModel(),
-          ),
-        ],
-        child: MyApp(),
+    ToastificationWrapper(child:
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => BottomNavigationViewModel(),),
+        ChangeNotifierProvider(create: (context) => JoblistNavigationViewModel(),),
+        ChangeNotifierProvider(create: (context) => JobPostViewModel()),
+        ChangeNotifierProvider(create: (context) => LoginNavigationViewModel()),
+        ChangeNotifierProvider(create: (context) => CandidatesAppliesViewModel()),
+      ],
+      child: MyApp(),
       ),
     ),
   );
@@ -77,6 +78,11 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
       context,
       listen: false,
     );
+    final candidateAppliesViewModel = Provider.of<CandidatesAppliesViewModel>(
+      context,
+      listen: false,
+    );
+    candidateAppliesViewModel.initFutures();
     bottomNavigationProvider.setAnimationController(
       AnimationController(
         vsync: this,
@@ -99,12 +105,14 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    var bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(
+    var bottomNavigationViewModel = Provider.of<BottomNavigationViewModel>(
       context,
     );
-    var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(
+    var joblistNavigationViewModel = Provider.of<JoblistNavigationViewModel>(
       context,
     );
+
+    var candidateAppliesViewModel = Provider.of<CandidatesAppliesViewModel>(context);
 
     return MaterialApp(
       locale: Locale('vi', 'VN'),
@@ -137,10 +145,10 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
           toolbarHeight: 45,
           backgroundColor: color,
           centerTitle: true,
-          title: appbarTitle(_role, bottomNavigationProvider.selectedIndex),
+          title: appbarTitle(_role, bottomNavigationViewModel.selectedIndex),
           bottom: bottomJobBar(
             _role,
-            bottomNavigationProvider.selectedIndex,
+            bottomNavigationViewModel.selectedIndex,
             context,
           ),
           actions: [
@@ -164,15 +172,15 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
         ),
         body: PageView(
           physics: NeverScrollableScrollPhysics(),
-          controller: bottomNavigationProvider.pageController,
-          children: pageView(_role, joblistNavigationProvider),
+          controller: bottomNavigationViewModel.pageController,
+          children: pageView(_role, joblistNavigationViewModel, candidateAppliesViewModel),
         ),
         bottomNavigationBar: Stack(
           children: [
             BottomNavigationBar(
-              currentIndex: bottomNavigationProvider.selectedIndex,
+              currentIndex: bottomNavigationViewModel.selectedIndex,
               backgroundColor: Colors.white,
-              onTap: bottomNavigationProvider.onItemTapped,
+              onTap: bottomNavigationViewModel.onItemTapped,
               type: BottomNavigationBarType.fixed,
               items: bottomNavigationItem(_role),
             ),
@@ -205,11 +213,12 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
   List<Widget> pageView(
     role Role,
     JoblistNavigationViewModel joblistNavigationProvider,
+      CandidatesAppliesViewModel candidateAppliesViewModel,
   ) {
     if (Role == role.candidate)
       return pageView_candidate(context);
     else if (Role == role.recruiter)
-      return pageView_recruiter(context);
+      return pageView_recruiter(context, candidateAppliesViewModel);
     else
       return pageView_admin(context);
   }

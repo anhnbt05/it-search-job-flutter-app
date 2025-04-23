@@ -9,9 +9,8 @@ class cCompanyLocations {
   DateTime? CreatedAt;
   DateTime? UpdatedAt;
   DateTime? DeletedAt;
-  String? CompanyID;
-  String? LocationID;
   cCompanies? Company;
   cLocations? Location;
-  List<cRecruiters>? Recruiters;
+  List<cRecruiterPost>? Recruiters;
 }
+

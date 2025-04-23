@@ -1,4 +1,3 @@
-import 'Candidates.dart';
 import 'Enum.dart';
 import 'Recruiters.dart';
 import 'UserNotifications.dart';
@@ -16,7 +15,8 @@ class cUsers {
   eRole? Role;
   DateTime? DeletedAt;
   bool? IsEmailVerified;
-  cCandidates? Candidates;
-  cRecruiters? Recruiters;
+  //cCandidates? Candidates;
+  cRecruiterPost? Recruiters;
   List<cUserNotifications>? UserNotifications;
+
 }
