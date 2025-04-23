@@ -8,7 +8,6 @@ import 'package:ui/Views/login/resetpassword_page.dart';
 import '../../Views/login/forgotpassword_page.dart';
 import '../../Views/login/otpverification_page.dart';
 import 'VerifyResetPasswordOtpViewModel.dart';
-import '../../Views/login/register_page.dart';
 
 class LoginNavigationViewModel extends ChangeNotifier {
   void goToForgotPassword(BuildContext context) {

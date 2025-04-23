@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../Helpers/toastification.dart';
 import '../../Models/Provinces.dart';
 import '../../ViewModels/login/CompaniesViewModel.dart';
 import '../../ViewModels/login/ProvincesViewModel.dart';
@@ -37,18 +38,25 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
       companyId: widget.companyId,
       branchName: _branchNameController.text,
       address: _addressController.text,
+      locationId: _selectedProvinceId!,
     );
 
     setState(() => isSubmitting = false);
 
     if (response.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Tạo chi nhánh thành công")),
+      showTopToastification(
+        title: 'Thành công',
+        content: response.message,
+        color: Colors.green,
+        icon: Icons.check_circle,
       );
-      Navigator.pop(context, true);
+      Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Lỗi: ${response.message}")),
+      showTopToastification(
+        title: 'Lỗi',
+        content: response.message,
+        color: Colors.red,
+        icon: Icons.error,
       );
     }
   }
@@ -97,7 +105,9 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: isSubmitting ? null : _submit,
-                child: isSubmitting ? CircularProgressIndicator() : Text("Tạo"),
+                child: isSubmitting
+                    ? CircularProgressIndicator()
+                    : Text("Tạo"),
               ),
             ],
           ),

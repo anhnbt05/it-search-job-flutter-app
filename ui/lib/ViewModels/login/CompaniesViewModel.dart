@@ -48,11 +48,39 @@ class CompaniesViewModel extends ChangeNotifier {
     required String companyId,
     required String branchName,
     required String address,
+    required String locationId,
   }) async {
     return await _service.addBranch(
       companyId: companyId,
       branchName: branchName,
       address: address,
+      locationId: locationId,
     );
+  }
+  Future<ResponseModel> addCompany({
+    required String name,
+    required String websiteUrl,
+    required String description,
+    required String branchName,
+    required String address,
+    required String locationId,
+  }) async {
+    isLoading = true;
+    notifyListeners();
+
+    final result = await _service.addCompany(
+      name: name,
+      websiteUrl: websiteUrl,
+      description: description,
+      branchName: branchName,
+      address: address,
+      locationId: locationId,
+    );
+
+    isLoading = false;
+    if (!result.success) errorMessage = result.message;
+    notifyListeners();
+
+    return result;
   }
 }
