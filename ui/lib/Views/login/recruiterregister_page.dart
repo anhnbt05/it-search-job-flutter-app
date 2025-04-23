@@ -27,6 +27,7 @@ class RecruiterRegisterPage extends StatefulWidget {
 }
 
 class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _positionController = TextEditingController();
   List<cCompanyLocations> locations = [];
   String? selectedCompanyId;
@@ -90,7 +91,7 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
   Future<void> registerRecruiter() async {
     final signUpVM = Provider.of<SignUpViewModel>(context, listen: false);
 
-    if (_positionController.text.isEmpty ||
+    if (!_formKey.currentState!.validate() ||
         selectedCompanyId == null ||
         selectedLocationId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -157,63 +158,84 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     final signUpVM = Provider.of<SignUpViewModel>(context);
     final showBranchDropdown = selectedCompanyId != null && locations.isNotEmpty;
 
     return Scaffold(
-      appBar: AppBar(title: Text("Đăng ký nhà tuyển dụng")),
+      backgroundColor: Colors.white,
       body: signUpVM.isLoading
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _positionController,
-              decoration: InputDecoration(labelText: 'Vị trí công việc'),
-            ),
-            SizedBox(height: 20),
-            Text("Chọn công ty"),
-            buildCompaniesList(),
-            TextButton(
-              onPressed: addCompany,
-              child: Text("Thêm công ty mới"),
-            ),
-            SizedBox(height: 20),
-            if (showBranchDropdown) ...[
-              Text("Chọn chi nhánh"),
-              DropdownButton<String>(
-                value: selectedLocationId,
-                hint: Text("Chọn chi nhánh"),
-                isExpanded: true,
-                items: locations.map((loc) {
-                  final id = loc.LocationID ?? "";
-                  return DropdownMenuItem<String>(
-                    value: id,
-                    child: Text(loc.BranchName ?? "Không tên"),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedLocationId = value;
-                  });
-                },
+        padding: EdgeInsets.fromLTRB(size.width * 0.08, size.height * 0.1, size.width * 0.08, 20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(child: Icon(Icons.business, size: 70, color: Colors.blueAccent)),
+              SizedBox(height: 40),
+              Text("Đăng ký nhà tuyển dụng", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26)),
+              SizedBox(height: 10),
+              Text("Vui lòng điền thông tin bên dưới để tiếp tục", style: TextStyle(color: Colors.grey[700], fontSize: 16)),
+              SizedBox(height: 30),
+
+              TextFormField(
+                controller: _positionController,
+                decoration: InputDecoration(
+                  labelText: "Vị trí công việc",
+                  prefixIcon: Icon(Icons.work),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                validator: (value) => value == null || value.isEmpty ? "Không được để trống" : null,
               ),
-              TextButton(
-                onPressed: createBranch,
-                child: Text("Tạo chi nhánh mới"),
+              SizedBox(height: 20),
+
+              Text("Chọn công ty", style: TextStyle(fontWeight: FontWeight.w600)),
+              buildCompaniesList(),
+              TextButton(onPressed: addCompany, child: Text("➕ Thêm công ty mới")),
+              SizedBox(height: 20),
+
+              if (showBranchDropdown) ...[
+                Text("Chọn chi nhánh", style: TextStyle(fontWeight: FontWeight.w600)),
+                DropdownButtonFormField<String>(
+                  value: selectedLocationId,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    prefixIcon: Icon(Icons.location_city),
+                  ),
+                  hint: Text("Chọn chi nhánh"),
+                  items: locations.map((loc) {
+                    final id = loc.LocationID ?? "";
+                    return DropdownMenuItem<String>(
+                      value: id,
+                      child: Text(loc.BranchName ?? "Không tên"),
+                    );
+                  }).toList(),
+                  onChanged: (value) => setState(() => selectedLocationId = value),
+                ),
+                TextButton(onPressed: createBranch, child: Text("➕ Tạo chi nhánh mới")),
+              ],
+
+              SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: registerRecruiter,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                  child: Text("Đăng ký", style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
+              ),
+              SizedBox(height: 20),
+              Center(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("← Quay lại", style: TextStyle(fontSize: 15, color: Colors.blue)),
+                ),
               ),
             ],
-            SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: registerRecruiter,
-              child: Text("Đăng ký"),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
-              ),
-            )
-          ],
+          ),
         ),
       ),
     );

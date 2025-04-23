@@ -141,7 +141,11 @@ class _RegisterPageState extends State<RegisterPage> {
         prefixIcon: Icon(icon),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
-      validator: validator ?? (value) => (value == null || value.isEmpty) ? "Không được để trống" : null,
+      validator: validator ?? (value) {
+        if (value == null || value.isEmpty) return "Không được để trống";
+        if (label == "Mật khẩu" && value.length < 6) return "Mật khẩu phải dài ít nhất 6 ký tự";
+        return null;
+      },
     );
   }
 
