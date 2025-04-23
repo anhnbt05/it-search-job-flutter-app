@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../Helpers/toastification.dart';
 import '../../Models/CompanyLocations.dart';
 import '../../Models/Companies.dart';
 import '../../ViewModels/login/CompaniesViewModel.dart';
+import '../../ViewModels/login/SignUpViewModel.dart';
 import 'createbranch_page.dart';
 import 'createcompany_page.dart';
 
@@ -12,12 +14,13 @@ class RecruiterRegisterPage extends StatefulWidget {
   final String fullName;
   final String phone;
 
-  RecruiterRegisterPage({
+  const RecruiterRegisterPage({
     required this.email,
     required this.password,
     required this.fullName,
     required this.phone,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<RecruiterRegisterPage> createState() => _RecruiterRegisterPageState();
@@ -25,7 +28,6 @@ class RecruiterRegisterPage extends StatefulWidget {
 
 class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
   final TextEditingController _positionController = TextEditingController();
-
   List<cCompanyLocations> locations = [];
   String? selectedCompanyId;
   String? selectedLocationId;
@@ -33,7 +35,9 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
   @override
   void initState() {
     super.initState();
-    Provider.of<CompaniesViewModel>(context, listen: false).fetchCompanies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CompaniesViewModel>(context, listen: false).fetchCompanies();
+    });
   }
 
   void fetchLocations(String companyId) async {
@@ -74,6 +78,7 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
         builder: (_) => CreateBranchPage(companyId: selectedCompanyId!),
       ),
     );
+
     if (newBranch != null) {
       setState(() {
         locations.add(newBranch);
@@ -82,25 +87,54 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
     }
   }
 
-  void registerRecruiter() {
+  Future<void> registerRecruiter() async {
+    final signUpVM = Provider.of<SignUpViewModel>(context, listen: false);
+
+    if (_positionController.text.isEmpty ||
+        selectedCompanyId == null ||
+        selectedLocationId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Vui lòng nhập đầy đủ thông tin")),
+      );
+      return;
+    }
+
     final payload = {
-      "email": widget.email,
-      "password": widget.password,
-      "fullName": widget.fullName,
-      "phone": widget.phone,
-      "role": "recruiter",
-      "position": _positionController.text,
-      "companyId": selectedCompanyId,
-      "companyLocationId": selectedLocationId,
+      "Email": widget.email,
+      "Password": widget.password,
+      "FullName": widget.fullName,
+      "PhoneNumber": widget.phone,
+      "Role": "recruiter",
+      "createRecruiterDto": {
+        "Position": _positionController.text,
+        "companyID": selectedCompanyId,
+        "companyLocationID": selectedLocationId,
+      }
     };
-    print("Gửi đăng ký: $payload");
-    // TODO: Gọi API tại đây nếu cần
+
+    final response = await signUpVM.register(payload);
+    if (response.success) {
+      showTopToastification(
+        title: 'Thành công',
+        content: response.message,
+        color: Colors.green,
+        icon: Icons.check_circle,
+      );
+      Navigator.pop(context);
+    } else {
+      showTopToastification(
+        title: 'Lỗi',
+        content: response.message,
+        color: Colors.red,
+        icon: Icons.error,
+      );
+    }
   }
 
   Widget buildCompaniesList() {
     final vm = Provider.of<CompaniesViewModel>(context);
 
-    if (vm.isLoading) return CircularProgressIndicator();
+    if (vm.isLoading) return Center(child: CircularProgressIndicator());
     if (vm.errorMessage != null) return Text("Lỗi: ${vm.errorMessage}");
 
     return Column(
@@ -123,11 +157,14 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final signUpVM = Provider.of<SignUpViewModel>(context);
     final showBranchDropdown = selectedCompanyId != null && locations.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(title: Text("Đăng ký nhà tuyển dụng")),
-      body: SingleChildScrollView(
+      body: signUpVM.isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +209,9 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
             ElevatedButton(
               onPressed: registerRecruiter,
               child: Text("Đăng ký"),
-              style: ElevatedButton.styleFrom(minimumSize: Size(double.infinity, 50)),
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(double.infinity, 50),
+              ),
             )
           ],
         ),

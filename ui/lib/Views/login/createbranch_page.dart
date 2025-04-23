@@ -44,6 +44,7 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
     setState(() => isSubmitting = false);
 
     if (response.success) {
+      await vm.fetchBranches(widget.companyId);
       showTopToastification(
         title: 'Thành công',
         content: response.message,

@@ -80,7 +80,7 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
     final isLoading = Provider.of<SignUpViewModel>(context).isLoading;
 
     return Scaffold(
-      appBar: AppBar(title: Text("Đăng ký Ứng viên")),
+      appBar: AppBar(title: Text("Đăng ký ứng viên")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -142,7 +142,7 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
                   onPressed: isLoading ? null : _submitCandidate,
                   child: isLoading
                       ? CircularProgressIndicator(color: Colors.white)
-                      : Text("Hoàn tất đăng ký", style: TextStyle(fontSize: 16)),
+                      : Text("Đăng ký", style: TextStyle(fontSize: 16)),
                 ),
               ),
             ],
