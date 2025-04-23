@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:ui/Views/login/verifyemail_page.dart';
 import '../../Helpers/toastification.dart';
 import '../../Models/CompanyLocations.dart';
 import '../../Models/Companies.dart';
@@ -121,7 +122,12 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
         color: Colors.green,
         icon: Icons.check_circle,
       );
-      Navigator.pop(context);
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+          builder: (context) => VerifyemailPage(email: widget.email),
+    ),
+      );
     } else {
       showTopToastification(
         title: 'Lỗi',
