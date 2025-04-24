@@ -1,10 +1,11 @@
 import 'package:http/http.dart' as http;
+import 'package:ui/%20Constants/api_constants.dart';
 import 'dart:convert';
 
 import '../Models/ResponseModel.dart';
 
 class AuthForgetPasswordService {
-  final String _baseUrl = "https://it-searcj-job-app-be.onrender.com";
+  final String _baseUrl = APIConstants.baseUrl;
 
   Future<ResponseModel> forgotPassword(String email) async {
     // print("Sending to: $_baseUrl/auth/forget-password");

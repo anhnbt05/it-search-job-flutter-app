@@ -1,31 +1,43 @@
+import 'dart:core';
+
+import 'CompanyLocations.dart';
+
 class cCompanies {
-  final String ID;
-  final String Name;
-  final String LogoUrl;
-  final DateTime CreatedAt;
-  final DateTime UpdatedAt;
-  final String WebsiteUrl;
-  final String Description;
+  String? ID;
+  String? Name;
+  String? WebsiteUrl;
+  String? LogoUrl;
+  String? Description;
+  DateTime? CreatedAt;
+  DateTime? UpdatedAt;
+  List<cCompanyLocations>? CompanyLocations;
 
   cCompanies({
-    required this.ID,
-    required this.Name,
-    required this.LogoUrl,
-    required this.CreatedAt,
-    required this.UpdatedAt,
-    required this.WebsiteUrl,
-    required this.Description,
+    this.ID,
+    this.Name,
+    this.WebsiteUrl,
+    this.LogoUrl,
+    this.Description,
+    this.CreatedAt,
+    this.UpdatedAt,
+    this.CompanyLocations,
   });
 
   factory cCompanies.fromJson(Map<String, dynamic> json) {
     return cCompanies(
-      ID: json['ID'],
+      ID: json['ID']?.toString(),
       Name: json['Name'],
-      LogoUrl: json['LogoUrl'],
-      CreatedAt: DateTime.parse(json['CreatedAt']),
-      UpdatedAt: DateTime.parse(json['UpdatedAt']),
       WebsiteUrl: json['WebsiteUrl'],
+      LogoUrl: json['LogoUrl'],
       Description: json['Description'],
+      CreatedAt: json['CreatedAt'] != null ? DateTime.parse(json['CreatedAt']) : null,
+      UpdatedAt: json['UpdatedAt'] != null ? DateTime.parse(json['UpdatedAt']) : null,
+      CompanyLocations: json['CompanyLocations'] != null
+          ? (json['CompanyLocations'] as List)
+          .map((e) => cCompanyLocations.fromJson(e))
+          .toList()
+          : null,
     );
   }
 }
+

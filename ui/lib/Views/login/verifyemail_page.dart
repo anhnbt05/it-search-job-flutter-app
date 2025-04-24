@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
+import 'package:ui/ViewModels/login/VerifyEmailViewModel.dart';
 import '../../Helpers/toastification.dart';
-import '../../ViewModels/login/VerifyResetPasswordOtpViewModel.dart';
+import '../../ViewModels/login/LoginNavigationViewModel.dart';
 
-class OtpVerificationPage extends StatelessWidget {
+class VerifyemailPage extends StatelessWidget {
   final String email;
 
-  const OtpVerificationPage({Key? key, required this.email}) : super(key: key);
+  const VerifyemailPage({Key? key, required this.email}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final otpController = TextEditingController();
 
-    return Consumer<VerifyResetPasswordOtpViewModel>(
+    return Consumer<VerifyEmailViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
           backgroundColor: Colors.white,
@@ -83,7 +83,7 @@ class OtpVerificationPage extends StatelessWidget {
                         return;
                       }
 
-                      final response = await viewModel.verifyOtp(email, otp);
+                      final response = await viewModel.verifyemail(email, otp);
 
                       showTopToastification(
                         content: response.message,
@@ -92,9 +92,7 @@ class OtpVerificationPage extends StatelessWidget {
                         icon: response.success ? Icons.check_circle_outline : Icons.error_outline,
                       );
 
-                      if (response.success) {
-                        LoginNavigationViewModel().goToResetPassword(context, email);
-                      }
+                      Navigator.of(context).popUntil((route) => route.isFirst);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,

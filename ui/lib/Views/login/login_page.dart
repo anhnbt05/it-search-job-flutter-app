@@ -13,10 +13,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  void onSignInClicked() {
-
-  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -105,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                   child: SizedBox( width: double.infinity, height: 56,
                     child: ElevatedButton(
-                        onPressed: onSignInClicked,
+                        onPressed: () {},
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue
                         ),
@@ -120,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () => LoginNavigationViewModel().goToRegister(context),
                         child: Text("ĐĂNG KÝ TÀI KHOẢN MỚI", style: TextStyle(fontSize: 15, color: Colors.grey),)
                       ),
                       TextButton(onPressed: () => LoginNavigationViewModel().goToForgotPassword(context),

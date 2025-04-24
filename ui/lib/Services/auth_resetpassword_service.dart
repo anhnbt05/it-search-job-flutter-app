@@ -1,10 +1,11 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../ Constants/api_constants.dart';
 import '../Models/ResponseModel.dart';
 
 class AuthResetpasswordService {
-  final String _baseUrl = "https://it-searcj-job-app-be.onrender.com";
+  final String _baseUrl = APIConstants.baseUrl;
 
   Future<ResponseModel> resetPassword(String email, String newPassword) async {
     print("Sending to: $_baseUrl/auth/reset-password");

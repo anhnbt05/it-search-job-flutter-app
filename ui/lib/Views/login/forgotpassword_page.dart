@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
+import '../../Helpers/toastification.dart';
 import '../../ViewModels/login/ForgotPasswordViewModel.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
@@ -73,8 +74,12 @@ class ForgotPasswordPage extends StatelessWidget {
                           if (email.isNotEmpty) {
                             await viewModel.sendResetLink(email);
                             final message = viewModel.errorMessage ?? viewModel.serverMessage ?? "Đã gửi yêu cầu đặt lại mật khẩu.";
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)),
-                               );
+                            showTopToastification(
+                              content: message,
+                              title: viewModel.errorMessage != null ? "Thất bại" : "Thành công",
+                              color: viewModel.errorMessage != null ? Colors.red : Colors.green,
+                              icon: viewModel.errorMessage != null ? Icons.error_outline : Icons.check_circle_outline,
+                            );
                             }
                           if (viewModel.errorMessage == null) {
                             LoginNavigationViewModel().goToOtp(context, email);

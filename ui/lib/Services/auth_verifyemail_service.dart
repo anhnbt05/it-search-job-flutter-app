@@ -4,22 +4,22 @@ import 'dart:convert';
 import '../ Constants/api_constants.dart';
 import '../Models/ResponseModel.dart';
 
-class AuthVerifyResetPasswordOtpService {
+class AuthVerifyemailService {
   final String _baseUrl = APIConstants.baseUrl;
 
-  Future<ResponseModel> verifyResetPasswordOtp(String email, String otp) async {
-    print("Sending to: $_baseUrl/auth/verify-reset-password-otp");
+  Future<ResponseModel> verifyemail(String email, String otp) async {
+    print("Sending to: $_baseUrl/auth/verify-email");
     print("Email: $email");
     print("Body: ${json.encode({"email": email, "otp": otp})}");
 
 
     final response = await http.post(
-        Uri.parse('$_baseUrl/auth/verify-reset-password-otp'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(
-            {"email": email,
-            "otp": otp},
-        ),
+      Uri.parse('$_baseUrl/auth/verify-email'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(
+        {"email": email,
+          "otp": otp},
+      ),
     );
     final responseData = json.decode(response.body);
     return ResponseModel.fromJson(responseData);

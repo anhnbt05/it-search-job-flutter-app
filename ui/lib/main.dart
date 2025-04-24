@@ -3,8 +3,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Helpers/helpers.dart';
-import 'package:ui/Services/application_recruiter_service.dart';
+import 'package:ui/ViewModels/login/CompaniesViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
+import 'package:ui/ViewModels/login/ProvincesViewModel.dart';
+import 'package:ui/ViewModels/login/SignUpViewModel.dart';
+import 'package:ui/Services/application_recruiter_service.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
 import 'package:ui/Views/candidate/candidate.dart';
@@ -30,6 +33,9 @@ void main() {
         ChangeNotifierProvider(create: (context) => JoblistNavigationViewModel(),),
         ChangeNotifierProvider(create: (context) => JobPostViewModel()),
         ChangeNotifierProvider(create: (context) => LoginNavigationViewModel()),
+        ChangeNotifierProvider(create: (context) => CompaniesViewModel()),
+        ChangeNotifierProvider(create: (context) => SignUpViewModel()),
+        ChangeNotifierProvider(create: (context) => ProvincesViewModel()),
         ChangeNotifierProvider(create: (context) => CandidatesAppliesViewModel()),
       ],
       child: MyApp(),
@@ -40,10 +46,10 @@ void main() {
 
 class MyApp extends StatefulWidget {
   @override
-  _MainAppState createState() => _MainAppState();
+  _MyAppState createState() => _MyAppState();
 }
 
-/*
+
 class _MyAppState extends State<MyApp> {
   bool isLoggedIn = false;
 
@@ -66,7 +72,7 @@ class _MainApp extends StatefulWidget {
   @override
   _MainAppState createState() => _MainAppState();
 }
-*/
+
 
 class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
   role _role = role.candidate;
