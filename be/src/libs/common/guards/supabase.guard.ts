@@ -30,10 +30,13 @@ export class SupabaseGuard extends BaseSupabaseAuthGuard {
 
     const { error } = await this.anonSupabaseClient.auth.getUser(token);
 
-    if (error)
+    if (error) {
+      console.error(error);
+
       throw new UnauthorizedException(
         'Token không hợp lệ hoặc đã hết hạn. Vui lòng cung cấp token hợp lệ.',
       );
+    }
 
     return token;
   }

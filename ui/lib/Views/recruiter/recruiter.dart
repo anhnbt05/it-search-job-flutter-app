@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Helpers/helpers.dart';
 import 'package:ui/Models/model.dart';
+import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 
+import '../../Models/Jobs.dart';
 import '../../ViewModels/BottomNavigationViewModel.dart';
-import 'PostJobView.dart';
+import 'CandidatesAppliedView.dart';
+import 'JobPostView.dart';
+import '../../Models/Applications.dart';
 
-List<Widget> pageView_recruiter(BuildContext context) {
+List<Widget> pageView_recruiter(BuildContext context, CandidatesAppliesViewModel viewModel) {
   return [
     ManagementScreen(),
-    CandidatesAppliedScreen(),
+    CandidatesAppliedScreen(context, viewModel),
     PostJobScreen(context),
     NotificationsScreen(),
     ProfileScreen(),
@@ -21,19 +25,6 @@ Widget ManagementScreen() {
     color: Colors.amberAccent.shade100,
     child: Center(
       child: Text("Quản lý", style: TextStyle(fontSize: 24)),
-    ),
-  );
-}
-
-Widget CandidatesAppliedScreen() {
-  // TODO: Modify section below
-  return Container(
-    color: Colors.blue.shade100, // Màu nền nhạt
-    child: Center(
-      child: Text(
-        "Danh sách ứng viên đã ứng tuyển",
-        style: TextStyle(fontSize: 24),
-      ),
     ),
   );
 }

@@ -1,19 +1,49 @@
-import 'Applications.dart';
-import 'Enum.dart';
-import 'JobFavorites.dart';
-import 'Users.dart';
 import 'WorkExperiences.dart';
 
-class cCandidates {
-  String? ID;
-  String? ResumeUrl;
-  List<String>? Certifications;
-  String? Bio;
-  eLevel? Level;
-  DateTime? DeletedAt;
-  String? UserID;
-  cUsers? User;
-  List<cApplications>? Applications;
-  List<cJobFavorites>? JobFavorites;
-  List<cWorkExperiences>? WorkExperiences;
+
+class cCandidates_cApplication_recruiter {
+  final String ID;
+  final String Bio;
+  final String Level;
+  final String? ResumeUrl;
+  final List<String> Certifications;
+  final String FullName;
+  final String Email;
+  final String PhoneNumber;
+  final String AvatarUrl;
+  final String Role;
+  final List<cWorkExperiences_cApplication_recruiter> WorkExperiences;
+
+  cCandidates_cApplication_recruiter({
+    required this.ID,
+    required this.Bio,
+    required this.Level,
+    this.ResumeUrl,
+    required this.Certifications,
+    required this.FullName,
+    required this.Email,
+    required this.PhoneNumber,
+    required this.AvatarUrl,
+    required this.Role,
+    required this.WorkExperiences,
+  });
+
+  factory cCandidates_cApplication_recruiter.fromJson(Map<String, dynamic> json) {
+    return cCandidates_cApplication_recruiter(
+      ID: json['ID'],
+      Bio: json['Bio'],
+      Level: json['Level'],
+      ResumeUrl: json['ResumeUrl'],
+      Certifications: List<String>.from(json['Certifications']),
+      FullName: json['FullName'],
+      Email: json['Email'],
+      PhoneNumber: json['PhoneNumber'],
+      AvatarUrl: json['AvatarUrl'],
+      Role: json['Role'],
+      WorkExperiences: (json['WorkExperiences'] as List)
+          .map((e) => cWorkExperiences_cApplication_recruiter.fromJson(e))
+          .toList(),
+    );
+  }
 }
+

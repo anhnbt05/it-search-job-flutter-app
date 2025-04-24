@@ -1,3 +1,7 @@
+import 'Companies.dart';
+import 'Locations.dart';
+import 'Recruiters.dart';
+
 class cCompanyLocations {
   String? ID;
   String? BranchName;
@@ -31,4 +35,8 @@ class cCompanyLocations {
       LocationID: json['LocationID']?.toString(),
     );
   }
+  cCompanies? Company;
+  cLocations? Location;
+  List<cRecruiterPost>? Recruiters;
 }
+

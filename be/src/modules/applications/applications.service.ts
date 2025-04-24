@@ -319,7 +319,7 @@ export class ApplicationsService {
 
       return {
         success: true,
-        message: 'Xử lý các đơn ứng tuyển thành công.',
+        message: 'Xử lý đơn ứng tuyển thành công.',
       };
     } catch (err) {
       console.error(err);
@@ -338,6 +338,7 @@ export class ApplicationsService {
           const application = await this.handleVerifyApplication(
             item,
             recruiterId,
+            'accept',
           );
 
           const metadata: CandidateApplicationApprovedMetadata = {
@@ -396,6 +397,7 @@ export class ApplicationsService {
           const application = await this.handleVerifyApplication(
             applicationId,
             recruiterId,
+            'rejected',
           );
 
           const { candidate_application_rejected } = NotificationType;
@@ -526,6 +528,7 @@ export class ApplicationsService {
   private handleVerifyApplication = async (
     applicationId: string,
     recruiterId: string,
+    options: 'accept' | 'rejected',
   ) => {
     const { data } = await this.anonSupabaseClient
       .from('Applications')
@@ -542,8 +545,80 @@ export class ApplicationsService {
 
     if (data.Jobs.Recruiters.ID !== recruiterId)
       throw new ForbiddenException(
-        `Đơn ứng tuyển có id '${applicationId}' không ứng tuyển cho công việc mà bạn đăng, nên bạn không thể xủ lý chúng.`,
+        `Đơn ứng tuyển có id '${applicationId}' không ứng tuyển cho công việc mà bạn đăng, nên bạn không thể xử lý chúng.`,
       );
+
+    if (data.Jobs.Status === JobStatus.closed)
+      throw new BadRequestException(
+        `Công việc '${data.Jobs.Title}' mà bạn đăng đã đóng do đã đủ ứng viên.`,
+      );
+
+    if (options === 'accept') {
+      const totalAcceptedApplicationsOfJob: number =
+        await this.jobsService.handleCountApplicationsOfJob(
+          data.Jobs.ID as string,
+          ApplicationStatus.accepted,
+        );
+
+      const vacancies: number = data.Jobs.Vacancies;
+
+      if (totalAcceptedApplicationsOfJob + 1 === vacancies) {
+        const { error } = await this.adminSupabaseClient
+          .from('Jobs')
+          .update([
+            {
+              Status: JobStatus.closed,
+            },
+          ])
+          .eq('ID', data.Jobs.ID);
+
+        if (error) {
+          console.error(error);
+
+          throw new InternalServerErrorException(
+            'Đã xảy ra lỗi khi cập nhật trạng thái của công việc.',
+          );
+        }
+
+        const { data: totalApplications } = await this.anonSupabaseClient
+          .from('Applications')
+          .select('*, Candidates(*)')
+          .neq('ID', applicationId)
+          .eq('JobID', data.Jobs.ID)
+          .overrideTypes<any[], { merge: false }>();
+
+        const userIds: string[] =
+          totalApplications?.map(
+            (application) => application.Candidates.UserID as string,
+          ) || [];
+
+        if (userIds.length) {
+          const metadata = {
+            jobId: data.Jobs.ID,
+            jobTitle: data.Jobs.Title,
+          };
+
+          const { candidate_job_closed } = NotificationType;
+
+          await Promise.all(
+            userIds.map(
+              async (userId) =>
+                await this.userNotificationsService.handleCreateUserNotification(
+                  {
+                    Content: handleFormatUserNotificationContent(
+                      NotificationType.candidate_job_closed as NotificationType,
+                      metadata,
+                    ),
+                    Type: candidate_job_closed,
+                    metadata,
+                  },
+                  userId,
+                ),
+            ),
+          );
+        }
+      }
+    }
 
     return data;
   };

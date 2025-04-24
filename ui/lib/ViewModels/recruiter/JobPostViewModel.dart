@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Helpers/toastification.dart';
 import '../../Models/Enum.dart';
-import 'package:ui/Services/JobService.dart';
+import 'package:ui/Services/job_service.dart';
 
 List<String> jobType_value = [
   "Bán thời gian",

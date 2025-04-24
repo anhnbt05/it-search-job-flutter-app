@@ -256,6 +256,9 @@ enum NotificationType {
   recruiter_job_rejected
   recruiter_new_application
   admin_new_job_post
+  recruiter_job_expiring_soon
+  recruiter_job_expired
+  candidate_job_closed
 }
 
 enum JobType {

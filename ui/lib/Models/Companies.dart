@@ -1,3 +1,5 @@
+import 'dart:core';
+
 import 'CompanyLocations.dart';
 
 class cCompanies {
@@ -38,3 +40,4 @@ class cCompanies {
     );
   }
 }
+
