@@ -105,7 +105,7 @@ Widget? appbarTitle_recruiter(int selectedIndex) {
       return Text('Quản lý',
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
     case 1:
-      return Text('Danh sách ứng viên',
+      return Text('Danh sách đơn ứng tuyển',
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
     case 2:
       return Text('Thêm tin tuyển dụng',

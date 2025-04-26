@@ -5,19 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9312053-9e5e-49bf-8451-898f90d1f6f0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/android/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/ui/android/app/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/ui/ios/Runner/Info.plist" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/ Constants/api_constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ Constants/api_constants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Models/Jobs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Models/Jobs.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/CandidatesAppliesViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/CandidatesAppliesViewModel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/CandidatesAppliedView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/CandidatesAppliedView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/ReadResumeScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/ReadResumeScreen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/recruiter.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/recruiter.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/ui/linux/flutter/generated_plugins.cmake" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ui/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/ui/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/ui/pubspec.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -79,6 +79,29 @@
       <updated>1744504225407</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="feat/job-list-view-for-recruiter" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
