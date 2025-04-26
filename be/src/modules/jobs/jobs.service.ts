@@ -199,18 +199,17 @@ export class JobsService {
             `Không tìm thấy nhà tuyển dụng liên kết với người dùng có id '${userId}'`,
           );
 
-        query
-          .match({
-            RecruiterID: data.ID,
-            Status: JobStatus.open,
-          })
-          .is('DeletedAt', null);
+        query.match({
+          RecruiterID: data.ID,
+        });
+      } else {
+        query.match({ Status: JobStatus.open }).is('DeletedAt', null);
       }
 
-      const { data: jobs, error: jobsError } = await query
-        .match({ Status: JobStatus.open })
-        .is('DeletedAt', null)
-        .overrideTypes<any[], { merge: false }>();
+      const { data: jobs, error: jobsError } = await query.overrideTypes<
+        any[],
+        { merge: false }
+      >();
 
       if (jobsError)
         throw new InternalServerErrorException(
