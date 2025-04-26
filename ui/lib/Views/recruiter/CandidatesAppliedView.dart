@@ -185,13 +185,26 @@ Widget CandidateApplied(int index, cApplications_recruiter application, List<cAp
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Image.network(application.Candidate.AvatarUrl, width: MediaQuery
-                  .of(context)
-                  .size
-                  .width / 10, height: MediaQuery
-                  .of(context)
-                  .size
-                  .width / 10),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  border: Border.all(
+                    width: 2.2,
+                    color: (application.Status == 'accepted')
+                      ? Colors.green
+                      : (application.Status == 'pending')
+                        ? Colors.transparent
+                        : Colors.red,
+                  )
+                ),
+                child: Image.network(application.Candidate.AvatarUrl, width: MediaQuery
+                    .of(context)
+                    .size
+                    .width / 10, height: MediaQuery
+                    .of(context)
+                    .size
+                    .width / 10,),
+              ),
               SizedBox(width: MediaQuery
                   .of(context)
                   .size
@@ -219,14 +232,14 @@ Widget CandidateApplied(int index, cApplications_recruiter application, List<cAp
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 5, vertical: 1),
                             child: Text(
-                              '${application.AppliedAt.day.toString().padLeft(
-                                  2, '0')}/${application.AppliedAt.month
-                                  .toString().padLeft(2, '0')}/${application
-                                  .AppliedAt.year}',
-                              style: TextStyle(
-                                fontSize: 12,
-                              ),
-                            ),
+                                  '${application.AppliedAt.day.toString().padLeft(
+                                      2, '0')}/${application.AppliedAt.month
+                                      .toString().padLeft(2, '0')}/${application
+                                      .AppliedAt.year}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
                           ),
                         )
                       ],
@@ -235,23 +248,24 @@ Widget CandidateApplied(int index, cApplications_recruiter application, List<cAp
                 ),
               ),
 
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(
-                      builder: (context) => ReadResumeScreen(
-                          application.Candidate.FullName, application.ResumeUrl, application.ID, job, applications, application.Status, Provider.of<CandidatesAppliesViewModel>(context)
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context, MaterialPageRoute(
+                          builder: (context) => ReadResumeScreen(
+                              application.Candidate.FullName, application.ResumeUrl, application.ID, job, applications, application.Status, Provider.of<CandidatesAppliesViewModel>(context)
+                          )
                       )
-                  )
-                  );
-                },
-                icon: Icon(Icons.article_outlined),
-                padding: EdgeInsets.zero,
-              ),
+                      );
+                    },
+                    icon: Icon(Icons.article_outlined),
+                    padding: EdgeInsets.zero,
+                  ),
+
 
               IconButton(
                 onPressed: () {},
-                icon: Icon(Icons.remove_red_eye_outlined),
+                icon: Icon(Icons.person_outline),
                 padding: EdgeInsets.zero,
               )
             ],

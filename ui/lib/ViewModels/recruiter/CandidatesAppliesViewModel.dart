@@ -40,7 +40,6 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _rejectReason.dispose();
-    _progressSubscription?.cancel();
     super.dispose();
   }
 
@@ -67,10 +66,6 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
       return appList;
     });
   }
-
-  double _progress = 0.0;
-  double get progress => _progress;
-  StreamSubscription? _progressSubscription;
 
   DownloadViewModel() {
     _initialize();
@@ -110,6 +105,12 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
         final index = appList?.indexWhere((app) => app.ID == applicationId);
         if (index != null && index >= 0) {
           appList![index] = appList[index].copyWith(status: 'accepted');
+          int jobIdx = jobs.indexWhere((job) => job!.ID == appList[index].JobID);
+          final acceptedCount = appList.where((e) => e.Status == "accepted").length;
+          if (jobs[jobIdx] != null && acceptedCount == jobs[jobIdx]!.Vacancies) {
+            jobs.removeWhere((e) => e!.ID == jobs[jobIdx]!.ID);
+            applications.remove(appList);
+          }
           break;
         }
       }
