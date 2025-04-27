@@ -6,6 +6,7 @@ import 'package:ui/Helpers/helpers.dart';
 import 'package:ui/ViewModels/login/CompaniesViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import 'package:ui/ViewModels/login/ProvincesViewModel.dart';
+import 'package:ui/ViewModels/login/SignInViewModel.dart';
 import 'package:ui/ViewModels/login/SignUpViewModel.dart';
 import 'package:ui/Services/application_recruiter_service.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
@@ -37,6 +38,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => SignUpViewModel()),
         ChangeNotifierProvider(create: (context) => ProvincesViewModel()),
         ChangeNotifierProvider(create: (context) => CandidatesAppliesViewModel()),
+        ChangeNotifierProvider(create: (context) => SignInViewModel()),
       ],
       child: MyApp(),
       ),

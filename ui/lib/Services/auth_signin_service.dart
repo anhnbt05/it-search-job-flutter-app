@@ -9,7 +9,7 @@ class AuthSignInService {
 
   Future<ResponseModel> signIn(String email, String password) async {
     final url = Uri.parse('$_baseUrl/auth/sign-in');
-
+    print("Body: ${json.encode({"email": email, "password": password})}");
 
     try {
       final response = await http.post(
