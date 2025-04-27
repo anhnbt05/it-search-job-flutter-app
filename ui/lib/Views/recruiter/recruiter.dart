@@ -7,26 +7,18 @@ import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 import '../../Models/Jobs.dart';
 import '../../ViewModels/BottomNavigationViewModel.dart';
 import 'CandidatesAppliedView.dart';
+import 'PostedJobsManagementView.dart';
 import 'JobPostView.dart';
 import '../../Models/Applications.dart';
 
-List<Widget> pageView_recruiter(BuildContext context, CandidatesAppliesViewModel viewModel) {
+List<Widget> pageView_recruiter(BuildContext context) {
   return [
-    ManagementScreen(),
-    CandidatesAppliedScreen(context, viewModel),
+    PostedJobsManagementScreen(context),
+    CandidatesAppliedScreen(context),
     PostJobScreen(context),
     NotificationsScreen(),
     ProfileScreen(),
   ];
-}
-
-Widget ManagementScreen() {
-  return Container(
-    color: Colors.amberAccent.shade100,
-    child: Center(
-      child: Text("Quản lý", style: TextStyle(fontSize: 24)),
-    ),
-  );
 }
 
 Widget NotificationsScreen() {

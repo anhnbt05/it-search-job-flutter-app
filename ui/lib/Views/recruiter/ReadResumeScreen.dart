@@ -35,11 +35,11 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
   @override
   Widget build(BuildContext context) {
     var viewModel = Provider.of<CandidatesAppliesViewModel>(context);
-    bool hasSlot = widget.job.Vacancies > widget.applications.where((e) => e.Status == "accepted").length;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: (widget.status == 'pending' && hasSlot) ? Size.fromHeight(90) : Size.fromHeight(50),
+        preferredSize: (widget.status == 'pending') ? Size.fromHeight(90) : Size.fromHeight(50),
         child: AppBar(
           iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: color,
@@ -160,7 +160,7 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
               )
             ],
           ),
-          bottom: displaySelection(context: context, viewModel: widget.viewModel, Id: widget.Id, status: widget.status, hasSlot: hasSlot),
+          bottom: displaySelection(context: context, viewModel: widget.viewModel, Id: widget.Id, status: widget.status),
         ),
       ),
       body: SfPdfViewer.network(
@@ -173,8 +173,8 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
 }
 
 
-PreferredSize? displaySelection({required BuildContext context, required CandidatesAppliesViewModel viewModel, required String Id, required String status, required bool hasSlot}) {
-  if (status != 'pending' || !hasSlot) {
+PreferredSize? displaySelection({required BuildContext context, required CandidatesAppliesViewModel viewModel, required String Id, required String status}) {
+  if (status != 'pending') {
     return null;
   } else {
     return PreferredSize(

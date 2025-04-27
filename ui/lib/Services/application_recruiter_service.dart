@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ui/Helpers/toastification.dart';
 import 'package:ui/Models/Applications.dart';
 
-import '../ Constants/api_constants.dart';
+import '../Constants/api_constants.dart';
 import 'api_service.dart';
 
 class ApplicationService {

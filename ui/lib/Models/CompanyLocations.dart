@@ -40,3 +40,29 @@ class cCompanyLocations {
   List<cRecruiterPost>? Recruiters;
 }
 
+class cCompanyLocation_RecruiterInfo {
+  final String ID;
+  final String Address;
+  final String CreatedAt;
+  final String UpdatedAt;
+  final String BranchName;
+
+  cCompanyLocation_RecruiterInfo({
+    required this.ID,
+    required this.Address,
+    required this.CreatedAt,
+    required this.UpdatedAt,
+    required this.BranchName,
+  });
+
+  factory cCompanyLocation_RecruiterInfo.fromJson(Map<String, dynamic> json) {
+    return cCompanyLocation_RecruiterInfo(
+      ID: json['ID'],
+      Address: json['Address'],
+      CreatedAt: json['CreatedAt'],
+      UpdatedAt: json['UpdatedAt'],
+      BranchName: json['BranchName'],
+    );
+  }
+}
+

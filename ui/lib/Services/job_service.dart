@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:ui/%20Constants/api_constants.dart';
+import 'package:ui/Constants/api_constants.dart';
 import 'api_service.dart';
 import 'package:ui/Models/Jobs.dart';
 

@@ -35,6 +35,7 @@ dependencies:
   dio: ^5.4.0
   toastification: ^3.0.2
   fl_downloader: ^2.0.2
+  jwt_decoder: ^2.0.1
   flutter:
     sdk: flutter
   dropdown_button2: ^2.3.9
@@ -68,6 +69,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/job-search-background.jpg
+    - assets/title-background.jpg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -94,6 +96,10 @@ flutter:
       - family: Poppins
         fonts:
           - asset: assets/fonts/Poppins-Regular.ttf
+          - asset: assets/fonts/Poppins-Medium.ttf
+            weight: 500
+          - asset: assets/fonts/Poppins-SemiBold.ttf
+            weight: 700
       - family: Anton
         fonts:
           - asset: assets/fonts/Anton-Regular.ttf

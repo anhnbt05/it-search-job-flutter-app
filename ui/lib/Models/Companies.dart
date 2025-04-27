@@ -41,3 +41,34 @@ class cCompanies {
   }
 }
 
+class cCompany_RecruiterInfo {
+  final String ID;
+  final String Name;
+  final String? LogoUrl;
+  final String CreatedAt;
+  final String UpdatedAt;
+  final String WebsiteUrl;
+  final String Description;
+
+  cCompany_RecruiterInfo({
+    required this.ID,
+    required this.Name,
+    this.LogoUrl,
+    required this.CreatedAt,
+    required this.UpdatedAt,
+    required this.WebsiteUrl,
+    required this.Description,
+  });
+
+  factory cCompany_RecruiterInfo.fromJson(Map<String, dynamic> json) {
+    return cCompany_RecruiterInfo(
+      ID: json['ID'],
+      Name: json['Name'],
+      LogoUrl: json['LogoUrl'],
+      CreatedAt: json['CreatedAt'],
+      UpdatedAt: json['UpdatedAt'],
+      WebsiteUrl: json['WebsiteUrl'],
+      Description: json['Description'],
+    );
+  }
+}

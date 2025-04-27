@@ -12,7 +12,7 @@ class cCandidates_cApplication_recruiter {
   final String PhoneNumber;
   final String AvatarUrl;
   final String Role;
-  final List<cWorkExperiences_cApplication_recruiter> WorkExperiences;
+  final List<cWorkExperiences> WorkExperiences;
 
   cCandidates_cApplication_recruiter({
     required this.ID,
@@ -41,7 +41,7 @@ class cCandidates_cApplication_recruiter {
       AvatarUrl: json['AvatarUrl'],
       Role: json['Role'],
       WorkExperiences: (json['WorkExperiences'] as List)
-          .map((e) => cWorkExperiences_cApplication_recruiter.fromJson(e))
+          .map((e) => cWorkExperiences.fromJson(e))
           .toList(),
     );
   }

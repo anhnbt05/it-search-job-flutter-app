@@ -54,6 +54,12 @@
       <excludeFolder url="file://$MODULE_DIR$/ui/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/example/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/ui/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/example/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/ui/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ui/windows/flutter/ephemeral/.plugin_symlinks/fl_downloader/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ui/windows/flutter/ephemeral/.plugin_symlinks/fl_downloader/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ui/windows/flutter/ephemeral/.plugin_symlinks/fl_downloader/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ui/windows/flutter/ephemeral/.plugin_symlinks/fl_downloader/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ui/windows/flutter/ephemeral/.plugin_symlinks/fl_downloader/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ui/windows/flutter/ephemeral/.plugin_symlinks/fl_downloader/example/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

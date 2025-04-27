@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ui/Services/application_recruiter_service.dart';
-import '../../ Constants/api_constants.dart';
+import '../../Constants/api_constants.dart';
 import '../../Models/Applications.dart';
 import '../../Models/Jobs.dart';
 import '../../Services/job_service.dart';
@@ -48,9 +48,9 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
 
     _applicationsFuture = _jobsFuture.then((jobsF) async {
 
-      jobs = jobsF;
+      jobs = jobsF.where((e) => e!.Status == 'open').toList();
 
-      List<Future<List<cApplications_recruiter>?>> applicationFutures = jobsF.map((job) {
+      List<Future<List<cApplications_recruiter>?>> applicationFutures = jobs.map((job) {
         return ApplicationService().getApplicationsList(
           accessToken: APIConstants.token,
           jobID: job!.ID.toString(),

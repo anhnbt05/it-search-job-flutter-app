@@ -52,22 +52,4 @@ class cJobs_recruiter {
     );
   }
 
-  cJobs_recruiter copyWith({String? status}) {
-    return cJobs_recruiter(
-      ID: this.ID,
-      Status: status ?? this.Status,
-      Title: this.Title,
-      Description: this.Description,
-      Address: this.Address,
-      Salary: this.Salary,
-      Vacancies: this.Vacancies,
-      Type: this.Type,
-      WorkingTimes: this.WorkingTimes,
-      PostedAt: this.PostedAt,
-      ExpiredAt: this.ExpiredAt,
-      Level: this.Level,
-      DeletedAt: this.DeletedAt,
-      Recruiter: this.Recruiter,
-    );
-  }
 }

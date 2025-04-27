@@ -10,7 +10,7 @@ import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 import '../../Models/Applications.dart';
 import 'ReadResumeScreen.dart';
 
-Widget CandidatesAppliedScreen(BuildContext context, CandidatesAppliesViewModel viewModel) {
+Widget CandidatesAppliedScreen(BuildContext context,) {
   var viewModel = Provider.of<CandidatesAppliesViewModel>(context);
 
   return Container(
