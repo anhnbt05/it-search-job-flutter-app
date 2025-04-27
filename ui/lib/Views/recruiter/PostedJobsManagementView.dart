@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Constants/color_constants.dart';
 
@@ -40,130 +41,88 @@ Widget body({
   required BuildContext context,
   required PostedJobsManagementViewModel viewModel,
 }) {
-  return Column(
-    children: [
-      Padding(
-        padding: const EdgeInsets.only(top: 5, left: 10, right: 5),
-        child: Column(
-          children: [
-            Container(
-              child: Row(
-                children: [
-                  Image.network(
-                    viewModel.recruiterInfo!.AvatarUrl,
-                    width: 50,
-                    height: 50,
-                  ),
-                  SizedBox(width: 5),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/title-background.jpg'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            viewModel.recruiterInfo!.FullName,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            viewModel.recruiterInfo!.Company.Name,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: ColorConstants.subTextColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Transform.translate(
-              offset: Offset(0, 12),
-              child: Container(
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                          width: 1,
-                          color: Colors.grey.shade800,
-                        )
-                    )
-                ),
-              ),
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                reverse: true,
+  return GestureDetector(
+    onTap: (){
+      print("ok");
+    },
+    child: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 5, left: 10, right: 5),
+          child: Column(
+            children: [
+              Container(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Container(
-                      color: Colors.white,
-                      width: 4,
-                      height: 20,
-                      child: SizedBox.shrink(),
+                    Image.network(
+                      viewModel.recruiterInfo!.AvatarUrl,
+                      width: 50,
+                      height: 50,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 1,
-                      ),
-                      child: Center(
-                        child: Row(
+                    SizedBox(width: 5),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/title-background.jpg'),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.green,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(1),
-                                child: Icon(
-                                  Icons.check_outlined,
-                                  size: 15,
-                                  color: Colors.white,
-                                ),
+                            Text(
+                              viewModel.recruiterInfo!.FullName,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
                               ),
                             ),
-                            Container(
-                              color: Colors.white,
-                              width: 2,
-                              height: 20,
-                              child: SizedBox.shrink(),
-                            ),
-                            Container(
-                                color: Colors.white,
-                                child: Text(
-                                  'Đã đăng: ${viewModel.jobs_open.length} bài',
-                                  style: TextStyle(fontSize: 12),
-                                ),
+                            Text(
+                              viewModel.recruiterInfo!.Company.Name,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: ColorConstants.subTextColor,
                               ),
-
+                            ),
                           ],
                         ),
                       ),
                     ),
-                    Container(
-                      color: Colors.white,
-                      width: 15,
-                      height: 20,
-                      child: SizedBox.shrink(),
-                    ),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          top: 1, right: 10, bottom: 1
+                  ],
+                ),
+              ),
+              Transform.translate(
+                offset: Offset(0, 12),
+                child: Container(
+                  decoration: BoxDecoration(
+                      border: Border(
+                          bottom: BorderSide(
+                            width: 1,
+                            color: Colors.grey.shade800,
+                          )
+                      )
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  reverse: true,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        color: Colors.white,
+                        width: 4,
+                        height: 20,
+                        child: SizedBox.shrink(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 0,
+                          vertical: 1,
                         ),
                         child: Center(
                           child: Row(
@@ -171,12 +130,12 @@ Widget body({
                               Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(5),
-                                  color: Colors.yellow.shade700,
+                                  color: Colors.green,
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(1),
                                   child: Icon(
-                                    Icons.access_time,
+                                    Icons.check_outlined,
                                     size: 15,
                                     color: Colors.white,
                                   ),
@@ -189,47 +148,324 @@ Widget body({
                                 child: SizedBox.shrink(),
                               ),
                               Container(
-                                color: Colors.white,
-                                child: Text(
-                                  'Chờ duyệt: ${viewModel.jobs_pending.length} bài',
-                                  style: TextStyle(fontSize: 12),
+                                  color: Colors.white,
+                                  child: Text(
+                                    'Đã đăng: ${viewModel.jobs_open.length} bài',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                color: Colors.white,
-                                width: 4,
-                                height: 20,
-                                child: SizedBox.shrink(),
-                              ),
+
                             ],
                           ),
                         ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        width: 15,
+                        height: 20,
+                        child: SizedBox.shrink(),
+                      ),
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 1, right: 10, bottom: 1
+                          ),
+                          child: Center(
+                            child: Row(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: Colors.yellow.shade700,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(1),
+                                    child: Icon(
+                                      Icons.access_time,
+                                      size: 15,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  color: Colors.white,
+                                  width: 2,
+                                  height: 20,
+                                  child: SizedBox.shrink(),
+                                ),
+                                Container(
+                                  color: Colors.white,
+                                  child: Text(
+                                    'Chờ duyệt: ${viewModel.jobs_pending.length} bài',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                                Container(
+                                  color: Colors.white,
+                                  width: 4,
+                                  height: 20,
+                                  child: SizedBox.shrink(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        JobsList(context, viewModel)
+      ],
+    ),
+  );
+}
+
+Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel) {
+  return Expanded(
+    child: Padding(
+      padding: const EdgeInsets.only(top: 5),
+      child: ListView(
+        children: [
+          JobsFilter(context, viewModel),
+          ...List.generate(
+            viewModel.jobs.length,
+                (index) => JobsItem(context, viewModel, index),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
+  return Padding(
+    padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+    child: Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(
+              width: 1,
+              color: Colors.transparent
+          )
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 50,
+                width: 50,
+                margin: EdgeInsets.only(right: 10),
+                child: (viewModel.recruiterInfo?.Company.LogoUrl != null)
+                    ? Image.network(
+                  viewModel.recruiterInfo!.Company.LogoUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey.shade200,
+                      child: Icon(Icons.broken_image, color: Colors.grey),
+                    );
+                  },
+                )
+                    : Container(
+                  color: Colors.grey.shade200,
+                  child: Icon(Icons.business, color: Colors.grey),
+                ),
+              ),
+
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      viewModel.jobs[index]!.Title,
+                      style: TextStyle(
+                        fontSize: 18,
+                        height: 1.2,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Status(context, viewModel, index),
+                    SizedBox(height: 5,),
+                    ShaderMask(
+                      shaderCallback: (bounds) =>
+                        LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.black,
+                            Colors.black,
+                            Colors.transparent,
+                          ],
+                          stops: [0.0, 0.9, 1.0],
+                        ).createShader(bounds),
+                      blendMode: BlendMode.dstIn,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            Salary(context, viewModel, index),
+                            SizedBox(width: 5,),
+                            Level(context, viewModel, index),
+                            SizedBox(width: 5,),
+                            JobType(context, viewModel, index),
+                            SizedBox(width: 20,)
+                          ]
+                        ),
+                      )
+                    ),
+                    SizedBox(height: 5,),
+                    Text(viewModel.jobs[index]!.Description,
+                      maxLines: 5,
+                      textAlign: TextAlign.justify,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11,
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-      JobsList(context, viewModel)
-    ],
+    ),
   );
 }
 
+Widget Level(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
+  StringBuffer Level = StringBuffer();
+  Level.write(viewModel.jobs[index]!.Level[0].toUpperCase());
+  Level.write(viewModel.jobs[index]!.Level.substring(1));
+  return Container(
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+            width: 0.5,
+            color: Colors.grey.shade700
+        )
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
+      child: Text(Level.toString(),
+        style: TextStyle(
+          fontSize: 12,
+          color: Colors.grey.shade700,
+        ),),
+    ),
+  );
+}
 
-Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel) {
- return Expanded(
-   child: Padding(
-     padding: const EdgeInsets.only(top: 5),
-     child: ListView(
-       children: [
-         JobsFilter(context, viewModel),
-       ],
-     ),
-   ),
- );
+Widget Salary(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
+  return Container(
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+            width: 0.5,
+            color: Colors.grey.shade700
+        )
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
+      child: Text(viewModel.jobs[index]!.Salary,
+        style: TextStyle(
+          fontSize: 12,
+          color: Colors.grey.shade700,
+        ),),
+    ),
+  );
+}
+
+Widget JobType(BuildContext context, PostedJobsManagementViewModel viewModel,
+    int index) {
+  final List<Map<String, String>> jobType = [
+    {"full_time": "Toàn thời gian"},
+    {"part_time": "Bán thời gian"},
+    {"remote": "Làm việc từ xa"},
+    {"free_lance": "làm việc tự do"}
+  ];
+  String JobType = jobType
+      .firstWhere((e) => e.keys.first == viewModel.jobs[index]!.Type,
+    orElse: () => {"unknown": "Không xác định"},)
+      .values
+      .first;
+  return Container(
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+            width: 0.5,
+            color: Colors.grey.shade700
+        )
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
+      child: Text(JobType,
+        style: TextStyle(
+          fontSize: 12,
+          color: Colors.grey.shade700,
+        ),),
+    ),
+  );
+}
+
+Widget Status(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
+  if (viewModel.jobs[index]!.Status == 'open') {
+    return Row(
+      children: [
+        Icon(Icons.verified_outlined, size: 14, color: Colors.green,),
+        SizedBox(width: 2,),
+        Text('Đang mở', style: TextStyle(
+          fontWeight: FontWeight.normal,
+          color: Colors.green,
+          fontSize: 13,
+        )),
+      ],
+    );
+  } else if (viewModel.jobs[index]!.Status == 'pending') {
+    return Row(
+      children: [
+        Icon(Icons.hourglass_top_outlined, size: 14, color: Colors.yellow.shade800,),
+        SizedBox(width: 2,),
+        Text('Đang chờ duyệt', style: TextStyle(
+          fontWeight: FontWeight.normal,
+          color: Colors.yellow.shade800,
+          fontSize: 13,
+        )),
+      ],
+    );
+  } else if (viewModel.jobs[index]!.Status == 'rejected') {
+    return Row(
+      children: [
+        Icon(Icons.highlight_off, size: 14, color: Colors.red,),
+        SizedBox(width: 2,),
+        Text('Đã bị từ chối', style: TextStyle(
+          fontWeight: FontWeight.normal,
+          color: Colors.red,
+          fontSize: 13,
+        )),
+      ],
+    );
+  }
+  return SizedBox.shrink();
 }
 
 Widget JobsFilter(BuildContext context, PostedJobsManagementViewModel viewModel) {
@@ -270,13 +506,6 @@ Widget JobsFilter(BuildContext context, PostedJobsManagementViewModel viewModel)
               buttonStyleData: ButtonStyleData(
                 width: MediaQuery.of(context).size.width / 2 - 80,
                 overlayColor: MaterialStateProperty.all(Colors.transparent),
-                /*
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: Colors.blue,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),*/
               ),
               dropdownStyleData: DropdownStyleData(
                 elevation: 1,
@@ -289,15 +518,6 @@ Widget JobsFilter(BuildContext context, PostedJobsManagementViewModel viewModel)
               iconStyleData: IconStyleData(
                 icon: Icon(Icons.arrow_drop_down),
               ),
-              onMenuStateChange: (isOpen) {
-                /*if (isOpen) {
-                      viewModel.setJobTypeBorderColor(Colors.blue);
-                    } else {
-                      if (viewModel.check == false || viewModel.jobTypeSelected != null)
-                        viewModel.setJobTypeBorderColor(Colors.grey.shade400);
-                      else viewModel.setJobTypeBorderColor(Colors.red);
-                    }*/
-              },
             ),
           ),
         ),

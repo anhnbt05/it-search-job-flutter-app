@@ -11,6 +11,7 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
   List<cJobs_recruiter?> _jobs_open = [];
   List<cJobs_recruiter?> _jobs_close = [];
   List<cJobs_recruiter?> _jobs_pending = [];
+  List<cJobs_recruiter?> _jobs = [];
   late Future<cRecruiters?> _recruiterFuture;
   cRecruiters? _recruiterInfo = null;
   String _statusFilter = "all";
@@ -19,6 +20,8 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
   List<cJobs_recruiter?> get jobs_open => _jobs_open;
   List<cJobs_recruiter?> get jobs_close => _jobs_close;
   List<cJobs_recruiter?> get jobs_pending => _jobs_pending;
+  List<cJobs_recruiter?> get jobs => _jobs;
+
   Future<cRecruiters?> get recruiter => _recruiterFuture;
 
   String get statusFilter => _statusFilter;
@@ -32,8 +35,8 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
 
   void initFutures() {
     _jobsFuture = JobService().getJobs(accessToken: APIConstants.token).then((value) {
+      _jobs = value.map((e) => e).toList();
       _jobs_open = value.where((element) => element!.Status == 'open').toList();
-      _jobs_close = value.where((element) => element!.Status == 'closed').toList();
       _jobs_pending = value.where((element) => element!.Status == 'pending').toList();
       return value;
     });

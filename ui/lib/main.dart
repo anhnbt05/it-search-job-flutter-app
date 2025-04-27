@@ -142,7 +142,7 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
           showUnselectedLabels: false,
           selectedLabelStyle: TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w500,
             color: Colors.white,
           ),
           selectedItemColor: Colors.black,
