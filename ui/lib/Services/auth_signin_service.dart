@@ -9,26 +9,44 @@ class AuthSignInService {
 
   Future<ResponseModel> signIn(String email, String password) async {
     final url = Uri.parse('$_baseUrl/auth/sign-in');
-    print("Body: ${json.encode({"email": email, "password": password})}");
+    print("📤 Request Body: ${json.encode({"email": email, "password": password})}");
 
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({"email": email,
-          "password": password},
-        ),
+        body: json.encode({
+          "email": email,
+          "password": password,
+        }),
       );
 
       print("📦 Status Code: ${response.statusCode}");
       print("📥 Response Body: ${response.body}");
+
       final responseData = json.decode(response.body);
-      return ResponseModel.fromJson(responseData);
+
+      if (response.statusCode == 201) {
+        return ResponseModel(
+          success: true,
+          message: "Đăng nhập thành công.",
+          messageList: ["Đăng nhập thành công."] ,
+          data: responseData,
+        );
+      } else {
+        return ResponseModel(
+          success: false,
+          message: responseData['message'] ?? "Đăng nhập thất bại.",
+          messageList: [responseData['error'] ?? "Có lỗi xảy ra."],
+          data: null,
+        );
+      }
     } catch (e) {
+      print("❌ Exception in signIn: $e");
       return ResponseModel(
         success: false,
-        message: "Không thể kết nối đến máy chủ",
-        messageList: ["Không thể kết nối đến máy chủ"],
+        message: "Không thể kết nối đến máy chủ.",
+        messageList: ["Không thể kết nối đến máy chủ."],
         data: null,
       );
     }

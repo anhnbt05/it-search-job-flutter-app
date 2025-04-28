@@ -22,48 +22,60 @@ class SignInViewModel extends ChangeNotifier {
 
     try {
       final ResponseModel result = await _authService.signIn(email, password);
-      String accessToken = result.data['accessToken'];
-      Map<String, dynamic> payload = Jwt.parseJwt(accessToken);
-      print('Payload: $payload');
 
-      if (result.success) {
-        String accessToken = result.data['accessToken'];
-        String refreshToken = result.data['refreshToken'];
+      print('SignIn API Result: success=${result.success}, message=${result.message}, data=${result.data}');
+
+      if (result.success == true && result.data != null) {
+        final String? accessToken = result.data?['accessToken'];
+        final String? refreshToken = result.data?['refreshToken'];
+
+        if (accessToken == null || refreshToken == null) {
+          errorMessage = "Không lấy được token, vui lòng thử lại.";
+          return;
+        }
+
 
         await _storage.write(key: 'accessToken', value: accessToken);
         await _storage.write(key: 'refreshToken', value: refreshToken);
 
-        Map<String, dynamic> payload = Jwt.parseJwt(accessToken);
-        print('Payload: $payload');
+        final Map<String, dynamic> payload = Jwt.parseJwt(accessToken);
+        print('Decoded JWT Payload: $payload');
 
-        String role = payload['role'];
-
-        // Navigation theo role
-        if (role == 'admin') {
-          // Navigator.pushReplacement(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => AdminHomePage()),
-          // );
-        } else if (role == 'recruiter') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => ManagementScreen()),
-          );
-        } else if (role == 'candidate') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
-          );
-        } else {
-          errorMessage = "Role không hợp lệ";
+        final String? role = payload['app_metadata']['role'];
+        if (role == null) {
+          errorMessage = "Không tìm thấy vai trò người dùng.";
+          return;
         }
+        _navigateByRole(context, role);
       } else {
-        errorMessage = result.message;
+        errorMessage = result.message ?? "Đăng nhập thất bại. Vui lòng kiểm tra tài khoản hoặc mật khẩu.";
+        print('Error Message: $errorMessage');
       }
-    } catch (e) {
-      errorMessage = "Có lỗi xảy ra, vui lòng thử lại.";
+    } catch (e, stackTrace) {
+      print('SignIn Error: $e');
+      print('StackTrace: $stackTrace');
+      errorMessage = "Có lỗi xảy ra, vui lòng thử lại sau.";
     } finally {
       isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void _navigateByRole(BuildContext context, String role) {
+    if (role == 'admin') {
+      // Navigator.of(context, rootNavigator: true).pushReplacement(
+      //   MaterialPageRoute(builder: (context) => AdminHomePage()),
+      // );
+    } else if (role == 'recruiter') {
+      Navigator.of(context, rootNavigator: true).pushReplacement(
+        MaterialPageRoute(builder: (context) => ManagementScreen()),
+      );
+    } else if (role == 'candidate') {
+      Navigator.of(context, rootNavigator: true).pushReplacement(
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+    } else {
+      errorMessage = "Role không hợp lệ.";
       notifyListeners();
     }
   }
