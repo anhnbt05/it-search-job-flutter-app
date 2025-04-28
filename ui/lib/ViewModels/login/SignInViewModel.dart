@@ -6,10 +6,13 @@ import 'package:ui/Views/candidate/candidate.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
 
 import '../../Models/ResponseModel.dart';
+import '../../Services/auth_refreshtoken_service.dart';
 import '../../Services/auth_signin_service.dart';
+
 
 class SignInViewModel extends ChangeNotifier {
   final AuthSignInService _authService = AuthSignInService();
+  final AuthRefreshTokenService _refreshTokenService = AuthRefreshTokenService();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   bool isLoading = false;
@@ -33,7 +36,6 @@ class SignInViewModel extends ChangeNotifier {
           errorMessage = "Không lấy được token, vui lòng thử lại.";
           return;
         }
-
 
         await _storage.write(key: 'accessToken', value: accessToken);
         await _storage.write(key: 'refreshToken', value: refreshToken);
@@ -61,8 +63,58 @@ class SignInViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> refreshAccessToken() async {
+    try {
+      final String? refreshToken = await _storage.read(key: 'refreshToken');
+      if (refreshToken == null) {
+        errorMessage = "Không tìm thấy refreshToken.";
+        notifyListeners();
+        return;
+      }
+
+      final ResponseModel result = await _refreshTokenService.refreshAccessToken(refreshToken);
+
+      print('Refresh Token Result: success=${result.success}, message=${result.message}, data=${result.data}');
+
+      if (result.success && result.data != null) {
+        final String? newAccessToken = result.data?['accessToken'];
+        if (newAccessToken != null) {
+          await _storage.write(key: 'accessToken', value: newAccessToken);
+          print('🔑 New AccessToken Saved Successfully');
+        } else {
+          errorMessage = "Không lấy được accessToken mới.";
+          notifyListeners();
+        }
+      } else {
+        errorMessage = result.message ?? "Làm mới token thất bại.";
+        notifyListeners();
+      }
+    } catch (e, stackTrace) {
+      print('Refresh Token Exception: $e');
+      print('StackTrace: $stackTrace');
+      errorMessage = "Có lỗi khi làm mới token.";
+      notifyListeners();
+    }
+  }
+
+  Future<bool> isAccessTokenExpired() async {
+    try {
+      final String? accessToken = await _storage.read(key: 'accessToken');
+      if (accessToken == null) {
+        return true;
+      }
+      bool isExpired = Jwt.isExpired(accessToken);
+      print('AccessToken expired: $isExpired');
+      return isExpired;
+    } catch (e) {
+      print('Error checking token expiry: $e');
+      return true;
+    }
+  }
+
   void _navigateByRole(BuildContext context, String role) {
     if (role == 'admin') {
+      // Mở AdminHomePage khi xong
       // Navigator.of(context, rootNavigator: true).pushReplacement(
       //   MaterialPageRoute(builder: (context) => AdminHomePage()),
       // );
