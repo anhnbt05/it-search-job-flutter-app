@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:toastification/toastification.dart';
 import 'package:ui/Models/Recruiters.dart';
 import 'package:ui/Services/user_service.dart';
 
@@ -9,8 +10,9 @@ import '../../Services/job_service.dart';
 class PostedJobsManagementViewModel extends ChangeNotifier {
   late Future<List<cJobs_recruiter?>> _jobsFuture;
   List<cJobs_recruiter?> _jobs_open = [];
-  List<cJobs_recruiter?> _jobs_close = [];
+  List<cJobs_recruiter?> _jobs_closed = [];
   List<cJobs_recruiter?> _jobs_pending = [];
+  List<cJobs_recruiter?> _jobs_rejected = [];
   List<cJobs_recruiter?> _jobs = [];
   late Future<cRecruiters?> _recruiterFuture;
   cRecruiters? _recruiterInfo = null;
@@ -18,8 +20,9 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
 
   Future<List<cJobs_recruiter?>> get jobsFuture => _jobsFuture;
   List<cJobs_recruiter?> get jobs_open => _jobs_open;
-  List<cJobs_recruiter?> get jobs_close => _jobs_close;
+  List<cJobs_recruiter?> get jobs_closed => _jobs_closed;
   List<cJobs_recruiter?> get jobs_pending => _jobs_pending;
+  List<cJobs_recruiter?> get jobs_rejected => _jobs_rejected;
   List<cJobs_recruiter?> get jobs => _jobs;
 
   Future<cRecruiters?> get recruiter => _recruiterFuture;
@@ -28,19 +31,45 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
 
   cRecruiters? get recruiterInfo => _recruiterInfo;
 
-  void setStatusFilter(String? value) {
+  void Filter(String? value) {
     _statusFilter = value!;
+    if (value == "all") {
+      _jobs = (_jobs_open + _jobs_closed + _jobs_pending + _jobs_rejected);
+    } else if (value == "open") {
+      _jobs = _jobs_open;
+    } else if (value == "pending") {
+      _jobs = _jobs_pending;
+    }
+    _jobs.sort((a,b) => a!.PostedAt.compareTo(b!.PostedAt));
     notifyListeners();
   }
 
   void initFutures() {
     _jobsFuture = JobService().getJobs(accessToken: APIConstants.token).then((value) {
       _jobs = value.map((e) => e).toList();
+      _jobs.sort((a,b) => a!.PostedAt.compareTo(b!.PostedAt));
+
       _jobs_open = value.where((element) => element!.Status == 'open').toList();
       _jobs_pending = value.where((element) => element!.Status == 'pending').toList();
+      _jobs_closed = value.where((element) => element!.Status == 'closed').toList();
+      _jobs_rejected = value.where((element) => element!.Status == 'rejected').toList();
       return value;
     });
 
     _recruiterFuture = UserService().getRecruiterInfo(Id: APIConstants.userId, accessToken: APIConstants.token).then((value) => _recruiterInfo = value);
+  }
+
+  Future<void> deleteJob({required String Id}) async {
+    final success = await JobService().deleteJob(accessToken: APIConstants.token, Id: Id);
+    if (success) {
+      cJobs_recruiter? job = _jobs.firstWhere((e) => e!.ID == Id);
+      if (job != null) {
+        if (job.Status == 'pending') _jobs_pending.removeWhere((e) => e!.ID == Id);
+        else if (job.Status == 'closed') _jobs_closed.removeWhere((e) => e!.ID == Id);
+        else if (job.Status == 'rejected') _jobs_rejected.removeWhere((e) => e!.ID == Id);
+      }
+      _jobs.removeWhere((element) => element!.ID == Id);
+      notifyListeners();
+    }
   }
 }

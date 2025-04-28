@@ -86,4 +86,20 @@ class ApiService {
       },
     );
   }
+  Future<http.Response> deleteJobWithToken({
+    required String endpoint,
+    required String Id,
+    required String accessToken,
+  }) async {
+    final url = Uri.parse('${APIConstants.baseUrl}/$endpoint/$Id');
+
+    return await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+  }
+
 }

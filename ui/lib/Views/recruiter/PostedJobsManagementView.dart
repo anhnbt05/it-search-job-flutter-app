@@ -150,7 +150,7 @@ Widget body({
                               Container(
                                   color: Colors.white,
                                   child: Text(
-                                    'Đã đăng: ${viewModel.jobs_open.length} bài',
+                                    'Đã đăng: ${viewModel.jobs_open.length + viewModel.jobs_closed.length} bài',
                                     style: TextStyle(fontSize: 12),
                                   ),
                                 ),
@@ -227,19 +227,56 @@ Widget body({
 Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel) {
   return Expanded(
     child: Padding(
-      padding: const EdgeInsets.only(top: 5),
+      padding: const EdgeInsets.only(top: 5, bottom: 5),
       child: ListView(
         children: [
           JobsFilter(context, viewModel),
+            if (viewModel.jobs.isEmpty && viewModel.statusFilter == 'all')
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                child: const Center(
+                  child: Text(
+                    'Bạn hiện không có bài đăng tuyển dụng nào',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            else if (viewModel.jobs.isEmpty && viewModel.statusFilter == 'open')
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                child: const Center(
+                  child: Text(
+                    'Bạn hiện không có bài đăng tuyển dụng nào đang mở',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            else if (viewModel.jobs.isEmpty && viewModel.statusFilter == 'pending')
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                  child: const Center(
+                    child: Text(
+                      'Bạn hiện không có bài đăng tuyển dụng nào đang chờ duyệt',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+          else
+          // Generate job list items if there are jobs with the selected status
           ...List.generate(
             viewModel.jobs.length,
                 (index) => JobsItem(context, viewModel, index),
           ),
+          const SizedBox(height: 5),
         ],
       ),
     ),
   );
 }
+
 
 Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
   return Padding(
@@ -264,92 +301,268 @@ Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, i
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Container(
-                height: 50,
-                width: 50,
-                margin: EdgeInsets.only(right: 10),
-                child: (viewModel.recruiterInfo?.Company.LogoUrl != null)
-                    ? Image.network(
-                  viewModel.recruiterInfo!.Company.LogoUrl!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 50,
+                    width: 50,
+                    margin: EdgeInsets.only(right: 10),
+                    child: (viewModel.recruiterInfo?.Company.LogoUrl != null)
+                        ? Image.network(
+                      viewModel.recruiterInfo!.Company.LogoUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade200,
+                          child: Icon(Icons.broken_image, color: Colors.grey),
+                        );
+                      },
+                    )
+                        : Container(
                       color: Colors.grey.shade200,
-                      child: Icon(Icons.broken_image, color: Colors.grey),
-                    );
-                  },
-                )
-                    : Container(
-                  color: Colors.grey.shade200,
-                  child: Icon(Icons.business, color: Colors.grey),
-                ),
-              ),
+                      child: Icon(Icons.business, color: Colors.grey),
+                    ),
+                  ),
 
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      viewModel.jobs[index]!.Title,
-                      style: TextStyle(
-                        fontSize: 18,
-                        height: 1.2,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Status(context, viewModel, index),
-                    SizedBox(height: 5,),
-                    ShaderMask(
-                      shaderCallback: (bounds) =>
-                        LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            Colors.black,
-                            Colors.black,
-                            Colors.transparent,
-                          ],
-                          stops: [0.0, 0.9, 1.0],
-                        ).createShader(bounds),
-                      blendMode: BlendMode.dstIn,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            Salary(context, viewModel, index),
-                            SizedBox(width: 5,),
-                            Level(context, viewModel, index),
-                            SizedBox(width: 5,),
-                            JobType(context, viewModel, index),
-                            SizedBox(width: 20,)
-                          ]
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          viewModel.jobs[index]!.Title,
+                          style: TextStyle(
+                            fontSize: 18,
+                            height: 1.2,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      )
+                        Status(context, viewModel, index),
+                        SizedBox(height: 5,),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                              children: [
+                                Salary(context, viewModel, index),
+                                SizedBox(width: 5,),
+                                Level(context, viewModel, index),
+                                SizedBox(width: 5,),
+                                JobType(context, viewModel, index),
+                                SizedBox(width: 20,)
+                              ]
+                          ),
+                        ),
+                        SizedBox(height: 5,),
+                        Text(viewModel.jobs[index]!.Description,
+                          maxLines: 5,
+                          textAlign: TextAlign.justify,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 5,),
-                    Text(viewModel.jobs[index]!.Description,
-                      maxLines: 5,
-                      textAlign: TextAlign.justify,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+              ActionField(context, viewModel, index),
             ],
           ),
         ),
       ),
     ),
   );
+}
+
+Widget ActionField(BuildContext context,
+    PostedJobsManagementViewModel viewModel, int index) {
+  if (viewModel.jobs[index]!.Status != 'open') {
+    return
+      Column(
+        children: [
+          SizedBox(height: 10,),
+          SizedBox(
+            height: 22,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  (viewModel.jobs[index]!.Status != 'closed') ? TextButton(
+                    style: ButtonStyle(
+                      splashFactory: NoSplash.splashFactory,
+                      overlayColor: MaterialStateProperty.all(
+                          Colors.transparent),
+                      elevation: MaterialStateProperty.all(0),
+                      padding: MaterialStateProperty.all(
+                          EdgeInsets.symmetric(horizontal: 5, vertical: 0)),
+                      minimumSize: MaterialStateProperty.all(Size(30, 30)),
+                      backgroundColor: MaterialStateProperty.all(
+                          Colors.transparent),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      print("no");
+                    },
+                    child: Row(
+                      children: [
+                        Container(
+                            decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                    width: 0.5,
+                                    color: Colors.blue
+                                )
+                            ),
+                            child: Icon(
+                              Icons.edit_note_sharp, color: Colors.white,
+                              size: 18,)),
+                        SizedBox(width: 5,),
+                        Text('Chỉnh sửa',
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal
+                          ),
+                        ),
+                      ],
+                    ),
+                  ) : SizedBox.shrink(),
+
+                  TextButton(
+                    style: ButtonStyle(
+                      splashFactory: NoSplash.splashFactory,
+                      overlayColor: MaterialStateProperty.all(
+                          Colors.transparent),
+                      elevation: MaterialStateProperty.all(0),
+                      padding: MaterialStateProperty.all(
+                          EdgeInsets.symmetric(horizontal: 5, vertical: 0)),
+                      minimumSize: MaterialStateProperty.all(Size(30, 30)),
+                      backgroundColor: MaterialStateProperty.all(
+                          Colors.transparent),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            backgroundColor: Colors.white,
+                            title: Text(
+                              "Xác nhận",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            content: Text(
+                              "Bạn có chắc chắn muốn xoá bài tuyển dụng ${viewModel
+                                  .jobs[index]!.Title} không?",
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                style: TextButton.styleFrom(
+                                  overlayColor: Colors.transparent,
+                                ),
+                                child: Text(
+                                  'Thoát',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  showDialog(
+                                    context: context,
+                                    barrierColor: Colors.black.withOpacity(0.5),
+                                    barrierDismissible: false,
+                                    builder: (BuildContext context) {
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.blue,
+                                        ),
+                                      );
+                                    },
+                                  );
+
+                                  await viewModel.deleteJob(
+                                      Id: viewModel.jobs[index]!.ID);
+                                  Navigator.of(context).pop();
+                                  Navigator.pop(context);
+                                },
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Color(0xeef5797a),
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Xóa',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Container(
+                            decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                    width: 0.5,
+                                    color: Colors.red
+                                )
+                            ),
+                            child: Icon(
+                              Icons.close_rounded, color: Colors.white,
+                              size: 18,)),
+                        SizedBox(width: 5,),
+                        Text('Xóa bài đăng',
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ]
+            ),
+          ),
+        ],
+      );
+  }
+  return SizedBox.shrink();
 }
 
 Widget Level(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
@@ -464,6 +677,18 @@ Widget Status(BuildContext context, PostedJobsManagementViewModel viewModel, int
         )),
       ],
     );
+  } else if (viewModel.jobs[index]!.Status == 'closed') {
+    return Row(
+      children: [
+        Icon(Icons.lock_outline, size: 14, color: Colors.red,),
+        SizedBox(width: 2,),
+        Text('Đã đóng', style: TextStyle(
+          fontWeight: FontWeight.normal,
+          color: Colors.red,
+          fontSize: 13,
+        )),
+      ],
+    );
   }
   return SizedBox.shrink();
 }
@@ -493,7 +718,7 @@ Widget JobsFilter(BuildContext context, PostedJobsManagementViewModel viewModel)
                 ),
                 DropdownMenuItem<String>(
                   value: "open",
-                  child: Text("Đã đăng", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                  child: Text("Đang mở", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
                 ),
                 DropdownMenuItem<String>(
                   value: "pending",
@@ -501,7 +726,7 @@ Widget JobsFilter(BuildContext context, PostedJobsManagementViewModel viewModel)
                 )
               ],
               onChanged: (value){
-                viewModel.setStatusFilter(value);
+                viewModel.Filter(value);
               },
               buttonStyleData: ButtonStyleData(
                 width: MediaQuery.of(context).size.width / 2 - 80,

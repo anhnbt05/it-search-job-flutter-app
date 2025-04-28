@@ -55,5 +55,24 @@ class JobService {
       return [];
     }
   }
+
+  Future<bool> deleteJob({
+    required String accessToken,
+    required String Id,
+  }) async {
+    try {
+      final response = await _apiService.deleteJobWithToken(endpoint: APIConstants.deleteJob_endpoint, Id: Id, accessToken: accessToken);
+      if (response.statusCode == 200) {
+        print("Job deleted successfully.");
+        return true;
+      } else {
+        print("Failed to delete job: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Error deleting job: $e");
+      return false;
+    }
+  }
 }
 
