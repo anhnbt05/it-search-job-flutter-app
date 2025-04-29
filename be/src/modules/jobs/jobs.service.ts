@@ -570,8 +570,14 @@ export class JobsService {
           'Thời gian hết hạn mới của công việc phải lớn hơn thời gian hiện tại.',
         );
 
-      const { Descriptions, Benefits, Requirements, ExpiredDate, ...res } =
-        updateJobDto;
+      const {
+        Descriptions,
+        Benefits,
+        Requirements,
+        ExpiredDate,
+        Categories,
+        ...res
+      } = updateJobDto;
 
       const { error } = await this.anonSupabaseClient
         .from('Jobs')
@@ -616,6 +622,64 @@ export class JobsService {
           Requirements,
           jobId,
         );
+      }
+
+      if (Categories && Categories.length) {
+        const foundCategories = await this.prismaService.categories.findMany({
+          where: {
+            CategoryName: {
+              in: Categories,
+            },
+          },
+        });
+
+        if (foundCategories.length !== Categories.length) {
+          const foundNames = new Set(
+            foundCategories.map((c) => c.CategoryName),
+          );
+
+          const missing = Categories.filter((name) => !foundNames.has(name));
+
+          throw new NotFoundException(
+            `Không tìm thấy các danh mục sau: ${missing.join(', ')}.`,
+          );
+        }
+
+        const existingValues = foundCategories.map((c) => c.ID);
+
+        const existingCategories = (
+          await this.prismaService.jobCategories.findMany({
+            where: {
+              JobID: jobId,
+            },
+          })
+        ).map((jc) => jc.CategoryID);
+
+        const newSet = new Set(existingValues);
+
+        const existingCategoriesSet = new Set(existingCategories);
+
+        const toAdd = existingValues.filter(
+          (val) => !existingCategoriesSet.has(val),
+        );
+
+        const toRemove = existingCategories.filter((val) => !newSet.has(val));
+
+        if (toRemove.length)
+          await this.adminSupabaseClient
+            .from('JobCategories')
+            .delete()
+            .eq('JobID', jobId)
+            .in('CategoryID', toRemove);
+
+        if (toAdd.length) {
+          await this.adminSupabaseClient.from('JobCategories').insert(
+            toAdd.map((val) => ({
+              CategoryID: val,
+              JobID: jobId,
+            })),
+          );
+        }
       }
 
       return this.handleFormattedJob(jobId);

@@ -192,4 +192,22 @@ export class UpdateJobDto {
     message: 'Yêu cầu của công việc phải là chuỗi không rỗng.',
   })
   readonly Requirements?: string[];
+
+  @ApiPropertyOptional({
+    name: 'Categories',
+    description: 'Các danh mục mới của công việc (Nếu có)',
+    type: [String],
+    example: ['Back End', 'Front End'],
+  })
+  @IsOptional()
+  @IsArray({ message: 'Danh sách các danh mục công việc phải là dạng mảng.' })
+  @ArrayNotEmpty({
+    message: 'Danh sách các danh mục công việc phải là mảng không rỗng.',
+  })
+  @IsString({ each: true, message: 'Danh mục công việc phải là dạng chuỗi.' })
+  @IsNotEmpty({
+    each: true,
+    message: 'Danh mục công việc phải là chuỗi không rỗng.',
+  })
+  readonly Categories?: string[];
 }
