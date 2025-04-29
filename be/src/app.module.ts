@@ -24,6 +24,7 @@ import { UserNotificationsModule } from './modules/user-notifications/user-notif
 import { UsersModule } from './modules/users/users.module';
 import { WebsocketsModule } from './modules/websockets/websockets.module';
 import { WorkExperiencesModule } from './modules/work-experiences/work-experiences.module';
+import { PrismaModule } from './modules/prisma/prisma.module';
 
 @Module({
   imports: [
@@ -87,6 +88,7 @@ import { WorkExperiencesModule } from './modules/work-experiences/work-experienc
         },
       },
     }),
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
