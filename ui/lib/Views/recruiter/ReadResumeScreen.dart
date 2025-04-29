@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/Helpers/toastification.dart';
 import 'package:ui/Models/Applications.dart';
 import 'package:ui/Models/Jobs.dart';
-import 'package:ui/Models/model.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 
 class ReadResumeScreen extends StatefulWidget {
@@ -42,7 +42,7 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
         preferredSize: (widget.status == 'pending') ? Size.fromHeight(90) : Size.fromHeight(50),
         child: AppBar(
           iconTheme: IconThemeData(color: Colors.white),
-          backgroundColor: color,
+          backgroundColor: ColorConstants.appbarColor,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

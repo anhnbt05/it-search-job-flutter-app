@@ -43,14 +43,17 @@ class JobService {
       if (response.statusCode == 200) {
         print("Successfully fetched jobs list.");
         List<dynamic>? data = jsonDecode(response.body);
-        var result = data?.map((e) => cJobs_recruiter.fromJson(e)).where((e) => e.DeletedAt == null && e.ExpiredAt.isAfter(DateTime.now())).toList() ?? [];
+        var result = data?.map((e) => cJobs_recruiter.fromJson(e))
+            .where((e) =>
+        e.DeletedAt == null && e.ExpiredAt.isAfter(DateTime.now()))
+            .toList() ?? [];
         result.sort((a, b) => b.PostedAt.compareTo(a.PostedAt));
         return result;
       } else {
         print("Failed to fetch jobs list: ${response.body}");
         return [];
       }
-    } catch(e) {
+    } catch (e) {
       print("Error: $e");
       return [];
     }
@@ -61,7 +64,10 @@ class JobService {
     required String Id,
   }) async {
     try {
-      final response = await _apiService.deleteJobWithToken(endpoint: APIConstants.deleteJob_endpoint, Id: Id, accessToken: accessToken);
+      final response = await _apiService.deleteJobWithToken(
+          endpoint: APIConstants.deleteJob_endpoint,
+          Id: Id,
+          accessToken: accessToken);
       if (response.statusCode == 200) {
         print("Job deleted successfully.");
         return true;
@@ -73,6 +79,27 @@ class JobService {
       print("Error deleting job: $e");
       return false;
     }
+  }
+
+  Future<cJobs?> getJobByID(
+      {required String Id, required String accessToken}) async {
+    try {
+      final response = await _apiService.getWithToken(
+          endpoint: '${APIConstants.getJob_endpoint}/$Id',
+          accessToken: APIConstants.token);
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
+        print("Successfully fetched job.");
+        var job = cJobs.fromJson(data);
+        return job;
+      } else {
+        print("Failed to fetch job: ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+    return null;
   }
 }
 

@@ -8,7 +8,9 @@ import 'package:provider/provider.dart';
 import 'package:ui/Constants/color_constants.dart';
 
 import '../../Models/Jobs.dart';
+import '../../ViewModels/recruiter/EditJobViewModel.dart';
 import '../../ViewModels/recruiter/PostedJobsManagementViewModel.dart';
+import 'EditJobScreen.dart';
 
 Widget PostedJobsManagementScreen(BuildContext context) {
   var viewModel = Provider.of<PostedJobsManagementViewModel>(context);
@@ -264,8 +266,18 @@ Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel) {
                     ),
                   ),
                 )
+              else if (viewModel.jobs.isEmpty && viewModel.statusFilter == 'closed_rejected')
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                    child: const Center(
+                      child: Text(
+                        'Bạn hiện không có bài đăng tuyển dụng nào đã đóng hoặc bị từ chối',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  )
           else
-          // Generate job list items if there are jobs with the selected status
           ...List.generate(
             viewModel.jobs.length,
                 (index) => JobsItem(context, viewModel, index),
@@ -346,11 +358,14 @@ Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, i
                         ),
                         Status(context, viewModel, index),
                         SizedBox(height: 5,),
+                        Salary(context, viewModel, index),
+                        SizedBox(height: 5),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                               children: [
-                                Salary(context, viewModel, index),
+
+
                                 SizedBox(width: 5,),
                                 Level(context, viewModel, index),
                                 SizedBox(width: 5,),
@@ -412,7 +427,15 @@ Widget ActionField(BuildContext context,
                       ),
                     ),
                     onPressed: () {
-                      print("no");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChangeNotifierProvider(
+                            create: (_) => EditJobViewModel(ID: viewModel.jobs[index]!.ID, recruiter: viewModel.recruiterInfo!),
+                            child: EditJobScreen(),
+                          ),
+                        ),
+                      );
                     },
                     child: Row(
                       children: [
@@ -590,20 +613,24 @@ Widget Level(BuildContext context, PostedJobsManagementViewModel viewModel, int 
 
 Widget Salary(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
   return Container(
-    decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        border: Border.all(
-            width: 0.5,
-            color: Colors.grey.shade700
-        )
-    ),
+    width: MediaQuery.of(context).size.width - 80,
     child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
-      child: Text(viewModel.jobs[index]!.Salary,
-        style: TextStyle(
-          fontSize: 12,
-          color: Colors.grey.shade700,
-        ),),
+        padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
+        child: Row(
+          children: [
+            Icon(Icons.monetization_on_outlined, size: 14, color: Colors.grey.shade700,),
+            SizedBox(width: 2,),
+            Expanded(
+              child: Text(viewModel.jobs[index]!.Salary,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade700,
+                ),),
+            ),
+          ],
+        ),
+
     ),
   );
 }
@@ -723,18 +750,23 @@ Widget JobsFilter(BuildContext context, PostedJobsManagementViewModel viewModel)
                 DropdownMenuItem<String>(
                   value: "pending",
                   child: Text("Chờ duyệt", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
-                )
+                ),
+                DropdownMenuItem<String>(
+                  value: "closed_rejected",
+                  child: Text("Đã đóng/Từ chối", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                ),
+
               ],
               onChanged: (value){
                 viewModel.Filter(value);
               },
               buttonStyleData: ButtonStyleData(
-                width: MediaQuery.of(context).size.width / 2 - 80,
+                width: MediaQuery.of(context).size.width / 2 - 30,
                 overlayColor: MaterialStateProperty.all(Colors.transparent),
               ),
               dropdownStyleData: DropdownStyleData(
                 elevation: 1,
-                width: MediaQuery.of(context).size.width / 2 - 80,
+                width: MediaQuery.of(context).size.width / 2 - 30,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.white

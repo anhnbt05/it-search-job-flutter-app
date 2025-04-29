@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/Models/model.dart';
+import 'package:ui/Constants/color_constants.dart';
 
+import '../Models/model.dart';
 import '../ViewModels/BottomNavigationViewModel.dart';
 import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
 
@@ -52,7 +53,7 @@ PreferredSize? bottomJobBar(role Role, int index, BuildContext context) {
         child: Container(
           height: 50,
           child: ClipRect(child: BottomNavigationBar(
-            selectedItemColor: color,
+            selectedItemColor: ColorConstants.appbarColor,
             unselectedLabelStyle: TextStyle(
                 fontSize: 18
             ),

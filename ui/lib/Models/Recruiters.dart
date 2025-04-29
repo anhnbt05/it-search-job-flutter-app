@@ -65,3 +65,26 @@ class cRecruiters {
   }
 }
 
+class cRecruiter_Job {
+  final String ID;
+  final String Position;
+  final String FullName;
+  final cCompany_Job Company;
+
+  cRecruiter_Job({
+    required this.ID,
+    required this.Position,
+    required this.FullName,
+    required this.Company,
+  });
+
+  factory cRecruiter_Job.fromJson(Map<String, dynamic> json) {
+    return cRecruiter_Job(
+      ID: json['ID'],
+      Position: json['Position'],
+      FullName: json['FullName'],
+      Company: cCompany_Job.fromJson(json['Company']),
+    );
+  }
+}
+

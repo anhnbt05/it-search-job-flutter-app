@@ -95,19 +95,19 @@ Widget? appbarTitle_recruiter(int selectedIndex) {
   switch (selectedIndex) {
     case 0:
       return Text('Quản lý',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
     case 1:
       return Text('Danh sách đơn ứng tuyển',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
     case 2:
       return Text('Thêm tin tuyển dụng',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
     case 3:
       return Text('Thông báo',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
     case 4:
       return Text('Hồ sơ cá nhân',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
   }
   return null;
 }

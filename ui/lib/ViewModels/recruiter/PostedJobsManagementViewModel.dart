@@ -15,7 +15,7 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
   List<cJobs_recruiter?> _jobs_rejected = [];
   List<cJobs_recruiter?> _jobs = [];
   late Future<cRecruiters?> _recruiterFuture;
-  cRecruiters? _recruiterInfo = null;
+  cRecruiters? _recruiterInfo;
   String _statusFilter = "all";
 
   Future<List<cJobs_recruiter?>> get jobsFuture => _jobsFuture;
@@ -39,6 +39,8 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
       _jobs = _jobs_open;
     } else if (value == "pending") {
       _jobs = _jobs_pending;
+    } else if (value == 'closed_rejected') {
+      _jobs = _jobs_closed + _jobs_rejected;
     }
     _jobs.sort((a,b) => a!.PostedAt.compareTo(b!.PostedAt));
     notifyListeners();
