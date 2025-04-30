@@ -7,13 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ui/Services/application_recruiter_service.dart';
+import 'package:ui/ViewModels/recruiter/PostedJobsManagementViewModel.dart';
 import '../../Constants/api_constants.dart';
 import '../../Models/Applications.dart';
 import '../../Models/Jobs.dart';
 import '../../Services/job_service.dart';
 
 class CandidatesAppliesViewModel extends ChangeNotifier {
-  late Future<List<cJobs_recruiter?>> _jobsFuture;
+  final PostedJobsManagementViewModel postedJobsManagementViewModel;
   late Future<List<List<cApplications_recruiter>?>> _applicationsFuture;
   TextEditingController _rejectReason = new TextEditingController();
 
@@ -24,7 +25,6 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
     _applications = value;
   }
 
-  Future<List<cJobs_recruiter?>> get jobsFuture => _jobsFuture;
   Future<List<List<cApplications_recruiter>?>> get applicationsFuture => _applicationsFuture;
 
   List<List<cApplications_recruiter>?> get applications => _applications;
@@ -43,26 +43,28 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
     super.dispose();
   }
 
+  CandidatesAppliesViewModel({required this.postedJobsManagementViewModel}) {
+    if (postedJobsManagementViewModel.isLoaded) {
+      initFutures();
+    } else {
+      postedJobsManagementViewModel.loadFuture.then((_) {
+        initFutures();
+      });
+    }
+  }
+
   void initFutures() {
-    _jobsFuture = JobService().getJobs(accessToken: APIConstants.token);
+    _jobs = postedJobsManagementViewModel.jobs_open;
+    List<Future<List<cApplications_recruiter>?>> applicationFutures = jobs.map((job) {
+      return ApplicationService().getApplicationsList(
+        accessToken: APIConstants.token,
+        jobID: job!.ID.toString(),
+      );
+    }).toList();
 
-    _applicationsFuture = _jobsFuture.then((jobsF) async {
-
-      jobs = jobsF.where((e) => e!.Status == 'open').toList();
-
-      List<Future<List<cApplications_recruiter>?>> applicationFutures = jobs.map((job) {
-        return ApplicationService().getApplicationsList(
-          accessToken: APIConstants.token,
-          jobID: job!.ID.toString(),
-        );
-      }).toList();
-
-      List<List<cApplications_recruiter>?> appList = await Future.wait(applicationFutures);
-
+    _applicationsFuture = Future.wait(applicationFutures).then((appList) {
       applications = appList;
-
       notifyListeners();
-
       return appList;
     });
   }
@@ -105,11 +107,20 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
         final index = appList?.indexWhere((app) => app.ID == applicationId);
         if (index != null && index >= 0) {
           appList![index] = appList[index].copyWith(status: 'accepted');
-          int jobIdx = jobs.indexWhere((job) => job!.ID == appList[index].JobID);
+          final jobId = appList[index].JobID;
+          int jobIdx = jobs.indexWhere((job) => job!.ID == jobId);
           final acceptedCount = appList.where((e) => e.Status == "accepted").length;
-          if (jobs[jobIdx] != null && acceptedCount == jobs[jobIdx]!.Vacancies) {
-            jobs.removeWhere((e) => e!.ID == jobs[jobIdx]!.ID);
+
+          if (jobIdx >= 0 && jobs[jobIdx] != null && acceptedCount == jobs[jobIdx]!.Vacancies) {
+            int i = postedJobsManagementViewModel.jobs_open.indexWhere((e) => e!.ID == jobId);
+            if (i >= 0) {
+              final closedJob = postedJobsManagementViewModel.jobs_open[i]!.copyWith(status: 'closed');
+              postedJobsManagementViewModel.jobs_closed.add(closedJob);
+              postedJobsManagementViewModel.jobs_open.removeAt(i);
+            }
+            jobs.removeWhere((e) => e!.ID == jobId);
             applications.remove(appList);
+            postedJobsManagementViewModel.Filter(postedJobsManagementViewModel.statusFilter);
           }
           break;
         }
@@ -117,6 +128,7 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
 
   Future<bool> rejectApplication(
       {required String applicationId, required String reason}) async {

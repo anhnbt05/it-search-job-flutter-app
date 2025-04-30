@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ui/Constants/api_constants.dart';
+import 'package:ui/Helpers/toastification.dart';
 import 'api_service.dart';
 import 'package:ui/Models/Jobs.dart';
 
@@ -100,6 +101,24 @@ class JobService {
       print("Error: $e");
     }
     return null;
+  }
+
+  Future<bool> editJob({required String Id, required Map<String, dynamic> jobData, required String accessToken}) async {
+    try {
+      final response = await _apiService.patchWithToken(endpoint: APIConstants.patchJob_endpoint, body: jobData, accessToken: accessToken, Id: Id);
+      if (response.statusCode == 200) {
+        showSuccessToastification(title: 'Hoàn tất', message: "Nội dung bài tuyển dụng đã được cập nhật\nVui lòng chờ quản trị viên phê duyệt");
+        return true;
+      } else {
+        print("Failed to edit job: ${response.body}");
+        showErrorToastification(title: 'Lỗi', message: jsonDecode(response.body)['message']);
+        return false;
+      }
+    } catch (e) {
+      print("Error: $e");
+      showErrorToastification(title: 'Lỗi', message: e.toString());
+      return false;
+    }
   }
 }
 

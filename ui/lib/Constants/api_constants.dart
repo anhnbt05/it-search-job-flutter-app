@@ -6,6 +6,7 @@ class APIConstants {
   static final String getCategories_endpoint = 'auth/categories';
   static final String postJob_endpoint = 'jobs';
   static final String deleteJob_endpoint = 'jobs';
+  static final String patchJob_endpoint = 'jobs';
   static final String token = "...";
   static final String userId = JwtDecoder.decode(token)["sub"] as String;
   static final String getApplications_recruiter_endpoint1 = 'jobs';

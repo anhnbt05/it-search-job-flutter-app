@@ -298,7 +298,7 @@ class JobPostViewModel extends ChangeNotifier {
       );
       return;
     }
-    print(nameText.text);
+
     late String salaryText;
     if (_salaryTypeSelected == "negotiable") {
       salaryText = "Thỏa thuận";

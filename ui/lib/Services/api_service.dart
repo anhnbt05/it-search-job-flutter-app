@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:ui/Constants/api_constants.dart';
 
 class ApiService {
-
   Future<http.Response> postWithToken({
     required String endpoint,
     required Map<String, dynamic> body,
@@ -102,4 +101,21 @@ class ApiService {
     );
   }
 
+  Future<http.Response> patchWithToken({
+    required String endpoint,
+    required Map<String, dynamic> body,
+    required String accessToken,
+    required String Id,
+  }) async {
+    final url = Uri.parse('${APIConstants.baseUrl}/$endpoint/$Id');
+
+    return await http.patch(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+    );
+  }
 }

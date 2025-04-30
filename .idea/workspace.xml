@@ -5,22 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9312053-9e5e-49bf-8451-898f90d1f6f0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/EditJobViewModel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/EditJobScreen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Constants/color_constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Constants/color_constants.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Helpers/helpers.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Helpers/helpers.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Models/Companies.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Models/Companies.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Constants/api_constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Constants/api_constants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Helpers/toastification.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Helpers/toastification.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/Models/Jobs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Models/Jobs.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Models/Recruiters.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Models/Recruiters.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Models/model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Models/model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Services/api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/api_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Services/application_recruiter_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/application_recruiter_service.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/Services/job_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/job_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/CandidatesAppliesViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/CandidatesAppliesViewModel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/EditJobViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/EditJobViewModel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/JobPostViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/JobPostViewModel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/PostedJobsManagementViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/PostedJobsManagementViewModel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/candidate/candidate.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/candidate/candidate.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/login/login_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/login/login_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/CandidatesAppliedView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/CandidatesAppliedView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/EditJobScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/EditJobScreen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/PostedJobsManagementView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/PostedJobsManagementView.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/ReadResumeScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/ReadResumeScreen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/recruiter.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/recruiter.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/main.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -115,10 +115,6 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/ui/lib/Services/api_service.dart</url>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/ui/lib/Services/auth_forgetpassword_service.dart</url>
           <option name="timeStamp" value="2" />

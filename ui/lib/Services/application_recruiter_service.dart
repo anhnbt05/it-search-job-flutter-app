@@ -52,15 +52,15 @@ class ApplicationService {
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        showSuccessToastification_applicationProcess(message: data['message']);
+        showSuccessToastification(message: data['message'], title: "Hoàn tất");
         return true;
       } else {
         var data = jsonDecode(response.body);
-        showErrorToastification_applicationProcess(message: data['message']);
+        showErrorToastification(message: data['message'], title: "Lỗi");
         return false;
       }
     } catch (e) {
-      showErrorToastification_applicationProcess(message: e.toString());
+      showErrorToastification(message: e.toString(), title: "Lỗi");
       return false;
     }
   }
@@ -86,16 +86,16 @@ class ApplicationService {
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        showSuccessToastification_applicationProcess(message: data['message']);
+        showSuccessToastification(message: data['message'], title: "Hoàn tất");
         return true;
       }
       else {
         var data = jsonDecode(response.body);
-        showErrorToastification_applicationProcess(message: data['message']);
+        showErrorToastification(message: data['message'], title: "Lỗi");
         return false;
       }
     } catch (e) {
-      showErrorToastification_applicationProcess(message: e.toString());
+      showErrorToastification(message: e.toString(), title: "Lỗi");
       return false;
     }
   }

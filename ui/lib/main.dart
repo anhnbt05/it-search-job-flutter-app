@@ -38,8 +38,13 @@ void main() {
         ChangeNotifierProvider(create: (context) => CompaniesViewModel()),
         ChangeNotifierProvider(create: (context) => SignUpViewModel()),
         ChangeNotifierProvider(create: (context) => ProvincesViewModel()),
-        ChangeNotifierProvider(create: (context) => CandidatesAppliesViewModel()),
         ChangeNotifierProvider(create: (context) => PostedJobsManagementViewModel()),
+        ChangeNotifierProvider(
+          create: (context) {
+            final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
+            return CandidatesAppliesViewModel(postedJobsManagementViewModel: postedJobsVM);
+          },
+        ),
         ChangeNotifierProvider(create: (context) => JoblistNavigationViewModel())
       ],
       child: MyApp(),
@@ -88,16 +93,7 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
       context,
       listen: false,
     );
-    final candidateAppliesViewModel = Provider.of<CandidatesAppliesViewModel>(
-      context,
-      listen: false,
-    );
-    final postedJobsManagementViewModel = Provider.of<PostedJobsManagementViewModel>(
-      context,
-      listen: false
-    );
-    postedJobsManagementViewModel.initFutures();
-    candidateAppliesViewModel.initFutures();
+
     bottomNavigationProvider.setAnimationController(
       AnimationController(
         vsync: this,

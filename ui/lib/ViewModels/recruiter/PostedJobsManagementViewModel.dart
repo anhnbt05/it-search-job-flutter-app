@@ -25,6 +25,10 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
   List<cJobs_recruiter?> get jobs_rejected => _jobs_rejected;
   List<cJobs_recruiter?> get jobs => _jobs;
 
+  set jobs(List<cJobs_recruiter?> value) {
+    _jobs = value;
+  }
+
   Future<cRecruiters?> get recruiter => _recruiterFuture;
 
   String get statusFilter => _statusFilter;
@@ -46,7 +50,17 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void initFutures() {
+  bool isLoaded = false;
+  late Future<void> loadFuture;
+
+  PostedJobsManagementViewModel() {
+    loadFuture = initFutures().then((_) {
+      isLoaded = true;
+      notifyListeners();
+    });
+  }
+
+  Future<void> initFutures() async {
     _jobsFuture = JobService().getJobs(accessToken: APIConstants.token).then((value) {
       _jobs = value.map((e) => e).toList();
       _jobs.sort((a,b) => a!.PostedAt.compareTo(b!.PostedAt));
@@ -59,6 +73,8 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
     });
 
     _recruiterFuture = UserService().getRecruiterInfo(Id: APIConstants.userId, accessToken: APIConstants.token).then((value) => _recruiterInfo = value);
+
+    await Future.wait([_jobsFuture, _recruiterFuture]);
   }
 
   Future<void> deleteJob({required String Id}) async {

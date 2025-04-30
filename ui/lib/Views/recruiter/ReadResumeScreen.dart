@@ -308,8 +308,8 @@ PreferredSize? displaySelection({required BuildContext context, required Candida
                                     },
                                   );
                                   if (viewModel.rejectReason.text.isEmpty) {
-                                    showErrorToastification_applicationProcess(
-                                        message: 'Lý do từ chối không được để trống');
+                                    showErrorToastification(
+                                        message: 'Lý do từ chối không được để trống', title: 'Lỗi');
                                     Navigator.of(context).pop();
                                   }
                                   else {

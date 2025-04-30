@@ -17,6 +17,7 @@ class cJobs_recruiter {
   final String Level;
   final String? DeletedAt;
   final cRecruiterPost Recruiter;
+  final List<String> Categories;
 
   cJobs_recruiter({
     required this.ID,
@@ -33,6 +34,7 @@ class cJobs_recruiter {
     required this.Level,
     this.DeletedAt,
     required this.Recruiter,
+    required this.Categories,
   });
 
   factory cJobs_recruiter.fromJson(Map<String, dynamic> json) {
@@ -51,6 +53,61 @@ class cJobs_recruiter {
       Level: json['Level'],
       DeletedAt: json['DeletedAt'],
       Recruiter: cRecruiterPost.fromJson(json['Recruiter']),
+      Categories: List<String>.from(json['Categories']),
+    );
+  }
+
+  cJobs_recruiter copyWith({String? status}) {
+    return cJobs_recruiter(
+      ID: ID,
+      Title: Title,
+      Description: Description,
+      Address: Address,
+      Salary: Salary,
+      Vacancies: Vacancies,
+      Type: Type,
+      WorkingTimes: WorkingTimes,
+      Status: status ?? Status,
+      PostedAt: PostedAt,
+      ExpiredAt: ExpiredAt,
+      Level: Level,
+      DeletedAt: 'DeletedAt',
+      Recruiter: Recruiter,
+      Categories: Categories,
+    );
+  }
+
+  cJobs_recruiter copyAll({
+    String? ID,
+    String? Title,
+    String? Description,
+    String? Address,
+    String? Salary,
+    int? Vacancies,
+    String? Type,
+    String? WorkingTimes,
+    String? Status,
+    DateTime? PostedAt,
+    DateTime? ExpiredAt,
+    String? Level,
+    List<String>? Categories,
+    cRecruiterPost? Recruiter,
+  }) {
+    return cJobs_recruiter(
+      ID: ID ?? this.ID,
+      Title: Title ?? this.Title,
+      Description: Description ?? this.Description,
+      Address: Address ?? this.Address,
+      Salary: Salary ?? this.Salary,
+      Vacancies: Vacancies ?? this.Vacancies,
+      Type: Type ?? this.Type,
+      WorkingTimes: WorkingTimes ?? this.WorkingTimes,
+      Status: Status ?? this.Status,
+      PostedAt: PostedAt ?? this.PostedAt,
+      ExpiredAt: ExpiredAt ?? this.ExpiredAt,
+      Level: Level ?? this.Level,
+      Categories: Categories ?? this.Categories,
+      Recruiter: Recruiter ?? this.Recruiter,
     );
   }
 }

@@ -17,7 +17,7 @@ Widget CandidatesAppliedScreen(BuildContext context,) {
       color: Colors.white,
       child: Center(
         child: FutureBuilder<List<cJobs_recruiter?>?>(
-          future: viewModel.jobsFuture,
+          future: viewModel.postedJobsManagementViewModel.jobsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator(
@@ -37,7 +37,6 @@ Widget CandidatesAppliedScreen(BuildContext context,) {
                     color: Colors.blue,
                   ));
                 }
-
                 return ListView.builder(
                     itemCount: viewModel.jobs.length,
                     itemBuilder: (context, index) {

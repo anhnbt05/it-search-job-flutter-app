@@ -360,12 +360,12 @@ Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, i
                         SizedBox(height: 5,),
                         Salary(context, viewModel, index),
                         SizedBox(height: 5),
+                        Categories(context, viewModel, viewModel.jobs[index]!),
+                        SizedBox(height: 3,),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                               children: [
-
-
                                 SizedBox(width: 5,),
                                 Level(context, viewModel, index),
                                 SizedBox(width: 5,),
@@ -397,8 +397,38 @@ Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, i
   );
 }
 
-Widget ActionField(BuildContext context,
-    PostedJobsManagementViewModel viewModel, int index) {
+Widget Categories(BuildContext context, PostedJobsManagementViewModel viewModel, cJobs_recruiter job) {
+  return SizedBox(
+    height: 25,
+    child: ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: job.Categories.length,
+      itemBuilder: (context, idx) {
+        return Container(
+          margin: EdgeInsets.only(left: 5),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(
+                  width: 0.5,
+                  color: Colors.grey.shade700
+              )
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
+            child: Text(job.Categories[idx],
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade700,
+              ),),
+          ),
+        );
+      },
+    ),
+  );
+
+}
+
+Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
   if (viewModel.jobs[index]!.Status != 'open') {
     return
       Column(
@@ -431,7 +461,7 @@ Widget ActionField(BuildContext context,
                         context,
                         MaterialPageRoute(
                           builder: (context) => ChangeNotifierProvider(
-                            create: (_) => EditJobViewModel(ID: viewModel.jobs[index]!.ID, recruiter: viewModel.recruiterInfo!),
+                            create: (_) => EditJobViewModel(vm: viewModel, index: index, recruiter: viewModel.recruiterInfo!),
                             child: EditJobScreen(),
                           ),
                         ),
