@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:ui/%20Constants/api_constants.dart';
+import 'package:ui/Constants/api_constants.dart';
 
 class ApiService {
-
   Future<http.Response> postWithToken({
     required String endpoint,
     required Map<String, dynamic> body,
@@ -84,6 +83,39 @@ class ApiService {
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       },
+    );
+  }
+  Future<http.Response> deleteJobWithToken({
+    required String endpoint,
+    required String Id,
+    required String accessToken,
+  }) async {
+    final url = Uri.parse('${APIConstants.baseUrl}/$endpoint/$Id');
+
+    return await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+  }
+
+  Future<http.Response> patchWithToken({
+    required String endpoint,
+    required Map<String, dynamic> body,
+    required String accessToken,
+    required String Id,
+  }) async {
+    final url = Uri.parse('${APIConstants.baseUrl}/$endpoint/$Id');
+
+    return await http.patch(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
     );
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Helpers/helpers.dart';
-import 'package:ui/Models/model.dart';
 
 import '../../ViewModels/candidate/JoblistNavigationViewModel.dart';
 
@@ -121,27 +120,27 @@ Widget? appbarTitle_cadidate(int selectedIndex) {
     case 0:
       return Text(
         'My Application',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
       );
     case 1:
       return Text(
         'Tìm kiếm',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
       );
     case 2:
       return Text(
         'Danh sách công việc',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
       );
     case 3:
       return Text(
         'Thông báo',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
       );
     case 4:
       return Text(
         'Hồ sơ cá nhân',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
       );
   }
   return null;

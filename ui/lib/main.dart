@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
+import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/Helpers/helpers.dart';
 import 'package:ui/ViewModels/login/CompaniesViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
@@ -12,16 +13,17 @@ import 'package:ui/Services/application_recruiter_service.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
 import 'package:ui/Views/candidate/candidate.dart';
-import 'package:ui/Models/model.dart';
 import 'package:ui/Views/admin/admin.dart';
 
-import ' Constants/api_constants.dart';
+import 'Constants/api_constants.dart';
 import 'Models/Applications.dart';
 import 'Models/Jobs.dart';
+import 'Models/model.dart';
 import 'Services/job_service.dart';
 import 'ViewModels/BottomNavigationViewModel.dart';
 import 'ViewModels/candidate/JoblistNavigationViewModel.dart';
 import 'ViewModels/recruiter/JobPostViewModel.dart';
+import 'ViewModels/recruiter/PostedJobsManagementViewModel.dart';
 import 'Views/login/login_page.dart';
 
 void main() {
@@ -37,7 +39,14 @@ void main() {
         ChangeNotifierProvider(create: (context) => CompaniesViewModel()),
         ChangeNotifierProvider(create: (context) => SignUpViewModel()),
         ChangeNotifierProvider(create: (context) => ProvincesViewModel()),
-        ChangeNotifierProvider(create: (context) => CandidatesAppliesViewModel()),
+        ChangeNotifierProvider(create: (context) => PostedJobsManagementViewModel()),
+        ChangeNotifierProvider(
+          create: (context) {
+            final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
+            return CandidatesAppliesViewModel(postedJobsManagementViewModel: postedJobsVM);
+          },
+        ),
+        ChangeNotifierProvider(create: (context) => JoblistNavigationViewModel()),
         ChangeNotifierProvider(create: (context) => SignInViewModel()),
       ],
       child: MyApp(),
@@ -86,11 +95,7 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
       context,
       listen: false,
     );
-    final candidateAppliesViewModel = Provider.of<CandidatesAppliesViewModel>(
-      context,
-      listen: false,
-    );
-    candidateAppliesViewModel.initFutures();
+
     bottomNavigationProvider.setAnimationController(
       AnimationController(
         vsync: this,
@@ -116,11 +121,6 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
     var bottomNavigationViewModel = Provider.of<BottomNavigationViewModel>(
       context,
     );
-    var joblistNavigationViewModel = Provider.of<JoblistNavigationViewModel>(
-      context,
-    );
-
-    var candidateAppliesViewModel = Provider.of<CandidatesAppliesViewModel>(context);
 
     return MaterialApp(
       locale: Locale('vi', 'VN'),
@@ -133,15 +133,16 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
 
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Poppins',
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          selectedIconTheme: IconThemeData(size: 25, color: color),
+          selectedIconTheme: IconThemeData(size: 25, color: ColorConstants.appbarColor),
           unselectedIconTheme: IconThemeData(size: 23, color: Colors.black),
           showSelectedLabels: true,
           showUnselectedLabels: false,
           selectedLabelStyle: TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w500,
             color: Colors.white,
           ),
           selectedItemColor: Colors.black,
@@ -151,7 +152,7 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
       home: Scaffold(
         appBar: AppBar(
           toolbarHeight: 45,
-          backgroundColor: color,
+          backgroundColor: ColorConstants.appbarColor,
           centerTitle: true,
           title: appbarTitle(_role, bottomNavigationViewModel.selectedIndex),
           bottom: bottomJobBar(
@@ -181,7 +182,7 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
         body: PageView(
           physics: NeverScrollableScrollPhysics(),
           controller: bottomNavigationViewModel.pageController,
-          children: pageView(_role, joblistNavigationViewModel, candidateAppliesViewModel),
+          children: pageView(_role),
         ),
         bottomNavigationBar: Stack(
           children: [
@@ -220,13 +221,11 @@ class _MainAppState extends State<MyApp> with TickerProviderStateMixin {
 
   List<Widget> pageView(
     role Role,
-    JoblistNavigationViewModel joblistNavigationProvider,
-      CandidatesAppliesViewModel candidateAppliesViewModel,
   ) {
     if (Role == role.candidate)
       return pageView_candidate(context);
     else if (Role == role.recruiter)
-      return pageView_recruiter(context, candidateAppliesViewModel);
+      return pageView_recruiter(context);
     else
       return pageView_admin(context);
   }

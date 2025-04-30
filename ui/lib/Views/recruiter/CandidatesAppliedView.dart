@@ -10,14 +10,14 @@ import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 import '../../Models/Applications.dart';
 import 'ReadResumeScreen.dart';
 
-Widget CandidatesAppliedScreen(BuildContext context, CandidatesAppliesViewModel viewModel) {
+Widget CandidatesAppliedScreen(BuildContext context,) {
   var viewModel = Provider.of<CandidatesAppliesViewModel>(context);
 
   return Container(
       color: Colors.white,
       child: Center(
         child: FutureBuilder<List<cJobs_recruiter?>?>(
-          future: viewModel.jobsFuture,
+          future: viewModel.postedJobsManagementViewModel.jobsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator(
@@ -37,7 +37,6 @@ Widget CandidatesAppliedScreen(BuildContext context, CandidatesAppliesViewModel 
                     color: Colors.blue,
                   ));
                 }
-
                 return ListView.builder(
                     itemCount: viewModel.jobs.length,
                     itemBuilder: (context, index) {

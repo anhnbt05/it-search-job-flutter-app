@@ -1,7 +1,7 @@
 import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/%20Constants/api_constants.dart';
+import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Services/application_recruiter_service.dart';
 import 'package:ui/Services/job_service.dart';
 import 'package:ui/ViewModels/recruiter/JobPostViewModel.dart';
@@ -48,20 +48,7 @@ class BottomNavigationViewModel extends ChangeNotifier {
     if (_selectedIndex != index) {
       _selectedIndex = index;
       notifyListeners();
-
-      if (_pageController.hasClients) {
-        if ((index - (_pageController.page ?? 0)).abs() > 1) {
-          // Nhảy trực tiếp nếu trang đích không nằm kế bên
-          _pageController.jumpToPage(index);
-        } else {
-          // Hiệu ứng trượt nếu trang đích là trang liền kề
-          _pageController.animateToPage(
-            index,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        }
-      }
+      _pageController.jumpToPage(index);
     }
   }
 

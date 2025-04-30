@@ -127,6 +127,7 @@ Widget PostJobScreen(BuildContext context) {
                       isDense: true,
                       hint: Text("Chọn hình thức", style: TextStyle(
                         fontSize: 14,
+                        fontWeight: FontWeight.normal,
                         color: Colors.grey,
                       ),),
                       value: viewModel.jobTypeSelected,
@@ -138,6 +139,7 @@ Widget PostJobScreen(BuildContext context) {
                           child: Text(jobType.toString().split(":").last.split("}").first,
                             style: TextStyle(
                               fontSize: 14,
+                              fontWeight: FontWeight.normal
                             ),),
                         );
                       }).toList(),
@@ -145,7 +147,7 @@ Widget PostJobScreen(BuildContext context) {
                         viewModel.setJobTypeSelected(newValue);
                       },
                       buttonStyleData: ButtonStyleData(
-                        width: MediaQuery.of(context).size.width - 170,
+                        width: MediaQuery.of(context).size.width - 172,
                         height: 40,
                         padding: EdgeInsets.symmetric(
                             horizontal: 8, vertical: 6),
@@ -194,6 +196,7 @@ Widget PostJobScreen(BuildContext context) {
                       isDense: true,
                       hint: Text("Chọn cấp độ", style: TextStyle(
                         fontSize: 14,
+                        fontWeight: FontWeight.normal,
                         color: Colors.grey,
                       ),
                       ),
@@ -206,6 +209,7 @@ Widget PostJobScreen(BuildContext context) {
                           child: Text(jobLevel.toString().split(":").last.split("}").first,
                             style: TextStyle(
                               fontSize: 14,
+                              fontWeight: FontWeight.normal,
                             ),),
                         );
                       }).toList(),
@@ -306,6 +310,7 @@ Widget PostJobScreen(BuildContext context) {
                 isDense: true,
                 hint: Text("Chọn lĩnh vực công việc", style: TextStyle(
                   fontSize: 14,
+                  fontWeight: FontWeight.normal,
                   color: Colors.grey,
                 ),
                 ),
@@ -318,7 +323,7 @@ Widget PostJobScreen(BuildContext context) {
                   final map = Map<String, String>.from(item);
                   return DropdownMenuItem<String>(
                     value: map.keys.first,
-                    child: Text(map.values.first, style: TextStyle(fontSize: 14)),
+                    child: Text(map.values.first, style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
                   );
                 }).toList(),
                 onChanged: (String? value) {
@@ -502,6 +507,7 @@ Widget PostJobScreen(BuildContext context) {
                       isDense: true,
                       hint: Text("Chọn hình thức lương", style: TextStyle(
                         fontSize: 14,
+                        fontWeight: FontWeight.normal,
                         color: Colors.grey,
                       ),),
                       value: viewModel.salaryTypeSelected,
@@ -513,14 +519,14 @@ Widget PostJobScreen(BuildContext context) {
                       ].map((item) {
                         return DropdownMenuItem<String>(
                           value: item["ID"],
-                          child: Text(item["Name"]!, style: TextStyle(fontSize: 14)),
+                          child: Text(item["Name"]!, style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
                         viewModel.setSalaryTypeSelected(newValue);
                       },
                       buttonStyleData: ButtonStyleData(
-                        width: MediaQuery.of(context).size.width - 83,
+                        width: MediaQuery.of(context).size.width - 84,
                         height: 40,
                         padding: EdgeInsets.symmetric(
                             horizontal: 8, vertical: 6),
@@ -781,7 +787,7 @@ Padding salaryUnitComboBox(JobPostViewModel jobPostProvider) {
         ].map((item) {
           return DropdownMenuItem<String>(
             value: item,
-            child: Text(item, style: TextStyle(fontSize: 14)),
+            child: Text(item, style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
           );
         }).toList(),
         onChanged: (String? newValue) {
@@ -831,7 +837,7 @@ Align titleinJD({required String title, required bool isCompulsory}) {
             text: title,
             style: TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.bold, color: Colors.black,
+              fontWeight: FontWeight.w500, color: Colors.black,
               fontFamily:'Poppins',
             ),
             children: [

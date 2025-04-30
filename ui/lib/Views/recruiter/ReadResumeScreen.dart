@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/Helpers/toastification.dart';
 import 'package:ui/Models/Applications.dart';
 import 'package:ui/Models/Jobs.dart';
-import 'package:ui/Models/model.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 
 class ReadResumeScreen extends StatefulWidget {
@@ -35,14 +35,14 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
   @override
   Widget build(BuildContext context) {
     var viewModel = Provider.of<CandidatesAppliesViewModel>(context);
-    bool hasSlot = widget.job.Vacancies > widget.applications.where((e) => e.Status == "accepted").length;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: (widget.status == 'pending' && hasSlot) ? Size.fromHeight(90) : Size.fromHeight(50),
+        preferredSize: (widget.status == 'pending') ? Size.fromHeight(90) : Size.fromHeight(50),
         child: AppBar(
           iconTheme: IconThemeData(color: Colors.white),
-          backgroundColor: color,
+          backgroundColor: ColorConstants.appbarColor,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -160,7 +160,7 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
               )
             ],
           ),
-          bottom: displaySelection(context: context, viewModel: widget.viewModel, Id: widget.Id, status: widget.status, hasSlot: hasSlot),
+          bottom: displaySelection(context: context, viewModel: widget.viewModel, Id: widget.Id, status: widget.status),
         ),
       ),
       body: SfPdfViewer.network(
@@ -173,8 +173,8 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
 }
 
 
-PreferredSize? displaySelection({required BuildContext context, required CandidatesAppliesViewModel viewModel, required String Id, required String status, required bool hasSlot}) {
-  if (status != 'pending' || !hasSlot) {
+PreferredSize? displaySelection({required BuildContext context, required CandidatesAppliesViewModel viewModel, required String Id, required String status}) {
+  if (status != 'pending') {
     return null;
   } else {
     return PreferredSize(
@@ -308,8 +308,8 @@ PreferredSize? displaySelection({required BuildContext context, required Candida
                                     },
                                   );
                                   if (viewModel.rejectReason.text.isEmpty) {
-                                    showErrorToastification_applicationProcess(
-                                        message: 'Lý do từ chối không được để trống');
+                                    showErrorToastification(
+                                        message: 'Lý do từ chối không được để trống', title: 'Lỗi');
                                     Navigator.of(context).pop();
                                   }
                                   else {

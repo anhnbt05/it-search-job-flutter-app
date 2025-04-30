@@ -1,4 +1,4 @@
-class cWorkExperiences_cApplication_recruiter {
+class cWorkExperiences {
   final String ID;
   final DateTime? EndDate;
   final String JobType;
@@ -9,7 +9,7 @@ class cWorkExperiences_cApplication_recruiter {
   final List<String> Descriptions;
   final String CompanyLogoUrl;
 
-  cWorkExperiences_cApplication_recruiter({
+  cWorkExperiences({
     required this.ID,
     this.EndDate,
     required this.JobType,
@@ -21,8 +21,8 @@ class cWorkExperiences_cApplication_recruiter {
     required this.CompanyLogoUrl,
   });
 
-  factory cWorkExperiences_cApplication_recruiter.fromJson(Map<String, dynamic> json) {
-    return cWorkExperiences_cApplication_recruiter(
+  factory cWorkExperiences.fromJson(Map<String, dynamic> json) {
+    return cWorkExperiences(
       ID: json['ID'],
       EndDate: json['EndDate'] != null ? DateTime.tryParse(json['EndDate']) : null,
       JobType: json['JobType'],
