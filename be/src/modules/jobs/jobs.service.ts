@@ -485,7 +485,7 @@ export class JobsService {
       const { data: admin } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
-        .eq('Email', this.configService.get<string>('ADMIN_EMAIL', ''))
+        .eq('Email', this.configService.get<string>('admin.email', ''))
         .maybeSingle<Users>();
 
       if (!admin)
@@ -538,23 +538,18 @@ export class JobsService {
     try {
       const { data } = await this.anonSupabaseClient
         .from('Jobs')
-        .select('*')
+        .select('*, Recruiters(*, CompanyLocations(*, Companies(*)))')
         .eq('ID', jobId)
-        .maybeSingle<Jobs>();
+        .maybeSingle<any>();
 
       if (!data)
         throw new NotFoundException(
           `Không tìm thấy công việc có id '${jobId}'.`,
         );
 
-      if (data.Status === JobStatus.pending)
+      if (data.Status === JobStatus.open || data.Status === JobStatus.closed)
         throw new BadRequestException(
-          `Bạn chỉ có thể cập nhật công việc khi công việc đang đợi quản trị viên duyệt.`,
-        );
-
-      if (data.Status === JobStatus.rejected)
-        throw new BadRequestException(
-          `Bạn không thể cập nhật công việc mà đã bị quản trị viên từ chối.`,
+          `Bạn không thể cập nhật công việc đang ${data.Status === JobStatus.open ? 'mở' : 'đóng'}.`,
         );
 
       if (!updateJobDto || !Object.keys(updateJobDto).length)
@@ -680,6 +675,49 @@ export class JobsService {
             })),
           );
         }
+      }
+
+      if (data.Status === JobStatus.rejected) {
+        await this.prismaService.jobs.update({
+          where: {
+            ID: data.ID,
+          },
+          data: {
+            Status: JobStatus.pending,
+          },
+        });
+
+        const { data: admin } = await this.anonSupabaseClient
+          .from('Users')
+          .select('*')
+          .eq('Email', this.configService.get<string>('admin.email', ''))
+          .maybeSingle<Users>();
+
+        if (!admin)
+          throw new NotFoundException(
+            `Không tìm thấy quản trị viên trong hệ thống.`,
+          );
+
+        const metadata: AdminNewJobPostMetadata = {
+          jobId: data.ID,
+          jobTitle: data.Title,
+          recruiterId: data.RecruiterID,
+          companyName: data?.Recruiters?.CompanyLocations?.Companies?.Name,
+        };
+
+        const { admin_new_job_post } = NotificationType;
+
+        await this.userNotificationsService.handleCreateUserNotification(
+          {
+            Content: handleFormatUserNotificationContent(
+              admin_new_job_post,
+              metadata,
+            ),
+            Type: admin_new_job_post,
+            metadata,
+          },
+          admin.ID,
+        );
       }
 
       return this.handleFormattedJob(jobId);
