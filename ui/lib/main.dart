@@ -7,6 +7,7 @@ import 'package:ui/Helpers/helpers.dart';
 import 'package:ui/ViewModels/login/CompaniesViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import 'package:ui/ViewModels/login/ProvincesViewModel.dart';
+import 'package:ui/ViewModels/login/SignInViewModel.dart';
 import 'package:ui/ViewModels/login/SignUpViewModel.dart';
 import 'package:ui/Services/application_recruiter_service.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
@@ -45,7 +46,8 @@ void main() {
             return CandidatesAppliesViewModel(postedJobsManagementViewModel: postedJobsVM);
           },
         ),
-        ChangeNotifierProvider(create: (context) => JoblistNavigationViewModel())
+        ChangeNotifierProvider(create: (context) => JoblistNavigationViewModel()),
+        ChangeNotifierProvider(create: (context) => SignInViewModel()),
       ],
       child: MyApp(),
       ),

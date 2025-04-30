@@ -587,6 +587,20 @@ export class ApplicationsService {
           .eq('JobID', data.Jobs.ID)
           .overrideTypes<any[], { merge: false }>();
 
+        if (totalApplications?.length) {
+          await this.adminSupabaseClient
+            .from('Applications')
+            .update([
+              {
+                Status: ApplicationStatus.rejected,
+              },
+            ])
+            .in(
+              'ID',
+              totalApplications.map((t) => t.ID),
+            );
+        }
+
         const userIds: string[] =
           totalApplications?.map(
             (application) => application.Candidates.UserID as string,
@@ -606,7 +620,7 @@ export class ApplicationsService {
                 await this.userNotificationsService.handleCreateUserNotification(
                   {
                     Content: handleFormatUserNotificationContent(
-                      NotificationType.candidate_job_closed as NotificationType,
+                      NotificationType.candidate_job_closed,
                       metadata,
                     ),
                     Type: candidate_job_closed,
