@@ -71,13 +71,16 @@ class JobService {
           accessToken: accessToken);
       if (response.statusCode == 200) {
         print("Job deleted successfully.");
+        showSuccessToastification(title: 'Xoá thành công', message: "Bài tuyển dụng đã được xóa");
         return true;
       } else {
         print("Failed to delete job: ${response.body}");
+        showErrorToastification(title: 'Lối', message: jsonDecode(response.body)['message']);
         return false;
       }
     } catch (e) {
       print("Error deleting job: $e");
+      showErrorToastification(title: 'Lỗi', message: e.toString());
       return false;
     }
   }

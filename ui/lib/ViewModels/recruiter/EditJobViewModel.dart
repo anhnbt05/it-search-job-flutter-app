@@ -338,9 +338,16 @@ class EditJobViewModel extends ChangeNotifier {
         Level: _jobLevelSelected.toString().split(".").last,
         Categories: _jobCategorySelectedList,
       );
-      print(vm.jobs[index]!.Salary);
+      if (vm.jobs[index]!.Status == 'rejected') {
+        final updatedJob = vm.jobs[index]!.copyWith(status: 'pending');
+        vm.jobs[index] = updatedJob;
+        vm.jobs_pending.add(updatedJob);
+        vm.jobs_rejected.removeWhere((e) => e!.ID == updatedJob.ID);
+        if (vm.statusFilter != 'all') vm.jobs.removeWhere((e) => e!.ID == updatedJob.ID);
+      }
       vm.jobs = List.from(vm.jobs);
       vm.notifyListeners();
+
     }
     return success;
   }

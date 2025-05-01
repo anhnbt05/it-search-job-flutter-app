@@ -5,23 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9312053-9e5e-49bf-8451-898f90d1f6f0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Constants/api_constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Constants/api_constants.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Helpers/toastification.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Helpers/toastification.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Models/Jobs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Models/Jobs.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Services/api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/api_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Services/application_recruiter_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/application_recruiter_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Services/auth_refreshtoken_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/auth_refreshtoken_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Services/auth_signin_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/auth_signin_service.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/Services/job_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/job_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/CandidatesAppliesViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/CandidatesAppliesViewModel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/login/SignInViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/login/SignInViewModel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/EditJobViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/EditJobViewModel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/JobPostViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/JobPostViewModel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/PostedJobsManagementViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/PostedJobsManagementViewModel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/CandidatesAppliedView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/CandidatesAppliedView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/EditJobScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/EditJobScreen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/PostedJobsManagementView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/PostedJobsManagementView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/ReadResumeScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/ReadResumeScreen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/ui/linux/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ui/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/ui/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,26 +51,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Flutter.main.dart.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feat/ui/recruiter/job-list-view&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/HK4/NM_UDDD/Do_an/it-search-job-app&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;advanced.settings&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Flutter.main.dart.executor": "Debug",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "fix/ui/edit-rejected-job-to-pending",
+    "ignore.virus.scanning.warn.message": "true",
+    "io.flutter.reload.alreadyRun": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/HK4/NM_UDDD/Do_an/it-search-job-app",
+    "settings.editor.selected.configurable": "advanced.settings",
+    "show.migrate.to.gradle.popup": "false"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\HK4\NM_UDDD\Do_an\it-search-job-app\ui\assets\fonts" />
