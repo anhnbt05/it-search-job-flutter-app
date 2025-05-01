@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import '../ Constants/api_constants.dart';
+import '../Constants/api_constants.dart';
 import '../Models/ResponseModel.dart';
 
 class AuthSignInService {

@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:ui/Views/admin/admin.dart';
 import 'package:ui/Views/candidate/candidate.dart';
+import 'package:ui/Views/recruiter/PostedJobsManagementView.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
 
 import '../../Models/ResponseModel.dart';
@@ -120,7 +121,7 @@ class SignInViewModel extends ChangeNotifier {
       // );
     } else if (role == 'recruiter') {
       Navigator.of(context, rootNavigator: true).pushReplacement(
-        MaterialPageRoute(builder: (context) => ManagementScreen()),
+        MaterialPageRoute(builder: (context) => PostedJobsManagementScreen(context)),
       );
     } else if (role == 'candidate') {
       Navigator.of(context, rootNavigator: true).pushReplacement(
