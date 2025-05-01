@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/ViewModels/login/SignInViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
+import '../../Helpers/toastification.dart';
 import '../../main.dart';
 
 class LoginPage extends StatefulWidget {
@@ -130,8 +131,11 @@ class _LoginPageState extends State<LoginPage> {
                               _passwordController.text,
                             );
                             if (signInViewModel.errorMessage != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(signInViewModel.errorMessage!)),
+                              showTopToastification(
+                                content: signInViewModel.errorMessage!,
+                                title: "Thất bại",
+                                color:  Colors.red,
+                                icon:  Icons.error_outline,
                               );
                             }
                           },
