@@ -150,8 +150,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 20,
-                                        fontFamily: 'Poppins',
-                                        fontWeight: FontWeight.w700,
+                                        height: 1.2,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),
@@ -973,15 +973,28 @@ class _EditJobScreenState extends State<EditJobScreen> {
     );
   }
 
-  Container customTextField({required String? hintText,required double height, required TextEditingController controller,TextInputType textInputType = TextInputType.multiline, Function(String)? change, bool isCompulsory = true, required BuildContext context, List<TextInputFormatter>? format}) {
+  Widget customTextField({
+    required String? hintText,
+    required double height,
+    required TextEditingController controller,
+    TextInputType textInputType = TextInputType.multiline,
+    Function(String)? change,
+    bool isCompulsory = true,
+    required BuildContext context,
+    List<TextInputFormatter>? format,
+  }) {
     var viewModel = Provider.of<EditJobViewModel>(context);
     var isValid = (viewModel.check == false || isCompulsory == false || (isCompulsory == true && controller.text.isNotEmpty));
 
-    return Container(
-      height: height,
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      child :SizedBox.expand(
-        child: TextField(
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Container(
+        height: height,
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        child: SizedBox.expand(
+          child: TextField(
             inputFormatters: format,
             onChanged: change,
             controller: controller,
@@ -1004,12 +1017,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5),
                 borderSide: BorderSide(
-                    color: isValid
-                        ? Colors.grey
-                        : Colors.red,
-                    width: isValid
-                        ? 0.5
-                        : 1
+                  color: isValid ? Colors.grey : Colors.red,
+                  width: isValid ? 0.5 : 1,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -1017,11 +1026,13 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 borderSide: BorderSide(color: Colors.blue, width: 1),
               ),
               contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            )
+            ),
+          ),
         ),
       ),
     );
   }
+
 
   Widget? salaryInput(String? option, EditJobViewModel viewModel, BuildContext context) {
     if (option == null) return null;

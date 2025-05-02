@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Helpers/toastification.dart';
+import 'package:ui/ViewModels/recruiter/PostedJobsManagementViewModel.dart';
+import '../../Constants/api_constants.dart';
 import '../../Models/Enum.dart';
 import 'package:ui/Services/job_service.dart';
+
+import '../../Services/category_service.dart';
 
 List<String> jobType_value = [
   "Bán thời gian",
@@ -13,10 +17,29 @@ List<String> jobType_value = [
 List<String> jobLevel_value = ["Intern", "Fresher", "Mid", "Junior", "Senior"];
 
 class JobPostViewModel extends ChangeNotifier {
+  PostedJobsManagementViewModel postedJobsManagementViewModel;
+  JobPostViewModel({required this.postedJobsManagementViewModel}) {
+    if (categoriesList == null || categoriesList!.isEmpty) {
+      CategoryService().getCategory(
+        accessToken: APIConstants.token,
+      ).then((result) {
+        if (result != null) {
+          categoriesList = result;
+          jobCategoryIDList = categoriesList!
+              .map((e) => e.keys.first)
+              .toList();
+        }
+      }).catchError((error) {
+        print("Error fetching categories: $error");
+      });
+    }
+
+    if (!postedJobsManagementViewModel.isLoaded) {
+      postedJobsManagementViewModel.loadFuture;
+    }
+  }
+
   bool _check = false;
-  final String _branchName = "Thành phố Hồ Chí Minh"; //recruiter.branchname
-  final String _address =
-      "Số 12 Nguyễn Văn Bảo, Phường 4, Quận Gò Vấp, Thành phố Hồ Chí Minh"; //companyAddress
 
   eJobType? _jobTypeSelected;
   eLevel? _jobLevelSelected;
@@ -47,10 +70,6 @@ class JobPostViewModel extends ChangeNotifier {
   final TextEditingController _workingTimeText = TextEditingController();
   List<Map<String, String>>? _categoriesList = [];
   List<String>? _jobCategoryIDList;
-
-  String get address => _address;
-
-  String get branchName => _branchName;
 
   final List<Map<String, String>> _jobType = List.generate(
     eJobType.values.length,
@@ -265,7 +284,7 @@ class JobPostViewModel extends ChangeNotifier {
     return false;
   }
 
-  void post() async {
+  Future<void> post() async {
     if (_check == false) _check = true;
     notifyListeners();
     if (_nameText.text.isEmpty ||
@@ -310,23 +329,62 @@ class JobPostViewModel extends ChangeNotifier {
       salaryText =
           "Từ ${_salaryNumber1.text} đến ${_salaryNumber2.text} ${_salaryUnitSelected}";
     }
-    await new JobService().postJob(
-      accessToken: "...",
+
+    var job = await JobService().postJob(
+      accessToken: APIConstants.token,
       jobData: {
-        "Title": _nameText.text,
-        "Description": _descriptionText.text,
-        "Address": _address, //
+        "Title": nameText.text,
+        "Description": descriptionText.text,
+        "Address": postedJobsManagementViewModel.recruiterInfo!.CompanyLocations.Address,
         "Salary": salaryText,
-        "Vacancies": int.parse(_vacancyText.text),
-        "Type": _jobTypeSelected.toString().split(".").last,
-        "WorkingTimes": _workingTimeText.text,
-        "ExpiredDate": _selectedDate!.toUtc().toIso8601String(),
-        "Level": _jobLevelSelected.toString().split(".").last,
-        "Descriptions": _jobDescriptionsText.text.split("\n").toList(),
-        "Benefits": _jobBenefitsText.text.split("\n").toList(),
-        "Requirements": _jobRequirementsText.text.split("\n").toList(),
-        "Categories": _jobCategorySelectedList,
+        "Vacancies": int.parse(vacancyText.text),
+        "Type": jobTypeSelected
+            .toString()
+            .split(".")
+            .last,
+        "WorkingTimes": workingTimeText.text,
+        "ExpiredDate": selectedDate!.toUtc().toIso8601String(),
+        "Level": jobLevelSelected
+            .toString()
+            .split(".")
+            .last,
+        "Categories": List<String>.from(jobCategorySelectedList),
+        "Descriptions": jobDescriptionsText.text.split("\n").where((line) =>
+        line
+            .trim()
+            .isNotEmpty).toList(),
+        "Benefits": jobBenefitsText.text.split("\n").where((line) =>
+        line
+            .trim()
+            .isNotEmpty).toList(),
+        "Requirements": jobRequirementsText.text.split("\n").where((line) =>
+        line
+            .trim()
+            .isNotEmpty).toList(),
       },
     );
+    if (job != null) {
+      postedJobsManagementViewModel.jobs_pending.add(job);
+      postedJobsManagementViewModel.Filter(postedJobsManagementViewModel.statusFilter);
+      _check = false;
+      _nameText.clear();
+      _descriptionText.clear();
+      _vacancyText.clear();
+      _jobDescriptionsText.clear();
+      _jobRequirementsText.clear();
+      _jobBenefitsText.clear();
+      _salaryNumber1.clear();
+      _salaryNumber2.clear();
+      _workingTimeText.clear();
+      _textEditingController.clear();
+      _jobTypeSelected = null;
+      _jobLevelSelected = null;
+      _salaryTypeSelected = null;
+      _salaryUnitSelected = "triệu VNĐ/tháng";
+      _selectedDate = null;
+      _jobCategorySelectedList.clear();
+      _isAccept = false;
+      notifyListeners();
+    }
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/Models/Jobs.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 
@@ -38,10 +39,12 @@ Widget CandidatesAppliedScreen(BuildContext context,) {
                   ));
                 }
                 return ListView.builder(
-                    itemCount: viewModel.jobs.length,
-                    itemBuilder: (context, index) {
-                      return JobItem(context, index, viewModel.jobs, viewModel.applications[index]);
-                    }
+                  padding: EdgeInsets.only(bottom: 7),
+                  itemCount: viewModel.jobs.length,
+                  itemBuilder: (context, index) {
+                    return JobItem(context, index, viewModel.jobs,
+                        viewModel.applications[index]);
+                  }
                 );
               }
             );
@@ -57,9 +60,16 @@ Widget JobItem(BuildContext context, int index, List<cJobs_recruiter?> jobs, Lis
     padding: const EdgeInsets.only(top: 12.0, left: 8.0, right: 8.0),
     child: Container(
       decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
         border: Border.all(
-          color: (hasNewApplications) ? Colors.grey.shade500 : Colors.grey.shade100,
-          width: (hasNewApplications) ? 1 : 2,
+          color: (hasNewApplications) ? Colors.grey.shade300 : Colors.transparent,
+          width: (hasNewApplications) ? 1 : 0,
         ),
         borderRadius: BorderRadius.circular(8),
         color: Colors.white,
@@ -90,6 +100,27 @@ Widget JobItem(BuildContext context, int index, List<cJobs_recruiter?> jobs, Lis
                     fontSize: 13,
                   ),
                 ),
+                SizedBox(height: 3,),
+                Container(
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: Color(0x052196f3),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        (hasNewApplications) ? Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Text("Mới", style: TextStyle(fontSize:13, color: Colors.redAccent, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
+                        ) : SizedBox.shrink(),
+                        Icon(Icons.group_outlined, size: 20, color: ColorConstants.subTextColor,),
+                        SizedBox(width: 2,),
+                        Text("Có ${applications!.length} đơn ứng tuyển", style: TextStyle(fontSize:13, color: ColorConstants.subTextColor, fontWeight: FontWeight.w500),),
+                        SizedBox(width: 5,),
+                      ],
+                    )
+                )
               ],
             ),
           ),
@@ -109,7 +140,7 @@ Widget JobItem(BuildContext context, int index, List<cJobs_recruiter?> jobs, Lis
                   ),
                   children: [
                     TextSpan(
-                      text: "${(applications == null || applications.isEmpty)
+                      text: "${(applications.isEmpty)
                           ? "0"
                           : applications
                           .where((application) => application.Status == 'accepted')

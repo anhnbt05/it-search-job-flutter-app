@@ -46,7 +46,7 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
     } else if (value == 'closed_rejected') {
       _jobs = _jobs_closed + _jobs_rejected;
     }
-    _jobs.sort((a,b) => a!.PostedAt.compareTo(b!.PostedAt));
+    _jobs.sort((a,b) => b!.PostedAt.compareTo(a!.PostedAt));
     notifyListeners();
   }
 
@@ -63,7 +63,7 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
   Future<void> initFutures() async {
     _jobsFuture = JobService().getJobs(accessToken: APIConstants.token).then((value) {
       _jobs = value.map((e) => e).toList();
-      _jobs.sort((a,b) => a!.PostedAt.compareTo(b!.PostedAt));
+      _jobs.sort((a,b) => b!.PostedAt.compareTo(a!.PostedAt));
 
       _jobs_open = value.where((element) => element!.Status == 'open').toList();
       _jobs_pending = value.where((element) => element!.Status == 'pending').toList();

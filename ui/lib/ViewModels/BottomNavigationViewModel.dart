@@ -29,19 +29,13 @@ class BottomNavigationViewModel extends ChangeNotifier {
   }
 
   void onCenterButtonTap(BuildContext context) async {
-    final jobPostViewModel = Provider.of<JobPostViewModel>(context, listen: false);
     _animationController.forward().then((_) => _animationController.reverse());
     _selectedIndex = 2;
     notifyListeners();
     if (_pageController.hasClients) {
       _pageController.jumpToPage(2);
     }
-    if (jobPostViewModel.categoriesList == null || jobPostViewModel.categoriesList!.isEmpty) {
-      jobPostViewModel.categoriesList = await CategoryService().getCategory(
-        accessToken: APIConstants.token
-      );
-      jobPostViewModel.jobCategoryIDList = jobPostViewModel.categoriesList?.map((e) => e.keys.first).toList();
-    }
+
   }
 
   void onItemTapped(int index) {
