@@ -8,7 +8,7 @@ import 'package:ui/Models/Jobs.dart';
 class JobService {
   final ApiService _apiService = ApiService();
 
-  Future<bool> postJob({
+  Future<cJobs_recruiter?> postJob({
     required String accessToken,
     required Map<String, dynamic> jobData,
   }) async {
@@ -21,14 +21,23 @@ class JobService {
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         print("Job posted successfully.");
-        return true;
+        List<dynamic> data = jsonDecode(response.body);
+        List<Map<String, dynamic>> jobs = (data).cast<Map<String, dynamic>>();
+        jobs.sort((a, b) =>
+            DateTime.parse(b['PostedAt']).compareTo(DateTime.parse(a['PostedAt'])));
+        var latestJob = jobs.isNotEmpty ? jobs.first : null;
+        var job = (latestJob == null) ? null : cJobs_recruiter.fromJson(latestJob);
+        showSuccessToastification(title: 'Thành công', message: 'Bài đăng của bạn đã được gửi đền quản trị viên để chờ duyệt');
+        return job;
       } else {
         print("Failed to post job: ${response.body}");
-        return false;
+        showErrorToastification(title: 'Lỗi', message: jsonDecode(response.body)['message']);
+        return null;
       }
     } catch (e) {
       print("Error posting job: $e");
-      return false;
+      showErrorToastification(title: 'Lỗi', message: e.toString());
+      return null;
     }
   }
 

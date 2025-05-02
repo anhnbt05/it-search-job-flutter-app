@@ -56,10 +56,19 @@ Widget body({
               Container(
                 child: Row(
                   children: [
-                    Image.network(
-                      viewModel.recruiterInfo!.AvatarUrl,
-                      width: 50,
-                      height: 50,
+                    Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                            width: 2.2,
+                            color: Colors.transparent
+                          )
+                      ),
+                      child: Image.network(
+                        viewModel.recruiterInfo!.AvatarUrl,
+                        width: 50,
+                        height: 50,
+                      ),
                     ),
                     SizedBox(width: 5),
                     Expanded(

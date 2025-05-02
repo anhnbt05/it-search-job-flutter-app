@@ -34,7 +34,6 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => BottomNavigationViewModel(),),
         ChangeNotifierProvider(create: (context) => JoblistNavigationViewModel(),),
-        ChangeNotifierProvider(create: (context) => JobPostViewModel()),
         ChangeNotifierProvider(create: (context) => LoginNavigationViewModel()),
         ChangeNotifierProvider(create: (context) => CompaniesViewModel()),
         ChangeNotifierProvider(create: (context) => SignUpViewModel()),
@@ -43,10 +42,15 @@ void main() {
         ChangeNotifierProvider(
           create: (context) {
             final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
+            return JobPostViewModel(postedJobsManagementViewModel: postedJobsVM);
+          },
+        ),
+        ChangeNotifierProvider(
+          create: (context) {
+            final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
             return CandidatesAppliesViewModel(postedJobsManagementViewModel: postedJobsVM);
           },
         ),
-        ChangeNotifierProvider(create: (context) => JoblistNavigationViewModel()),
         ChangeNotifierProvider(create: (context) => SignInViewModel()),
       ],
       child: MyApp(),

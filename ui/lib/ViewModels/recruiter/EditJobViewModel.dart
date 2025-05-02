@@ -96,6 +96,7 @@ class EditJobViewModel extends ChangeNotifier {
       _selectedDate = job!.ExpiredAt;
       getSalary(job!.Salary);
       _jobCategorySelectedList = job!.Categories;
+      _jobCategoryList.removeWhere((e) => _jobCategorySelectedList.contains(e));
       return jobF;
     });
 
