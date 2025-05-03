@@ -82,7 +82,7 @@ class EditJobViewModel extends ChangeNotifier {
   }
 
   EditJobViewModel({required this.index, required this.vm, required this.recruiter}) {
-    _jobFuture = JobService().getJobByID(Id: vm.jobs[index]!.ID, accessToken: APIConstants.token).then((jobF) {
+    _jobFuture = JobService().getJobByID(Id: vm.jobs[index]!.ID, accessToken: APIConstants.accessToken).then((jobF) {
       job = jobF;
       _nameText = TextEditingController(text: jobF!.Title);
       _descriptionText = TextEditingController(text: job!.Description);
@@ -101,7 +101,7 @@ class EditJobViewModel extends ChangeNotifier {
     });
 
     _categoriesFuture = CategoryService().getCategory(
-        accessToken: APIConstants.token
+        accessToken: APIConstants.accessToken
     ).then((value) {
       _jobCategoryList = value!.map((e) => e.values.first).toList();
       return value;
@@ -309,7 +309,7 @@ class EditJobViewModel extends ChangeNotifier {
     }
     bool success = await JobService().editJob(
       Id: job!.ID,
-      accessToken: APIConstants.token,
+      accessToken: APIConstants.accessToken,
       jobData: {
         "Title": _nameText.text,
         "Description": _descriptionText.text,

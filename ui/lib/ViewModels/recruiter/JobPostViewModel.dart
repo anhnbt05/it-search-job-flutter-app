@@ -21,7 +21,7 @@ class JobPostViewModel extends ChangeNotifier {
   JobPostViewModel({required this.postedJobsManagementViewModel}) {
     if (categoriesList == null || categoriesList!.isEmpty) {
       CategoryService().getCategory(
-        accessToken: APIConstants.token,
+        accessToken: APIConstants.accessToken,
       ).then((result) {
         if (result != null) {
           categoriesList = result;
@@ -331,7 +331,7 @@ class JobPostViewModel extends ChangeNotifier {
     }
 
     var job = await JobService().postJob(
-      accessToken: APIConstants.token,
+      accessToken: APIConstants.accessToken,
       jobData: {
         "Title": nameText.text,
         "Description": descriptionText.text,

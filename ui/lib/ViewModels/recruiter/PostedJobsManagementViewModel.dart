@@ -8,6 +8,7 @@ import '../../Models/Jobs.dart';
 import '../../Services/job_service.dart';
 
 class PostedJobsManagementViewModel extends ChangeNotifier {
+  late final String userId;
   late Future<List<cJobs_recruiter?>> _jobsFuture;
   List<cJobs_recruiter?> _jobs_open = [];
   List<cJobs_recruiter?> _jobs_closed = [];
@@ -53,7 +54,7 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
   bool isLoaded = false;
   late Future<void> loadFuture;
 
-  PostedJobsManagementViewModel() {
+  PostedJobsManagementViewModel(this.userId) {
     loadFuture = initFutures().then((_) {
       isLoaded = true;
       notifyListeners();
@@ -61,7 +62,7 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
   }
 
   Future<void> initFutures() async {
-    _jobsFuture = JobService().getJobs(accessToken: APIConstants.token).then((value) {
+    _jobsFuture = JobService().getJobs(accessToken: APIConstants.accessToken).then((value) {
       _jobs = value.map((e) => e).toList();
       _jobs.sort((a,b) => b!.PostedAt.compareTo(a!.PostedAt));
 
@@ -72,13 +73,13 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
       return value;
     });
 
-    _recruiterFuture = UserService().getRecruiterInfo(Id: APIConstants.userId, accessToken: APIConstants.token).then((value) => _recruiterInfo = value);
+    _recruiterFuture = UserService().getRecruiterInfo(Id: userId, accessToken: APIConstants.accessToken).then((value) => _recruiterInfo = value);
 
     await Future.wait([_jobsFuture, _recruiterFuture]);
   }
 
   Future<void> deleteJob({required String Id}) async {
-    final success = await JobService().deleteJob(accessToken: APIConstants.token, Id: Id);
+    final success = await JobService().deleteJob(accessToken: APIConstants.accessToken, Id: Id);
     if (success) {
       cJobs_recruiter? job = _jobs.firstWhere((e) => e!.ID == Id);
       if (job != null) {
