@@ -99,7 +99,7 @@ class JobService {
     try {
       final response = await _apiService.getWithToken(
           endpoint: '${APIConstants.getJob_endpoint}/$Id',
-          accessToken: APIConstants.token);
+          accessToken: accessToken);
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
         print("Successfully fetched job.");

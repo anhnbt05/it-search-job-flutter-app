@@ -30,31 +30,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     ToastificationWrapper(
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => BottomNavigationViewModel()),
-          ChangeNotifierProvider(create: (_) => JoblistNavigationViewModel()),
-          ChangeNotifierProvider(create: (_) => LoginNavigationViewModel()),
-          ChangeNotifierProvider(create: (_) => CompaniesViewModel()),
-          ChangeNotifierProvider(create: (_) => SignUpViewModel()),
-          ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
-          ChangeNotifierProvider(create: (_) => PostedJobsManagementViewModel()),
-          ChangeNotifierProvider(
-            create: (context) {
-              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
-              return JobPostViewModel(postedJobsManagementViewModel: postedJobsVM);
-            },
-          ),
-          ChangeNotifierProvider(
-            create: (context) {
-              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
-              return CandidatesAppliesViewModel(postedJobsManagementViewModel: postedJobsVM);
-            },
-          ),
-          ChangeNotifierProvider(create: (_) => SignInViewModel()),
-        ],
-        child: MyApp(),
-      ),
+      child: MyApp(),
     ),
   );
 }
@@ -67,49 +43,73 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool isLoggedIn = false;
   String? userRole;
+  String? userId;
 
-  void loginSuccess(String role) {
+  void loginSuccess(String role, String id) {
     setState(() {
       isLoggedIn = true;
       userRole = role;
+      userId = id;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: isLoggedIn
-          ? _MainApp(role: userRole!)
-          : LoginPage(onLoginSuccess: loginSuccess),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BottomNavigationViewModel()),
+        ChangeNotifierProvider(create: (_) => JoblistNavigationViewModel()),
+        ChangeNotifierProvider(create: (_) => LoginNavigationViewModel()),
+        ChangeNotifierProvider(create: (_) => CompaniesViewModel()),
+        ChangeNotifierProvider(create: (_) => SignUpViewModel()),
+        ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
+        ChangeNotifierProvider(create: (_) => SignInViewModel()),
+
+        if (isLoggedIn && userId != null) ...[
+          ChangeNotifierProvider(create: (_) => PostedJobsManagementViewModel(userId!)),
+          ChangeNotifierProvider(
+            create: (context) {
+              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
+              return JobPostViewModel(postedJobsManagementViewModel: postedJobsVM);
+            },
+          ),
+          ChangeNotifierProvider(
+            create: (context) {
+              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
+              return CandidatesAppliesViewModel(postedJobsManagementViewModel: postedJobsVM);
+            },
+          ),
+        ],
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: isLoggedIn && userRole != null
+            ? _MainApp(role: userRole!, userId: userId!)
+            : LoginPage(onLoginSuccess: loginSuccess),
+      ),
     );
   }
 }
 
 class _MainApp extends StatefulWidget {
   final String role;
+  final String userId;
 
-  const _MainApp({Key? key, required this.role}) : super(key: key);
+  const _MainApp({Key? key, required this.role, required this.userId}) : super(key: key);
 
   @override
   _MainAppState createState() => _MainAppState();
 }
 
 class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
-  late role _role;
+  late String _role;
 
   @override
   void initState() {
     super.initState();
-
-    _role = role.values.firstWhere(
-          (e) => e.toString().split('.').last == widget.role,
-    );
-
+    _role = widget.role;
     final bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(context, listen: false);
-    final candidateAppliesViewModel = Provider.of<CandidatesAppliesViewModel>(context, listen: false);
 
-    candidateAppliesViewModel.initFutures();
     bottomNavigationProvider.setAnimationController(
       AnimationController(
         vsync: this,
@@ -130,7 +130,7 @@ class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final bottomNavigationViewModel = Provider.of<BottomNavigationViewModel>(context);
-    
+
     return MaterialApp(
       locale: const Locale('vi', 'VN'),
       supportedLocales: const [Locale('vi', 'VN'), Locale('en', 'US')],
@@ -142,6 +142,7 @@ class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Poppins',
+        scaffoldBackgroundColor: Colors.white,
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           selectedIconTheme: IconThemeData(size: 25, color: ColorConstants.appbarColor),
           unselectedIconTheme: const IconThemeData(size: 23, color: Colors.black),
@@ -149,7 +150,7 @@ class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
           showUnselectedLabels: false,
           selectedLabelStyle: const TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w500,
             color: Colors.white,
           ),
           selectedItemColor: Colors.black,
@@ -167,20 +168,6 @@ class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
             bottomNavigationViewModel.selectedIndex,
             context,
           ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    _role = (_role == role.candidate) ? role.recruiter : role.candidate;
-                  });
-                },
-                icon: const Icon(Icons.change_circle_outlined, size: 25),
-                color: Colors.white,
-              ),
-            ),
-          ],
         ),
         body: PageView(
           physics: const NeverScrollableScrollPhysics(),
@@ -203,21 +190,21 @@ class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
     );
   }
 
-  Widget? appbarTitle(role Role, int selectedIndex) {
-    if (Role == role.candidate) return appbarTitle_cadidate(selectedIndex);
-    if (Role == role.recruiter) return appbarTitle_recruiter(selectedIndex);
+  Widget? appbarTitle(String Role, int selectedIndex) {
+    if (Role == 'candidate') return appbarTitle_cadidate(selectedIndex);
+    if (Role == 'recruiter') return appbarTitle_recruiter(selectedIndex);
     return null;
   }
 
-  List<BottomNavigationBarItem> bottomNavigationItem(role Role) {
-    if (Role == role.recruiter) return bottomNavigationItem_recruiter(context);
-    if (Role == role.candidate) return bottomNavigationItem_candidate(context);
+  List<BottomNavigationBarItem> bottomNavigationItem(String Role) {
+    if (Role == 'recruiter') return bottomNavigationItem_recruiter(context);
+    if (Role == 'candidate') return bottomNavigationItem_candidate(context);
     return bottomNavigationItem_admin();
   }
 
-  List<Widget> pageView(role Role) {
-    if (Role == role.candidate) return pageView_candidate(context);
-    if (Role == role.recruiter) return pageView_recruiter(context);
+  List<Widget> pageView(String Role) {
+    if (Role == 'candidate') return pageView_candidate(context);
+    if (Role == 'recruiter') return pageView_recruiter(context);
     return pageView_admin(context);
   }
 }

@@ -43,9 +43,9 @@ BottomNavigationBarItem hiddenTabItem() {
   return BottomNavigationBarItem(icon: SizedBox.shrink(), label: '');
 }
 
-PreferredSize? bottomJobBar(role Role, int index, BuildContext context) {
+PreferredSize? bottomJobBar(String Role, int index, BuildContext context) {
   var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(context);
-  if (index != 2 && Role == role.candidate || Role != role.candidate) return null;
+  if (index != 2 && Role == 'candidate' || Role != 'candidate') return null;
   else {
     return
     PreferredSize(

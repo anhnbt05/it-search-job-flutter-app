@@ -7,7 +7,7 @@ import '../../Helpers/toastification.dart';
 import '../../main.dart';
 
 class LoginPage extends StatefulWidget {
-  final void Function(String) onLoginSuccess;
+  final void Function(String, String) onLoginSuccess;
   const LoginPage({Key? key, required this.onLoginSuccess}) : super(key: key);
 
   @override
@@ -126,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: signInViewModel.isLoading
                               ? null
                               : () async {
-                           final role = await signInViewModel.signIn(
+                           final Map<String, dynamic>? payload = await signInViewModel.signIn(
                               context,
                               _usernameController.text,
                               _passwordController.text,
@@ -138,8 +138,10 @@ class _LoginPageState extends State<LoginPage> {
                                 color:  Colors.red,
                                 icon:  Icons.error_outline,
                               );
-                            } else if (role != null) {
-                              widget.onLoginSuccess(role);
+                            } else if (payload != null) {
+                              final String role = payload['app_metadata']['role'];
+                              final String userId = payload['sub'];
+                              widget.onLoginSuccess(role, userId);
                             }
                           },
                           style: ElevatedButton.styleFrom(

@@ -55,9 +55,10 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
 
   void initFutures() {
     _jobs = postedJobsManagementViewModel.jobs_open;
+    print(postedJobsManagementViewModel.jobs_open.length);
     List<Future<List<cApplications_recruiter>?>> applicationFutures = jobs.map((job) {
       return ApplicationService().getApplicationsList(
-        accessToken: APIConstants.token,
+        accessToken: APIConstants.accessToken,
         jobID: job!.ID.toString(),
       );
     }).toList();
@@ -99,7 +100,7 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
 
   Future<void> approveApplication(String applicationId) async {
     final success = await ApplicationService().acceptApplication(
-      accessToken: APIConstants.token,
+      accessToken: APIConstants.accessToken,
       openApplicationIds: [applicationId],
     );
     if (success) {
@@ -133,7 +134,7 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
   Future<bool> rejectApplication(
       {required String applicationId, required String reason}) async {
     final success = await ApplicationService().rejectApplication(
-        accessToken: APIConstants.token,
+        accessToken: APIConstants.accessToken,
         applicationId: applicationId,
         reason: reason);
     if (success) {

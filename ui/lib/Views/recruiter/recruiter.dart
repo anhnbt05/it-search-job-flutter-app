@@ -57,9 +57,9 @@ List<BottomNavigationBarItem> bottomNavigationItem_recruiter(BuildContext contex
   ];
 }
 
-Positioned buttonAddJDforRecruiter(role Role, BuildContext context) {
+Positioned buttonAddJDforRecruiter(String Role, BuildContext context) {
   var navigationProvider = Provider.of<BottomNavigationViewModel>(context);
-  if (Role == role.recruiter) {
+  if (Role == 'recruiter') {
     return Positioned(
       bottom: MediaQuery.of(context).padding.bottom + (kBottomNavigationBarHeight / 2) - 25,
       left: MediaQuery.of(context).size.width / 2 - 25,
