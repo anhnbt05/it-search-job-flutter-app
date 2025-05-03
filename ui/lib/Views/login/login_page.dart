@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/ViewModels/login/SignInViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
+import '../../Helpers/toastification.dart';
 import '../../main.dart';
 
 class LoginPage extends StatefulWidget {
-  final VoidCallback onLoginSuccess;
+  final void Function(String) onLoginSuccess;
   const LoginPage({Key? key, required this.onLoginSuccess}) : super(key: key);
 
   @override
@@ -125,15 +126,20 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: signInViewModel.isLoading
                               ? null
                               : () async {
-                            await signInViewModel.signIn(
+                           final role = await signInViewModel.signIn(
                               context,
                               _usernameController.text,
                               _passwordController.text,
                             );
                             if (signInViewModel.errorMessage != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(signInViewModel.errorMessage!)),
+                              showTopToastification(
+                                content: signInViewModel.errorMessage!,
+                                title: "Thất bại",
+                                color:  Colors.red,
+                                icon:  Icons.error_outline,
                               );
+                            } else if (role != null) {
+                              widget.onLoginSuccess(role);
                             }
                           },
                           style: ElevatedButton.styleFrom(

@@ -19,7 +19,8 @@ class SignInViewModel extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
-  Future<void> signIn(BuildContext context, String email, String password) async {
+  Future<String?> signIn(BuildContext context, String email,
+      String password) async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
@@ -27,7 +28,8 @@ class SignInViewModel extends ChangeNotifier {
     try {
       final ResponseModel result = await _authService.signIn(email, password);
 
-      print('SignIn API Result: success=${result.success}, message=${result.message}, data=${result.data}');
+      print('SignIn API Result: success=${result.success}, message=${result
+          .message}, data=${result.data}');
 
       if (result.success == true && result.data != null) {
         final String? accessToken = result.data?['accessToken'];
@@ -35,7 +37,7 @@ class SignInViewModel extends ChangeNotifier {
 
         if (accessToken == null || refreshToken == null) {
           errorMessage = "Không lấy được token, vui lòng thử lại.";
-          return;
+          return null;
         }
 
         await _storage.write(key: 'accessToken', value: accessToken);
@@ -47,11 +49,12 @@ class SignInViewModel extends ChangeNotifier {
         final String? role = payload['app_metadata']['role'];
         if (role == null) {
           errorMessage = "Không tìm thấy vai trò người dùng.";
-          return;
+          return null;
         }
-        _navigateByRole(context, role);
+        return role;
       } else {
-        errorMessage = result.message ?? "Đăng nhập thất bại. Vui lòng kiểm tra tài khoản hoặc mật khẩu.";
+        errorMessage = result.message ??
+            "Đăng nhập thất bại. Vui lòng kiểm tra tài khoản hoặc mật khẩu.";
         print('Error Message: $errorMessage');
       }
     } catch (e, stackTrace) {
@@ -73,9 +76,11 @@ class SignInViewModel extends ChangeNotifier {
         return;
       }
 
-      final ResponseModel result = await _refreshTokenService.refreshAccessToken(refreshToken);
+      final ResponseModel result = await _refreshTokenService
+          .refreshAccessToken(refreshToken);
 
-      print('Refresh Token Result: success=${result.success}, message=${result.message}, data=${result.data}');
+      print('Refresh Token Result: success=${result.success}, message=${result
+          .message}, data=${result.data}');
 
       if (result.success && result.data != null) {
         final String? newAccessToken = result.data?['accessToken'];
@@ -110,26 +115,6 @@ class SignInViewModel extends ChangeNotifier {
     } catch (e) {
       print('Error checking token expiry: $e');
       return true;
-    }
-  }
-
-  void _navigateByRole(BuildContext context, String role) {
-    if (role == 'admin') {
-      // Mở AdminHomePage khi xong
-      // Navigator.of(context, rootNavigator: true).pushReplacement(
-      //   MaterialPageRoute(builder: (context) => AdminHomePage()),
-      // );
-    } else if (role == 'recruiter') {
-      Navigator.of(context, rootNavigator: true).pushReplacement(
-        MaterialPageRoute(builder: (context) => PostedJobsManagementScreen(context)),
-      );
-    } else if (role == 'candidate') {
-      Navigator.of(context, rootNavigator: true).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
-    } else {
-      errorMessage = "Role không hợp lệ.";
-      notifyListeners();
     }
   }
 }
