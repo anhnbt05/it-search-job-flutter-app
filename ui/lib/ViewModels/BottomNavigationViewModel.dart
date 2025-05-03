@@ -1,7 +1,7 @@
 import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/%20Constants/api_constants.dart';
+import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Services/application_recruiter_service.dart';
 import 'package:ui/Services/job_service.dart';
 import 'package:ui/ViewModels/recruiter/JobPostViewModel.dart';
@@ -29,39 +29,20 @@ class BottomNavigationViewModel extends ChangeNotifier {
   }
 
   void onCenterButtonTap(BuildContext context) async {
-    final jobPostViewModel = Provider.of<JobPostViewModel>(context, listen: false);
     _animationController.forward().then((_) => _animationController.reverse());
     _selectedIndex = 2;
     notifyListeners();
     if (_pageController.hasClients) {
       _pageController.jumpToPage(2);
     }
-    if (jobPostViewModel.categoriesList == null || jobPostViewModel.categoriesList!.isEmpty) {
-      jobPostViewModel.categoriesList = await CategoryService().getCategory(
-        accessToken: APIConstants.token
-      );
-      jobPostViewModel.jobCategoryIDList = jobPostViewModel.categoriesList?.map((e) => e.keys.first).toList();
-    }
+
   }
 
   void onItemTapped(int index) {
     if (_selectedIndex != index) {
       _selectedIndex = index;
       notifyListeners();
-
-      if (_pageController.hasClients) {
-        if ((index - (_pageController.page ?? 0)).abs() > 1) {
-          // Nhảy trực tiếp nếu trang đích không nằm kế bên
-          _pageController.jumpToPage(index);
-        } else {
-          // Hiệu ứng trượt nếu trang đích là trang liền kề
-          _pageController.animateToPage(
-            index,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        }
-      }
+      _pageController.jumpToPage(index);
     }
   }
 

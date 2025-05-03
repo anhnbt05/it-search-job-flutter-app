@@ -13,7 +13,9 @@ Widget PostJobScreen(BuildContext context) {
 
   return Container(
     color: Colors.white,
-    child: SingleChildScrollView(
+    child: (viewModel.postedJobsManagementViewModel.recruiterInfo == null)
+        ? Center(child: CircularProgressIndicator(color: Colors.blue),)
+        : SingleChildScrollView(
       child: Column(
         children: [
           Row(
@@ -22,11 +24,23 @@ Widget PostJobScreen(BuildContext context) {
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                 child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(20),
+                  height: 80,
+                  width: 80,
+                  margin: EdgeInsets.only(right: 10),
+                  child: (viewModel.postedJobsManagementViewModel.recruiterInfo?.Company.LogoUrl != null)
+                      ? Image.network(
+                    viewModel.postedJobsManagementViewModel.recruiterInfo!.Company.LogoUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey.shade200,
+                        child: Icon(Icons.broken_image, color: Colors.grey),
+                      );
+                    },
+                  )
+                      : Container(
+                    color: Colors.grey.shade200,
+                    child: Icon(Icons.business, color: Colors.grey),
                   ),
                 ),
               ),
@@ -37,14 +51,14 @@ Widget PostJobScreen(BuildContext context) {
                   children: [
                     Padding(
                       padding: EdgeInsets.only(top: 10, right: 5),
-                      child: Text(
-                        'Công ty TNHH Phát triển Công nghệ Thông tin và Truyền thông Việt Nam',
+                      child: Text(viewModel.postedJobsManagementViewModel.recruiterInfo!.Company.Name,
                         softWrap: true,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 19,
-                          fontFamily: 'Anton',
+                          fontSize: 20,
+                          height: 1.2,
+                          fontWeight: FontWeight.w500
                         ),
                       ),
                     ),
@@ -55,8 +69,7 @@ Widget PostJobScreen(BuildContext context) {
                         children: [
                           Icon(Icons.person_outline, size: 15),
                           SizedBox(width: 5),
-                          Text(
-                            'Hồ Văn Tên',
+                          Text(viewModel.postedJobsManagementViewModel.recruiterInfo!.FullName,
                             style: TextStyle(fontSize: 15),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -127,6 +140,7 @@ Widget PostJobScreen(BuildContext context) {
                       isDense: true,
                       hint: Text("Chọn hình thức", style: TextStyle(
                         fontSize: 14,
+                        fontWeight: FontWeight.normal,
                         color: Colors.grey,
                       ),),
                       value: viewModel.jobTypeSelected,
@@ -138,6 +152,7 @@ Widget PostJobScreen(BuildContext context) {
                           child: Text(jobType.toString().split(":").last.split("}").first,
                             style: TextStyle(
                               fontSize: 14,
+                              fontWeight: FontWeight.normal
                             ),),
                         );
                       }).toList(),
@@ -145,7 +160,7 @@ Widget PostJobScreen(BuildContext context) {
                         viewModel.setJobTypeSelected(newValue);
                       },
                       buttonStyleData: ButtonStyleData(
-                        width: MediaQuery.of(context).size.width - 170,
+                        width: MediaQuery.of(context).size.width - 172,
                         height: 40,
                         padding: EdgeInsets.symmetric(
                             horizontal: 8, vertical: 6),
@@ -194,6 +209,7 @@ Widget PostJobScreen(BuildContext context) {
                       isDense: true,
                       hint: Text("Chọn cấp độ", style: TextStyle(
                         fontSize: 14,
+                        fontWeight: FontWeight.normal,
                         color: Colors.grey,
                       ),
                       ),
@@ -206,6 +222,7 @@ Widget PostJobScreen(BuildContext context) {
                           child: Text(jobLevel.toString().split(":").last.split("}").first,
                             style: TextStyle(
                               fontSize: 14,
+                              fontWeight: FontWeight.normal,
                             ),),
                         );
                       }).toList(),
@@ -306,6 +323,7 @@ Widget PostJobScreen(BuildContext context) {
                 isDense: true,
                 hint: Text("Chọn lĩnh vực công việc", style: TextStyle(
                   fontSize: 14,
+                  fontWeight: FontWeight.normal,
                   color: Colors.grey,
                 ),
                 ),
@@ -318,7 +336,7 @@ Widget PostJobScreen(BuildContext context) {
                   final map = Map<String, String>.from(item);
                   return DropdownMenuItem<String>(
                     value: map.keys.first,
-                    child: Text(map.values.first, style: TextStyle(fontSize: 14)),
+                    child: Text(map.values.first, style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
                   );
                 }).toList(),
                 onChanged: (String? value) {
@@ -430,14 +448,14 @@ Widget PostJobScreen(BuildContext context) {
                       TextSpan(
                         children: <TextSpan>[
                           TextSpan(
-                            text: viewModel.branchName + ": ",
+                            text: "${viewModel.postedJobsManagementViewModel.recruiterInfo!.CompanyLocations.BranchName}: ",
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           TextSpan(
-                            text: viewModel.address,
+                            text: viewModel.postedJobsManagementViewModel.recruiterInfo!.CompanyLocations.Address,
                             style: TextStyle(fontSize: 14,),
                           ),
                         ],
@@ -502,6 +520,7 @@ Widget PostJobScreen(BuildContext context) {
                       isDense: true,
                       hint: Text("Chọn hình thức lương", style: TextStyle(
                         fontSize: 14,
+                        fontWeight: FontWeight.normal,
                         color: Colors.grey,
                       ),),
                       value: viewModel.salaryTypeSelected,
@@ -513,14 +532,14 @@ Widget PostJobScreen(BuildContext context) {
                       ].map((item) {
                         return DropdownMenuItem<String>(
                           value: item["ID"],
-                          child: Text(item["Name"]!, style: TextStyle(fontSize: 14)),
+                          child: Text(item["Name"]!, style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
                         viewModel.setSalaryTypeSelected(newValue);
                       },
                       buttonStyleData: ButtonStyleData(
-                        width: MediaQuery.of(context).size.width - 83,
+                        width: MediaQuery.of(context).size.width - 84,
                         height: 40,
                         padding: EdgeInsets.symmetric(
                             horizontal: 8, vertical: 6),
@@ -648,28 +667,49 @@ Widget PostJobScreen(BuildContext context) {
                 ),
               ),
               Padding(padding: EdgeInsets.only(left: 10), child:
-              ElevatedButton(
-                onPressed: viewModel.post,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xE9E0F7FF),
-                  elevation: 0,
-                  minimumSize: Size(120, 35),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  side: BorderSide(
-                    color: Colors.blue,
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  "Đăng bài",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue[900],
-                  ),
-                ),
-              ),
+              // Replace the existing ElevatedButton code in the PostJobScreen function with this:
+
+              Builder(
+                builder: (BuildContext dialogContext) {
+                  return ElevatedButton(
+                    onPressed: () async {
+                      showDialog(
+                        context: dialogContext,
+                        barrierColor: Colors.black.withOpacity(0.5),
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.blue,
+                            ),
+                          );
+                        },
+                      );
+                      await viewModel.post();
+                      Navigator.pop(dialogContext);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xE9E0F7FF),
+                      elevation: 0,
+                      minimumSize: Size(120, 35),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      side: BorderSide(
+                        color: Colors.blue,
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      "Đăng bài",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue[900],
+                      ),
+                    ),
+                  );
+                },
+              )
               ),
             ],
           ),
@@ -694,6 +734,9 @@ Widget? salaryInput(String? option, JobPostViewModel jobPostProvider, BuildConte
             padding: EdgeInsets.only(top: 5),
             child: customTextField(
               hintText: 'Nhập số tiền...',
+              format: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
               height: 40,
               textInputType: TextInputType.number,
               controller: viewModel.salaryNumber1,
@@ -723,6 +766,9 @@ Widget? salaryInput(String? option, JobPostViewModel jobPostProvider, BuildConte
                     hintText: 'Tối thiểu...',
                     height: 40,
                     textInputType: TextInputType.number,
+                    format: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
                     controller: viewModel.salaryNumber1,
                     isCompulsory: true,
                     context: context
@@ -741,6 +787,9 @@ Widget? salaryInput(String? option, JobPostViewModel jobPostProvider, BuildConte
                   child: customTextField(
                     hintText: 'Tối đa...',
                     height: 40,
+                    format: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
                     textInputType: TextInputType.number,
                     controller: viewModel.salaryNumber2,
                     isCompulsory: true,
@@ -781,7 +830,7 @@ Padding salaryUnitComboBox(JobPostViewModel jobPostProvider) {
         ].map((item) {
           return DropdownMenuItem<String>(
             value: item,
-            child: Text(item, style: TextStyle(fontSize: 14)),
+            child: Text(item, style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
           );
         }).toList(),
         onChanged: (String? newValue) {
@@ -831,7 +880,7 @@ Align titleinJD({required String title, required bool isCompulsory}) {
             text: title,
             style: TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.bold, color: Colors.black,
+              fontWeight: FontWeight.w500, color: Colors.black,
               fontFamily:'Poppins',
             ),
             children: [

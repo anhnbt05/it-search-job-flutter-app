@@ -7,26 +7,18 @@ import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 import '../../Models/Jobs.dart';
 import '../../ViewModels/BottomNavigationViewModel.dart';
 import 'CandidatesAppliedView.dart';
+import 'PostedJobsManagementView.dart';
 import 'JobPostView.dart';
 import '../../Models/Applications.dart';
 
-List<Widget> pageView_recruiter(BuildContext context, CandidatesAppliesViewModel viewModel) {
+List<Widget> pageView_recruiter(BuildContext context) {
   return [
-    ManagementScreen(),
-    CandidatesAppliedScreen(context, viewModel),
+    PostedJobsManagementScreen(context),
+    CandidatesAppliedScreen(context),
     PostJobScreen(context),
     NotificationsScreen(),
     ProfileScreen(),
   ];
-}
-
-Widget ManagementScreen() {
-  return Container(
-    color: Colors.amberAccent.shade100,
-    child: Center(
-      child: Text("Quản lý", style: TextStyle(fontSize: 24)),
-    ),
-  );
 }
 
 Widget NotificationsScreen() {
@@ -103,19 +95,19 @@ Widget? appbarTitle_recruiter(int selectedIndex) {
   switch (selectedIndex) {
     case 0:
       return Text('Quản lý',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
     case 1:
       return Text('Danh sách đơn ứng tuyển',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
     case 2:
       return Text('Thêm tin tuyển dụng',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
     case 3:
       return Text('Thông báo',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
     case 4:
       return Text('Hồ sơ cá nhân',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
   }
   return null;
 }

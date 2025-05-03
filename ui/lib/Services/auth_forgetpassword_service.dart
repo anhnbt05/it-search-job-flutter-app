@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:ui/%20Constants/api_constants.dart';
+import 'package:ui/Constants/api_constants.dart';
 import 'dart:convert';
 
 import '../Models/ResponseModel.dart';

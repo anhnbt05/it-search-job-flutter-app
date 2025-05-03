@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:ui/Models/Provinces.dart';
 import 'dart:convert';
 
-import '../ Constants/api_constants.dart';
+import '../Constants/api_constants.dart';
 import '../Models/ResponseModel.dart';
 
 class AuthProvincesService {

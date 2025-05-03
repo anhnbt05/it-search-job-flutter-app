@@ -15,7 +15,9 @@ import {
   Categories,
   Jobs,
   JobStatus,
+  Level,
   NotificationType,
+  Prisma,
   Recruiters,
   Role,
   Users,
@@ -38,6 +40,7 @@ import {
   RejectedJobStatusDto,
   UpdateJobDto,
 } from 'src/modules/jobs/dtos';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { UserNotificationsService } from 'src/modules/user-notifications/user-notifications.service';
 import { UsersService } from 'src/modules/users/users.service';
 
@@ -53,6 +56,7 @@ export class JobsService {
     private readonly usersService: UsersService,
     private readonly userNotificationsService: UserNotificationsService,
     private readonly configService: ConfigService,
+    private readonly prismaService: PrismaService,
   ) {}
 
   @Cron('0 0 * * *')
@@ -184,7 +188,7 @@ export class JobsService {
       const query = this.anonSupabaseClient
         .from('Jobs')
         .select(
-          '*, Recruiters(*, Users(FullName), CompanyLocations(*, Companies(*)))',
+          '*, Recruiters(*, Users(FullName), CompanyLocations(*, Companies(*))), JobCategories(*, Categories(*))',
         );
 
       if (isRecruiter) {
@@ -217,7 +221,7 @@ export class JobsService {
         );
 
       return jobs?.map((job) => ({
-        ...omit(job, ['RecruiterID', 'Recruiters']),
+        ...omit(job, ['RecruiterID', 'Recruiters', 'JobCategories']),
         Recruiter: {
           ...omit(job.Recruiters, [
             'Users',
@@ -228,6 +232,9 @@ export class JobsService {
           FullName: job.Recruiters.Users.FullName,
           Company: job.Recruiters.CompanyLocations.Companies,
         },
+        Categories: job.JobCategories.map(
+          (jc: any) => jc.Categories.CategoryName,
+        ),
       }));
     } catch (err) {
       console.error(err);
@@ -478,7 +485,7 @@ export class JobsService {
       const { data: admin } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
-        .eq('Email', this.configService.get<string>('ADMIN_EMAIL', ''))
+        .eq('Email', this.configService.get<string>('admin.email', ''))
         .maybeSingle<Users>();
 
       if (!admin)
@@ -507,13 +514,7 @@ export class JobsService {
         admin.ID,
       );
 
-      return (
-        await this.anonSupabaseClient
-          .from('Jobs')
-          .select('*')
-          .eq('ID', data.ID)
-          .maybeSingle<Jobs>()
-      ).data;
+      return this.handleGetJobs(userId);
     } catch (err) {
       console.error(err);
       throw err;
@@ -537,23 +538,18 @@ export class JobsService {
     try {
       const { data } = await this.anonSupabaseClient
         .from('Jobs')
-        .select('*')
+        .select('*, Recruiters(*, CompanyLocations(*, Companies(*)))')
         .eq('ID', jobId)
-        .maybeSingle<Jobs>();
+        .maybeSingle<any>();
 
       if (!data)
         throw new NotFoundException(
           `Không tìm thấy công việc có id '${jobId}'.`,
         );
 
-      if (data.Status === JobStatus.pending)
+      if (data.Status === JobStatus.open || data.Status === JobStatus.closed)
         throw new BadRequestException(
-          `Bạn chỉ có thể cập nhật công việc khi công việc đang đợi quản trị viên duyệt.`,
-        );
-
-      if (data.Status === JobStatus.rejected)
-        throw new BadRequestException(
-          `Bạn không thể cập nhật công việc mà đã bị quản trị viên từ chối.`,
+          `Bạn không thể cập nhật công việc đang ${data.Status === JobStatus.open ? 'mở' : 'đóng'}.`,
         );
 
       if (!updateJobDto || !Object.keys(updateJobDto).length)
@@ -569,8 +565,14 @@ export class JobsService {
           'Thời gian hết hạn mới của công việc phải lớn hơn thời gian hiện tại.',
         );
 
-      const { Descriptions, Benefits, Requirements, ExpiredDate, ...res } =
-        updateJobDto;
+      const {
+        Descriptions,
+        Benefits,
+        Requirements,
+        ExpiredDate,
+        Categories,
+        ...res
+      } = updateJobDto;
 
       const { error } = await this.anonSupabaseClient
         .from('Jobs')
@@ -614,6 +616,107 @@ export class JobsService {
           'Requirement',
           Requirements,
           jobId,
+        );
+      }
+
+      if (Categories && Categories.length) {
+        const foundCategories = await this.prismaService.categories.findMany({
+          where: {
+            CategoryName: {
+              in: Categories,
+            },
+          },
+        });
+
+        if (foundCategories.length !== Categories.length) {
+          const foundNames = new Set(
+            foundCategories.map((c) => c.CategoryName),
+          );
+
+          const missing = Categories.filter((name) => !foundNames.has(name));
+
+          throw new NotFoundException(
+            `Không tìm thấy các danh mục sau: ${missing.join(', ')}.`,
+          );
+        }
+
+        const existingValues = foundCategories.map((c) => c.ID);
+
+        const existingCategories = (
+          await this.prismaService.jobCategories.findMany({
+            where: {
+              JobID: jobId,
+            },
+          })
+        ).map((jc) => jc.CategoryID);
+
+        const newSet = new Set(existingValues);
+
+        const existingCategoriesSet = new Set(existingCategories);
+
+        const toAdd = existingValues.filter(
+          (val) => !existingCategoriesSet.has(val),
+        );
+
+        const toRemove = existingCategories.filter((val) => !newSet.has(val));
+
+        if (toRemove.length)
+          await this.adminSupabaseClient
+            .from('JobCategories')
+            .delete()
+            .eq('JobID', jobId)
+            .in('CategoryID', toRemove);
+
+        if (toAdd.length) {
+          await this.adminSupabaseClient.from('JobCategories').insert(
+            toAdd.map((val) => ({
+              CategoryID: val,
+              JobID: jobId,
+            })),
+          );
+        }
+      }
+
+      if (data.Status === JobStatus.rejected) {
+        await this.prismaService.jobs.update({
+          where: {
+            ID: data.ID,
+          },
+          data: {
+            Status: JobStatus.pending,
+          },
+        });
+
+        const { data: admin } = await this.anonSupabaseClient
+          .from('Users')
+          .select('*')
+          .eq('Email', this.configService.get<string>('admin.email', ''))
+          .maybeSingle<Users>();
+
+        if (!admin)
+          throw new NotFoundException(
+            `Không tìm thấy quản trị viên trong hệ thống.`,
+          );
+
+        const metadata: AdminNewJobPostMetadata = {
+          jobId: data.ID,
+          jobTitle: data.Title,
+          recruiterId: data.RecruiterID,
+          companyName: data?.Recruiters?.CompanyLocations?.Companies?.Name,
+        };
+
+        const { admin_new_job_post } = NotificationType;
+
+        await this.userNotificationsService.handleCreateUserNotification(
+          {
+            Content: handleFormatUserNotificationContent(
+              admin_new_job_post,
+              metadata,
+            ),
+            Type: admin_new_job_post,
+            metadata,
+          },
+          admin.ID,
         );
       }
 
@@ -844,6 +947,66 @@ export class JobsService {
     }
   };
 
+  public handleGetJobFavorites = async (userId: string) => {
+    const { data: candidate } = await this.anonSupabaseClient
+      .from('Candidates')
+      .select('*')
+      .eq('UserID', userId)
+      .maybeSingle<Candidates>();
+
+    if (!candidate)
+      throw new NotFoundException(
+        'Không tìm thấy ứng viên này trong hệ thống.',
+      );
+
+    const { data: jobFavorites, error } = await this.anonSupabaseClient
+      .from('JobFavorites')
+      .select(
+        '*, Jobs(*, JobBenefits(*), JobRequirements(*), JobDescriptions(*), Recruiters(*, Users(*) ,CompanyLocations(*, Companies(*))) ,JobCategories(*, Categories(CategoryName)))',
+      )
+      .eq('CandidateID', candidate.ID)
+      .overrideTypes<any[], { merge: false }>();
+
+    if (error) {
+      console.error(error);
+
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi trong quá trình lấy danh sách các công việc ưa thích của ứng viên.',
+      );
+    }
+
+    return (
+      jobFavorites.map((jf: any) => ({
+        ...omit(jf, ['CandidateID', 'JobID', 'Jobs']),
+        Job: {
+          ...omit(jf.Jobs, ['JobCategories', 'Recruiters', 'RecruiterID']),
+          Categories: jf?.Jobs.JobCategories?.map(
+            (jc: any) => jc.Categories.CategoryName,
+          ),
+          Recruiter: {
+            ID: jf.Jobs.Recruiters.ID,
+            FullName: jf.Jobs.Recruiters.Users.FullName,
+            Position: jf.Jobs.Recruiters.Position,
+            Email: jf.Jobs.Recruiters.Users.Email,
+            PhoneNumber: jf.Jobs.Recruiters.Users.PhoneNumber,
+            AvatarUrl: jf.Jobs.Recruiters.Users.AvatarUrl,
+            Company: {
+              Name: jf.Jobs.Recruiters.CompanyLocations.Companies.Name,
+              LogoUrl: jf.Jobs.Recruiters.CompanyLocations.Companies.LogoUrl,
+            },
+          },
+          JobBenefits: jf.Jobs.JobBenefits.map((jb: any) => jb.Benefit),
+          JobDescriptions: jf.Jobs.JobDescriptions.map(
+            (jd: any) => jd.Description,
+          ),
+          JobRequirements: jf.Jobs.JobRequirements.map(
+            (jr: any) => jr.Requirement,
+          ),
+        },
+      })) ?? []
+    );
+  };
+
   public handleCreateJobFavorites = async (
     userId: string,
     createJobFavoritesDto: CreateJobFavoritesDto,
@@ -957,7 +1120,8 @@ export class JobsService {
             *,
             JobDescriptions(*),
             JobRequirements(*),
-            JobBenefits(*)
+            JobBenefits(*),
+            JobCategories(*, Categories(*))
           )
         `,
         )
@@ -972,13 +1136,16 @@ export class JobsService {
       }
 
       return response?.data?.map((d) => ({
-        ...d.Jobs,
+        ...omit(d.Jobs, ['JobCategories']),
         JobBenefits: d.Jobs.JobBenefits.map((jb: any) => jb.Benefit),
         JobDescriptions: d.Jobs.JobDescriptions.map(
           (jd: any) => jd.Description,
         ),
         JobRequirements: d.Jobs.JobRequirements.map(
           (jr: any) => jr.Requirement,
+        ),
+        Categories: d.Jobs.JobCategories.map(
+          (jc: any) => jc.Categories.CategoryName,
         ),
       }));
     } catch (err) {
@@ -1008,20 +1175,73 @@ export class JobsService {
           'Bạn chỉ có thể lấy các công việc phù hợp với trình độ của chính bạn.',
         );
 
-      const { data: jobs, error: jobsError } =
-        await this.anonSupabaseClient.rpc('get_jobs_sorted_by_level', {
-          candidate_level: data.Level,
-        });
+      const candidateLevel = data.Level;
 
-      if (jobsError) {
-        console.error(jobsError);
+      const jobs = await this.prismaService.$queryRaw<any[]>`
+        SELECT 
+          j.*, 
+          json_agg(DISTINCT r) AS recruiter, 
+          json_agg(DISTINCT u) AS user, 
+          json_agg(DISTINCT jb) AS job_benefits,
+          json_agg(DISTINCT jd) AS job_descriptions,
+          json_agg(DISTINCT jr) AS job_requirements,
+          json_agg(DISTINCT c) AS company
+        FROM "Jobs" j
+          LEFT JOIN "Recruiters" r ON r."ID" = j."RecruiterID"
+          LEFT JOIN "Users" u ON u."ID" = r."UserID"
+          LEFT JOIN "CompanyLocations" cl ON cl."ID" = r."CompanyLocationID"
+          LEFT JOIN "Companies" c ON c."ID" = cl."CompanyID"
+          LEFT JOIN "JobBenefits" jb ON jb."JobID" = j."ID"
+          LEFT JOIN "JobDescriptions" jd ON jd."JobID" = j."ID"
+          LEFT JOIN "JobRequirements" jr ON jr."JobID" = j."ID"
+        GROUP BY j."ID", r."ID"
+        ORDER BY
+          CASE 
+            WHEN j."Level" = ${Prisma.sql`CAST(${candidateLevel} AS "Level")`} THEN 0
+            WHEN ${Prisma.sql`CAST(${candidateLevel} AS "Level")`} = ${Prisma.sql`CAST(${Level.senior} AS "Level")`} AND j."Level" = ${Prisma.sql`CAST(${Level.senior} AS "Level")`} THEN 1
+            WHEN ${Prisma.sql`CAST(${candidateLevel} AS "Level")`} = ${Prisma.sql`CAST(${Level.mid} AS "Level")`} AND j."Level" = ${Prisma.sql`CAST(${Level.mid} AS "Level")`} THEN 1
+            WHEN ${Prisma.sql`CAST(${candidateLevel} AS "Level")`} = ${Prisma.sql`CAST(${Level.junior} AS "Level")`} AND j."Level" = ${Prisma.sql`CAST(${Level.junior} AS "Level")`} THEN 1
+            ELSE 2
+          END,
+          j."PostedAt" DESC
+      `;
 
-        throw new InternalServerErrorException(
-          'Đã xảy ra lỗi khi lấy ra các công việc gợi ý cho ứng viên.',
-        );
-      }
-
-      return jobs?.filter((job: any) => job.Status === JobStatus.open) ?? [];
+      return (
+        jobs
+          ?.filter((job: any) => job.Status === JobStatus.open)
+          .map((job: any) => ({
+            ...omit(job, [
+              'job_benefits',
+              'job_descriptions',
+              'job_requirements',
+              'CompanyLocationID',
+              'UserID',
+              'user',
+              'recruiter',
+              'company',
+              'RecruiterID',
+            ]),
+            JobBenefits: job.job_benefits.map((jb: any) => jb.Benefit),
+            JobDescriptions: job.job_descriptions.map(
+              (jd: any) => jd.Description,
+            ),
+            JobRequirements: job.job_requirements.map(
+              (jr: any) => jr.Requirement,
+            ),
+            Recruiter: {
+              ID: job.recruiter[0].ID,
+              Position: job.recruiter[0].Position,
+              FullName: job.user[0].FullName,
+              Email: job.user[0].Email,
+              PhoneNumber: job.user[0].PhoneNumber,
+              AvatarUrl: job.user[0].AvatarUrl,
+              Company: {
+                Name: job.company[0].Name,
+                LogoUrl: job.company[0].LogoUrl,
+              },
+            },
+          })) ?? []
+      );
     } catch (err) {
       console.error(err);
       throw err;
@@ -1033,7 +1253,7 @@ export class JobsService {
       const { data, error } = await this.anonSupabaseClient
         .from('Locations')
         .select(
-          'ID, Name, Country, CompanyLocations(*, Recruiters(*, Jobs(*, Recruiters(*, Users(FullName, Email, PhoneNumber) ,CompanyLocations(*, Companies(*))))))',
+          'ID, Name, Country, CompanyLocations(*, Recruiters(*, Jobs(*, JobBenefits(*), JobDescriptions(*), JobRequirements(*) ,JobCategories(*, Categories(*)), Recruiters(*, Users(FullName, Email, PhoneNumber) ,CompanyLocations(*, Companies(*))))))',
         )
         .eq('ID', locationId)
         .maybeSingle<any>();
@@ -1049,7 +1269,7 @@ export class JobsService {
             location.Recruiters?.flatMap((recruiter: any) =>
               recruiter.Jobs.filter((job: any) => job.Status === JobStatus.open)
                 .map((item: any) => ({
-                  ...omit(item, ['Recruiters', 'RecruiterID']),
+                  ...omit(item, ['Recruiters', 'RecruiterID', 'JobCategories']),
                   Recruiter: {
                     ...omit(item.Recruiters, [
                       'UserID',
@@ -1067,6 +1287,16 @@ export class JobsService {
                         item.Recruiters.CompanyLocations.Companies.LogoUrl,
                     },
                   },
+                  JobBenefits: item.JobBenefits.map((jb: any) => jb.Benefit),
+                  JobDescriptions: item.JobDescriptions.map(
+                    (jd: any) => jd.Description,
+                  ),
+                  JobRequirements: item.JobRequirements.map(
+                    (jr: any) => jr.Requirement,
+                  ),
+                  Categories: item.JobCategories.map(
+                    (jc: any) => jc.Categories.CategoryName,
+                  ),
                 }))
                 .sort(
                   (a: any, b: any) =>

@@ -44,10 +44,10 @@ void showTopToastification({
   );
 }
 
-void showSuccessToastification_applicationProcess({required String message}) {
-  showTopToastification(content: message, title: 'Hoàn tất', color: successColor, icon: Icons.check_circle_outline);
+void showSuccessToastification({required String title, required String message}) {
+  showTopToastification(content: message, title: title, color: successColor, icon: Icons.check_circle_outline);
 }
 
-void showErrorToastification_applicationProcess({required String message}) {
-  showTopToastification(content: message, title: 'Lỗi', color: errorColor, icon: Icons.error_outline);
+void showErrorToastification({required String title, required String message}) {
+  showTopToastification(content: message, title: title, color: errorColor, icon: Icons.error_outline);
 }
