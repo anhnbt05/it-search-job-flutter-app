@@ -54,10 +54,12 @@
 
   class _MyAppState extends State<MyApp> {
     bool isLoggedIn = false;
+    String? userRole;
 
-    void loginSuccess() {
+    void loginSuccess(String role) {
       setState(() {
         isLoggedIn = true;
+        userRole = role;
       });
     }
 
@@ -65,23 +67,30 @@
     Widget build(BuildContext context) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: isLoggedIn ? _MainApp() : LoginPage(onLoginSuccess: loginSuccess),
+        home: isLoggedIn ? _MainApp(role: userRole!) : LoginPage(onLoginSuccess: loginSuccess),
       );
     }
   }
 
   class _MainApp extends StatefulWidget {
+    final String role;
+    const _MainApp({Key? key, required this.role}) : super(key: key);
+
     @override
     _MainAppState createState() => _MainAppState();
   }
 
 
   class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
-    role _role = role.candidate;
+    late role _role;
 
     @override
     void initState() {
       super.initState();
+
+      _role = role.values.firstWhere(
+            (e) => e.toString().split('.').last == widget.role,
+      );
       final bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(
         context,
         listen: false,
