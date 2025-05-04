@@ -1,28 +1,39 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import '../Constants/api_constants.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:ui/Helpers/helpers.dart';
+
 import '../Models/ResponseModel.dart';
 
 class AuthSignInService {
-  final String _baseUrl = APIConstants.baseUrl;
+  final String _baseUrl = dotenv.env['BASE_URL'] ?? '';
 
   Future<ResponseModel> signIn(String email, String password) async {
     final url = Uri.parse('$_baseUrl/auth/sign-in');
-    print("Request Body: ${json.encode({"email": email, "password": password})}");
+
+    final deviceInfoDetails = await getDeviceInfo();
+
+    final playerId = await getOneSignalPlayerId();
+
+    if (playerId == null) {
+      throw Exception("Missing player ID");
+    }
+
+    final payload = {
+      'email': email,
+      'password': password,
+      'playerId': playerId,
+      'deviceInfo': deviceInfoDetails['deviceInfo'],
+      'platform': deviceInfoDetails['platform'],
+    };
 
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          "email": email,
-          "password": password,
-        }),
+        body: json.encode(payload),
       );
-
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
 
       final responseData = json.decode(response.body);
 
@@ -30,7 +41,7 @@ class AuthSignInService {
         return ResponseModel(
           success: true,
           message: "Đăng nhập thành công.",
-          messageList: ["Đăng nhập thành công."] ,
+          messageList: ["Đăng nhập thành công."],
           data: responseData,
         );
       } else {

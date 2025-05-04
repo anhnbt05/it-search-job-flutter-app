@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
-import 'package:ui/ViewModels/login/SignInViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
+import 'package:ui/ViewModels/login/SignInViewModel.dart';
+
 import '../../Helpers/toastification.dart';
-import '../../main.dart';
 
 class LoginPage extends StatefulWidget {
   final void Function(String, String) onLoginSuccess;
@@ -68,7 +67,11 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
                       child: Text(
                         "Xin chào\nChào mừng bạn trở lại",
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 30),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 30,
+                        ),
                       ),
                     ),
                     Padding(
@@ -78,10 +81,14 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(fontSize: 18, color: Colors.black),
                         decoration: InputDecoration(
                           labelText: "EMAIL",
-                          labelStyle: TextStyle(color: Colors.grey, fontSize: 15),
+                          labelStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 15,
+                          ),
                           prefixIcon: Icon(Icons.email),
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                     ),
@@ -96,11 +103,16 @@ class _LoginPageState extends State<LoginPage> {
                             obscureText: _obscureText,
                             decoration: InputDecoration(
                               labelText: "MẬT KHẨU",
-                              labelStyle: TextStyle(color: Colors.grey, fontSize: 15),
+                              labelStyle: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 15,
+                              ),
                               prefixIcon: Icon(Icons.lock),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscureText ? Icons.visibility_off : Icons.visibility,
+                                  _obscureText
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
                                   color: Colors.blue,
                                 ),
                                 onPressed: () {
@@ -123,33 +135,45 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton(
-                          onPressed: signInViewModel.isLoading
-                              ? null
-                              : () async {
-                           final Map<String, dynamic>? payload = await signInViewModel.signIn(
-                              context,
-                              _usernameController.text,
-                              _passwordController.text,
-                            );
-                            if (signInViewModel.errorMessage != null) {
-                              showTopToastification(
-                                content: signInViewModel.errorMessage!,
-                                title: "Thất bại",
-                                color:  Colors.red,
-                                icon:  Icons.error_outline,
-                              );
-                            } else if (payload != null) {
-                              final String role = payload['app_metadata']['role'];
-                              final String userId = payload['sub'];
-                              widget.onLoginSuccess(role, userId);
-                            }
-                          },
+                          onPressed:
+                              signInViewModel.isLoading
+                                  ? null
+                                  : () async {
+                                    final Map<String, dynamic>? payload =
+                                        await signInViewModel.signIn(
+                                          context,
+                                          _usernameController.text,
+                                          _passwordController.text,
+                                        );
+                                    if (signInViewModel.errorMessage != null) {
+                                      showTopToastification(
+                                        content: signInViewModel.errorMessage!,
+                                        title: "Thất bại",
+                                        color: Colors.red,
+                                        icon: Icons.error_outline,
+                                      );
+                                    } else if (payload != null) {
+                                      final String role =
+                                          payload['app_metadata']['role'];
+                                      final String userId = payload['sub'];
+                                      widget.onLoginSuccess(role, userId);
+                                    }
+                                  },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
                           ),
-                          child: signInViewModel.isLoading
-                              ? CircularProgressIndicator(color: Colors.white)
-                              : Text("ĐĂNG NHẬP", style: TextStyle(color: Colors.white, fontSize: 16)),
+                          child:
+                              signInViewModel.isLoading
+                                  ? CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                  : Text(
+                                    "ĐĂNG NHẬP",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                         ),
                       ),
                     ),
@@ -160,12 +184,29 @@ class _LoginPageState extends State<LoginPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           TextButton(
-                            onPressed: () => LoginNavigationViewModel().goToRegister(context),
-                            child: Text("ĐĂNG KÝ TÀI KHOẢN MỚI", style: TextStyle(fontSize: 15, color: Colors.grey)),
+                            onPressed:
+                                () => LoginNavigationViewModel().goToRegister(
+                                  context,
+                                ),
+                            child: Text(
+                              "ĐĂNG KÝ TÀI KHOẢN MỚI",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.grey,
+                              ),
+                            ),
                           ),
                           TextButton(
-                            onPressed: () => LoginNavigationViewModel().goToForgotPassword(context),
-                            child: Text("QUÊN MẬT KHẨU", style: TextStyle(fontSize: 15, color: Colors.blue)),
+                            onPressed:
+                                () => LoginNavigationViewModel()
+                                    .goToForgotPassword(context),
+                            child: Text(
+                              "QUÊN MẬT KHẨU",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.blue,
+                              ),
+                            ),
                           ),
                         ],
                       ),
