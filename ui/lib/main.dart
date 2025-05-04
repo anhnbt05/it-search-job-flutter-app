@@ -28,11 +28,7 @@ import 'Views/login/login_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    ToastificationWrapper(
-      child: MyApp(),
-    ),
-  );
+  runApp(ToastificationWrapper(child: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -66,26 +62,39 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => SignInViewModel()),
 
         if (isLoggedIn && userId != null) ...[
-          ChangeNotifierProvider(create: (_) => PostedJobsManagementViewModel(userId!)),
+          ChangeNotifierProvider(
+            create: (_) => PostedJobsManagementViewModel(userId!),
+          ),
           ChangeNotifierProvider(
             create: (context) {
-              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
-              return JobPostViewModel(postedJobsManagementViewModel: postedJobsVM);
+              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(
+                context,
+                listen: false,
+              );
+              return JobPostViewModel(
+                postedJobsManagementViewModel: postedJobsVM,
+              );
             },
           ),
           ChangeNotifierProvider(
             create: (context) {
-              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
-              return CandidatesAppliesViewModel(postedJobsManagementViewModel: postedJobsVM);
+              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(
+                context,
+                listen: false,
+              );
+              return CandidatesAppliesViewModel(
+                postedJobsManagementViewModel: postedJobsVM,
+              );
             },
           ),
         ],
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: isLoggedIn && userRole != null
-            ? _MainApp(role: userRole!, userId: userId!)
-            : LoginPage(onLoginSuccess: loginSuccess),
+        home:
+            isLoggedIn && userRole != null
+                ? _MainApp(role: userRole!, userId: userId!)
+                : LoginPage(onLoginSuccess: loginSuccess),
       ),
     );
   }
@@ -95,7 +104,8 @@ class _MainApp extends StatefulWidget {
   final String role;
   final String userId;
 
-  const _MainApp({Key? key, required this.role, required this.userId}) : super(key: key);
+  const _MainApp({Key? key, required this.role, required this.userId})
+    : super(key: key);
 
   @override
   _MainAppState createState() => _MainAppState();
@@ -108,7 +118,10 @@ class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _role = widget.role;
-    final bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(context, listen: false);
+    final bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(
+      context,
+      listen: false,
+    );
 
     bottomNavigationProvider.setAnimationController(
       AnimationController(
@@ -122,14 +135,19 @@ class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    final bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(context, listen: false);
+    final bottomNavigationProvider = Provider.of<BottomNavigationViewModel>(
+      context,
+      listen: false,
+    );
     bottomNavigationProvider.animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final bottomNavigationViewModel = Provider.of<BottomNavigationViewModel>(context);
+    final bottomNavigationViewModel = Provider.of<BottomNavigationViewModel>(
+      context,
+    );
 
     return MaterialApp(
       locale: const Locale('vi', 'VN'),
@@ -144,8 +162,14 @@ class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
         fontFamily: 'Poppins',
         scaffoldBackgroundColor: Colors.white,
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          selectedIconTheme: IconThemeData(size: 25, color: ColorConstants.appbarColor),
-          unselectedIconTheme: const IconThemeData(size: 23, color: Colors.black),
+          selectedIconTheme: IconThemeData(
+            size: 25,
+            color: ColorConstants.appbarColor,
+          ),
+          unselectedIconTheme: const IconThemeData(
+            size: 23,
+            color: Colors.black,
+          ),
           showSelectedLabels: true,
           showUnselectedLabels: false,
           selectedLabelStyle: const TextStyle(

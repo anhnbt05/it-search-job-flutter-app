@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 
 class APIConstants {
-  static final String baseUrl = 'https://it-searcj-job-app-be.onrender.com';
+  static final String baseUrl =
+      dotenv.env['BASE_URL'] ?? 'https://it-searcj-job-app-be.onrender.com';
   static final FlutterSecureStorage storage = const FlutterSecureStorage();
   static final String getCategories_endpoint = 'auth/categories';
   static final String postJob_endpoint = 'jobs';
