@@ -163,15 +163,13 @@ Future<void> initializeOneSignal() async {
   try {
     String oneSignalAppId = dotenv.env['ONESIGNAL_APP_ID'] ?? '';
 
-    print(oneSignalAppId);
+    await OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
 
-    // await OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    OneSignal.initialize(oneSignalAppId);
 
-    // OneSignal.initialize(oneSignalAppId);
+    await OneSignal.Notifications.clearAll();
 
-    // await OneSignal.Notifications.clearAll();
-
-    // await OneSignal.Notifications.requestPermission(true);
+    await OneSignal.Notifications.requestPermission(true);
   } catch (e) {
     print('Error initializing OneSignal: $e');
   }

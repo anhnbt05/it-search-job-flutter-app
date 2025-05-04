@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
@@ -9,25 +10,21 @@ import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import 'package:ui/ViewModels/login/ProvincesViewModel.dart';
 import 'package:ui/ViewModels/login/SignInViewModel.dart';
 import 'package:ui/ViewModels/login/SignUpViewModel.dart';
-import 'package:ui/Services/application_recruiter_service.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
-import 'package:ui/Views/recruiter/recruiter.dart';
-import 'package:ui/Views/candidate/candidate.dart';
 import 'package:ui/Views/admin/admin.dart';
+import 'package:ui/Views/candidate/candidate.dart';
+import 'package:ui/Views/recruiter/recruiter.dart';
 
-import 'Constants/api_constants.dart';
-import 'Models/Applications.dart';
-import 'Models/Jobs.dart';
-import 'Models/model.dart';
-import 'Services/job_service.dart';
 import 'ViewModels/BottomNavigationViewModel.dart';
 import 'ViewModels/candidate/JoblistNavigationViewModel.dart';
 import 'ViewModels/recruiter/JobPostViewModel.dart';
 import 'ViewModels/recruiter/PostedJobsManagementViewModel.dart';
 import 'Views/login/login_page.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+  await initializeOneSignal();
   runApp(ToastificationWrapper(child: MyApp()));
 }
 
