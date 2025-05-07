@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Models/Recruiters.dart';
 import 'package:ui/Services/user_service.dart';
@@ -6,20 +7,20 @@ import 'package:ui/Services/user_service.dart';
 import '../../Constants/api_constants.dart';
 import '../../Models/Jobs.dart';
 import '../../Services/job_service.dart';
+import '../login/SignInViewModel.dart';
 
 class PostedJobsManagementViewModel extends ChangeNotifier {
   late final String userId;
-  late Future<List<cJobs_recruiter?>> _jobsFuture;
+  late final Future<List<cJobs_recruiter?>>? _jobsFuture;
   List<cJobs_recruiter?> _jobs_open = [];
   List<cJobs_recruiter?> _jobs_closed = [];
   List<cJobs_recruiter?> _jobs_pending = [];
   List<cJobs_recruiter?> _jobs_rejected = [];
   List<cJobs_recruiter?> _jobs = [];
-  late Future<cRecruiters?> _recruiterFuture;
-  cRecruiters? _recruiterInfo;
+
   String _statusFilter = "all";
 
-  Future<List<cJobs_recruiter?>> get jobsFuture => _jobsFuture;
+  Future<List<cJobs_recruiter?>>? get jobsFuture => _jobsFuture;
   List<cJobs_recruiter?> get jobs_open => _jobs_open;
   List<cJobs_recruiter?> get jobs_closed => _jobs_closed;
   List<cJobs_recruiter?> get jobs_pending => _jobs_pending;
@@ -30,11 +31,7 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
     _jobs = value;
   }
 
-  Future<cRecruiters?> get recruiter => _recruiterFuture;
-
   String get statusFilter => _statusFilter;
-
-  cRecruiters? get recruiterInfo => _recruiterInfo;
 
   void Filter(String? value) {
     _statusFilter = value!;
@@ -52,17 +49,18 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
   }
 
   bool isLoaded = false;
-  late Future<void> loadFuture;
+  late final Future<void> loadFuture;
 
-  PostedJobsManagementViewModel(this.userId) {
-    loadFuture = initFutures().then((_) {
+  PostedJobsManagementViewModel(this.userId, BuildContext context) {
+    loadFuture = initFutures(context).then((_) {
       isLoaded = true;
       notifyListeners();
     });
   }
 
-  Future<void> initFutures() async {
-    _jobsFuture = JobService().getJobs(accessToken: APIConstants.accessToken).then((value) {
+  Future<void> initFutures(BuildContext context) async {
+    var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
+    _jobsFuture = JobService().getJobs(accessToken: APIConstants.accessToken, authViewModel: authViewModel).then((value) {
       _jobs = value.map((e) => e).toList();
       _jobs.sort((a,b) => b!.PostedAt.compareTo(a!.PostedAt));
 
@@ -72,14 +70,12 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
       _jobs_rejected = value.where((element) => element!.Status == 'rejected').toList();
       return value;
     });
-
-    _recruiterFuture = UserService().getRecruiterInfo(Id: userId, accessToken: APIConstants.accessToken).then((value) => _recruiterInfo = value);
-
-    await Future.wait([_jobsFuture, _recruiterFuture]);
+    await _jobsFuture;
   }
 
-  Future<void> deleteJob({required String Id}) async {
-    final success = await JobService().deleteJob(accessToken: APIConstants.accessToken, Id: Id);
+  Future<void> deleteJob({required String Id, required BuildContext context}) async {
+    var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
+    final success = await JobService().deleteJob(accessToken: APIConstants.accessToken, Id: Id, authViewModel: authViewModel);
     if (success) {
       cJobs_recruiter? job = _jobs.firstWhere((e) => e!.ID == Id);
       if (job != null) {

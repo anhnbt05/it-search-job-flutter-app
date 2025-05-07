@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Models/Categories.dart';
 import 'package:ui/Models/Jobs.dart';
@@ -10,6 +11,7 @@ import 'package:ui/ViewModels/recruiter/PostedJobsManagementViewModel.dart';
 import '../../Helpers/toastification.dart';
 import '../../Models/Enum.dart';
 import '../../Services/category_service.dart';
+import '../login/SignInViewModel.dart';
 
 List<String> jobType_value = [
   "Bán thời gian",
@@ -81,8 +83,9 @@ class EditJobViewModel extends ChangeNotifier {
     }
   }
 
-  EditJobViewModel({required this.index, required this.vm, required this.recruiter}) {
-    _jobFuture = JobService().getJobByID(Id: vm.jobs[index]!.ID, accessToken: APIConstants.accessToken).then((jobF) {
+  EditJobViewModel({required this.index, required this.vm, required this.recruiter, required BuildContext context}) {
+    var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
+    _jobFuture = JobService().getJobByID(Id: vm.jobs[index]!.ID, accessToken: APIConstants.accessToken, authViewModel: authViewModel).then((jobF) {
       job = jobF;
       _nameText = TextEditingController(text: jobF!.Title);
       _descriptionText = TextEditingController(text: job!.Description);
@@ -101,7 +104,8 @@ class EditJobViewModel extends ChangeNotifier {
     });
 
     _categoriesFuture = CategoryService().getCategory(
-        accessToken: APIConstants.accessToken
+      accessToken: APIConstants.accessToken,
+      authViewModel: authViewModel
     ).then((value) {
       _jobCategoryList = value!.map((e) => e.values.first).toList();
       return value;
@@ -271,7 +275,8 @@ class EditJobViewModel extends ChangeNotifier {
     return false;
   }
 
-  Future<bool> update() async {
+  Future<bool> update(BuildContext context) async {
+    var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
     if (_check == false) _check = true;
     notifyListeners();
     if (_nameText.text.isEmpty ||
@@ -308,6 +313,7 @@ class EditJobViewModel extends ChangeNotifier {
       "Từ ${_salaryNumber1.text} đến ${_salaryNumber2.text} ${_salaryUnitSelected}";
     }
     bool success = await JobService().editJob(
+      authViewModel: authViewModel,
       Id: job!.ID,
       accessToken: APIConstants.accessToken,
       jobData: {

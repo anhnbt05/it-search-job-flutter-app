@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Helpers/toastification.dart';
 import 'package:ui/ViewModels/recruiter/PostedJobsManagementViewModel.dart';
+import 'package:ui/ViewModels/recruiter/ProfileViewModel.dart';
 import '../../Constants/api_constants.dart';
 import '../../Models/Enum.dart';
 import 'package:ui/Services/job_service.dart';
 
 import '../../Services/category_service.dart';
+import '../login/SignInViewModel.dart';
 
 List<String> jobType_value = [
   "Bán thời gian",
@@ -18,10 +21,11 @@ List<String> jobLevel_value = ["Intern", "Fresher", "Mid", "Junior", "Senior"];
 
 class JobPostViewModel extends ChangeNotifier {
   PostedJobsManagementViewModel postedJobsManagementViewModel;
-  JobPostViewModel({required this.postedJobsManagementViewModel}) {
+  JobPostViewModel({required this.postedJobsManagementViewModel, required SignInViewModel authViewModel}) {
     if (categoriesList == null || categoriesList!.isEmpty) {
       CategoryService().getCategory(
         accessToken: APIConstants.accessToken,
+        authViewModel: authViewModel,
       ).then((result) {
         if (result != null) {
           categoriesList = result;
@@ -284,7 +288,8 @@ class JobPostViewModel extends ChangeNotifier {
     return false;
   }
 
-  Future<void> post() async {
+  Future<void> post(BuildContext context) async {
+    var recruiterVM = Provider.of<RecruiterProfileViewModel>(context);
     if (_check == false) _check = true;
     notifyListeners();
     if (_nameText.text.isEmpty ||
@@ -329,13 +334,14 @@ class JobPostViewModel extends ChangeNotifier {
       salaryText =
           "Từ ${_salaryNumber1.text} đến ${_salaryNumber2.text} ${_salaryUnitSelected}";
     }
-
+    final authViewModel = Provider.of<SignInViewModel>(context, listen: false);
     var job = await JobService().postJob(
+      authViewModel: authViewModel,
       accessToken: APIConstants.accessToken,
       jobData: {
         "Title": nameText.text,
         "Description": descriptionText.text,
-        "Address": postedJobsManagementViewModel.recruiterInfo!.CompanyLocations.Address,
+        "Address": recruiterVM.recruiterInfo!.CompanyLocations.Address,
         "Salary": salaryText,
         "Vacancies": int.parse(vacancyText.text),
         "Type": jobTypeSelected

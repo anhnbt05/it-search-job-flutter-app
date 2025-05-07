@@ -240,6 +240,13 @@
             </list>
           </value>
         </entry>
+        <entry key="flutter_dotenv">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/flutter_dotenv-5.2.1/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="flutter_lints">
           <value>
             <list>
@@ -1002,6 +1009,7 @@
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file-7.0.1/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/fixnum-1.1.1/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/fl_downloader-2.0.2/lib" />
+      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/flutter_dotenv-5.2.1/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/flutter_lints-5.0.0/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/flutter_secure_storage-9.2.4/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/flutter_secure_storage_linux-1.2.3/lib" />

@@ -15,23 +15,23 @@ import '../../Services/job_service.dart';
 
 class CandidatesAppliesViewModel extends ChangeNotifier {
   final PostedJobsManagementViewModel postedJobsManagementViewModel;
-  late Future<List<List<cApplications_recruiter>?>> _applicationsFuture;
+  late Future<List<List<cApplications_recruiter>?>>? _applicationsFuture;
   TextEditingController _rejectReason = new TextEditingController();
 
-  List<cJobs_recruiter?> _jobs = [];
-  List<List<cApplications_recruiter>?> _applications = [];
+  List<cJobs_recruiter?>? _jobs;
+  List<List<cApplications_recruiter>?>? _applications;
 
-  set applications(List<List<cApplications_recruiter>?> value) {
+  set applications(List<List<cApplications_recruiter>?>? value) {
     _applications = value;
   }
 
-  Future<List<List<cApplications_recruiter>?>> get applicationsFuture => _applicationsFuture;
+  Future<List<List<cApplications_recruiter>?>>? get applicationsFuture => _applicationsFuture;
 
-  List<List<cApplications_recruiter>?> get applications => _applications;
-  List<cJobs_recruiter?> get jobs => _jobs;
+  List<List<cApplications_recruiter>?>? get applications => _applications;
+  List<cJobs_recruiter?>? get jobs => _jobs;
 
 
-  set jobs(List<cJobs_recruiter?> value) {
+  set jobs(List<cJobs_recruiter?>? value) {
     _jobs = value;
   }
 
@@ -42,6 +42,10 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
     _rejectReason.dispose();
     super.dispose();
   }
+
+  bool isLoad = false;
+  late final Future<void> loadFuture;
+
 
   CandidatesAppliesViewModel({required this.postedJobsManagementViewModel}) {
     if (postedJobsManagementViewModel.isLoaded) {
@@ -56,7 +60,7 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
   void initFutures() {
     _jobs = postedJobsManagementViewModel.jobs_open;
     print(postedJobsManagementViewModel.jobs_open.length);
-    List<Future<List<cApplications_recruiter>?>> applicationFutures = jobs.map((job) {
+    List<Future<List<cApplications_recruiter>?>> applicationFutures = jobs!.map((job) {
       return ApplicationService().getApplicationsList(
         accessToken: APIConstants.accessToken,
         jobID: job!.ID.toString(),
@@ -68,6 +72,8 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
       notifyListeners();
       return appList;
     });
+
+    if (isLoad == false) isLoad = true;
   }
 
   DownloadViewModel() {
@@ -104,23 +110,23 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
       openApplicationIds: [applicationId],
     );
     if (success) {
-      for (var appList in applications) {
+      for (var appList in applications!) {
         final index = appList?.indexWhere((app) => app.ID == applicationId);
         if (index != null && index >= 0) {
           appList![index] = appList[index].copyWith(status: 'accepted');
           final jobId = appList[index].JobID;
-          int jobIdx = jobs.indexWhere((job) => job!.ID == jobId);
+          int jobIdx = jobs!.indexWhere((job) => job!.ID == jobId);
           final acceptedCount = appList.where((e) => e.Status == "accepted").length;
 
-          if (jobIdx >= 0 && jobs[jobIdx] != null && acceptedCount == jobs[jobIdx]!.Vacancies) {
+          if (jobIdx >= 0 && jobs![jobIdx] != null && acceptedCount == jobs![jobIdx]!.Vacancies) {
             int i = postedJobsManagementViewModel.jobs_open.indexWhere((e) => e!.ID == jobId);
             if (i >= 0) {
               final closedJob = postedJobsManagementViewModel.jobs_open[i]!.copyWith(status: 'closed');
               postedJobsManagementViewModel.jobs_closed.add(closedJob);
               postedJobsManagementViewModel.jobs_open.removeAt(i);
             }
-            jobs.removeWhere((e) => e!.ID == jobId);
-            applications.remove(appList);
+            jobs!.removeWhere((e) => e!.ID == jobId);
+            applications!.remove(appList);
             postedJobsManagementViewModel.Filter(postedJobsManagementViewModel.statusFilter);
           }
           break;
@@ -138,7 +144,7 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
         applicationId: applicationId,
         reason: reason);
     if (success) {
-      for (var appList in applications) {
+      for (var appList in applications!) {
         final index = appList?.indexWhere((app) => app.ID == applicationId);
         if (index != null && index >= 0) {
           appList![index] = appList[index].copyWith(status: 'rejected');

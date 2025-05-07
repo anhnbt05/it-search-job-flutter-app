@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:ui/Constants/api_constants.dart';
 
+import '../ViewModels/login/SignInViewModel.dart';
 import 'api_service.dart';
 
 class CategoryService {
@@ -9,8 +10,14 @@ class CategoryService {
 
   Future<List<Map<String, String>>?> getCategory({
     required String accessToken,
+    required SignInViewModel authViewModel,
   }) async {
     try {
+      if (await authViewModel.isAccessTokenExpired()) {
+        await authViewModel.refreshAccessToken();
+        accessToken = (await APIConstants.storage.read(key: 'accessToken'))!;
+      }
+
       final response = await _apiService.getWithToken(
         endpoint: APIConstants.getCategories_endpoint,
         accessToken: accessToken,

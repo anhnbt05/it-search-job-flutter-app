@@ -9,6 +9,7 @@ import '../../ViewModels/BottomNavigationViewModel.dart';
 import 'CandidatesAppliedView.dart';
 import 'PostedJobsManagementView.dart';
 import 'JobPostView.dart';
+import 'ProfileView.dart';
 import '../../Models/Applications.dart';
 
 List<Widget> pageView_recruiter(BuildContext context) {
@@ -17,7 +18,7 @@ List<Widget> pageView_recruiter(BuildContext context) {
     CandidatesAppliedScreen(context),
     PostJobScreen(context),
     NotificationsScreen(),
-    ProfileScreen(),
+    ProfileScreen(context),
   ];
 }
 
@@ -28,19 +29,6 @@ Widget NotificationsScreen() {
     child: Center(
       child: Text(
         "Thông báo",
-        style: TextStyle(fontSize: 24),
-      ),
-    ),
-  );
-}
-
-Widget ProfileScreen() {
-  // TODO: Modify section below
-  return Container(
-    color: Colors.orange.shade100,
-    child: Center(
-      child: Text(
-        "Hồ sơ",
         style: TextStyle(fontSize: 24),
       ),
     ),

@@ -19,6 +19,7 @@ import 'ViewModels/BottomNavigationViewModel.dart';
 import 'ViewModels/candidate/JoblistNavigationViewModel.dart';
 import 'ViewModels/recruiter/JobPostViewModel.dart';
 import 'ViewModels/recruiter/PostedJobsManagementViewModel.dart';
+import 'ViewModels/recruiter/ProfileViewModel.dart';
 import 'Views/login/login_page.dart';
 
 Future<void> main() async {
@@ -58,18 +59,18 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
         ChangeNotifierProvider(create: (_) => SignInViewModel()),
 
-        if (isLoggedIn && userId != null) ...[
+        if (isLoggedIn && userId != null && userRole == 'recruiter') ...[
+          ChangeNotifierProvider(create: (context) => RecruiterProfileViewModel(userId!, context)),
           ChangeNotifierProvider(
-            create: (_) => PostedJobsManagementViewModel(userId!),
+            create: (context) => PostedJobsManagementViewModel(userId!, context),
           ),
           ChangeNotifierProvider(
             create: (context) {
-              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(
-                context,
-                listen: false,
-              );
+              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false,);
+              final authViewModel = Provider.of<SignInViewModel>(context, listen: false);
               return JobPostViewModel(
                 postedJobsManagementViewModel: postedJobsVM,
+                authViewModel: authViewModel,
               );
             },
           ),

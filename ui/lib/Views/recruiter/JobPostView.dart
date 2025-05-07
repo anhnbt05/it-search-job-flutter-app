@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:ui/ViewModels/recruiter/ProfileViewModel.dart';
 
 import '../../Helpers/helpers.dart';
 import '../../Models/Enum.dart';
@@ -10,10 +11,10 @@ import '../../ViewModels/recruiter/JobPostViewModel.dart';
 
 Widget PostJobScreen(BuildContext context) {
   var viewModel = Provider.of<JobPostViewModel>(context);
-
+  var recruiterVM = Provider.of<RecruiterProfileViewModel>(context);
   return Container(
     color: Colors.white,
-    child: (viewModel.postedJobsManagementViewModel.recruiterInfo == null)
+    child: (recruiterVM.recruiterInfo == null)
         ? Center(child: CircularProgressIndicator(color: Colors.blue),)
         : SingleChildScrollView(
       child: Column(
@@ -27,9 +28,9 @@ Widget PostJobScreen(BuildContext context) {
                   height: 80,
                   width: 80,
                   margin: EdgeInsets.only(right: 10),
-                  child: (viewModel.postedJobsManagementViewModel.recruiterInfo?.Company.LogoUrl != null)
+                  child: (recruiterVM.recruiterInfo?.Company.LogoUrl != null)
                       ? Image.network(
-                    viewModel.postedJobsManagementViewModel.recruiterInfo!.Company.LogoUrl!,
+                    recruiterVM.recruiterInfo!.Company.LogoUrl!,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
@@ -51,7 +52,7 @@ Widget PostJobScreen(BuildContext context) {
                   children: [
                     Padding(
                       padding: EdgeInsets.only(top: 10, right: 5),
-                      child: Text(viewModel.postedJobsManagementViewModel.recruiterInfo!.Company.Name,
+                      child: Text(recruiterVM.recruiterInfo!.Company.Name,
                         softWrap: true,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -69,7 +70,7 @@ Widget PostJobScreen(BuildContext context) {
                         children: [
                           Icon(Icons.person_outline, size: 15),
                           SizedBox(width: 5),
-                          Text(viewModel.postedJobsManagementViewModel.recruiterInfo!.FullName,
+                          Text(recruiterVM.recruiterInfo!.FullName,
                             style: TextStyle(fontSize: 15),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -448,14 +449,14 @@ Widget PostJobScreen(BuildContext context) {
                       TextSpan(
                         children: <TextSpan>[
                           TextSpan(
-                            text: "${viewModel.postedJobsManagementViewModel.recruiterInfo!.CompanyLocations.BranchName}: ",
+                            text: "${recruiterVM.recruiterInfo!.CompanyLocations.BranchName}: ",
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           TextSpan(
-                            text: viewModel.postedJobsManagementViewModel.recruiterInfo!.CompanyLocations.Address,
+                            text: recruiterVM.recruiterInfo!.CompanyLocations.Address,
                             style: TextStyle(fontSize: 14,),
                           ),
                         ],
@@ -685,7 +686,7 @@ Widget PostJobScreen(BuildContext context) {
                           );
                         },
                       );
-                      await viewModel.post();
+                      await viewModel.post(context);
                       Navigator.pop(dialogContext);
                     },
                     style: ElevatedButton.styleFrom(

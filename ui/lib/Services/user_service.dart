@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:ui/Constants/api_constants.dart';
 
 import '../Models/Recruiters.dart';
+import '../ViewModels/login/SignInViewModel.dart';
 import 'api_service.dart';
 
 
@@ -11,8 +12,12 @@ class UserService {
   final ApiService _apiService = ApiService();
 
   Future<cRecruiters?> getRecruiterInfo(
-      {required String Id, required String accessToken}) async {
+      {required String Id, required String accessToken, required SignInViewModel authViewModel}) async {
     try {
+      if (await authViewModel.isAccessTokenExpired()) {
+        await authViewModel.refreshAccessToken();
+        accessToken = (await APIConstants.storage.read(key: 'accessToken'))!;
+      }
       final response = await _apiService.getWithToken(
         accessToken: accessToken,
         endpoint: '${APIConstants.getUser_endpoint}/$Id',);

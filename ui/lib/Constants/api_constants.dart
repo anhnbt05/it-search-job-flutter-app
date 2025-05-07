@@ -1,9 +1,13 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../Services/auth_refreshtoken_service.dart';
+import '../Services/auth_signin_service.dart';
+
 class APIConstants {
-  static final String baseUrl =
-      dotenv.env['BASE_URL'] ?? 'https://it-searcj-job-app-be.onrender.com';
+  static final String baseUrl = dotenv.env['BASE_URL'] ?? '';
+  static final AuthSignInService authService = AuthSignInService();
+  static final AuthRefreshTokenService refreshTokenService = AuthRefreshTokenService();
   static final FlutterSecureStorage storage = const FlutterSecureStorage();
   static final String getCategories_endpoint = 'auth/categories';
   static final String postJob_endpoint = 'jobs';

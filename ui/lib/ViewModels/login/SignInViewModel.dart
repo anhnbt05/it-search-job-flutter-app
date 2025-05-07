@@ -13,10 +13,6 @@ import '../../Services/auth_signin_service.dart';
 
 
 class SignInViewModel extends ChangeNotifier {
-  final AuthSignInService _authService = AuthSignInService();
-  final AuthRefreshTokenService _refreshTokenService = AuthRefreshTokenService();
-
-
   bool isLoading = false;
   String? errorMessage;
 
@@ -27,7 +23,7 @@ class SignInViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final ResponseModel result = await _authService.signIn(email, password);
+      final ResponseModel result = await APIConstants.authService.signIn(email, password);
 
       print('SignIn API Result: success=${result.success}, message=${result
           .message}, data=${result.data}');
@@ -79,7 +75,7 @@ class SignInViewModel extends ChangeNotifier {
         return;
       }
 
-      final ResponseModel result = await _refreshTokenService
+      final ResponseModel result = await APIConstants.refreshTokenService
           .refreshAccessToken(refreshToken);
 
       print('Refresh Token Result: success=${result.success}, message=${result

@@ -75,7 +75,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
         );
 
         if (shouldPop == true && context.mounted) {
-          Navigator.of(context).pop('Đã đồng ý'); // Trả về kết quả nếu cần
+          Navigator.of(context).pop();
         }
       },
       child: Scaffold(
@@ -878,7 +878,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                                               },
                                             );
 
-                                            bool success = await viewModel.update();
+                                            bool success = await viewModel.update(context);
                                             Navigator.of(context).pop();
                                             Navigator.pop(context);
                                             if (success) {

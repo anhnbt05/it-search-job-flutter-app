@@ -10,39 +10,34 @@ import 'package:ui/Constants/color_constants.dart';
 import '../../Models/Jobs.dart';
 import '../../ViewModels/recruiter/EditJobViewModel.dart';
 import '../../ViewModels/recruiter/PostedJobsManagementViewModel.dart';
+import '../../ViewModels/recruiter/ProfileViewModel.dart';
 import 'EditJobScreen.dart';
 
 Widget PostedJobsManagementScreen(BuildContext context) {
   var viewModel = Provider.of<PostedJobsManagementViewModel>(context);
-  return FutureBuilder<List<cJobs_recruiter?>>(
-    future: viewModel.jobsFuture,
+  var recruiterVM = Provider.of<RecruiterProfileViewModel>(context);
+  if (recruiterVM.recruiterInfo != null) {
+    return body(
+        context: context, viewModel: viewModel, recruiterVM: recruiterVM);
+  }
+  return FutureBuilder(
+    future: Future.wait([
+      viewModel.jobsFuture!,
+      recruiterVM.recruiterFuture!,
+    ]),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const Center(
-          child: CircularProgressIndicator(color: Colors.blue),
-        );
+            child: CircularProgressIndicator(color: Colors.blue));
+      } else {
+        return body(
+            context: context, viewModel: viewModel, recruiterVM: recruiterVM);
       }
-
-      return FutureBuilder(
-        future: viewModel.recruiter,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.blue),
-            );
-          } else {
-            return body(context: context, viewModel: viewModel);
-          }
-        },
-      );
     },
   );
 }
 
-Widget body({
-  required BuildContext context,
-  required PostedJobsManagementViewModel viewModel,
-}) {
+Widget body({required BuildContext context, required PostedJobsManagementViewModel viewModel, required RecruiterProfileViewModel recruiterVM}) {
   return GestureDetector(
     onTap: (){
       print("ok");
@@ -65,7 +60,7 @@ Widget body({
                           )
                       ),
                       child: Image.network(
-                        viewModel.recruiterInfo!.AvatarUrl,
+                        recruiterVM.recruiterInfo!.AvatarUrl,
                         width: 50,
                         height: 50,
                       ),
@@ -83,14 +78,14 @@ Widget body({
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              viewModel.recruiterInfo!.FullName,
+                              recruiterVM.recruiterInfo!.FullName,
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
                               ),
                             ),
                             Text(
-                              viewModel.recruiterInfo!.Company.Name,
+                              recruiterVM.recruiterInfo!.Company.Name,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: ColorConstants.subTextColor,
@@ -229,13 +224,13 @@ Widget body({
             ],
           ),
         ),
-        JobsList(context, viewModel)
+        JobsList(context, viewModel, recruiterVM)
       ],
     ),
   );
 }
 
-Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel) {
+Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel, RecruiterProfileViewModel recruiterVM) {
   return Expanded(
     child: Padding(
       padding: const EdgeInsets.only(top: 5, bottom: 5),
@@ -289,7 +284,7 @@ Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel) {
           else
           ...List.generate(
             viewModel.jobs.length,
-                (index) => JobsItem(context, viewModel, index),
+                (index) => JobsItem(context, viewModel, recruiterVM, index),
           ),
           const SizedBox(height: 5),
         ],
@@ -299,7 +294,7 @@ Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel) {
 }
 
 
-Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
+Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, RecruiterProfileViewModel recruiterVM, int index,) {
   return Padding(
     padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
     child: Container(
@@ -333,9 +328,9 @@ Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, i
                     height: 50,
                     width: 50,
                     margin: EdgeInsets.only(right: 10),
-                    child: (viewModel.recruiterInfo?.Company.LogoUrl != null)
+                    child: (recruiterVM.recruiterInfo?.Company.LogoUrl != null)
                         ? Image.network(
-                      viewModel.recruiterInfo!.Company.LogoUrl!,
+                      recruiterVM.recruiterInfo!.Company.LogoUrl!,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -397,7 +392,7 @@ Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, i
                   ),
                 ],
               ),
-              ActionField(context, viewModel, index),
+              ActionField(context, viewModel, recruiterVM, index),
             ],
           ),
         ),
@@ -437,7 +432,7 @@ Widget Categories(BuildContext context, PostedJobsManagementViewModel viewModel,
 
 }
 
-Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
+Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel, RecruiterProfileViewModel recruiterVM, int index) {
   if (viewModel.jobs[index]!.Status != 'open') {
     return
       Column(
@@ -470,7 +465,7 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                         context,
                         MaterialPageRoute(
                           builder: (context) => ChangeNotifierProvider(
-                            create: (_) => EditJobViewModel(vm: viewModel, index: index, recruiter: viewModel.recruiterInfo!),
+                            create: (_) => EditJobViewModel(vm: viewModel, index: index, recruiter: recruiterVM.recruiterInfo!, context: context),
                             child: EditJobScreen(),
                           ),
                         ),
@@ -569,7 +564,9 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                                   );
 
                                   await viewModel.deleteJob(
-                                      Id: viewModel.jobs[index]!.ID);
+                                    context: context,
+                                    Id: viewModel.jobs[index]!.ID
+                                  );
                                   Navigator.of(context).pop();
                                   Navigator.pop(context);
                                 },

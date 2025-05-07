@@ -13,7 +13,19 @@ import 'ReadResumeScreen.dart';
 
 Widget CandidatesAppliedScreen(BuildContext context,) {
   var viewModel = Provider.of<CandidatesAppliesViewModel>(context);
-
+  if (viewModel.jobs != null && viewModel.applications != null) {
+    return ListView.builder(
+        padding: EdgeInsets.only(bottom: 7),
+        itemCount: viewModel.jobs!.length,
+        itemBuilder: (context, index) {
+          if (viewModel.applications == null) {
+            return SizedBox.shrink();
+          }
+          return JobItem(context, index, viewModel.jobs!,
+              viewModel.applications![index]);
+        }
+    );
+  }
   return Container(
       color: Colors.white,
       child: Center(
@@ -26,7 +38,7 @@ Widget CandidatesAppliedScreen(BuildContext context,) {
               ));
             }
 
-            if (viewModel.jobs.isEmpty) {
+            if (viewModel.jobs == null || viewModel.jobs!.isEmpty) {
               return const Center(child: Text('Bạn chưa có bài đăng nào'));
             }
 
@@ -40,10 +52,13 @@ Widget CandidatesAppliedScreen(BuildContext context,) {
                 }
                 return ListView.builder(
                   padding: EdgeInsets.only(bottom: 7),
-                  itemCount: viewModel.jobs.length,
+                  itemCount: viewModel.jobs!.length,
                   itemBuilder: (context, index) {
-                    return JobItem(context, index, viewModel.jobs,
-                        viewModel.applications[index]);
+                    if (viewModel.applications == null) {
+                      return SizedBox.shrink();
+                    }
+                    return JobItem(context, index, viewModel.jobs!,
+                        viewModel.applications![index]);
                   }
                 );
               }

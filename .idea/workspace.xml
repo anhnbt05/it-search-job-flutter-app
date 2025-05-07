@@ -5,22 +5,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9312053-9e5e-49bf-8451-898f90d1f6f0" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/ProfileViewModel.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/ProfileView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/Constants/api_constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Constants/api_constants.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Helpers/helpers.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Helpers/helpers.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Services/category_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/category_service.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/Services/job_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/job_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Services/user_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Services/user_service.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/login/SignInViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/login/SignInViewModel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/CandidatesAppliesViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/CandidatesAppliesViewModel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/EditJobViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/EditJobViewModel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/JobPostViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/JobPostViewModel.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/PostedJobsManagementViewModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/ViewModels/recruiter/PostedJobsManagementViewModel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/lib/Views/login/login_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/login/login_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/CandidatesAppliedView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/CandidatesAppliedView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/EditJobScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/EditJobScreen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/JobPostView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/JobPostView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/PostedJobsManagementView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/PostedJobsManagementView.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/Views/recruiter/recruiter.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/Views/recruiter/recruiter.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ui/lib/main.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/ui/linux/flutter/generated_plugin_registrant.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/ui/linux/flutter/generated_plugins.cmake" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ui/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/ui/pubspec.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/flutter/generated_plugin_registrant.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/flutter/generated_plugins.cmake" afterDir="false" />
@@ -64,8 +72,9 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
+    "com.google.services.firebase.aqiPopupShown": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "feat/role-login",
+    "git-widget-placeholder": "feat/ui/recruiter-info",
     "ignore.virus.scanning.warn.message": "true",
     "io.flutter.reload.alreadyRun": "true",
     "kotlin-language-version-configured": "true",
