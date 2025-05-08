@@ -4,11 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:ui/Helpers/helpers.dart';
 
 import '../../ViewModels/candidate/JoblistNavigationViewModel.dart';
+import 'FindJobsView.dart';
 
 List<Widget> pageView_candidate(BuildContext context) {
   return [
     HomeScreen(),
-    SearchScreen(),
+    FindJobsView(),
     JobListScreen(context),
     NotificationsScreen(),
     ProfileScreen(),
