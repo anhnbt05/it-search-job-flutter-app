@@ -11,6 +11,7 @@ class RecruiterProfileViewModel extends ChangeNotifier {
   cRecruiters? _recruiterInfo;
   Future<cRecruiters?>? get recruiterFuture => _recruiterFuture;
   cRecruiters? get recruiterInfo => _recruiterInfo;
+  PageController pageController = PageController();
 
   RecruiterProfileViewModel(String userId, BuildContext context) {
     var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
