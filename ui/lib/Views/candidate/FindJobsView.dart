@@ -1,56 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:ui/Models/Jobs.dart';
+
+import '../../ViewModels/candidate/FindJobsViewModel.dart';
 
 class FindJobsView extends StatelessWidget {
   const FindJobsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final job = {
-      "id": "c1f917bf-f4ab-434a-a446-d4dfded60687",
-      "title": "Thực tập sinh Web Developer",
-      "description":
-      "Chúng tôi đang tìm kiếm thực tập sinh đam mê lập trình web để tham gia các dự án thực tế và phát triển kỹ năng chuyên môn",
-      "address": "Quận Bình Thạnh, TP. Hồ Chí Minh, Việt Nam",
-      "salary": "Hỗ trợ 3,000,000 - 5,000,000 VND/tháng",
-      "vacancies": 3,
-      "type": "part_time",
-      "workingTimes": "Thứ 2 - Thứ 6, 8:30 - 17:30",
-      "status": "open",
-      "level": "intern",
-      "company": {
-        "name": "Công ty ABC",
-        "websiteUrl": "https://techcorp.com",
-        "description": "Công ty đứng đầu về công nghệ tại Việt Nam",
-      },
-      "recruiter": {
-        "fullName": "Lê Văn Nam",
-        "position": "Trưởng phòng nhân sự"
-      },
-      "categories": ["Back End"]
-    };
+    return ChangeNotifierProvider(
+      create: (_) => FindJobsViewModel()..fetchJobs(),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF9FAFB),
+        body: Consumer<FindJobsViewModel>(
+          builder: (context, viewModel, _) {
+            if (viewModel.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          JobCard(job: job),
-        ],
+            if (viewModel.error != null) {
+              return Center(
+                child: Text('Đã xảy ra lỗi: ${viewModel.error}'),
+              );
+            }
+
+            if (viewModel.jobs.isEmpty) {
+              return const Center(child: Text('Không có công việc nào.'));
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: viewModel.jobs.length,
+              itemBuilder: (context, index) {
+                final job = viewModel.jobs[index];
+                if (job == null) return const SizedBox();
+                return JobCard(job: job);
+              },
+            );
+          },
+        ),
       ),
     );
   }
 }
-
 class JobCard extends StatelessWidget {
-  final Map<String, dynamic> job;
+  final cJobs_recruiter job;
 
   const JobCard({super.key, required this.job});
 
   @override
   Widget build(BuildContext context) {
-    final company = job['company'];
-    final recruiter = job['recruiter'];
-    final categories = job['categories'] as List;
+    final recruiter = job.Recruiter;
+    final categories = job.Categories;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -69,88 +71,86 @@ class JobCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            job['title'],
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF111827),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  job.Title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF111827),
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  // TODO: Lưu việc yêu thích
+                },
+                icon: const Icon(Icons.bookmark_border),
+                color: Color(0xFF2563EB),
+                tooltip: 'Lưu công việc',
+              ),
+            ],
           ),
           const SizedBox(height: 6),
           Text(
-            company['name'],
+            recruiter.Company.Name.toString(),
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               color: Color(0xFF374151),
             ),
           ),
           const SizedBox(height: 10),
-          _buildInfoRow(Icons.place, job['address']),
+          _buildInfoRow(Icons.place, job.Address),
           const SizedBox(height: 6),
-          _buildInfoRow(Icons.monetization_on, job['salary']),
+          _buildInfoRow(Icons.monetization_on, job.Salary),
           const SizedBox(height: 6),
-          _buildInfoRow(Icons.access_time, job['workingTimes']),
+          _buildInfoRow(Icons.access_time, job.WorkingTimes),
           const SizedBox(height: 6),
-          _buildInfoRow(Icons.category, categories.join(', ')),
-          const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: categories.map((cat) => _buildTag(cat)).toList(),
           ),
           const Divider(height: 24, color: Color(0xFFE5E7EB)),
-          Text(
-            job['description'],
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF6B7280),
-            ),
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              const Icon(Icons.person, size: 16, color: Color(0xFF9CA3AF)),
-              const SizedBox(width: 4),
-              Text(
-                '${recruiter['fullName']} - ${recruiter['position']}',
-                style: const TextStyle(color: Color(0xFF4B5563)),
+              Row(
+                children: [
+                  TextButton.icon(
+                    onPressed: () {
+                      // TODO: Điều hướng đến trang chi tiết
+                    },
+                    icon:  Icon(Icons.visibility, size: 18, color: Color(0xFF2563EB)),
+                    label: const Text(
+                      'Xem chi tiết',
+                      style: TextStyle(color: Color(0xFF2563EB)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      // TODO: Gửi đơn ứng tuyển
+                    },
+                    icon: const Icon(Icons.send),
+                    label: const Text('Nộp đơn'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF2563EB),
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'Xem chi tiết',
-                    style: TextStyle(color: Color(0xFF2563EB)),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.send),
-                  label: const Text('Nộp đơn ứng tuyển'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[100],
-                    foregroundColor: Colors.blue[900],
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+
         ],
       ),
     );

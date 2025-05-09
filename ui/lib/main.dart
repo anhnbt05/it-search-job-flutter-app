@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/ViewModels/candidate/FindJobsViewModel.dart';
 import 'package:ui/ViewModels/login/CompaniesViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import 'package:ui/ViewModels/login/ProvincesViewModel.dart';
@@ -57,6 +58,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => SignUpViewModel()),
         ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
         ChangeNotifierProvider(create: (_) => SignInViewModel()),
+        ChangeNotifierProvider(create: (_) => FindJobsViewModel()),
 
         if (isLoggedIn && userId != null) ...[
           ChangeNotifierProvider(
