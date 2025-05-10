@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:ui/Constants/color_constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../ViewModels/recruiter/ProfileViewModel.dart';
 
@@ -119,17 +120,35 @@ Widget RecruiterInfo(BuildContext context) {
                 ListTile(
                   dense: true,
                   leading: Icon(
+                    Icons.business_center_outlined,
+                    color: Colors.green,
+                    size: 20,
+                  ),
+                  title: Text(viewModel.recruiterInfo!.Company.Name,
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ),
+                ListTile(
+                  dense: true,
+                  leading: Icon(
                     Icons.location_city_outlined,
                     color: Colors.green,
                     size: 20,
                   ),
-                  title: Text(
-                    viewModel.recruiterInfo!.CompanyLocations.Address,
+                  title: Text("${viewModel.recruiterInfo!.CompanyLocations.BranchName}: ${viewModel.recruiterInfo!.CompanyLocations.Address}",
                     style: TextStyle(fontSize: 14),
                   ),
                 ),
+                SizedBox(height: 20,)
               ],
             ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 15),
+            child: Text('Thông tin cá nhân', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
           ),
         ),
         Align(
@@ -251,8 +270,28 @@ Widget CompanyInfo(BuildContext context) {
                     textAlign: TextAlign.justify,
                   ),
                 ),
+                Align(alignment: Alignment.centerLeft,child: Text("Chi nhánh:", style: TextStyle(fontWeight: FontWeight.w500),)),
+                SizedBox(height: 5,),
+                SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: viewModel.branches.length,
+                    itemBuilder: (context, index)
+                    {
+                      return branchItems(context, index);
+                    }
+                  ),
+                )
               ],
             ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 15),
+            child: Text('Thông tin công ty', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
           ),
         ),
         Align(
@@ -267,6 +306,38 @@ Widget CompanyInfo(BuildContext context) {
             ),
           ),
         ),
+      ],
+    ),
+  );
+}
+
+Widget branchItems(BuildContext context, int index) {
+  var viewModel = Provider.of<RecruiterProfileViewModel>(context);
+  return Container(
+    width: 200,
+    decoration: BoxDecoration(
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 5,
+          offset: Offset(5, 5),
+        ),
+      ],
+      borderRadius: BorderRadius.circular(5),
+      color: Colors.white
+    ),
+    margin: EdgeInsets.only(left: 5, right: 5, bottom: 5),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(3),
+          child: Text(viewModel.branches[index]!.BranchName!, style: TextStyle(color: ColorConstants.subTextColor,fontWeight: FontWeight.w500, fontSize: 14),),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
+          child: Text(viewModel.branches[index]!.Address!, style: TextStyle(fontSize: 11),maxLines: 3, overflow: TextOverflow.ellipsis,),
+        )
       ],
     ),
   );
