@@ -69,6 +69,70 @@ class JobService {
     }
   }
 
+  Future<List<cJobs?>> getRecommendedJobs({
+    required String accessToken,
+    required String candidateID,
+  }) async {
+    try {
+      final response = await _apiService.getWithToken(
+        endpoint: APIConstants.getRecommendedJobs_candidate_endpoint(candidateID),
+        accessToken: accessToken,
+      );
+
+      if (response.statusCode == 200) {
+        print("Successfully fetched full jobs list.");
+        List<dynamic>? data = jsonDecode(response.body);
+
+        var result = data
+            ?.map((e) => cJobs.fromJson(e))
+            .where((e) =>
+        e.DeletedAt == null && e.ExpiredAt.isAfter(DateTime.now()))
+            .toList() ??
+            [];
+
+        result.sort((a, b) => b.PostedAt.compareTo(a.PostedAt));
+        return result;
+      } else {
+        print("Failed to fetch full jobs list: ${response.body}");
+        return [];
+      }
+    } catch (e) {
+      print("Error: $e");
+      return [];
+    }
+  }
+
+  Future<cJobs?> getDetailJobs({
+    required String jobId,
+    required String accessToken,
+  }) async {
+    try {
+      final response = await _apiService.getWithToken(
+        endpoint: APIConstants.getDetailJob_candidate_endpoint(jobId),
+        accessToken: accessToken,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final job = cJobs.fromJson(data);
+
+        if (job.DeletedAt == null && job.ExpiredAt.isAfter(DateTime.now())) {
+          return job;
+        } else {
+          print("Job đã hết hạn hoặc bị xoá");
+          return null;
+        }
+      } else {
+        print("Không lấy được chi tiết job: ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Lỗi khi lấy chi tiết job: $e");
+      return null;
+    }
+  }
+
+
   Future<bool> deleteJob({
     required String accessToken,
     required String Id,

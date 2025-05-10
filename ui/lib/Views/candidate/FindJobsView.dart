@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Models/Jobs.dart';
 
 import '../../ViewModels/candidate/FindJobsViewModel.dart';
+import 'JobDetailView.dart';
 
 class FindJobsView extends StatelessWidget {
   const FindJobsView({super.key});
@@ -122,7 +124,12 @@ class JobCard extends StatelessWidget {
                 children: [
                   TextButton.icon(
                     onPressed: () {
-                      // TODO: Điều hướng đến trang chi tiết
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => JobDetailView(jobId: job.ID),
+                        ),
+                      );
                     },
                     icon:  Icon(Icons.visibility, size: 18, color: Color(0xFF2563EB)),
                     label: const Text(

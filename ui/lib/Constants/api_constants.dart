@@ -16,4 +16,10 @@ class APIConstants {
   static final String getJob_endpoint = 'jobs';
   static final String getUser_endpoint = 'users';
   static final String responseJobApplication_endpoint = 'applications/process';
+  static String getRecommendedJobs_candidate_endpoint(String candidateId) {
+    return 'jobs/candidates/$candidateId/recommended-jobs';
+  }
+  static String getDetailJob_candidate_endpoint(String jobId) {
+    return 'jobs/$jobId';
+  }
 }
