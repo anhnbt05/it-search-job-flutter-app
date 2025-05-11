@@ -1,4 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Models/CompanyLocations.dart';
 import 'package:ui/Models/ResponseModel.dart';

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:ui/Constants/color_constants.dart';
+import 'package:ui/ViewModels/recruiter/EditRecruiterInformationViewModel.dart';
+import 'package:ui/Views/recruiter/EditRecruiterInformationScreen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../ViewModels/recruiter/ProfileViewModel.dart';
 
@@ -36,7 +38,7 @@ Widget body(BuildContext context) {
               MediaQuery.of(context).size.height -
               kToolbarHeight -
               kBottomNavigationBarHeight -
-              35,
+              45,
           child: PageView(
             controller: viewModel.pageController,
             children: [RecruiterInfo(context), CompanyInfo(context)],
@@ -159,7 +161,15 @@ Widget RecruiterInfo(BuildContext context) {
               children: [
                 GestureDetector(
                   onTap: () {
-                    print("Ok");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChangeNotifierProvider(
+                          create: (_) => EditRecruiterInformationViewMode(context),
+                          child: EditRecruiterInformationScreen(),
+                        ),
+                      ),
+                    );
                   },
                   child: Icon(Icons.edit, size: 25),
                 ),
@@ -270,6 +280,7 @@ Widget CompanyInfo(BuildContext context) {
                     textAlign: TextAlign.justify,
                   ),
                 ),
+                SizedBox(height: 5),
                 Align(alignment: Alignment.centerLeft,child: Text("Chi nhánh:", style: TextStyle(fontWeight: FontWeight.w500),)),
                 SizedBox(height: 5,),
                 SizedBox(
