@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/Models/Jobs.dart';
 import '../../ViewModels/candidate/DetailJobViewModel.dart';
 
 class JobDetailView extends StatelessWidget {
@@ -15,70 +14,88 @@ class JobDetailView extends StatelessWidget {
       child: Consumer<DetailJobViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isLoading) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text("Chi tiết công việc"),
-                backgroundColor: const Color(0xFF2563EB),
-              ),
-              body: const Center(child: CircularProgressIndicator()),
+            return _buildScaffold(
+              context,
+              const Center(child: CircularProgressIndicator()),
             );
           }
 
           if (viewModel.error != null) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text("Chi tiết công việc"),
-                backgroundColor: const Color(0xFF2563EB),
-              ),
-              body: Center(
-                child: Text(viewModel.error!),
-              ),
+            return _buildScaffold(
+              context,
+              Center(child: Text(viewModel.error!)),
             );
           }
 
           final job = viewModel.jobDetail;
           final recruiter = job?.Recruiter;
 
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(job?.Title ?? "Job Detail"),
-              backgroundColor: const Color(0xFF2563EB),
-              foregroundColor: Colors.white,
-            ),
-            backgroundColor: const Color(0xFFF9FAFB),
-            body: SingleChildScrollView(
+          return _buildScaffold(
+            context,
+            SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _sectionTitle("Công ty tuyển dụng"),
-                  _textContent(recruiter?.Company.Name ?? "N/A"),
-
-                  _sectionTitle("Địa điểm làm việc"),
-                  _textContent(job?.Address ?? "N/A"),
-
-                  _sectionTitle("Mức lương"),
-                  _textContent(job?.Salary ?? "N/A"),
-
-                  _sectionTitle("Số lượng tuyển"),
-                  _textContent('${job?.Vacancies ?? 0} người'),
-
-                  _sectionTitle("Hình thức làm việc"),
-                  _textContent(job?.Type ?? "N/A"),
-
-                  _sectionTitle("Thời gian làm việc"),
-                  _textContent(job?.WorkingTimes ?? "N/A"),
-
-                  _sectionTitle("Trình độ yêu cầu"),
-                  _textContent(job?.Level ?? "N/A"),
-
-                  _sectionTitle("Tình trạng"),
-                  _textContent(job?.Status ?? "N/A"),
-
-                  _sectionTitle("Ngày đăng & Hạn nộp"),
-                  _textContent(
-                    'Đăng ngày: ${_formatDate(job?.PostedAt ?? DateTime.now())}\nHết hạn: ${_formatDate(job?.ExpiredAt ?? DateTime.now())}',
+                  _iconText(Icons.business, "Công ty tuyển dụng", recruiter?.Company.Name ?? "N/A"),
+                  _iconText(Icons.location_on, "Địa điểm làm việc", job?.Address ?? "N/A"),
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: _iconText(Icons.attach_money, "Mức lương", job?.Salary ?? "N/A"),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _iconText(Icons.people, "Số lượng tuyển", '${job?.Vacancies ?? 0} người'),
+                        ),
+                      ],
+                    ),
                   ),
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: _iconText(Icons.work_outline, "Hình thức làm việc", job?.Type ?? "N/A"),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _iconText(Icons.access_time, "Thời gian làm việc", job?.WorkingTimes ?? "N/A"),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Row(
+                    children: [
+                      Expanded(child: _iconText(Icons.school, "Trình độ yêu cầu", job?.Level ?? "N/A")),
+                      const SizedBox(width: 16),
+                      Expanded(child: _iconText(Icons.check_circle_outline, "Tình trạng", job?.Status ?? "N/A")),
+                    ],
+                  ),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _iconText(
+                          Icons.calendar_today,
+                          "Ngày đăng",
+                          _formatDate(job?.PostedAt ?? DateTime.now()),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _iconText(
+                          Icons.calendar_today,
+                          "Hạn nộp",
+                          _formatDate(job?.ExpiredAt ?? DateTime.now()),
+                        ),
+                      ),
+                    ],
+                  ),
+
 
                   _sectionTitle("Danh mục"),
                   Wrap(
@@ -124,6 +141,18 @@ class JobDetailView extends StatelessWidget {
     );
   }
 
+  Scaffold _buildScaffold(BuildContext context, Widget body) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Chi tiết công việc"),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+      ),
+      backgroundColor: const Color(0xFFF9FAFB),
+      body: body,
+    );
+  }
+
   Widget _sectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 6),
@@ -138,10 +167,35 @@ class JobDetailView extends StatelessWidget {
     );
   }
 
-  Widget _textContent(String text) {
-    return Text(
-      text,
-      style: const TextStyle(fontSize: 14, color: Color(0xFF4B5563)),
+  Widget _iconText(IconData icon, String label, String content) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: Color(0xFF2563EB)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Color(0xFF111827),
+                    )),
+                const SizedBox(height: 2),
+                Text(content,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF4B5563),
+                    )),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
