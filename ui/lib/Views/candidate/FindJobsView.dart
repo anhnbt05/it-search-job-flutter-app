@@ -43,7 +43,7 @@ class FindJobsView extends StatelessWidget {
                           flex: 2,
                           child: TextField(
                             onChanged: (value) {
-                              // TODO: Thêm logic tìm kiếm
+                              context.read<FindJobsViewModel>().filterJobs(value);
                             },
                             decoration: const InputDecoration(
                               border: InputBorder.none,

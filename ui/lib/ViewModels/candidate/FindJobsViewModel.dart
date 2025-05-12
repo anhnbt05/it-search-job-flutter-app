@@ -10,6 +10,7 @@ class FindJobsViewModel extends ChangeNotifier {
   final FlutterSecureStorage _storage = APIConstants.storage;
 
   List<cJobs?> recommendedjobs = [];
+  List<cJobs_recruiter?> _allJobs = [];
   List<cJobs_recruiter?> jobs = [];
   bool isLoading = false;
   String? error;
@@ -41,6 +42,7 @@ class FindJobsViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   Future<void> fetchJobs() async {
     isLoading = true;
     error = null;
@@ -49,9 +51,9 @@ class FindJobsViewModel extends ChangeNotifier {
     try {
       final accessToken = APIConstants.accessToken;
 
-      jobs = await _jobService.getJobs(
-        accessToken: accessToken,
-      );
+      final fetchedJobs = await _jobService.getJobs(accessToken: accessToken);
+      _allJobs = fetchedJobs;
+      jobs = fetchedJobs;
     } catch (e) {
       error = "Đã xảy ra lỗi khi tải danh sách công việc: $e";
     } finally {
@@ -59,6 +61,16 @@ class FindJobsViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void filterJobs(String query) {
+    final q = query.toLowerCase().trim();
+    jobs = _allJobs.where((job) {
+      final title = job?.Title.toLowerCase() ?? '';
+      return title.contains(q);
+    }).toList();
+    notifyListeners();
+  }
+
   Future<void> addFavoriteJob(List<String> jobData) async {
     final accessToken = APIConstants.accessToken;
 
@@ -85,3 +97,4 @@ class FindJobsViewModel extends ChangeNotifier {
     }
   }
 }
+
