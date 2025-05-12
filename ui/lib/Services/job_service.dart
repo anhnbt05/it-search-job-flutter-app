@@ -41,12 +41,72 @@ class JobService {
     }
   }
 
+  Future<bool> postFavoriteJob({
+    required String accessToken,
+    required List<String> jobData,
+  }) async {
+    try {
+      final response = await _apiService.postFavoriteJobWithToken(
+        endpoint: APIConstants.FavoritesJobs_endpoint,
+        jobIds: List<String>.from(jobData),
+        accessToken: accessToken,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Job added to favorites successfully.");
+        showSuccessToastification(
+          title: 'Thành công',
+          message: 'Đã thêm vào danh sách yêu thích',
+        );
+        return true;
+      } else {
+        print("Failed to add job to favorites: ${response.body}");
+        showErrorToastification(
+          title: 'Lỗi',
+          message: jsonDecode(response.body)['message'],
+        );
+        return false;
+      }
+    } catch (e) {
+      print("Error adding favorite job: $e");
+      showErrorToastification(title: 'Lỗi', message: e.toString());
+      return false;
+    }
+  }
+
   Future<List<cJobs_recruiter?>> getJobs({
     required String accessToken,
   }) async {
     try {
       final response = await _apiService.getWithToken(
         endpoint: APIConstants.getJob_endpoint,
+        accessToken: accessToken,
+      );
+
+      if (response.statusCode == 200) {
+        print("Successfully fetched jobs list.");
+        List<dynamic>? data = jsonDecode(response.body);
+        var result = data?.map((e) => cJobs_recruiter.fromJson(e))
+            .where((e) =>
+        e.DeletedAt == null && e.ExpiredAt.isAfter(DateTime.now()))
+            .toList() ?? [];
+        result.sort((a, b) => b.PostedAt.compareTo(a.PostedAt));
+        return result;
+      } else {
+        print("Failed to fetch jobs list: ${response.body}");
+        return [];
+      }
+    } catch (e) {
+      print("Error: $e");
+      return [];
+    }
+  }
+  Future<List<cJobs_recruiter?>> getFavoritesJobs({
+    required String accessToken,
+  }) async {
+    try {
+      final response = await _apiService.getWithToken(
+        endpoint: APIConstants.FavoritesJobs_endpoint,
         accessToken: accessToken,
       );
 
@@ -153,6 +213,39 @@ class JobService {
       }
     } catch (e) {
       print("Error deleting job: $e");
+      showErrorToastification(title: 'Lỗi', message: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> deleteFavoriteJob({
+    required String accessToken,
+    required List<String> jobId,
+  }) async {
+    try {
+      final response = await _apiService.deleteFavoriteJobWithToken(
+        endpoint: APIConstants.FavoritesJobs_endpoint,
+        jobIds: jobId,
+        accessToken: accessToken,
+      );
+
+      if (response.statusCode == 200) {
+        print("Job removed from favorites successfully.");
+        showSuccessToastification(
+          title: 'Thành công',
+          message: 'Đã xoá khỏi danh sách yêu thích',
+        );
+        return true;
+      } else {
+        print("Failed to remove job from favorites: ${response.body}");
+        showErrorToastification(
+          title: 'Lỗi',
+          message: jsonDecode(response.body)['message'],
+        );
+        return false;
+      }
+    } catch (e) {
+      print("Error removing favorite job: $e");
       showErrorToastification(title: 'Lỗi', message: e.toString());
       return false;
     }

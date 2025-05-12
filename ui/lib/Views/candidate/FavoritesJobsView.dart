@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Models/Jobs.dart';
 
-import '../../Services/job_service.dart';
-import '../../ViewModels/candidate/FindJobsViewModel.dart';
+import '../../ViewModels/candidate/FavoritesJobsViewModel.dart';
 import 'JobDetailView.dart';
 
-class FindJobsView extends StatelessWidget {
-  const FindJobsView({super.key});
+class FavoritesJobsView extends StatelessWidget {
+  const FavoritesJobsView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => FindJobsViewModel()..fetchJobs(),
+      create: (_) => FavoritesJobsViewModel()..fetchFavoritesJobs(),
       child: Scaffold(
         backgroundColor: const Color(0xFFF9FAFB),
-        body: Consumer<FindJobsViewModel>(
+        body: Consumer<FavoritesJobsViewModel>(
           builder: (context, viewModel, _) {
             return Column(
               children: [
@@ -35,39 +33,6 @@ class FindJobsView extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.search, color: Colors.grey),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          flex: 2,
-                          child: TextField(
-                            onChanged: (value) {
-                              // TODO: Thêm logic tìm kiếm
-                            },
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                        const VerticalDivider(),
-                        // Expanded(
-                        //   child: DropdownButtonHideUnderline(
-                        //     child: DropdownButton<String>(
-                        //       hint: const Text('Tất cả địa điểm'),
-                        //       onChanged: (value) {
-                        //         // TODO: Logic lọc theo tỉnh thành
-                        //       },
-                        //       items: const [
-                        //         DropdownMenuItem(value: 'Hà Nội', child: Text('Hà Nội')),
-                        //         DropdownMenuItem(value: 'Hồ Chí Minh', child: Text('Hồ Chí Minh')),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                        const SizedBox(width: 12),
-                      ],
-                    ),
                   ),
                 ),
                 Expanded(
@@ -76,7 +41,7 @@ class FindJobsView extends StatelessWidget {
                       : viewModel.error != null
                       ? Center(child: Text('Đã xảy ra lỗi: ${viewModel.error}'))
                       : viewModel.jobs.isEmpty
-                      ? const Center(child: Text('Không có công việc nào.'))
+                      ? const Center(child: Text('Không có công việc yêu thích nào.'))
                       : ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: viewModel.jobs.length,
@@ -105,7 +70,7 @@ class JobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final recruiter = job.Recruiter;
     final categories = job.Categories;
-    bool isFavorite = false;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(16),
@@ -165,38 +130,6 @@ class JobCard extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-
-              // Nút yêu thích
-              IconButton(
-                onPressed: () async {
-                      final jobService = JobService();
-                      List<String> data = [job.ID];
-                      print("Job ID: ${job.ID}");
-
-                      if (!isFavorite) {
-                        final success = await jobService.postFavoriteJob(
-                          accessToken: APIConstants.accessToken,
-                          jobData: data,
-                        );
-                        if (success) {
-                          isFavorite = true;
-                        }
-                      } else {
-                        final success = await jobService.deleteFavoriteJob(
-                          accessToken: APIConstants.accessToken,
-                          jobId: data,
-                        );
-                        if (success) {
-                          isFavorite = false;
-                        }
-                      }
-                    },
-                icon: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: isFavorite ? Colors.blue : Colors.grey,
-                ),
-                tooltip: isFavorite ? 'Bỏ lưu công việc' : 'Lưu công việc',
               ),
             ],
           ),

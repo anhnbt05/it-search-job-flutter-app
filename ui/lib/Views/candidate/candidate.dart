@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:ui/Helpers/helpers.dart';
 
 import '../../ViewModels/candidate/JoblistNavigationViewModel.dart';
+import 'FavoritesJobsView.dart';
 import 'FindJobsView.dart';
 
 List<Widget> pageView_candidate(BuildContext context) {
@@ -48,12 +49,7 @@ Widget JobListScreen(BuildContext context) {
             style: TextStyle(fontSize: 24),
           ),
         ),
-        Center(
-          child: Text(
-            "Danh sách công việc yêu thích",
-            style: TextStyle(fontSize: 24),
-          ),
-        ),
+        FavoritesJobsView(),
       ],
     ),
   );

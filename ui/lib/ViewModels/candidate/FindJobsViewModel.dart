@@ -59,4 +59,29 @@ class FindJobsViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+  Future<void> addFavoriteJob(List<String> jobData) async {
+    final accessToken = APIConstants.accessToken;
+
+    final success = await _jobService.postFavoriteJob(
+      accessToken: accessToken,
+      jobData: jobData,
+    );
+
+    if (success) {
+      notifyListeners();
+    }
+  }
+
+  Future<void> removeFavoriteJob(List<String> jobId) async {
+    final accessToken = APIConstants.accessToken;
+
+    final success = await _jobService.deleteFavoriteJob(
+      accessToken: accessToken,
+      jobId: jobId,
+    );
+
+    if (success) {
+      notifyListeners();
+    }
+  }
 }

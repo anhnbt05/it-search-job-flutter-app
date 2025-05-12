@@ -22,4 +22,5 @@ class APIConstants {
   static String getDetailJob_candidate_endpoint(String jobId) {
     return 'jobs/$jobId';
   }
+  static final String FavoritesJobs_endpoint = 'jobs/candidates/favorites';
 }

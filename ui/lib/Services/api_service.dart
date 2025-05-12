@@ -19,6 +19,29 @@ class ApiService {
       body: jsonEncode(body),
     );
   }
+  Future<http.Response> postFavoriteJobWithToken({
+    required String endpoint,
+    required List<String> jobIds,
+    required String accessToken,
+  }) async {
+    final url = Uri.parse('${APIConstants.baseUrl}/$endpoint');
+
+    final body = <String, dynamic>{
+      'jobIds': jobIds.map((e) => e.toString()).toList(), // Đảm bảo là List<String>
+    };
+
+    print('Gửi đi: ${jsonEncode(body)}');
+
+    return await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+  }
+
 
   Future<http.Response> acceptApplicationsWithToken({
     required String endpoint,
@@ -98,6 +121,27 @@ class ApiService {
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       },
+    );
+  }
+
+  Future<http.Response> deleteFavoriteJobWithToken({
+    required String endpoint,
+    required List<String> jobIds,
+    required String accessToken,
+  }) async {
+    final url = Uri.parse('${APIConstants.baseUrl}/$endpoint');
+
+    final body = {
+      'jobIds': jobIds,
+    };
+
+    return await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
     );
   }
 
