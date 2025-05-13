@@ -298,6 +298,20 @@ export class UsersService {
         }
       }
 
+      const { PhoneNumber } = res;
+
+      if (PhoneNumber) {
+        const existingPhoneNumber = await this.anonSupabaseClient
+          .from('Users')
+          .select('*')
+          .eq('PhoneNumber', PhoneNumber);
+
+        if (existingPhoneNumber)
+          throw new BadRequestException(
+            `Số điện thoại mới này đã được sử dụng bởi người dùng khác.`,
+          );
+      }
+
       const { error } = await this.adminSupabaseClient
         .from('Users')
         .update([res])
