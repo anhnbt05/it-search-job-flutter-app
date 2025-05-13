@@ -77,7 +77,8 @@ Widget RecruiterInfo(BuildContext context) {
               children: [
                 CircleAvatar(
                   radius: 50,
-                  child: Image.network(viewModel.recruiterInfo!.AvatarUrl),
+                  child: ClipOval(child: Image.network(viewModel.recruiterInfo!.AvatarUrl, fit: BoxFit.cover, width: 100, height: 100,),),
+
                 ),
                 SizedBox(height: 5),
                 Text(
@@ -165,7 +166,7 @@ Widget RecruiterInfo(BuildContext context) {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ChangeNotifierProvider(
-                          create: (_) => EditRecruiterInformationViewMode(context),
+                          create: (_) => EditRecruiterInformationViewMode(context, viewModel.userId),
                           child: EditRecruiterInformationScreen(),
                         ),
                       ),

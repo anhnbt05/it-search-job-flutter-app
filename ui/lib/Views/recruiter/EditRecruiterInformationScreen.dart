@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../Constants/color_constants.dart';
+import '../../Helpers/toastification.dart';
 import '../../ViewModels/recruiter/EditRecruiterInformationViewModel.dart';
 import '../../ViewModels/recruiter/ProfileViewModel.dart';
 
@@ -97,14 +98,16 @@ class _EditRecruiterInformationScreenState
                                       child: CircleAvatar(
                                         radius: 70,
                                         backgroundColor: Colors.white,
-                                        child: ClipOval(
-                                          child: Image.network(
-                                            profileViewModel.recruiterInfo!.AvatarUrl,
+                                        child: viewModel.avtImage != null
+                                            ? ClipOval(
+                                          child: Image.file(
+                                            viewModel.avtImage!,
                                             fit: BoxFit.cover,
                                             width: 140,
                                             height: 140,
                                           ),
-                                        ),
+                                        )
+                                            : CircularProgressIndicator(color: Colors.blue,),
                                       ),
                                     ),
 
@@ -116,7 +119,7 @@ class _EditRecruiterInformationScreenState
                                     padding: const EdgeInsets.only(left: 10),
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        print("OK");
+                                        viewModel.pickImage();
                                       },
                                       style: ButtonStyle(
                                         backgroundColor:
@@ -356,7 +359,157 @@ class _EditRecruiterInformationScreenState
                             ),
                             child: ElevatedButton(
                               onPressed: () {
-                                print("OK");
+                                showDialog(
+                                  context: context,
+                                  builder: (dialogContext) {
+                                    return Dialog(
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      insetPadding: EdgeInsets.all(9),
+                                      child: Container(
+                                        width: MediaQuery.of(dialogContext).size.width - 10,
+                                        padding: EdgeInsets.all(10),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'Thay đổi mật khẩu',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 22,
+                                              ),
+                                            ),
+                                            Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left: 5, top: 10),
+                                                child: Text(
+                                                  'Mật khẩu mới:',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+                                            Container(
+                                              height: 50,
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 5,
+                                              ),
+                                              child: SizedBox.expand(
+                                                child: TextField(
+                                                  autofocus: true,
+                                                  controller: viewModel.passwordController,
+                                                  textAlignVertical:
+                                                  TextAlignVertical.top,
+                                                  keyboardType: TextInputType.text,
+                                                  style: TextStyle(fontSize: 14),
+                                                  decoration: InputDecoration(
+                                                    hintText: 'Nhập mật khẩu mới...',
+                                                    hintStyle: TextStyle(
+                                                      color: Colors.grey,
+                                                    ),
+                                                    border: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(
+                                                        5,
+                                                      ),
+                                                    ),
+                                                    isDense: true,
+                                                    enabledBorder: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(
+                                                        5,
+                                                      ),
+                                                      borderSide: BorderSide(
+                                                        color: Colors.grey,
+                                                        width: 0.5,
+                                                      ),
+                                                    ),
+                                                    focusedBorder: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(
+                                                        5,
+                                                      ),
+                                                      borderSide: BorderSide(
+                                                        color: Colors.blue,
+                                                        width: 1,
+                                                      ),
+                                                    ),
+                                                    contentPadding: EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 6,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(dialogContext);
+                                                  },
+                                                  style: TextButton.styleFrom(
+                                                    overlayColor: Colors.transparent,
+                                                  ),
+                                                  child: Text(
+                                                    'Hủy',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () async {
+                                                    final currentDialogContext = dialogContext;
+                                                    if (viewModel.passwordController.text.isEmpty) {
+                                                      showErrorToastification(
+                                                          message: 'Vui lòng nhập mật khẩu mới',
+                                                          title: 'Lỗi'
+                                                      );
+                                                    } else {
+                                                      showDialog(
+                                                        context: currentDialogContext,
+                                                        barrierColor: Colors.black.withOpacity(0.5),
+                                                        barrierDismissible: false,
+                                                        builder: (BuildContext loadingContext) {
+                                                          return Center(
+                                                            child: CircularProgressIndicator(
+                                                              color: Colors.blue,
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                      await viewModel.resetPassword(context).then((value) {Navigator.pop(context); Navigator.pop(dialogContext);});
+                                                    }
+                                                  },
+                                                  style: TextButton.styleFrom(
+                                                    backgroundColor: Color(0xee65c29c),
+                                                    foregroundColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(10),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    'Xác nhận thay đổi',
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
                               },
                               style: ButtonStyle(
                                 backgroundColor: WidgetStateProperty.all(
@@ -395,11 +548,25 @@ class _EditRecruiterInformationScreenState
                         ),
                         Align(
                           alignment: Alignment.bottomRight,
+
                           child: Padding(
                             padding: EdgeInsets.only(right: 10),
                             child: ElevatedButton(
                               onPressed: () {
-                                print("OK");
+                                showDialog(
+                                  context: context,
+                                  barrierColor: Colors.black.withOpacity(0.5),
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.blue,
+                                      ),
+                                    );
+                                  },
+                                );
+                                
+                                viewModel.updateRecruiterInfo(context, viewModel.userId).then((value) => Navigator.pop(context));
                               },
                               style: ButtonStyle(
                                 backgroundColor: WidgetStateProperty.all(

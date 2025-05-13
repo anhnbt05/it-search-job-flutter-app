@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Helpers/helpers.dart';
-import 'package:ui/Models/model.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 
 import '../../Models/Jobs.dart';

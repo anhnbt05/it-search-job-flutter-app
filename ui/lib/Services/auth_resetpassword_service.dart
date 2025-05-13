@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+import 'package:ui/Helpers/toastification.dart';
 import 'dart:convert';
 
 import '../Constants/api_constants.dart';
@@ -22,6 +23,11 @@ class AuthResetpasswordService {
       ),
     );
     final responseData = json.decode(response.body);
+    if (response.statusCode == 201) {
+      showSuccessToastification(title: "Thành công", message: responseData["message"]);
+    } else {
+      print("Loi" + response.body);
+    }
     return ResponseModel.fromJson(responseData);
   }
 }

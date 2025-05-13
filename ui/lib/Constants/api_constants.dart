@@ -14,7 +14,6 @@ class APIConstants {
   static final String deleteJob_endpoint = 'jobs';
   static final String patchJob_endpoint = 'jobs';
   static late final String accessToken;
-  static late final String refreshToken;
   static final String getApplications_recruiter_endpoint1 = 'jobs';
   static final String getApplications_recruiter_endpoint2 = 'applications';
   static final String getJob_endpoint = 'jobs';

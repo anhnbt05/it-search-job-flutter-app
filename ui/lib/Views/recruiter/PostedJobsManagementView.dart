@@ -54,10 +54,13 @@ Widget body({required BuildContext context, required PostedJobsManagementViewMod
                           color: Colors.transparent
                         )
                     ),
-                    child: Image.network(
-                      recruiterVM.recruiterInfo!.AvatarUrl,
-                      width: 50,
-                      height: 50,
+                    child: ClipOval(
+                      child: Image.network(
+                        recruiterVM.recruiterInfo!.AvatarUrl,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   SizedBox(width: 5),

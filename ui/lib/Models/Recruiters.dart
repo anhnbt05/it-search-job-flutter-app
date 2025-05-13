@@ -28,7 +28,6 @@ class cRecruiterPost {
 }
 
 class cRecruiters {
-  final String ID;
   final String Position;
   final String FullName;
   final String Email;
@@ -39,7 +38,6 @@ class cRecruiters {
   final cCompanyLocation_RecruiterInfo CompanyLocations;
 
   cRecruiters({
-    required this.ID,
     required this.Position,
     required this.FullName,
     required this.Email,
@@ -52,7 +50,6 @@ class cRecruiters {
 
   factory cRecruiters.fromJson(Map<String, dynamic> json) {
     return cRecruiters(
-      ID: json['ID'],
       Position: json['Position'],
       FullName: json['FullName'],
       Email: json['Email'],
@@ -61,6 +58,24 @@ class cRecruiters {
       IsEmailVerified: json['IsEmailVerified'],
       Company: cCompany_RecruiterInfo.fromJson(json['Company']),
       CompanyLocations: cCompanyLocation_RecruiterInfo.fromJson(json['CompanyLocations']),
+    );
+  }
+
+  cRecruiters CopyRecruiterInfor({
+    required String newFullName,
+    required String newPhoneNumber,
+    required String newPosition,
+    required String newAvatarUrl,
+  }) {
+    return cRecruiters(
+      Position: newPosition,
+      FullName: newFullName,
+      Email: Email,
+      AvatarUrl: newAvatarUrl,
+      PhoneNumber: newPhoneNumber,
+      IsEmailVerified: IsEmailVerified,
+      Company: Company,
+      CompanyLocations: CompanyLocations,
     );
   }
 }
