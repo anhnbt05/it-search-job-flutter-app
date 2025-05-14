@@ -26,7 +26,7 @@ class AuthResetpasswordService {
     if (response.statusCode == 201) {
       showSuccessToastification(title: "Thành công", message: responseData["message"]);
     } else {
-      print("Loi" + response.body);
+      print("Lỗi" + responseData['message']);
     }
     return ResponseModel.fromJson(responseData);
   }

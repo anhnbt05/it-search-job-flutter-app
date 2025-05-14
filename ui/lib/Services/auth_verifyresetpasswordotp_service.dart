@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+import 'package:ui/Helpers/toastification.dart';
 import 'dart:convert';
 
 import '../Constants/api_constants.dart';
@@ -22,6 +23,10 @@ class AuthVerifyResetPasswordOtpService {
         ),
     );
     final responseData = json.decode(response.body);
+    if (response.statusCode != 201) {
+      showErrorToastification(title: "Lỗi", message: responseData['message']);
+    }
     return ResponseModel.fromJson(responseData);
   }
+
 }

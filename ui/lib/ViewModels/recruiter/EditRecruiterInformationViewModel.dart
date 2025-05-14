@@ -8,20 +8,25 @@ import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Helpers/toastification.dart';
+import 'package:ui/Models/ResponseModel.dart';
 import 'package:ui/Services/api_service.dart';
 import 'package:ui/Services/auth_resetpassword_service.dart';
+import 'package:ui/Services/auth_verifyresetpasswordotp_service.dart';
 import 'package:ui/Services/user_service.dart';
 
 import '../../Constants/api_constants.dart';
+import '../../Services/auth_forgetpassword_service.dart';
 import '../login/SignInViewModel.dart';
 import 'ProfileViewModel.dart';
 
-class EditRecruiterInformationViewMode extends ChangeNotifier {
+class EditRecruiterInformationViewModel extends ChangeNotifier {
   late String userId;
   late final TextEditingController _fullNameController;
   late final TextEditingController _phoneNumberController;
   late final TextEditingController _positionController;
-  late final TextEditingController _passwordController;
+  late final TextEditingController _otpController;
+  late final TextEditingController _newPasswordController;
+  late final TextEditingController _confirmNewPasswordController;
 
   File? _avtImage;
   File? _oldAvtImage;
@@ -30,18 +35,35 @@ class EditRecruiterInformationViewMode extends ChangeNotifier {
   TextEditingController get fullNameController => _fullNameController;
   TextEditingController get phoneNumberController => _phoneNumberController;
   TextEditingController get positionController => _positionController;
-  TextEditingController get passwordController => _passwordController;
+  TextEditingController get otpController => _otpController;
+  TextEditingController get newPasswordController => _newPasswordController;
+  TextEditingController get confirmNewPasswordController => _confirmNewPasswordController;
+
+
+  set otpController(TextEditingController value) {
+    _otpController = value;
+  }
+
+  set newPasswordController(TextEditingController value) {
+    _newPasswordController = value;
+  }
+
+  set confirmNewPasswordController(TextEditingController value) {
+    _confirmNewPasswordController = value;
+  }
 
   File? get avtImage => _avtImage;
   Uint8List? get imageBytes => _imageBytes;
   File? get oldAvtImage => _oldAvtImage;
 
-  EditRecruiterInformationViewMode(BuildContext context, this.userId) {
+  EditRecruiterInformationViewModel(BuildContext context, this.userId) {
     var profileViewModel = Provider.of<RecruiterProfileViewModel>(context);
     _fullNameController = TextEditingController(text: profileViewModel.recruiterInfo!.FullName);
     _phoneNumberController = TextEditingController(text: profileViewModel.recruiterInfo!.PhoneNumber);
     _positionController = TextEditingController(text: profileViewModel.recruiterInfo!.Position);
-    _passwordController = TextEditingController();
+    _newPasswordController = TextEditingController();
+    _confirmNewPasswordController = TextEditingController();
+    _otpController = TextEditingController();
     downloadImage(profileViewModel.recruiterInfo!.AvatarUrl);
     _oldAvtImage = _avtImage;
   }
@@ -97,9 +119,15 @@ class EditRecruiterInformationViewMode extends ChangeNotifier {
     }
   }
 
-  Future<void> resetPassword(context) async {
-    var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
+  Future<ResponseModel> resetPassword(context) async {
     var profileViewModel = Provider.of<RecruiterProfileViewModel>(context, listen: false);
-    await AuthResetpasswordService().resetPassword(profileViewModel.recruiterInfo!.Email, passwordController.text);
+    return await AuthResetpasswordService().resetPassword(profileViewModel.recruiterInfo!.Email, newPasswordController.text);
+  }
+
+  Future<ResponseModel> verifyOTP(context) async {
+    notifyListeners();
+    var profileViewModel = Provider.of<RecruiterProfileViewModel>(context, listen: false);
+    return await AuthVerifyResetPasswordOtpService().verifyResetPasswordOtp(profileViewModel.recruiterInfo!.Email, otpController.text);
+
   }
 }

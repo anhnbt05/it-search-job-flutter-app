@@ -166,7 +166,7 @@ Widget RecruiterInfo(BuildContext context) {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ChangeNotifierProvider(
-                          create: (_) => EditRecruiterInformationViewMode(context, viewModel.userId),
+                          create: (_) => EditRecruiterInformationViewModel(context, viewModel.userId),
                           child: EditRecruiterInformationScreen(),
                         ),
                       ),
