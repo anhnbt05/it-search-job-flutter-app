@@ -301,10 +301,11 @@ export class UsersService {
       const { PhoneNumber } = res;
 
       if (PhoneNumber) {
-        const existingPhoneNumber = await this.anonSupabaseClient
+        const { data: existingPhoneNumber } = await this.anonSupabaseClient
           .from('Users')
           .select('*')
-          .eq('PhoneNumber', PhoneNumber);
+          .eq('PhoneNumber', PhoneNumber)
+          .maybeSingle<Users>();
 
         if (existingPhoneNumber)
           throw new BadRequestException(
