@@ -301,11 +301,21 @@ export class UsersService {
       const { PhoneNumber } = res;
 
       if (PhoneNumber) {
-        const { data: existingPhoneNumber } = await this.anonSupabaseClient
-          .from('Users')
-          .select('*')
-          .eq('PhoneNumber', PhoneNumber)
-          .maybeSingle<Users>();
+        const { data: existingPhoneNumber, error } =
+          await this.anonSupabaseClient
+            .from('Users')
+            .select('*')
+            .eq('PhoneNumber', PhoneNumber)
+            .neq('ID', currentUserId)
+            .maybeSingle<Users>();
+
+        if (error) {
+          console.error(error);
+
+          throw new InternalServerErrorException(
+            'Đã xảy ra lỗi khi kiểm tra số điện thoại.',
+          );
+        }
 
         if (existingPhoneNumber)
           throw new BadRequestException(
