@@ -23,4 +23,10 @@ class APIConstants {
     return 'jobs/$jobId';
   }
   static final String FavoritesJobs_endpoint = 'jobs/candidates/favorites';
+  static String getJobsbyLocations_endpoint(String locationId) {
+    return 'jobs/locations/$locationId';
+  }
+  static String getJobsbyCategories_endpoint(String categoryName) {
+    return 'jobs/categories/$categoryName';
+  }
 }

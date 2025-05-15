@@ -111,7 +111,7 @@ class JobService {
       );
 
       if (response.statusCode == 200) {
-        print("Successfully fetched jobs list.");
+        print("Successfully fetched favorite jobs list.");
         List<dynamic>? data = jsonDecode(response.body);
         var result = data?.map((e) => cJobs_recruiter.fromJson(e))
             .where((e) =>
@@ -129,7 +129,7 @@ class JobService {
     }
   }
 
-  Future<List<cJobs?>> getRecommendedJobs({
+  Future<List<cJobs_recruiter?>> getRecommendedJobs({
     required String accessToken,
     required String candidateID,
   }) async {
@@ -140,11 +140,11 @@ class JobService {
       );
 
       if (response.statusCode == 200) {
-        print("Successfully fetched full jobs list.");
+        print("Successfully fetched recommended full jobs list.");
         List<dynamic>? data = jsonDecode(response.body);
 
         var result = data
-            ?.map((e) => cJobs.fromJson(e))
+            ?.map((e) => cJobs_recruiter.fromJson(e))
             .where((e) =>
         e.DeletedAt == null && e.ExpiredAt.isAfter(DateTime.now()))
             .toList() ??
@@ -161,6 +161,91 @@ class JobService {
       return [];
     }
   }
+  Future<List<cJobs_recruiter?>> getJobsbyLocation({
+    required String accessToken,
+    required String locationID,
+  }) async {
+    try {
+      final response = await _apiService.getWithToken(
+        endpoint: APIConstants.getJobsbyLocations_endpoint(locationID),
+        accessToken: accessToken,
+      );
+
+      if (response.statusCode == 200) {
+        print("Successfully fetched full jobs by location list.");
+        List<dynamic>? data = jsonDecode(response.body);
+
+        var result = data
+            ?.map((e) => cJobs_recruiter.fromJson(e))
+            .where((e) =>
+        e.DeletedAt == null && e.ExpiredAt.isAfter(DateTime.now()))
+            .toList() ??
+            [];
+
+        result.sort((a, b) => b.PostedAt.compareTo(a.PostedAt));
+        return result;
+      } else {
+        print("Failed to fetch full jobs list: ${response.body}");
+        return [];
+      }
+    } catch (e) {
+      print("Error: $e");
+      return [];
+    }
+  }
+  Future<List<cJobs_recruiter?>> getJobsbyCategory({
+    required String accessToken,
+    required String categoryName,
+  }) async {
+    try {
+      final response = await _apiService.getWithToken(
+        endpoint: APIConstants.getJobsbyCategories_endpoint(categoryName),
+        accessToken: accessToken,
+      );
+
+      if (response.statusCode == 200) {
+        final result = <cJobs_recruiter>[];
+        print("Successfully fetched full jobs by category list.");
+        final decoded = jsonDecode(response.body);
+        print("Decoded response: $decoded");
+        // ✅ Bước kiểm tra kiểu dữ liệu
+        if (decoded is List) {
+
+
+          for (var i = 0; i < decoded.length; i++) {
+            var e = decoded[i];
+            if (e is Map<String, dynamic>) {
+              try {
+                final job = cJobs_recruiter.fromJson(e);
+                if (job.DeletedAt == null && job.ExpiredAt.isAfter(DateTime.now())) {
+                  result.add(job);
+                }
+              } catch (err) {
+                print("❌ Error parsing job item at index $i: $err");
+                print("➡️ Item data: ${jsonEncode(e)}");
+              }
+            } else {
+              print("⛔ Skipped item (not a Map): $e");
+            }
+          }
+
+          result.sort((a, b) => b.PostedAt.compareTo(a.PostedAt));
+          return result;
+        } else {
+          print("Expected a list from API, got: ${decoded.runtimeType}");
+          return [];
+        }
+      } else {
+        print("Failed to fetch full jobs list: ${response.body}");
+        return [];
+      }
+    } catch (e) {
+      print("Error: $e");
+      return [];
+    }
+  }
+
+
 
   Future<cJobs?> getDetailJobs({
     required String jobId,

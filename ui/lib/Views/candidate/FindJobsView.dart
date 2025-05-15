@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Models/Jobs.dart';
+import 'package:ui/Views/candidate/FillterButtomSheetView.dart';
 
 import '../../Services/job_service.dart';
 import '../../ViewModels/candidate/FindJobsViewModel.dart';
@@ -9,6 +10,20 @@ import 'JobDetailView.dart';
 
 class FindJobsView extends StatelessWidget {
   const FindJobsView({super.key});
+
+//   @override
+//   State<FindJobsView> createState() => _FindJobsViewState();
+// }
+//
+// class _FindJobsViewState extends State<FindJobsView> {
+//   late FindJobsViewModel viewModel;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     viewModel = FindJobsViewModel();
+//     viewModel.fetchJobs();
+//   }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +55,6 @@ class FindJobsView extends StatelessWidget {
                         const Icon(Icons.search, color: Colors.grey),
                         const SizedBox(width: 8),
                         Expanded(
-                          flex: 2,
                           child: TextField(
                             onChanged: (value) {
                               context.read<FindJobsViewModel>().filterJobs(value);
@@ -50,26 +64,24 @@ class FindJobsView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const VerticalDivider(),
-                        // Expanded(
-                        //   child: DropdownButtonHideUnderline(
-                        //     child: DropdownButton<String>(
-                        //       hint: const Text('Tất cả địa điểm'),
-                        //       onChanged: (value) {
-                        //         // TODO: Logic lọc theo tỉnh thành
-                        //       },
-                        //       items: const [
-                        //         DropdownMenuItem(value: 'Hà Nội', child: Text('Hà Nội')),
-                        //         DropdownMenuItem(value: 'Hồ Chí Minh', child: Text('Hồ Chí Minh')),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                        const SizedBox(width: 12),
+                        IconButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                              ),
+                              builder: (context) => FilterBottomSheetView(viewModel: viewModel),
+                            );
+                          },
+                          icon: const Icon(Icons.tune, color: Colors.grey),
+                        ),
                       ],
                     ),
                   ),
                 ),
+
                 Expanded(
                   child: viewModel.isLoading
                       ? const Center(child: CircularProgressIndicator())

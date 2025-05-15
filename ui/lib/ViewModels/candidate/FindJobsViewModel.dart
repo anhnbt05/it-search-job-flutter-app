@@ -9,10 +9,11 @@ class FindJobsViewModel extends ChangeNotifier {
   final JobService _jobService = JobService();
   final FlutterSecureStorage _storage = APIConstants.storage;
 
-  List<cJobs?> recommendedjobs = [];
+  List<cJobs_recruiter?> recommendedjobs = [];
   List<cJobs_recruiter?> _allJobs = [];
   List<cJobs_recruiter?> jobs = [];
   bool isLoading = false;
+  bool hasFetched = false;
   String? error;
 
   Future<void> fetchRecommendedJobs() async {
@@ -44,6 +45,7 @@ class FindJobsViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchJobs() async {
+    if (hasFetched) return;
     isLoading = true;
     error = null;
     notifyListeners();
@@ -54,8 +56,50 @@ class FindJobsViewModel extends ChangeNotifier {
       final fetchedJobs = await _jobService.getJobs(accessToken: accessToken);
       _allJobs = fetchedJobs;
       jobs = fetchedJobs;
+      hasFetched = true;
     } catch (e) {
       error = "Đã xảy ra lỗi khi tải danh sách công việc: $e";
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+  Future<void> fetchJobsByLocation(String locationId) async {
+    isLoading = true;
+    error = null;
+    notifyListeners();
+
+    try {
+      final accessToken = APIConstants.accessToken;
+      final fetchedJobs = await _jobService.getJobsbyLocation(
+        accessToken: accessToken,
+        locationID: locationId,
+      );
+      _allJobs = fetchedJobs;
+      jobs = fetchedJobs;
+    } catch (e) {
+      error = "Đã xảy ra lỗi khi lọc theo địa điểm: $e";
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchJobsByCategory(String categoryName) async {
+    isLoading = true;
+    error = null;
+    notifyListeners();
+
+    try {
+      final accessToken = APIConstants.accessToken;
+      final fetchedJobs = await _jobService.getJobsbyCategory(
+        accessToken: accessToken,
+        categoryName: categoryName,
+      );
+      _allJobs = fetchedJobs;
+      jobs = fetchedJobs;
+    } catch (e) {
+      error = "Đã xảy ra lỗi khi lọc theo ngành nghề: $e";
     } finally {
       isLoading = false;
       notifyListeners();
