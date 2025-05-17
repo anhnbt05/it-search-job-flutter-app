@@ -29,18 +29,18 @@ class SignInViewModel extends ChangeNotifier {
           .message}, data=${result.data}');
 
       if (result.success == true && result.data != null) {
-        APIConstants.accessToken = result.data?['accessToken'];
         String refreshToken = result.data?['refreshToken'];
+        String accessToken = result.data?['accessToken'];
 
-        if (APIConstants.accessToken == null || refreshToken == null) {
+        if (accessToken == null || refreshToken == null) {
           errorMessage = "Không lấy được token, vui lòng thử lại.";
           return null;
         }
 
-        await APIConstants.storage.write(key: 'accessToken', value: APIConstants.accessToken);
+        await APIConstants.storage.write(key: 'accessToken', value: accessToken);
         await APIConstants.storage.write(key: 'refreshToken', value: refreshToken);
 
-        final Map<String, dynamic> payload = Jwt.parseJwt(APIConstants.accessToken);
+        final Map<String, dynamic> payload = Jwt.parseJwt(accessToken);
         print('Decoded JWT Payload: $payload');
 
         final String? role = payload['app_metadata']['role'];
@@ -84,8 +84,8 @@ class SignInViewModel extends ChangeNotifier {
       if (result.success && result.data != null) {
         final String? newAccessToken = result.data?['accessToken'];
         if (newAccessToken != null) {
-          await APIConstants.storage.write(key: 'accessToken', value: newAccessToken);
-          APIConstants.accessToken = newAccessToken;
+          await APIConstants.storage.write(
+              key: 'accessToken', value: newAccessToken);
           print('🔑 New AccessToken Saved Successfully');
         } else {
           errorMessage = "Không lấy được accessToken mới.";

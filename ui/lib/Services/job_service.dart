@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Helpers/toastification.dart';
 import 'package:ui/ViewModels/login/SignInViewModel.dart';
+import '../Helpers/helpers.dart';
 import 'api_service.dart';
 import 'package:ui/Models/Jobs.dart';
 
@@ -10,20 +12,16 @@ class JobService {
   final ApiService _apiService = ApiService();
 
   Future<cJobs_recruiter?> postJob({
-    required String accessToken,
     required Map<String, dynamic> jobData,
-    required SignInViewModel authViewModel,
+    required BuildContext context,
   }) async {
     try {
-      if (await authViewModel.isAccessTokenExpired()) {
-        await authViewModel.refreshAccessToken();
-        accessToken = (await APIConstants.storage.read(key: 'accessToken'))!;
-      }
+      final validToken = await getValidAccessToken(context);
 
       final response = await _apiService.postWithToken(
         endpoint: APIConstants.postJob_endpoint,
         body: jobData,
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
@@ -50,18 +48,14 @@ class JobService {
   }
 
   Future<List<cJobs_recruiter?>> getJobs({
-    required String accessToken,
-    required SignInViewModel authViewModel,
+    required BuildContext context,
   }) async {
     try {
-      if (await authViewModel.isAccessTokenExpired()) {
-        await authViewModel.refreshAccessToken();
-        accessToken = (await APIConstants.storage.read(key: 'accessToken'))!;
-      }
+      final validToken = await getValidAccessToken(context);
 
       final response = await _apiService.getWithToken(
         endpoint: APIConstants.getJob_endpoint,
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 200) {
@@ -84,20 +78,16 @@ class JobService {
   }
 
   Future<bool> deleteJob({
-    required String accessToken,
     required String Id,
-    required SignInViewModel authViewModel,
+    required BuildContext context,
   }) async {
     try {
-      if (await authViewModel.isAccessTokenExpired()) {
-        await authViewModel.refreshAccessToken();
-        accessToken = (await APIConstants.storage.read(key: 'accessToken'))!;
-      }
+      final validToken = await getValidAccessToken(context);
 
       final response = await _apiService.deleteJobWithToken(
           endpoint: APIConstants.deleteJob_endpoint,
           Id: Id,
-          accessToken: accessToken);
+          accessToken: validToken!);
       if (response.statusCode == 200) {
         print("Job deleted successfully.");
         showSuccessToastification(title: 'Xoá thành công', message: "Bài tuyển dụng đã được xóa");
@@ -115,15 +105,13 @@ class JobService {
   }
 
   Future<cJobs?> getJobByID(
-      {required String Id, required String accessToken, required SignInViewModel authViewModel}) async {
+      {required String Id, required BuildContext context}) async {
     try {
-      if (await authViewModel.isAccessTokenExpired()) {
-        await authViewModel.refreshAccessToken();
-        accessToken = (await APIConstants.storage.read(key: 'accessToken'))!;
-      }
+      final validToken = await getValidAccessToken(context);
+
       final response = await _apiService.getWithToken(
           endpoint: '${APIConstants.getJob_endpoint}/$Id',
-          accessToken: accessToken);
+          accessToken: validToken!);
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
         print("Successfully fetched job.");
@@ -139,14 +127,11 @@ class JobService {
     return null;
   }
 
-  Future<bool> editJob({required String Id, required Map<String, dynamic> jobData, required String accessToken, required SignInViewModel authViewModel}) async {
+  Future<bool> editJob({required String Id, required Map<String, dynamic> jobData, required BuildContext context}) async {
     try {
-      if (await authViewModel.isAccessTokenExpired()) {
-        await authViewModel.refreshAccessToken();
-        accessToken = (await APIConstants.storage.read(key: 'accessToken'))!;
-      }
+      final validToken = await getValidAccessToken(context);
 
-      final response = await _apiService.patchWithToken(endpoint: APIConstants.patchJob_endpoint, body: jobData, accessToken: accessToken, Id: Id);
+      final response = await _apiService.patchWithToken(endpoint: APIConstants.patchJob_endpoint, body: jobData, accessToken: validToken!, Id: Id);
       if (response.statusCode == 200) {
         showSuccessToastification(title: 'Hoàn tất', message: "Nội dung bài tuyển dụng đã được cập nhật\nVui lòng chờ quản trị viên phê duyệt");
         return true;

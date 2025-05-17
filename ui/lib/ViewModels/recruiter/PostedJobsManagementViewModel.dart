@@ -60,7 +60,7 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
 
   Future<void> initFutures(BuildContext context) async {
     var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
-    _jobsFuture = JobService().getJobs(accessToken: APIConstants.accessToken, authViewModel: authViewModel).then((value) {
+    _jobsFuture = JobService().getJobs(context: context).then((value) {
       _jobs = value.map((e) => e).toList();
       _jobs.sort((a,b) => b!.PostedAt.compareTo(a!.PostedAt));
 
@@ -75,7 +75,7 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
 
   Future<void> deleteJob({required String Id, required BuildContext context}) async {
     var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
-    final success = await JobService().deleteJob(accessToken: APIConstants.accessToken, Id: Id, authViewModel: authViewModel);
+    final success = await JobService().deleteJob(Id: Id, context: context);
     if (success) {
       cJobs_recruiter? job = _jobs.firstWhere((e) => e!.ID == Id);
       if (job != null) {

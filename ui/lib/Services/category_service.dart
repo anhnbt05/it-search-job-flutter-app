@@ -1,26 +1,23 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:ui/Constants/api_constants.dart';
 
-import '../ViewModels/login/SignInViewModel.dart';
+import '../Helpers/helpers.dart';
 import 'api_service.dart';
 
 class CategoryService {
   final ApiService _apiService = ApiService();
 
   Future<List<Map<String, String>>?> getCategory({
-    required String accessToken,
-    required SignInViewModel authViewModel,
+    required BuildContext context,
   }) async {
     try {
-      if (await authViewModel.isAccessTokenExpired()) {
-        await authViewModel.refreshAccessToken();
-        accessToken = (await APIConstants.storage.read(key: 'accessToken'))!;
-      }
+      final validToken = await getValidAccessToken(context);
 
       final response = await _apiService.getWithToken(
         endpoint: APIConstants.getCategories_endpoint,
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 200) {

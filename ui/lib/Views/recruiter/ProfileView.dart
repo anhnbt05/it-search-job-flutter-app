@@ -7,7 +7,9 @@ import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/ViewModels/recruiter/EditRecruiterInformationViewModel.dart';
 import 'package:ui/Views/recruiter/EditRecruiterInformationScreen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../ViewModels/recruiter/EditCompanyInformationViewModel.dart';
 import '../../ViewModels/recruiter/ProfileViewModel.dart';
+import 'EditCompanyInformationView.dart';
 
 Widget ProfileScreen(BuildContext context) {
   var viewModel = Provider.of<RecruiterProfileViewModel>(context);
@@ -312,7 +314,15 @@ Widget CompanyInfo(BuildContext context) {
             padding: const EdgeInsets.all(15),
             child: GestureDetector(
               onTap: () {
-                print("Ok");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChangeNotifierProvider(
+                      create: (_) => EditCompanyInformationViewModel(context),
+                      child: EditCompanyInformationScreen(),
+                    ),
+                  ),
+                );
               },
               child: Icon(Icons.edit, size: 25),
             ),

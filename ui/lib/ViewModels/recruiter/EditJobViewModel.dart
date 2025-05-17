@@ -85,7 +85,7 @@ class EditJobViewModel extends ChangeNotifier {
 
   EditJobViewModel({required this.index, required this.vm, required this.recruiter, required BuildContext context}) {
     var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
-    _jobFuture = JobService().getJobByID(Id: vm.jobs[index]!.ID, accessToken: APIConstants.accessToken, authViewModel: authViewModel).then((jobF) {
+    _jobFuture = JobService().getJobByID(Id: vm.jobs[index]!.ID, context: context).then((jobF) {
       job = jobF;
       _nameText = TextEditingController(text: jobF!.Title);
       _descriptionText = TextEditingController(text: job!.Description);
@@ -104,8 +104,7 @@ class EditJobViewModel extends ChangeNotifier {
     });
 
     _categoriesFuture = CategoryService().getCategory(
-      accessToken: APIConstants.accessToken,
-      authViewModel: authViewModel
+      context: context
     ).then((value) {
       _jobCategoryList = value!.map((e) => e.values.first).toList();
       return value;
@@ -313,9 +312,8 @@ class EditJobViewModel extends ChangeNotifier {
       "Từ ${_salaryNumber1.text} đến ${_salaryNumber2.text} ${_salaryUnitSelected}";
     }
     bool success = await JobService().editJob(
-      authViewModel: authViewModel,
       Id: job!.ID,
-      accessToken: APIConstants.accessToken,
+      context: context,
       jobData: {
         "Title": _nameText.text,
         "Description": _descriptionText.text,

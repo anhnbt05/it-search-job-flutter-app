@@ -67,10 +67,9 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(
             create: (context) {
               final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false,);
-              final authViewModel = Provider.of<SignInViewModel>(context, listen: false);
               return JobPostViewModel(
                 postedJobsManagementViewModel: postedJobsVM,
-                authViewModel: authViewModel,
+                context: context,
               );
             },
           ),
@@ -82,6 +81,7 @@ class _MyAppState extends State<MyApp> {
               );
               return CandidatesAppliesViewModel(
                 postedJobsManagementViewModel: postedJobsVM,
+                context: context
               );
             },
           ),

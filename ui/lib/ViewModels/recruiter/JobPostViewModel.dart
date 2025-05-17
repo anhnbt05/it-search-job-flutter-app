@@ -21,11 +21,10 @@ List<String> jobLevel_value = ["Intern", "Fresher", "Mid", "Junior", "Senior"];
 
 class JobPostViewModel extends ChangeNotifier {
   PostedJobsManagementViewModel postedJobsManagementViewModel;
-  JobPostViewModel({required this.postedJobsManagementViewModel, required SignInViewModel authViewModel}) {
+  JobPostViewModel({required this.postedJobsManagementViewModel, required BuildContext context}) {
     if (categoriesList == null || categoriesList!.isEmpty) {
       CategoryService().getCategory(
-        accessToken: APIConstants.accessToken,
-        authViewModel: authViewModel,
+        context: context,
       ).then((result) {
         if (result != null) {
           categoriesList = result;
@@ -336,8 +335,7 @@ class JobPostViewModel extends ChangeNotifier {
     }
     final authViewModel = Provider.of<SignInViewModel>(context, listen: false);
     var job = await JobService().postJob(
-      authViewModel: authViewModel,
-      accessToken: APIConstants.accessToken,
+      context: context,
       jobData: {
         "Title": nameText.text,
         "Description": descriptionText.text,

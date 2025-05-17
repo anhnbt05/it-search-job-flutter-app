@@ -289,6 +289,7 @@ PreferredSize? displaySelection({
                                         );
 
                                         final result = await viewModel.rejectApplication(
+                                          context: currentDialogContext,
                                           applicationId: Id,
                                           reason: viewModel.rejectReason.text,
                                         );
@@ -391,7 +392,7 @@ PreferredSize? displaySelection({
                                 },
                               );
 
-                              await viewModel.approveApplication(Id);
+                              await viewModel.approveApplication(applicationId: Id, context: currentDialogContext);
                               if (currentDialogContext.mounted) {
                                 Navigator.of(currentDialogContext).pop();
                                 Navigator.of(currentDialogContext).pop();

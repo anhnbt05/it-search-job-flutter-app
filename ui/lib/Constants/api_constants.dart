@@ -16,6 +16,7 @@ class APIConstants {
   static late final String accessToken;
   static final String getApplications_recruiter_endpoint1 = 'jobs';
   static final String getApplications_recruiter_endpoint2 = 'applications';
+  static final String patchCompany_endpoint = 'companies';
   static final String getJob_endpoint = 'jobs';
   static final String getUser_endpoint = 'users';
   static final String responseJobApplication_endpoint = 'applications/process';

@@ -104,13 +104,13 @@ class EditRecruiterInformationViewModel extends ChangeNotifier {
   Future<void> updateRecruiterInfo(BuildContext context, String userId) async {
     var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
     var recruiterVM = Provider.of<RecruiterProfileViewModel>(context, listen: false);
-    String? newAvtUrl = await UserService().patchRecruiterInfo(accessToken: APIConstants.accessToken,
-        userId: userId,
-        updateRecruiterDto: {"Position": positionController.text},
-        file: avtImage!,
-        newName: fullNameController.text,
-        newPhoneNumber: phoneNumberController.text,
-        authViewModel: authViewModel
+    String? newAvtUrl = await UserService().patchRecruiterInfo(
+      userId: userId,
+      updateRecruiterDto: {"Position": positionController.text},
+      file: avtImage!,
+      newName: fullNameController.text,
+      newPhoneNumber: phoneNumberController.text,
+      context: context
     );
     if (newAvtUrl != null) {
       recruiterVM.recruiterInfo = recruiterVM.recruiterInfo!.CopyRecruiterInfor(newFullName: fullNameController.text, newPhoneNumber: phoneNumberController.text, newPosition: positionController.text, newAvatarUrl: newAvtUrl);

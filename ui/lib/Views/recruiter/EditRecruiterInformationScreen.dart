@@ -61,24 +61,6 @@ class _EditRecruiterInformationScreenState
                               height: 120,
                               color: Color(0x3fBBD6FF),
                             ),
-                            Align(
-                              alignment: Alignment.topRight,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 8, right: 15),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Image.network(
-                                    profileViewModel.recruiterInfo!.Company.LogoUrl!,
-                                    width: 90,
-                                    height: 90,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ),
                             Column(
                               children: [
                                 SizedBox(height: 20),
@@ -250,7 +232,7 @@ class _EditRecruiterInformationScreenState
                                 Padding(
                                   padding: const EdgeInsets.only(
                                     left: 7,
-                                    top: 0,
+                                    top: 7,
                                     bottom: 5,
                                   ),
                                   child: Text(
@@ -270,7 +252,7 @@ class _EditRecruiterInformationScreenState
                                 Padding(
                                   padding: const EdgeInsets.only(
                                     left: 7,
-                                    top: 0,
+                                    top: 7,
                                     bottom: 5,
                                   ),
                                   child: Text(

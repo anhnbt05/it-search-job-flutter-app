@@ -47,22 +47,22 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
   late final Future<void> loadFuture;
 
 
-  CandidatesAppliesViewModel({required this.postedJobsManagementViewModel}) {
+  CandidatesAppliesViewModel({required this.postedJobsManagementViewModel, required BuildContext context}) {
     if (postedJobsManagementViewModel.isLoaded) {
-      initFutures();
+      initFutures(context);
     } else {
       postedJobsManagementViewModel.loadFuture.then((_) {
-        initFutures();
+        initFutures(context);
       });
     }
   }
 
-  void initFutures() {
+  void initFutures(BuildContext context) {
     _jobs = postedJobsManagementViewModel.jobs_open;
     print(postedJobsManagementViewModel.jobs_open.length);
     List<Future<List<cApplications_recruiter>?>> applicationFutures = jobs!.map((job) {
       return ApplicationService().getApplicationsList(
-        accessToken: APIConstants.accessToken,
+        context: context,
         jobID: job!.ID.toString(),
       );
     }).toList();
@@ -104,9 +104,9 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
     await FlDownloader.download(url, fileName: fileName);
   }
 
-  Future<void> approveApplication(String applicationId) async {
+  Future<void> approveApplication({required String applicationId, required BuildContext context}) async {
     final success = await ApplicationService().acceptApplication(
-      accessToken: APIConstants.accessToken,
+      context: context,
       openApplicationIds: [applicationId],
     );
     if (success) {
@@ -138,11 +138,11 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
 
 
   Future<bool> rejectApplication(
-      {required String applicationId, required String reason}) async {
+      {required String applicationId, required String reason, required BuildContext context}) async {
     final success = await ApplicationService().rejectApplication(
-        accessToken: APIConstants.accessToken,
-        applicationId: applicationId,
-        reason: reason);
+      context: context,
+      applicationId: applicationId,
+      reason: reason);
     if (success) {
       for (var appList in applications!) {
         final index = appList?.indexWhere((app) => app.ID == applicationId);
