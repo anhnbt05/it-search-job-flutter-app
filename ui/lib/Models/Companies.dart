@@ -71,6 +71,22 @@ class cCompany_RecruiterInfo {
       Description: json['Description'],
     );
   }
+  cCompany_RecruiterInfo copyWith({
+    String? newName,
+    String? newDescription,
+    String? newWebsiteUrl,
+  }) {
+    return cCompany_RecruiterInfo(
+      ID: this.ID,
+      Name: newName ?? this.Name,
+      LogoUrl: this.LogoUrl,
+      CreatedAt: this.CreatedAt,
+      UpdatedAt: this.UpdatedAt,
+      WebsiteUrl: newWebsiteUrl ?? this.WebsiteUrl,
+      Description: newDescription ?? this.Description,
+    );
+  }
+
 }
 
 class cCompany_Job {

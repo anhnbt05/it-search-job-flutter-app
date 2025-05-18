@@ -13,10 +13,6 @@ import '../../Services/auth_signin_service.dart';
 
 
 class SignInViewModel extends ChangeNotifier {
-  final AuthSignInService _authService = AuthSignInService();
-  final AuthRefreshTokenService _refreshTokenService = AuthRefreshTokenService();
-
-
   bool isLoading = false;
   String? errorMessage;
 
@@ -27,24 +23,24 @@ class SignInViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final ResponseModel result = await _authService.signIn(email, password);
+      final ResponseModel result = await APIConstants.authService.signIn(email, password);
 
       print('SignIn API Result: success=${result.success}, message=${result
           .message}, data=${result.data}');
 
       if (result.success == true && result.data != null) {
-        APIConstants.accessToken = result.data?['accessToken'];
-        APIConstants.refreshToken = result.data?['refreshToken'];
+        String refreshToken = result.data?['refreshToken'];
+        String accessToken = result.data?['accessToken'];
 
-        if (APIConstants.accessToken == null || APIConstants.refreshToken == null) {
+        if (accessToken == null || refreshToken == null) {
           errorMessage = "Không lấy được token, vui lòng thử lại.";
           return null;
         }
 
-        await APIConstants.storage.write(key: 'accessToken', value: APIConstants.accessToken);
-        await APIConstants.storage.write(key: 'refreshToken', value: APIConstants.refreshToken);
+        await APIConstants.storage.write(key: 'accessToken', value: accessToken);
+        await APIConstants.storage.write(key: 'refreshToken', value: refreshToken);
 
-        final Map<String, dynamic> payload = Jwt.parseJwt(APIConstants.accessToken);
+        final Map<String, dynamic> payload = Jwt.parseJwt(accessToken);
         print('Decoded JWT Payload: $payload');
 
         final String? role = payload['app_metadata']['role'];
@@ -79,7 +75,7 @@ class SignInViewModel extends ChangeNotifier {
         return;
       }
 
-      final ResponseModel result = await _refreshTokenService
+      final ResponseModel result = await APIConstants.refreshTokenService
           .refreshAccessToken(refreshToken);
 
       print('Refresh Token Result: success=${result.success}, message=${result
@@ -88,7 +84,8 @@ class SignInViewModel extends ChangeNotifier {
       if (result.success && result.data != null) {
         final String? newAccessToken = result.data?['accessToken'];
         if (newAccessToken != null) {
-          await APIConstants.storage.write(key: 'accessToken', value: newAccessToken);
+          await APIConstants.storage.write(
+              key: 'accessToken', value: newAccessToken);
           print('🔑 New AccessToken Saved Successfully');
         } else {
           errorMessage = "Không lấy được accessToken mới.";

@@ -8,8 +8,10 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Constants/color_constants.dart';
 
+import '../Constants/api_constants.dart';
 import '../ViewModels/BottomNavigationViewModel.dart';
 import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
+import '../ViewModels/login/SignInViewModel.dart';
 
 String removeVietnameseAccentsRegex(String text) {
   return text
@@ -173,4 +175,12 @@ Future<void> initializeOneSignal() async {
   } catch (e) {
     print('Error initializing OneSignal: $e');
   }
+}
+
+Future<String?> getValidAccessToken(BuildContext context) async {
+  var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
+  if (await authViewModel.isAccessTokenExpired()) {
+    await authViewModel.refreshAccessToken();
+  }
+  return await APIConstants.storage.read(key: 'accessToken');
 }

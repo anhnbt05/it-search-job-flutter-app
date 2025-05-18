@@ -10,98 +10,90 @@ import 'package:ui/Constants/color_constants.dart';
 import '../../Models/Jobs.dart';
 import '../../ViewModels/recruiter/EditJobViewModel.dart';
 import '../../ViewModels/recruiter/PostedJobsManagementViewModel.dart';
+import '../../ViewModels/recruiter/ProfileViewModel.dart';
 import 'EditJobScreen.dart';
 
 Widget PostedJobsManagementScreen(BuildContext context) {
   var viewModel = Provider.of<PostedJobsManagementViewModel>(context);
-  return FutureBuilder<List<cJobs_recruiter?>>(
-    future: viewModel.jobsFuture,
+  var recruiterVM = Provider.of<RecruiterProfileViewModel>(context);
+  if (recruiterVM.recruiterInfo != null) {
+    return body(
+        context: context, viewModel: viewModel, recruiterVM: recruiterVM);
+  }
+  return FutureBuilder(
+    future: Future.wait([
+      viewModel.jobsFuture!,
+      recruiterVM.recruiterFuture!,
+    ]),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const Center(
-          child: CircularProgressIndicator(color: Colors.blue),
-        );
+            child: CircularProgressIndicator(color: Colors.blue));
+      } else {
+        return body(
+            context: context, viewModel: viewModel, recruiterVM: recruiterVM);
       }
-
-      return FutureBuilder(
-        future: viewModel.recruiter,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.blue),
-            );
-          } else {
-            return body(context: context, viewModel: viewModel);
-          }
-        },
-      );
     },
   );
 }
 
-Widget body({
-  required BuildContext context,
-  required PostedJobsManagementViewModel viewModel,
-}) {
-  return GestureDetector(
-    onTap: (){
-      print("ok");
-    },
-    child: Column(
+Widget body({required BuildContext context, required PostedJobsManagementViewModel viewModel, required RecruiterProfileViewModel recruiterVM}) {
+  return Column(
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 5, left: 10, right: 5),
           child: Column(
             children: [
-              Container(
-                child: Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          border: Border.all(
-                            width: 2.2,
-                            color: Colors.transparent
-                          )
-                      ),
+              Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(
+                          width: 2.2,
+                          color: Colors.transparent
+                        )
+                    ),
+                    child: ClipOval(
                       child: Image.network(
-                        viewModel.recruiterInfo!.AvatarUrl,
+                        recruiterVM.recruiterInfo!.AvatarUrl,
                         width: 50,
                         height: 50,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    SizedBox(width: 5),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('assets/title-background.jpg'),
-                            fit: BoxFit.cover,
+                  ),
+                  SizedBox(width: 5),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/title-background.jpg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            recruiterVM.recruiterInfo!.FullName,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              viewModel.recruiterInfo!.FullName,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                              ),
+                          Text(
+                            recruiterVM.recruiterInfo!.Company.Name,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: ColorConstants.subTextColor,
                             ),
-                            Text(
-                              viewModel.recruiterInfo!.Company.Name,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: ColorConstants.subTextColor,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               Transform.translate(
                 offset: Offset(0, 12),
@@ -229,13 +221,12 @@ Widget body({
             ],
           ),
         ),
-        JobsList(context, viewModel)
+        JobsList(context, viewModel, recruiterVM)
       ],
-    ),
   );
 }
 
-Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel) {
+Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel, RecruiterProfileViewModel recruiterVM) {
   return Expanded(
     child: Padding(
       padding: const EdgeInsets.only(top: 5, bottom: 5),
@@ -289,7 +280,7 @@ Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel) {
           else
           ...List.generate(
             viewModel.jobs.length,
-                (index) => JobsItem(context, viewModel, index),
+                (index) => JobsItem(context, viewModel, recruiterVM, index),
           ),
           const SizedBox(height: 5),
         ],
@@ -299,106 +290,111 @@ Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel) {
 }
 
 
-Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
-  return Padding(
-    padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-    child: Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: Offset(0, 5),
-            ),
-          ],
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(
-              width: 1,
-              color: Colors.transparent
-          )
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: IntrinsicHeight(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 50,
-                    width: 50,
-                    margin: EdgeInsets.only(right: 10),
-                    child: (viewModel.recruiterInfo?.Company.LogoUrl != null)
-                        ? Image.network(
-                      viewModel.recruiterInfo!.Company.LogoUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade200,
-                          child: Icon(Icons.broken_image, color: Colors.grey),
-                        );
-                      },
-                    )
-                        : Container(
-                      color: Colors.grey.shade200,
-                      child: Icon(Icons.business, color: Colors.grey),
-                    ),
-                  ),
-
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          viewModel.jobs[index]!.Title,
-                          style: TextStyle(
-                            fontSize: 18,
-                            height: 1.2,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Status(context, viewModel, index),
-                        SizedBox(height: 5,),
-                        Salary(context, viewModel, index),
-                        SizedBox(height: 5),
-                        Categories(context, viewModel, viewModel.jobs[index]!),
-                        SizedBox(height: 3,),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                              children: [
-                                SizedBox(width: 5,),
-                                Level(context, viewModel, index),
-                                SizedBox(width: 5,),
-                                JobType(context, viewModel, index),
-                                SizedBox(width: 20,)
-                              ]
-                          ),
-                        ),
-                        SizedBox(height: 5,),
-                        Text(viewModel.jobs[index]!.Description,
-                          maxLines: 5,
-                          textAlign: TextAlign.justify,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, RecruiterProfileViewModel recruiterVM, int index,) {
+  return GestureDetector(
+    onTap: () {
+      print(viewModel.jobs[index]!.Title);
+    },
+    child: Padding(
+      padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                offset: Offset(0, 5),
               ),
-              ActionField(context, viewModel, index),
             ],
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+                width: 1,
+                color: Colors.transparent
+            )
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: IntrinsicHeight(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 50,
+                      margin: EdgeInsets.only(right: 10),
+                      child: (recruiterVM.recruiterInfo?.Company.LogoUrl != null)
+                          ? Image.network(
+                        recruiterVM.recruiterInfo!.Company.LogoUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey.shade200,
+                            child: Icon(Icons.broken_image, color: Colors.grey),
+                          );
+                        },
+                      )
+                          : Container(
+                        color: Colors.grey.shade200,
+                        child: Icon(Icons.business, color: Colors.grey),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            viewModel.jobs[index]!.Title,
+                            style: TextStyle(
+                              fontSize: 18,
+                              height: 1.2,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Status(context, viewModel, index),
+                          SizedBox(height: 5,),
+                          Salary(context, viewModel, index),
+                          SizedBox(height: 5),
+                          Categories(context, viewModel, viewModel.jobs[index]!),
+                          SizedBox(height: 3,),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                                children: [
+                                  SizedBox(width: 5,),
+                                  Level(context, viewModel, index),
+                                  SizedBox(width: 5,),
+                                  JobType(context, viewModel, index),
+                                  SizedBox(width: 20,)
+                                ]
+                            ),
+                          ),
+                          SizedBox(height: 5,),
+                          Text(viewModel.jobs[index]!.Description,
+                            maxLines: 5,
+                            textAlign: TextAlign.justify,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                ActionField(context, viewModel, recruiterVM, index),
+              ],
+            ),
           ),
         ),
       ),
@@ -437,7 +433,7 @@ Widget Categories(BuildContext context, PostedJobsManagementViewModel viewModel,
 
 }
 
-Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel, int index) {
+Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel, RecruiterProfileViewModel recruiterVM, int index) {
   if (viewModel.jobs[index]!.Status != 'open') {
     return
       Column(
@@ -470,7 +466,7 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                         context,
                         MaterialPageRoute(
                           builder: (context) => ChangeNotifierProvider(
-                            create: (_) => EditJobViewModel(vm: viewModel, index: index, recruiter: viewModel.recruiterInfo!),
+                            create: (_) => EditJobViewModel(vm: viewModel, index: index, recruiter: recruiterVM.recruiterInfo!, context: context),
                             child: EditJobScreen(),
                           ),
                         ),
@@ -569,7 +565,9 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                                   );
 
                                   await viewModel.deleteJob(
-                                      Id: viewModel.jobs[index]!.ID);
+                                    context: context,
+                                    Id: viewModel.jobs[index]!.ID
+                                  );
                                   Navigator.of(context).pop();
                                   Navigator.pop(context);
                                 },

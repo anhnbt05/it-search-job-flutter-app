@@ -1,4 +1,6 @@
 import 'package:http/http.dart' as http;
+import 'package:ui/Helpers/toastification.dart';
+import 'package:ui/ViewModels/login/SignInViewModel.dart';
 import 'dart:convert';
 
 import '../Constants/api_constants.dart';
@@ -87,6 +89,12 @@ class AuthCompaniesService {
         }),
       );
       final dynamic decoded = json.decode(response.body);
+      print(decoded);
+      if (response.statusCode == 201) {
+        showSuccessToastification(title: "Hoàn tất", message: "Thêm mới chi nhánh cho công ty thành công");
+      } else {
+        showErrorToastification(title: "Lỗi", message: decoded['message'][0]['message']);
+      }
       return ResponseModel.fromJson(decoded);
     } catch (e) {
       return ResponseModel(
