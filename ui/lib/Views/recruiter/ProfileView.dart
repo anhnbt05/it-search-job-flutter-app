@@ -178,8 +178,21 @@ Widget RecruiterInfo(BuildContext context) {
                 ),
                 SizedBox(height: 20),
                 GestureDetector(
-                  onTap: () {
-                    print("Ok");
+                  onTap: () async {
+                    showDialog(
+                      context: context,
+                      barrierColor: Colors.black.withOpacity(0.5),
+                      barrierDismissible: false,
+                      builder: (_) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.blue,
+                          ),
+                        );
+                      },
+                    );
+                    await viewModel.signOut(context);
+                    Navigator.pop(context);
                   },
                   child: Icon(Icons.exit_to_app, size: 25, color: Colors.red),
                 ),

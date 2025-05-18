@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/ViewModels/AuthViewModel.dart';
 import 'package:ui/ViewModels/login/CompaniesViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import 'package:ui/ViewModels/login/ProvincesViewModel.dart';
@@ -26,7 +27,12 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
   await initializeOneSignal();
-  runApp(ToastificationWrapper(child: MyApp()));
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => AuthViewModel(),
+      child: ToastificationWrapper(child: MyApp()),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -35,20 +41,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isLoggedIn = false;
-  String? userRole;
-  String? userId;
-
-  void loginSuccess(String role, String id) {
-    setState(() {
-      isLoggedIn = true;
-      userRole = role;
-      userId = id;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
+    final authVM = Provider.of<AuthViewModel>(context);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => BottomNavigationViewModel()),
@@ -59,10 +56,10 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
         ChangeNotifierProvider(create: (_) => SignInViewModel()),
 
-        if (isLoggedIn && userId != null && userRole == 'recruiter') ...[
-          ChangeNotifierProvider(create: (context) => RecruiterProfileViewModel(userId!, context)),
+        if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'recruiter') ...[
+          ChangeNotifierProvider(create: (context) => RecruiterProfileViewModel(authVM.userId!, context)),
           ChangeNotifierProvider(
-            create: (context) => PostedJobsManagementViewModel(userId!, context),
+            create: (context) => PostedJobsManagementViewModel(authVM.userId!, context),
           ),
           ChangeNotifierProvider(
             create: (context) {
@@ -90,9 +87,11 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home:
-            isLoggedIn && userRole != null
-                ? _MainApp(role: userRole!, userId: userId!)
-                : LoginPage(onLoginSuccess: loginSuccess),
+        authVM.isLoggedIn && authVM.userRole != null
+            ? _MainApp(role: authVM.userRole!, userId: authVM.userId!)
+            : LoginPage(onLoginSuccess: (role, id) {
+          authVM.login(role, id);
+        }),
       ),
     );
   }

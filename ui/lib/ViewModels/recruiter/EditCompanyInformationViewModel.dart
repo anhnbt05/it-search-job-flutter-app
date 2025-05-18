@@ -5,6 +5,7 @@ import 'package:ui/Services/auth_provinces_service.dart';
 import '../../Models/CompanyLocations.dart';
 import '../../Models/Provinces.dart';
 import '../../Services/auth_companies_service.dart';
+import '../../Services/auth_signout_service.dart';
 import '../../Services/company_service.dart';
 import 'ProfileViewModel.dart';
 
@@ -79,13 +80,17 @@ class EditCompanyInformationViewModel extends ChangeNotifier {
       context,
       listen: false,
     );
-    await CompanyService().editCompany(
+    var success = await CompanyService().editCompany(
       companyId: profileViewModel.recruiterInfo!.Company.ID,
       newName: nameController.text,
       newDescription: descriptionController.text,
       newWebsiteUrl: websiteURLController.text,
       context: context,
     );
+    if (success) {
+      profileViewModel.recruiterInfo!.Company = profileViewModel.recruiterInfo!.Company.copyWith(newDescription: descriptionController.text, newName: nameController.text, newWebsiteUrl: websiteURLController.text);
+      profileViewModel.notifyListeners();
+    }
   }
 
   Future<bool> addBranch(BuildContext context) async {

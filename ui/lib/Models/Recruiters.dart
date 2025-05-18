@@ -34,7 +34,7 @@ class cRecruiters {
   final String AvatarUrl;
   final String PhoneNumber;
   final bool IsEmailVerified;
-  final cCompany_RecruiterInfo Company;
+  late cCompany_RecruiterInfo Company;
   final cCompanyLocation_RecruiterInfo CompanyLocations;
 
   cRecruiters({
