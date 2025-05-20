@@ -12,7 +12,7 @@ export class CreateCompanyLocationDto {
   readonly Address!: string;
 
   @IsUUID('4', {
-    message: 'Mã định danh của tỉnh, thành phố phải có dạng là UUID.',
+    message: 'Tỉnh, thành phố không được để trống.',
   })
   readonly LocationID!: string;
 }
