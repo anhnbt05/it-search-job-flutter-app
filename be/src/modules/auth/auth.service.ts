@@ -863,29 +863,41 @@ export class AuthService {
         .eq('ID', companyId)
         .maybeSingle<any>();
 
-      if (!company)
-        throw new NotFoundException(
-          `Không tìm thấy công ty có id '${companyId}'.`,
-        );
+      if (!company) throw new NotFoundException(`Không tìm thấy công ty này.`);
 
       const { BranchName, Address, LocationID } = createCompanyLocationDto;
 
-      const { error } = await this.adminSupabaseClient
-        .from('CompanyLocations')
-        .upsert(
-          [
-            {
-              BranchName,
-              Address,
-              LocationID,
-              CompanyID: companyId,
-            },
-          ],
-          { onConflict: 'BranchName,CompanyID' },
-        );
+      const { data: existingBranch, error: errorExistingBranch } =
+        await this.anonSupabaseClient
+          .from('CompanyLocations')
+          .select('*')
+          .match({ BranchName, CompanyID: companyId })
+          .maybeSingle<CompanyLocations>();
 
-      if (error) {
-        console.error(error);
+      if (errorExistingBranch) {
+        console.error(errorExistingBranch);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi tìm kiếm chi nhánh của công ty.',
+        );
+      }
+
+      if (existingBranch)
+        throw new BadRequestException('Chi nhánh đã tồn tại trong công ty.');
+
+      const { error: errorCreateBranch } = await this.adminSupabaseClient
+        .from('CompanyLocations')
+        .insert([
+          {
+            BranchName,
+            Address,
+            LocationID,
+            CompanyID: companyId,
+          },
+        ]);
+
+      if (errorCreateBranch) {
+        console.error(errorCreateBranch);
 
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi khi tạo mới địa điểm làm việc của công ty.',
