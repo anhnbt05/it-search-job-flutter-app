@@ -183,8 +183,11 @@ class JobCard extends StatelessWidget {
               IconButton(
                 onPressed: () async {
                       final jobService = JobService();
-                      List<String> data = [job.ID];
-                      print("Job ID: ${job.ID}");
+                      List<String> data = [job.ID.toString()];
+                      print('job.ID = ${job.ID}');
+                      print('job.ID.runtimeType = ${job.ID.runtimeType}');
+                      print('jobData = $data');
+                      print('jobData.runtimeType = ${data.runtimeType}');
 
                       if (!isFavorite) {
                         final success = await jobService.postFavoriteJob(

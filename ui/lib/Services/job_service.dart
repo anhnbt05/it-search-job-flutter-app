@@ -51,7 +51,7 @@ class JobService {
         jobIds: List<String>.from(jobData),
         accessToken: accessToken,
       );
-
+      print("job.ID json = ${jsonEncode(jobData)}");
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Job added to favorites successfully.");
         showSuccessToastification(

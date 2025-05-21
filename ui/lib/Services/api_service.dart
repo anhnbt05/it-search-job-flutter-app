@@ -26,8 +26,8 @@ class ApiService {
   }) async {
     final url = Uri.parse('${APIConstants.baseUrl}/$endpoint');
 
-    final body = <String, dynamic>{
-      'jobIds': jobIds.map((e) => e.toString()).toList(), // Đảm bảo là List<String>
+    final body = {
+      'jobIds': jobIds,
     };
 
     print('Gửi đi: ${jsonEncode(body)}');

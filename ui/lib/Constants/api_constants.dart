@@ -29,4 +29,11 @@ class APIConstants {
   static String getJobsbyCategories_endpoint(String categoryName) {
     return 'jobs/categories/$categoryName';
   }
+  static final String postApplication_endpoint = 'applications';
+  static String getDetailApplication_candidate_endpoint(String applicationId) {
+    return 'applications/$applicationId';
+  }
+  static String deleteApplication_candidate_endpoint(String applicationId) {
+    return 'applications/$applicationId';
+  }
 }
