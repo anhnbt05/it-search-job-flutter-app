@@ -1038,10 +1038,13 @@ export class JobsService {
         )
         .select('*');
 
-      if (insertJobFavortiesData)
+      if (insertJobFavortiesData) {
+        console.error(insertJobFavortiesData);
+
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi khi thêm mới công việc ưa thích của ứng viên.',
         );
+      }
 
       return {
         success: true,
@@ -1118,6 +1121,7 @@ export class JobsService {
           *,
           Jobs (
             *,
+            Recruiters(*, Users(*), CompanyLocations(*, Companies(*))),
             JobDescriptions(*),
             JobRequirements(*),
             JobBenefits(*),
@@ -1136,7 +1140,7 @@ export class JobsService {
       }
 
       return response?.data?.map((d) => ({
-        ...omit(d.Jobs, ['JobCategories']),
+        ...omit(d.Jobs, ['JobCategories', 'RecruiterID', 'Recruiters']),
         JobBenefits: d.Jobs.JobBenefits.map((jb: any) => jb.Benefit),
         JobDescriptions: d.Jobs.JobDescriptions.map(
           (jd: any) => jd.Description,
@@ -1147,6 +1151,17 @@ export class JobsService {
         Categories: d.Jobs.JobCategories.map(
           (jc: any) => jc.Categories.CategoryName,
         ),
+        Recruiter: {
+          ID: d.Jobs.Recruiters.ID,
+          Position: d.Jobs.Recruiters.Position,
+          FullName: d.Jobs.Recruiters.Users.FullName,
+          PhoneNumber: d.Jobs.Recruiters.Users.PhoneNumber,
+          Email: d.Jobs.Recruiters.Users.Email,
+          Company: {
+            Name: d.Jobs.Recruiters.CompanyLocations.Companies.Name,
+            LogoUrl: d.Jobs.Recruiters.CompanyLocations.Companies.LogoUrl,
+          },
+        },
       }));
     } catch (err) {
       console.error(err);
