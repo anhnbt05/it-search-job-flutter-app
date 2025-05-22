@@ -1,38 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ui/Constants/api_constants.dart';
+import 'package:ui/Models/Applications.dart';
 import 'package:ui/Models/Jobs.dart';
-import 'package:ui/Views/candidate/FillterButtomSheetView.dart';
+import 'package:ui/ViewModels/candidate/AppliedJobsViewModel.dart';
 
-import '../../Services/application_candidate_service.dart';
-import '../../Services/job_service.dart';
-import '../../ViewModels/candidate/FindJobsViewModel.dart';
 import 'JobDetailView.dart';
 
-class FindJobsView extends StatelessWidget {
-  const FindJobsView({super.key});
-
-//   @override
-//   State<FindJobsView> createState() => _FindJobsViewState();
-// }
-//
-// class _FindJobsViewState extends State<FindJobsView> {
-//   late FindJobsViewModel viewModel;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     viewModel = FindJobsViewModel();
-//     viewModel.fetchJobs();
-//   }
+class AppliedJobsView extends StatelessWidget {
+  const AppliedJobsView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => FindJobsViewModel()..fetchJobs(),
+      create: (_) => AppliedJobsViewModel()..fetchAllAppliedJobsWithDetails(),
       child: Scaffold(
         backgroundColor: const Color(0xFFF9FAFB),
-        body: Consumer<FindJobsViewModel>(
+        body: Consumer<AppliedJobsViewModel>(
           builder: (context, viewModel, _) {
             return Column(
               children: [
@@ -51,52 +34,22 @@ class FindJobsView extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.search, color: Colors.grey),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            onChanged: (value) {
-                              context.read<FindJobsViewModel>().filterJobs(value);
-                            },
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                              ),
-                              builder: (context) => FilterBottomSheetView(viewModel: viewModel),
-                            );
-                          },
-                          icon: const Icon(Icons.tune, color: Colors.grey),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
-
                 Expanded(
                   child: viewModel.isLoading
                       ? const Center(child: CircularProgressIndicator())
-                      : viewModel.error != null
-                      ? Center(child: Text('Đã xảy ra lỗi: ${viewModel.error}'))
-                      : viewModel.jobs.isEmpty
-                      ? const Center(child: Text('Không có công việc nào.'))
+                      : viewModel.errorMessage != null
+                      ? Center(child: Text('Đã xảy ra lỗi: ${viewModel.errorMessage}'))
+                      : viewModel.appliedJobs.isEmpty
+                      ? const Center(child: Text('Không có công việc ứng tuyển nào.'))
                       : ListView.builder(
                     padding: const EdgeInsets.all(16),
-                    itemCount: viewModel.jobs.length,
+                    itemCount: viewModel.appliedJobs.length,
                     itemBuilder: (context, index) {
-                      final job = viewModel.jobs[index];
-                      if (job == null) return const SizedBox();
-                      return JobCard(job: job);
+                      final appliedJobs = viewModel.appliedJobs[index];
+                      if (appliedJobs == null) return const SizedBox();
+                      return JobCard(appliedJobs: appliedJobs);
                     },
                   ),
                 ),
@@ -110,15 +63,18 @@ class FindJobsView extends StatelessWidget {
 }
 
 class JobCard extends StatelessWidget {
-  final cJobs_recruiter job;
+  final AppliedJobWithDetail appliedJobs;
 
-  const JobCard({super.key, required this.job});
+  const JobCard({super.key, required this.appliedJobs});
 
   @override
   Widget build(BuildContext context) {
-    final recruiter = job.Recruiter;
-    final categories = job.Categories;
-    bool isFavorite = false;
+    final job = appliedJobs.detail?.Job;
+    final recruiter = job?.Recruiter;
+    final categories = job?.Categories;
+    if (job == null) {
+      return  Center(child: Text('Không có công việc đã ứng tuyển nào.'));
+    }
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(16),
@@ -141,9 +97,9 @@ class JobCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: recruiter.Company.LogoUrl != null
+                child: recruiter?.Company.LogoUrl != null
                     ? Image.network(
-                  recruiter.Company.LogoUrl!,
+                  recruiter!.Company.LogoUrl!,
                   width: 60,
                   height: 60,
                   fit: BoxFit.cover,
@@ -161,7 +117,7 @@ class JobCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      job.Title,
+                      job!.Title,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -170,7 +126,7 @@ class JobCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      recruiter.Company.Name ?? '',
+                      recruiter!.Company.Name ?? '',
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF374151),
@@ -178,41 +134,6 @@ class JobCard extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-
-              // Nút yêu thích
-              IconButton(
-                onPressed: () async {
-                      final jobService = JobService();
-                      List<String> data = [job.ID.toString()];
-                      print('job.ID = ${job.ID}');
-                      print('job.ID.runtimeType = ${job.ID.runtimeType}');
-                      print('jobData = $data');
-                      print('jobData.runtimeType = ${data.runtimeType}');
-
-                      if (!isFavorite) {
-                        final success = await jobService.postFavoriteJob(
-                          accessToken: APIConstants.accessToken,
-                          jobData: data,
-                        );
-                        if (success) {
-                          isFavorite = true;
-                        }
-                      } else {
-                        final success = await jobService.deleteFavoriteJob(
-                          accessToken: APIConstants.accessToken,
-                          jobId: data,
-                        );
-                        if (success) {
-                          isFavorite = false;
-                        }
-                      }
-                    },
-                icon: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: isFavorite ? Colors.blue : Colors.grey,
-                ),
-                tooltip: isFavorite ? 'Bỏ lưu công việc' : 'Lưu công việc',
               ),
             ],
           ),
@@ -229,7 +150,7 @@ class JobCard extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: categories.map((cat) => _buildTag(cat)).toList(),
+            children: categories!.map((cat) => _buildTag(cat)).toList(),
           ),
           const Divider(height: 24, color: Color(0xFFE5E7EB)),
           Row(
@@ -252,15 +173,11 @@ class JobCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               ElevatedButton.icon(
-                onPressed: () async {
-                  final applicationService = ApplicationCandidateService();
-                  final success = await applicationService.applyForJob(
-                    accessToken: APIConstants.accessToken,
-                    jobId: job.ID,
-                  );
+                onPressed: () {
+
                 },
                 icon: const Icon(Icons.send),
-                label: const Text('Nộp đơn'),
+                label: const Text('Huỷ đơn'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2563EB),
                   foregroundColor: Colors.white,

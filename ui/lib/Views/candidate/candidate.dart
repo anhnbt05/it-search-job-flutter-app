@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/Views/candidate/AppliedJobsView.dart';
 
 import '../../ViewModels/candidate/JoblistNavigationViewModel.dart';
 import 'FavoritesJobsView.dart';
@@ -25,30 +26,16 @@ Widget HomeScreen() {
   );
 }
 
-Widget SearchScreen() {
-  // TODO: Modify section below
-  return Container(
-    color: Colors.green.shade100,
-    child: Center(child: Text("Tìm kiếm", style: TextStyle(fontSize: 24))),
-  );
-}
-
 Widget JobListScreen(BuildContext context) {
   var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(
     context,
   );
-  // TODO: Modify section below
   return Container(
     color: Colors.orange.shade100,
     child: PageView(
       controller: joblistNavigationProvider.joblistController,
       children: [
-        Center(
-          child: Text(
-            'Danh sách công việc đã ứng tuyển',
-            style: TextStyle(fontSize: 24),
-          ),
-        ),
+        AppliedJobsView(),
         FavoritesJobsView(),
       ],
     ),

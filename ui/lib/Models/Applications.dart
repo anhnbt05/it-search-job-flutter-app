@@ -1,3 +1,5 @@
+import 'package:ui/Models/Jobs.dart';
+
 import 'Candidates.dart';
 
 class cApplications_recruiter {
@@ -40,6 +42,36 @@ class cApplications_recruiter {
       DeletedAt: this.DeletedAt,
       ResumeUrl: this.ResumeUrl,
       Candidate: this.Candidate,
+    );
+  }
+}
+class cApplications_candidate {
+  final String ID;
+  final String ResumeUrl;
+  final String Status;
+  final DateTime AppliedAt;
+  final String? DeletedAt;
+  final cJobs_recruiter? Job;
+
+  cApplications_candidate({
+    required this.ID,
+    required this.ResumeUrl,
+    required this.Status,
+    required this.AppliedAt,
+    required this.DeletedAt,
+    required this.Job,
+  });
+
+  factory cApplications_candidate.fromJson(Map<String, dynamic> json) {
+    return cApplications_candidate(
+      ID: json['ID'],
+      ResumeUrl: json['ResumeUrl'],
+      Status: json['Status'],
+      AppliedAt: DateTime.parse(json['AppliedAt']),
+      DeletedAt: json['DeletedAt'],
+      Job: json['Job'] != null
+          ? cJobs_recruiter.fromJson(json['Job'])
+          : null,
     );
   }
 }
