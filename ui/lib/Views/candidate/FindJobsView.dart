@@ -108,7 +108,6 @@ class FindJobsView extends StatelessWidget {
     );
   }
 }
-
 class JobCard extends StatelessWidget {
   final cJobs_recruiter job;
 
@@ -116,174 +115,157 @@ class JobCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final recruiter = job.Recruiter;
-    final categories = job.Categories;
-    bool isFavorite = false;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    return Consumer<FindJobsViewModel>(
+      builder: (context, viewModel, _) {
+        final recruiter = job.Recruiter;
+        final categories = job.Categories;
+        final jobId = job.ID.toString();
+        final isFavorite = viewModel.isJobFavorited(jobId);
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 20),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: recruiter.Company.LogoUrl != null
-                    ? Image.network(
-                  recruiter.Company.LogoUrl!,
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                )
-                    : Container(
-                  width: 60,
-                  height: 60,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.image, size: 30, color: Colors.grey),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      job.Title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF111827),
-                      ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: (recruiter.Company.LogoUrl != null && recruiter.Company.LogoUrl!.isNotEmpty)
+                        ? Image.network(
+                      recruiter.Company.LogoUrl!,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    )
+                        : Container(
+                      width: 60,
+                      height: 60,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.image, size: 30, color: Colors.grey),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      recruiter.Company.Name ?? '',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF374151),
-                      ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          job.Title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF111827),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          recruiter.Company.Name ?? '',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF374151),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-
-              // Nút yêu thích
-              IconButton(
-                onPressed: () async {
-                      final jobService = JobService();
-                      List<String> data = [job.ID.toString()];
-                      print('job.ID = ${job.ID}');
-                      print('job.ID.runtimeType = ${job.ID.runtimeType}');
-                      print('jobData = $data');
-                      print('jobData.runtimeType = ${data.runtimeType}');
-
-                      if (!isFavorite) {
-                        final success = await jobService.postFavoriteJob(
-                          accessToken: APIConstants.accessToken,
-                          jobData: data,
-                        );
-                        if (success) {
-                          isFavorite = true;
-                        }
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      if (isFavorite) {
+                        await viewModel.removeFavoriteJob(jobId);
                       } else {
-                        final success = await jobService.deleteFavoriteJob(
-                          accessToken: APIConstants.accessToken,
-                          jobId: data,
-                        );
-                        if (success) {
-                          isFavorite = false;
-                        }
+                        await viewModel.addFavoriteJob(jobId);
                       }
                     },
-                icon: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: isFavorite ? Colors.blue : Colors.grey,
-                ),
-                tooltip: isFavorite ? 'Bỏ lưu công việc' : 'Lưu công việc',
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 4),
-              _buildInfoRow(Icons.place, job.Address),
-              _buildInfoRow(Icons.monetization_on, job.Salary),
-              _buildInfoRow(Icons.access_time, job.WorkingTimes),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: categories.map((cat) => _buildTag(cat)).toList(),
-          ),
-          const Divider(height: 24, color: Color(0xFFE5E7EB)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => JobDetailView(jobId: job.ID),
+                    icon: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.blue : Colors.grey,
                     ),
-                  );
-                },
-                icon: const Icon(Icons.visibility, size: 18, color: Color(0xFF2563EB)),
-                label: const Text(
-                  'Xem chi tiết',
-                  style: TextStyle(color: Color(0xFF2563EB)),
-                ),
+                    tooltip: isFavorite ? 'Bỏ lưu công việc' : 'Lưu công việc',
+                  )
+                ],
               ),
-              const SizedBox(width: 12),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  final applicationService = ApplicationCandidateService();
-                  final success = await applicationService.applyForJob(
-                    accessToken: APIConstants.accessToken,
-                    jobId: job.ID,
-                  );
-                },
-                icon: const Icon(Icons.send),
-                label: const Text('Nộp đơn'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2563EB),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 4),
+                  _buildInfoRow(Icons.place, job.Address),
+                  _buildInfoRow(Icons.monetization_on, job.Salary),
+                  _buildInfoRow(Icons.access_time, job.WorkingTimes),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: categories.map((cat) => _buildTag(cat)).toList(),
+              ),
+              const Divider(height: 24, color: Color(0xFFE5E7EB)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => JobDetailView(jobId: job.ID),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.visibility, size: 18, color: Color(0xFF2563EB)),
+                    label: const Text(
+                      'Xem chi tiết',
+                      style: TextStyle(color: Color(0xFF2563EB)),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final applicationService = ApplicationCandidateService();
+                      await applicationService.applyForJob(
+                        accessToken: APIConstants.accessToken,
+                        jobId: job.ID,
+                      );
+                    },
+                    icon: const Icon(Icons.send),
+                    label: const Text('Nộp đơn'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2563EB),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
-
-
 
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
       children: [
         Icon(icon, size: 16, color: const Color(0xFF9CA3AF)),
-        const SizedBox(width: 6, height: 25,),
+        const SizedBox(width: 6, height: 25),
         Expanded(
           child: Text(
             text,
@@ -309,3 +291,4 @@ class JobCard extends StatelessWidget {
     );
   }
 }
+

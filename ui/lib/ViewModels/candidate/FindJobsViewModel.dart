@@ -12,6 +12,7 @@ class FindJobsViewModel extends ChangeNotifier {
   List<cJobs_recruiter?> recommendedjobs = [];
   List<cJobs_recruiter?> _allJobs = [];
   List<cJobs_recruiter?> jobs = [];
+  Set<String> favoriteJobIds = {};
   bool isLoading = false;
   bool hasFetched = false;
   String? error;
@@ -57,6 +58,10 @@ class FindJobsViewModel extends ChangeNotifier {
       _allJobs = fetchedJobs;
       jobs = fetchedJobs;
       hasFetched = true;
+
+      // Đồng thời lấy danh sách favorite
+      await fetchFavoriteJobs();
+
     } catch (e) {
       error = "Đã xảy ra lỗi khi tải danh sách công việc: $e";
     } finally {
@@ -64,6 +69,7 @@ class FindJobsViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   Future<void> fetchJobsByLocation(String locationId) async {
     isLoading = true;
     error = null;
@@ -77,6 +83,9 @@ class FindJobsViewModel extends ChangeNotifier {
       );
       _allJobs = fetchedJobs;
       jobs = fetchedJobs;
+
+      // Cập nhật lại favorite sau lọc
+      await fetchFavoriteJobs();
     } catch (e) {
       error = "Đã xảy ra lỗi khi lọc theo địa điểm: $e";
     } finally {
@@ -98,6 +107,9 @@ class FindJobsViewModel extends ChangeNotifier {
       );
       _allJobs = fetchedJobs;
       jobs = fetchedJobs;
+
+      // Cập nhật lại favorite sau lọc
+      await fetchFavoriteJobs();
     } catch (e) {
       error = "Đã xảy ra lỗi khi lọc theo ngành nghề: $e";
     } finally {
@@ -115,30 +127,48 @@ class FindJobsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addFavoriteJob(List<String> jobData) async {
-    final accessToken = APIConstants.accessToken;
+  bool isJobFavorited(String jobId) {
+    return favoriteJobIds.contains(jobId);
+  }
 
-    final success = await _jobService.postFavoriteJob(
-      accessToken: accessToken,
-      jobData: jobData,
-    );
-
-    if (success) {
-      notifyListeners();
+  Future<void> fetchFavoriteJobs() async {
+    try {
+      final accessToken = APIConstants.accessToken;
+      final favoriteJobs = await _jobService.getFavoritesJobs(
+        accessToken: accessToken,
+      );
+      favoriteJobIds = favoriteJobs.map((job) => job!.ID.toString()).toSet();
+    } catch (e) {
+      // không thông báo lỗi UI nếu fail phần này
+      print("Lỗi khi lấy danh sách yêu thích: $e");
     }
   }
 
-  Future<void> removeFavoriteJob(List<String> jobId) async {
+  Future<void> addFavoriteJob(String jobId) async {
     final accessToken = APIConstants.accessToken;
 
-    final success = await _jobService.deleteFavoriteJob(
+    final success = await _jobService.postFavoriteJob(
       accessToken: accessToken,
       jobId: jobId,
     );
 
     if (success) {
+      favoriteJobIds.add(jobId);
+      notifyListeners();
+    }
+  }
+
+  Future<void> removeFavoriteJob(String jobId) async {
+    final accessToken = APIConstants.accessToken;
+
+    final success = await _jobService.deleteFavoriteJob(
+      accessToken: accessToken,
+      jobIds: jobId,
+    );
+
+    if (success) {
+      favoriteJobIds.remove(jobId);
       notifyListeners();
     }
   }
 }
-

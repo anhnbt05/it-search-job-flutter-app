@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:uuid/uuid.dart';
 import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Helpers/toastification.dart';
 import 'api_service.dart';
@@ -43,36 +43,41 @@ class JobService {
 
   Future<bool> postFavoriteJob({
     required String accessToken,
-    required List<String> jobData,
+    required String jobId,
   }) async {
     try {
-      final response = await _apiService.postFavoriteJobWithToken(
+      final body = {'jobIds': [jobId]};
+
+      print("Sending body: ${jsonEncode(body)}");
+
+      final response = await _apiService.postWithToken(
         endpoint: APIConstants.FavoritesJobs_endpoint,
-        jobIds: List<String>.from(jobData),
+        body: body,
         accessToken: accessToken,
       );
-      print("job.ID json = ${jsonEncode(jobData)}");
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Job added to favorites successfully.");
         showSuccessToastification(
           title: 'Thành công',
           message: 'Đã thêm vào danh sách yêu thích',
         );
         return true;
       } else {
-        print("Failed to add job to favorites: ${response.body}");
+        print("Lỗi server: ${response.body}");
+        final errorMessage = jsonDecode(response.body)['message'];
         showErrorToastification(
           title: 'Lỗi',
-          message: jsonDecode(response.body)['message'],
+          message: errorMessage.toString(),
         );
         return false;
       }
     } catch (e) {
-      print("Error adding favorite job: $e");
+      print("Lỗi Exception: $e");
       showErrorToastification(title: 'Lỗi', message: e.toString());
       return false;
     }
   }
+
 
   Future<List<cJobs_recruiter?>> getJobs({
     required String accessToken,
@@ -204,37 +209,18 @@ class JobService {
       );
 
       if (response.statusCode == 200) {
-        final result = <cJobs_recruiter>[];
         print("Successfully fetched full jobs by category list.");
-        final decoded = jsonDecode(response.body);
-        print("Decoded response: $decoded");
-        // ✅ Bước kiểm tra kiểu dữ liệu
-        if (decoded is List) {
+        List<dynamic>? data = jsonDecode(response.body);
 
+        var result = data
+            ?.map((e) => cJobs_recruiter.fromJson(e))
+            .where((e) =>
+        e.DeletedAt == null && e.ExpiredAt.isAfter(DateTime.now()))
+            .toList() ??
+            [];
 
-          for (var i = 0; i < decoded.length; i++) {
-            var e = decoded[i];
-            if (e is Map<String, dynamic>) {
-              try {
-                final job = cJobs_recruiter.fromJson(e);
-                if (job.DeletedAt == null && job.ExpiredAt.isAfter(DateTime.now())) {
-                  result.add(job);
-                }
-              } catch (err) {
-                print("❌ Error parsing job item at index $i: $err");
-                print("➡️ Item data: ${jsonEncode(e)}");
-              }
-            } else {
-              print("⛔ Skipped item (not a Map): $e");
-            }
-          }
-
-          result.sort((a, b) => b.PostedAt.compareTo(a.PostedAt));
-          return result;
-        } else {
-          print("Expected a list from API, got: ${decoded.runtimeType}");
-          return [];
-        }
+        result.sort((a, b) => b.PostedAt.compareTo(a.PostedAt));
+        return result;
       } else {
         print("Failed to fetch full jobs list: ${response.body}");
         return [];
@@ -244,7 +230,6 @@ class JobService {
       return [];
     }
   }
-
 
 
   Future<cJobs?> getDetailJobs({
@@ -305,12 +290,12 @@ class JobService {
 
   Future<bool> deleteFavoriteJob({
     required String accessToken,
-    required List<String> jobId,
+    required String jobIds,
   }) async {
     try {
-      final response = await _apiService.deleteFavoriteJobWithToken(
+      final response = await _apiService.deleteJobWithToken(
         endpoint: APIConstants.FavoritesJobs_endpoint,
-        jobIds: jobId,
+        Id: jobIds,
         accessToken: accessToken,
       );
 
@@ -325,7 +310,7 @@ class JobService {
         print("Failed to remove job from favorites: ${response.body}");
         showErrorToastification(
           title: 'Lỗi',
-          message: jsonDecode(response.body)['message'],
+          message: jsonDecode(response.body)['message'] ?? 'Xóa không thành công',
         );
         return false;
       }
