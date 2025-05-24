@@ -70,6 +70,8 @@ export class JobsController {
           Recruiter: {
             ID: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
             Position: 'Trưởng phòng nhân sự',
+            AvatarUrl:
+              'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files/1747550944599-1747494653748-1747154111462-1747150754868-1747070271297-1000003940.jpg',
             DeletedAt: null,
             FullName: 'Lê Văn Nam',
             Company: {

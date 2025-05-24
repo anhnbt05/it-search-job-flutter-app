@@ -185,10 +185,12 @@ export class JobsService {
 
       const isRecruiter = user.Role === Role.recruiter ? true : false;
 
+      const isAdmin = user.Role === Role.admin ? true : false;
+
       const query = this.anonSupabaseClient
         .from('Jobs')
         .select(
-          '*, Recruiters(*, Users(FullName), CompanyLocations(*, Companies(*))), JobCategories(*, Categories(*))',
+          '*, Recruiters(*, Users(FullName, AvatarUrl), CompanyLocations(*, Companies(*))), JobCategories(*, Categories(*))',
         );
 
       if (isRecruiter) {
@@ -206,6 +208,8 @@ export class JobsService {
         query.match({
           RecruiterID: data.ID,
         });
+      } else if (isAdmin) {
+        query.match({ Status: JobStatus.pending }).is('DeletedAt', null);
       } else {
         query.match({ Status: JobStatus.open }).is('DeletedAt', null);
       }
@@ -220,22 +224,25 @@ export class JobsService {
           'Đã xảy ra lỗi khi lấy danh sách các công việc.',
         );
 
-      return jobs?.map((job) => ({
-        ...omit(job, ['RecruiterID', 'Recruiters', 'JobCategories']),
-        Recruiter: {
-          ...omit(job.Recruiters, [
-            'Users',
-            'UserID',
-            'CompanyLocationID',
-            'CompanyLocations',
-          ]),
-          FullName: job.Recruiters.Users.FullName,
-          Company: job.Recruiters.CompanyLocations.Companies,
-        },
-        Categories: job.JobCategories.map(
-          (jc: any) => jc.Categories.CategoryName,
-        ),
-      }));
+      return jobs?.map((job) => {
+        return {
+          ...omit(job, ['RecruiterID', 'Recruiters', 'JobCategories']),
+          Recruiter: {
+            ...omit(job.Recruiters, [
+              'Users',
+              'UserID',
+              'CompanyLocationID',
+              'CompanyLocations',
+            ]),
+            AvatarUrl: job.Recruiters.Users.AvatarUrl,
+            FullName: job.Recruiters.Users.FullName,
+            Company: job.Recruiters.CompanyLocations.Companies,
+          },
+          Categories: job.JobCategories.map(
+            (jc: any) => jc.Categories.CategoryName,
+          ),
+        };
+      });
     } catch (err) {
       console.error(err);
       throw err;
