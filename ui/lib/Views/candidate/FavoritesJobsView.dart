@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:ui/Models/JobFavorites.dart';
 import 'package:ui/Models/Jobs.dart';
 
 import '../../ViewModels/candidate/FavoritesJobsViewModel.dart';
@@ -19,22 +20,54 @@ class FavoritesJobsView extends StatelessWidget {
             return Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(6),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(32),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Divider(
+                          thickness: 1,
+                          color: Color(0xFFE5E7EB),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        margin: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.check, color: Colors.white, size: 16),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Đã thích: ${viewModel.jobs.length} bài',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Expanded(
+                        child: Divider(
+                          thickness: 1,
+                          color: Color(0xFFE5E7EB),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
                 Expanded(
                   child: viewModel.isLoading
                       ? const Center(child: CircularProgressIndicator())
@@ -48,7 +81,7 @@ class FavoritesJobsView extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final job = viewModel.jobs[index];
                       if (job == null) return const SizedBox();
-                      return JobCard(job: job);
+                      return JobCard(favoritejob: job);
                     },
                   ),
                 ),
@@ -62,14 +95,14 @@ class FavoritesJobsView extends StatelessWidget {
 }
 
 class JobCard extends StatelessWidget {
-  final cJobs_recruiter job;
+  final cJobFavorites favoritejob;
 
-  const JobCard({super.key, required this.job});
+  const JobCard({super.key, required this.favoritejob});
 
   @override
   Widget build(BuildContext context) {
-    final recruiter = job.Recruiter;
-    final categories = job.Categories;
+    final recruiter = favoritejob.Job?.Recruiter;
+    final categories = favoritejob.Job?.Categories;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -93,9 +126,9 @@ class JobCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: recruiter.Company.LogoUrl != null
+                child: recruiter?.Company.LogoUrl != null
                     ? Image.network(
-                  recruiter.Company.LogoUrl!,
+                  recruiter!.Company.LogoUrl!,
                   width: 60,
                   height: 60,
                   fit: BoxFit.cover,
@@ -113,7 +146,7 @@ class JobCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      job.Title,
+                      favoritejob.Job!.Title,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -122,7 +155,7 @@ class JobCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      recruiter.Company.Name ?? '',
+                      recruiter?.Company.Name ?? '',
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF374151),
@@ -137,16 +170,16 @@ class JobCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 4),
-              _buildInfoRow(Icons.place, job.Address),
-              _buildInfoRow(Icons.monetization_on, job.Salary),
-              _buildInfoRow(Icons.access_time, job.WorkingTimes),
+              _buildInfoRow(Icons.place, favoritejob.Job!.Address),
+              _buildInfoRow(Icons.monetization_on, favoritejob.Job!.Salary),
+              _buildInfoRow(Icons.access_time, favoritejob.Job!.WorkingTimes),
             ],
           ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: categories.map((cat) => _buildTag(cat)).toList(),
+            children: categories!.map((cat) => _buildTag(cat)).toList(),
           ),
           const Divider(height: 24, color: Color(0xFFE5E7EB)),
           Row(
@@ -157,7 +190,7 @@ class JobCard extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => JobDetailView(jobId: job.ID),
+                      builder: (_) => JobDetailView(jobId: favoritejob.Job!.ID),
                     ),
                   );
                 },
@@ -190,13 +223,11 @@ class JobCard extends StatelessWidget {
     );
   }
 
-
-
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
       children: [
         Icon(icon, size: 16, color: const Color(0xFF9CA3AF)),
-        const SizedBox(width: 6, height: 25,),
+        const SizedBox(width: 6, height: 25),
         Expanded(
           child: Text(
             text,

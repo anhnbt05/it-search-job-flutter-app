@@ -43,15 +43,23 @@ class AppliedJobsView extends StatelessWidget {
                       ? Center(child: Text('Đã xảy ra lỗi: ${viewModel.errorMessage}'))
                       : viewModel.appliedJobs.isEmpty
                       ? const Center(child: Text('Không có công việc ứng tuyển nào.'))
-                      : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: viewModel.appliedJobs.length,
-                    itemBuilder: (context, index) {
-                      final appliedJobs = viewModel.appliedJobs[index];
-                      if (appliedJobs == null) return const SizedBox();
-                      return JobCard(appliedJobs: appliedJobs);
-                    },
-                  ),
+                      : () {
+                    final validJobs = viewModel.appliedJobs
+                        .where((job) => job != null && job.detail?.Job != null)
+                        .toList();
+
+                    if (validJobs.isEmpty) {
+                      return const Center(child: Text('Không có công việc đã ứng tuyển nào.'));
+                    }
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: validJobs.length,
+                      itemBuilder: (context, index) {
+                        return JobCard(appliedJobs: validJobs[index]!);
+                      },
+                    );
+                  }(),
                 ),
               ],
             );
@@ -72,9 +80,6 @@ class JobCard extends StatelessWidget {
     final job = appliedJobs.detail?.Job;
     final recruiter = job?.Recruiter;
     final categories = job?.Categories;
-    if (job == null) {
-      return  Center(child: Text('Không có công việc đã ứng tuyển nào.'));
-    }
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(16),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:uuid/uuid.dart';
 import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Helpers/toastification.dart';
+import '../Models/JobFavorites.dart';
 import 'api_service.dart';
 import 'package:ui/Models/Jobs.dart';
 
@@ -106,7 +107,7 @@ class JobService {
       return [];
     }
   }
-  Future<List<cJobs_recruiter?>> getFavoritesJobs({
+  Future<List<cJobFavorites>> getFavoritesJobs({
     required String accessToken,
   }) async {
     try {
@@ -118,11 +119,19 @@ class JobService {
       if (response.statusCode == 200) {
         print("Successfully fetched favorite jobs list.");
         List<dynamic>? data = jsonDecode(response.body);
-        var result = data?.map((e) => cJobs_recruiter.fromJson(e))
+
+        List<cJobFavorites> result = data?.map((e) => cJobFavorites.fromJson(e))
             .where((e) =>
-        e.DeletedAt == null && e.ExpiredAt.isAfter(DateTime.now()))
-            .toList() ?? [];
-        result.sort((a, b) => b.PostedAt.compareTo(a.PostedAt));
+        e.DeletedAt == null &&
+            e.Job != null &&
+            e.Job!.ExpiredAt != null &&
+            e.Job!.ExpiredAt!.isAfter(DateTime.now()))
+            .toList() ??
+            [];
+
+        result.sort((a, b) =>
+            b.Job!.PostedAt!.compareTo(a.Job!.PostedAt!));
+
         return result;
       } else {
         print("Failed to fetch jobs list: ${response.body}");
@@ -133,6 +142,7 @@ class JobService {
       return [];
     }
   }
+
 
   Future<List<cJobs_recruiter?>> getRecommendedJobs({
     required String accessToken,
@@ -159,6 +169,11 @@ class JobService {
         return result;
       } else {
         print("Failed to fetch full jobs list: ${response.body}");
+        final errorMessage = jsonDecode(response.body)['message'];
+        showErrorToastification(
+          title: 'Lỗi',
+          message: errorMessage.toString(),
+        );
         return [];
       }
     } catch (e) {
@@ -290,12 +305,13 @@ class JobService {
 
   Future<bool> deleteFavoriteJob({
     required String accessToken,
-    required String jobIds,
+    required String jobId,
   }) async {
+    final body = {'jobIds': [jobId]};
     try {
-      final response = await _apiService.deleteJobWithToken(
+      final response = await _apiService.deleteFavoriteJobWithToken(
         endpoint: APIConstants.FavoritesJobs_endpoint,
-        Id: jobIds,
+        body: body,
         accessToken: accessToken,
       );
 

@@ -103,14 +103,11 @@ class ApiService {
 
   Future<http.Response> deleteFavoriteJobWithToken({
     required String endpoint,
-    required List<String> jobIds,
+    required Map<String, dynamic> body,
     required String accessToken,
   }) async {
     final url = Uri.parse('${APIConstants.baseUrl}/$endpoint');
 
-    final body = {
-      'jobIds': jobIds,
-    };
 
     return await http.delete(
       url,

@@ -3,12 +3,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ui/Models/Jobs.dart';
 
 import '../../Constants/api_constants.dart';
+import '../../Models/JobFavorites.dart';
 import '../../Services/job_service.dart';
 
 class FavoritesJobsViewModel extends ChangeNotifier {
   final JobService _jobService = JobService();
 
-  List<cJobs_recruiter?> jobs = [];
+  List<cJobFavorites?> jobs = [];
   bool isLoading = false;
   String? error;
 

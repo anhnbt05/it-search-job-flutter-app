@@ -114,23 +114,23 @@ class JobDetailView extends StatelessWidget {
                   ...job?.JobBenefits.map(_buildBulletItem).toList() ?? [],
 
                   const SizedBox(height: 24),
-                  Center(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        // TODO: Gửi đơn ứng tuyển
-                      },
-                      icon: const Icon(Icons.send),
-                      label: const Text('Nộp đơn ngay'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2563EB),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Center(
+                  //   child: ElevatedButton.icon(
+                  //     onPressed: () {
+                  //       // TODO: Gửi đơn ứng tuyển
+                  //     },
+                  //     icon: const Icon(Icons.send),
+                  //     label: const Text('Nộp đơn ngay'),
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: const Color(0xFF2563EB),
+                  //       foregroundColor: Colors.white,
+                  //       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(12),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   const SizedBox(height: 24),
                 ],
               ),
