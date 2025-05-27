@@ -30,6 +30,7 @@ export class ProcessJobStatusDto {
       'Danh sách các mã định danh của công việc đồng ý mở là một mảng không rỗng.',
   })
   @IsUUID('4', {
+    each: true,
     message: 'Mã định danh của công việc muốn mở phải có dạng UUID.',
   })
   readonly openJobIds?: string[];
