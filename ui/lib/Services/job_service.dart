@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Helpers/toastification.dart';
 import 'package:ui/ViewModels/login/SignInViewModel.dart';
 import '../Helpers/helpers.dart';
+import '../Models/ResponseModel.dart';
 import 'api_service.dart';
 import 'package:ui/Models/Jobs.dart';
 
@@ -145,6 +147,53 @@ class JobService {
       showErrorToastification(title: 'Lỗi', message: e.toString());
       return false;
     }
+  }
+
+  Future<ResponseModel> approveJob({required String Id, required BuildContext context}) async {
+    final validToken = await getValidAccessToken(context);
+    final response = await http.patch(
+      Uri.parse('${APIConstants.baseUrl}/${APIConstants.patchJob_admin_endpoint}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${validToken}',
+      },
+      body: jsonEncode({
+        "openJobIds": [Id]
+      }),
+    );
+    final responseData = json.decode(response.body);
+    if (response.statusCode != 200) {
+      showErrorToastification(title: "Lỗi", message: responseData['message'][0]['message']);
+    } else {
+      showSuccessToastification(title: 'Hoàn tất', message: 'Đã chấp nhận thành công bài đăng tuyển dụng');
+    }
+    return ResponseModel.fromJson(responseData);
+  }
+
+  Future<ResponseModel> rejectJob({required String Id, required String reason, required BuildContext context}) async {
+    final validToken = await getValidAccessToken(context);
+    final response = await http.patch(
+      Uri.parse('${APIConstants.baseUrl}/${APIConstants.patchJob_admin_endpoint}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${validToken}',
+      },
+      body: jsonEncode({
+        "rejectedJobs": [
+          {
+            "jobId": Id,
+            "reason": reason
+          }
+        ]
+      }),
+    );
+    final responseData = json.decode(response.body);
+    if (response.statusCode != 200) {
+      showErrorToastification(title: "Lỗi", message: responseData['message'][0]['message']);
+    } else {
+      showSuccessToastification(title: 'Hoàn tất', message: 'Đã từ chối thành công bài đăng tuyển dụng');
+    }
+    return ResponseModel.fromJson(responseData);
   }
 }
 

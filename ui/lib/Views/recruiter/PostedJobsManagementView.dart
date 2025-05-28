@@ -403,35 +403,37 @@ Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, R
 }
 
 Widget Categories(BuildContext context, PostedJobsManagementViewModel viewModel, cJobs_recruiter job) {
-  return SizedBox(
-    height: 25,
-    child: ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: job.Categories.length,
-      itemBuilder: (context, idx) {
-        return Container(
-          margin: EdgeInsets.only(left: 5),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(
-                  width: 0.5,
-                  color: Colors.grey.shade700
-              )
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
-            child: Text(job.Categories[idx],
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade700,
-              ),),
-          ),
-        );
-      },
-    ),
-  );
-
-}
+    return SizedBox(
+      height: 30,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: job.Categories.length,
+        itemBuilder: (context, idx) {
+          return Container(
+            margin: EdgeInsets.only(left: 5),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                    width: 0.5,
+                    color: Colors.grey.shade700
+                )
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(job.Categories[idx],
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade700,
+                  ),),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
 Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel, RecruiterProfileViewModel recruiterVM, int index) {
   if (viewModel.jobs[index]!.Status != 'open') {

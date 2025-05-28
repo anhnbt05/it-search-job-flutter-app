@@ -203,7 +203,7 @@ Widget JobItem(BuildContext context, int index, RecruiterApprovalViewModel viewM
 
 Widget Categories(BuildContext context, RecruiterApprovalViewModel viewModel, cJobs_recruiter job) {
   return SizedBox(
-    height: 25,
+    height: 30,
     child: ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: job.Categories.length,
@@ -219,17 +219,19 @@ Widget Categories(BuildContext context, RecruiterApprovalViewModel viewModel, cJ
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
-            child: Text(job.Categories[idx],
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade700,
-              ),),
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(job.Categories[idx],
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade700,
+                ),),
+            ),
           ),
         );
       },
     ),
   );
-
 }
 
 Widget Level(BuildContext context, RecruiterApprovalViewModel viewModel, int index) {
@@ -274,7 +276,6 @@ Widget Salary(BuildContext context, RecruiterApprovalViewModel viewModel, int in
           ),
         ],
       ),
-
     ),
   );
 }

@@ -1,5 +1,3 @@
-
-import 'Companies.dart';
 import 'Recruiters.dart';
 
 class cJobs_recruiter {
