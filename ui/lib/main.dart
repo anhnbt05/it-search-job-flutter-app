@@ -17,6 +17,7 @@ import 'package:ui/Views/candidate/candidate.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
 
 import 'ViewModels/BottomNavigationViewModel.dart';
+import 'ViewModels/admin/RecruimentApprovalViewModel.dart';
 import 'ViewModels/candidate/JoblistNavigationViewModel.dart';
 import 'ViewModels/recruiter/JobPostViewModel.dart';
 import 'ViewModels/recruiter/PostedJobsManagementViewModel.dart';
@@ -41,7 +42,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   Widget build(BuildContext context) {
     final authVM = Provider.of<AuthViewModel>(context);
@@ -49,14 +49,14 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => BottomNavigationViewModel()),
-        ChangeNotifierProvider(create: (_) => JoblistNavigationViewModel()),
         ChangeNotifierProvider(create: (_) => LoginNavigationViewModel()),
-        ChangeNotifierProvider(create: (_) => CompaniesViewModel()),
         ChangeNotifierProvider(create: (_) => SignUpViewModel()),
-        ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
         ChangeNotifierProvider(create: (_) => SignInViewModel()),
+        ChangeNotifierProvider(create: (_) => JoblistNavigationViewModel()),
 
         if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'recruiter') ...[
+          ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
+          ChangeNotifierProvider(create: (_) => CompaniesViewModel()),
           ChangeNotifierProvider(create: (context) => RecruiterProfileViewModel(authVM.userId!, context)),
           ChangeNotifierProvider(
             create: (context) => PostedJobsManagementViewModel(authVM.userId!, context),
@@ -83,6 +83,9 @@ class _MyAppState extends State<MyApp> {
             },
           ),
         ],
+        if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'admin') ...[
+          ChangeNotifierProvider(create: (context) => RecruiterApprovalViewModel(context))
+        ]
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -214,18 +217,21 @@ class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
   Widget? appbarTitle(String Role, int selectedIndex) {
     if (Role == 'candidate') return appbarTitle_cadidate(selectedIndex);
     if (Role == 'recruiter') return appbarTitle_recruiter(selectedIndex);
+    if (Role == 'admin') return appbarTitle_admin(selectedIndex);
     return null;
   }
 
   List<BottomNavigationBarItem> bottomNavigationItem(String Role) {
     if (Role == 'recruiter') return bottomNavigationItem_recruiter(context);
     if (Role == 'candidate') return bottomNavigationItem_candidate(context);
-    return bottomNavigationItem_admin();
+    if (Role == 'admin') return bottomNavigationItem_admin(context);
+    return [];
   }
 
   List<Widget> pageView(String Role) {
     if (Role == 'candidate') return pageView_candidate(context);
     if (Role == 'recruiter') return pageView_recruiter(context);
-    return pageView_admin(context);
+    if (Role == 'admin') return pageView_admin(context);
+    return [];
   }
 }

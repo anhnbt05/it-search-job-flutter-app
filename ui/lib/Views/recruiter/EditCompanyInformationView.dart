@@ -609,7 +609,7 @@ class _EditCompanyInformationScreenState
                                 ),
                               ),
                               child: const Text(
-                                'Tiếp tục',
+                                'Thêm',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,

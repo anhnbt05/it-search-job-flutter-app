@@ -92,7 +92,7 @@ class cCompany_RecruiterInfo {
 class cCompany_Job {
   final String ID;
   final String Name;
-  final String LogoUrl;
+  final String? LogoUrl;
   final String WebsiteUrl;
   final String Description;
 

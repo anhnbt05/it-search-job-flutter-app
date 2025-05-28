@@ -2,23 +2,23 @@ import 'Companies.dart';
 import 'CompanyLocations.dart';
 
 class cRecruiterPost {
-  final String ID;
   final String Position;
   final String? DeletedAt;
   final String FullName;
   final cCompanies Company;
+  final String? AvatarUrl;
 
   cRecruiterPost({
-    required this.ID,
     required this.Position,
     this.DeletedAt,
     required this.FullName,
     required this.Company,
+    required this.AvatarUrl,
   });
 
   factory cRecruiterPost.fromJson(Map<String, dynamic> json) {
     return cRecruiterPost(
-      ID: json['ID'],
+      AvatarUrl: json['AvatarUrl'],
       Position: json['Position'],
       DeletedAt: json['DeletedAt'],
       FullName: json['FullName'],

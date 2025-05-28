@@ -36,6 +36,7 @@ class RecruiterProfileViewModel extends ChangeNotifier {
               (recruiterInfo == null) ? "" : recruiterInfo!.Company.ID).then((
               value) {
             _branches = value.data;
+            notifyListeners();
             return value;
           });
           return value;
