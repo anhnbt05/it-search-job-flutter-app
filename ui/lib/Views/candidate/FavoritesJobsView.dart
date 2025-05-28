@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:ui/Models/JobFavorites.dart';
 import 'package:ui/Models/Jobs.dart';
 
+import '../../Constants/api_constants.dart';
+import '../../Services/application_candidate_service.dart';
 import '../../ViewModels/candidate/FavoritesJobsViewModel.dart';
 import 'JobDetailView.dart';
 
@@ -202,8 +204,12 @@ class JobCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               ElevatedButton.icon(
-                onPressed: () {
-                  // TODO: Gửi đơn ứng tuyển
+                onPressed: () async {
+                  final applicationService = ApplicationCandidateService();
+                  await applicationService.applyForJob(
+                    accessToken: APIConstants.accessToken,
+                    jobId: favoritejob.Job!.ID,
+                  );
                 },
                 icon: const Icon(Icons.send),
                 label: const Text('Nộp đơn'),

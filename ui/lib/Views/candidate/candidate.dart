@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Helpers/helpers.dart';
 import 'package:ui/Views/candidate/AppliedJobsView.dart';
+import 'package:ui/Views/candidate/ProfileCandidateView.dart';
 
 import '../../ViewModels/candidate/JoblistNavigationViewModel.dart';
 import 'FavoritesJobsView.dart';
@@ -14,7 +15,7 @@ List<Widget> pageView_candidate(BuildContext context) {
     FindJobsView(),
     JobListScreen(context),
     NotificationsScreen(),
-    ProfileScreen(),
+    ProfileCandidateView(),
   ];
 }
 
