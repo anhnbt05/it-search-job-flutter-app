@@ -18,6 +18,9 @@ export class DeleteJobFavoritesDto {
   @ArrayNotEmpty({
     message: 'Danh sách các công việc cần xoá phải là mảng không rỗng.',
   })
-  @IsUUID('4', { message: 'Mã định danh của công việc phải là dạng UUID.' })
+  @IsUUID('4', {
+    each: true,
+    message: 'Mã định danh của công việc phải là dạng UUID.',
+  })
   readonly jobIds!: string[];
 }

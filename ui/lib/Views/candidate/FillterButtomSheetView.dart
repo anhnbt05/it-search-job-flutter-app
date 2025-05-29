@@ -40,8 +40,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheetView> {
 
   Future<void> loadFilterData() async {
     final provinceResponse = await authProvincesService.getProvinces();
-    final accessToken = APIConstants.accessToken;
-    final categoryList = await categoryService.getCategory2(accessToken: accessToken);
+    final categoryList = await categoryService.getCategory2(context: context);
 
     final List<cProvinces> loadedLocations = [];
     final List<cCategories> loadedCategories = [];
@@ -208,7 +207,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheetView> {
 
             ElevatedButton.icon(
               onPressed: () async {
-                await widget.viewModel.fetchRecommendedJobs();
+                await widget.viewModel.fetchRecommendedJobs(context);
                 Navigator.pop(context);
               },
               icon: const Icon(Icons.star, color: Colors.white),
@@ -255,12 +254,12 @@ class _FilterBottomSheetState extends State<FilterBottomSheetView> {
                   onPressed: () async {
                     if (selectedLocation != null) {
                       await widget.viewModel.fetchJobsByLocation(
-                          selectedLocation!.id);
+                          selectedLocation!.id,context);
                     } else if (selectedCategory != null) {
                       await widget.viewModel.fetchJobsByCategory(
-                          selectedCategory!.CategoryName!);
+                          selectedCategory!.CategoryName!,context);
                     } else {
-                      await widget.viewModel.fetchJobs();
+                      await widget.viewModel.fetchJobs(context);
                     }
                     Navigator.pop(context);
                   },

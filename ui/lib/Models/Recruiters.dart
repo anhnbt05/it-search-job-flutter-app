@@ -2,23 +2,23 @@ import 'Companies.dart';
 import 'CompanyLocations.dart';
 
 class cRecruiterPost {
-  final String ID;
   final String Position;
   final String? DeletedAt;
   final String FullName;
   final cCompanies Company;
+  final String? AvatarUrl;
 
   cRecruiterPost({
-    required this.ID,
     required this.Position,
     this.DeletedAt,
     required this.FullName,
     required this.Company,
+    required this.AvatarUrl,
   });
 
   factory cRecruiterPost.fromJson(Map<String, dynamic> json) {
     return cRecruiterPost(
-      ID: json['ID'],
+      AvatarUrl: json['AvatarUrl'],
       Position: json['Position'],
       DeletedAt: json['DeletedAt'],
       FullName: json['FullName'],
@@ -28,18 +28,16 @@ class cRecruiterPost {
 }
 
 class cRecruiters {
-  final String ID;
   final String Position;
   final String FullName;
   final String Email;
   final String AvatarUrl;
   final String PhoneNumber;
   final bool IsEmailVerified;
-  final cCompany_RecruiterInfo Company;
+  late cCompany_RecruiterInfo Company;
   final cCompanyLocation_RecruiterInfo CompanyLocations;
 
   cRecruiters({
-    required this.ID,
     required this.Position,
     required this.FullName,
     required this.Email,
@@ -52,7 +50,6 @@ class cRecruiters {
 
   factory cRecruiters.fromJson(Map<String, dynamic> json) {
     return cRecruiters(
-      ID: json['ID'],
       Position: json['Position'],
       FullName: json['FullName'],
       Email: json['Email'],
@@ -61,6 +58,24 @@ class cRecruiters {
       IsEmailVerified: json['IsEmailVerified'],
       Company: cCompany_RecruiterInfo.fromJson(json['Company']),
       CompanyLocations: cCompanyLocation_RecruiterInfo.fromJson(json['CompanyLocations']),
+    );
+  }
+
+  cRecruiters CopyRecruiterInfor({
+    required String newFullName,
+    required String newPhoneNumber,
+    required String newPosition,
+    required String newAvatarUrl,
+  }) {
+    return cRecruiters(
+      Position: newPosition,
+      FullName: newFullName,
+      Email: Email,
+      AvatarUrl: newAvatarUrl,
+      PhoneNumber: newPhoneNumber,
+      IsEmailVerified: IsEmailVerified,
+      Company: Company,
+      CompanyLocations: CompanyLocations,
     );
   }
 }

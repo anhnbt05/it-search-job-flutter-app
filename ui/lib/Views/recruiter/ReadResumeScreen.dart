@@ -34,7 +34,7 @@ class ReadResumeScreen extends StatefulWidget {
 class _ReadResumeScreenState extends State<ReadResumeScreen> {
   @override
   Widget build(BuildContext context) {
-    var viewModel = Provider.of<CandidatesAppliesViewModel>(context);
+    var viewModel = widget.viewModel;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -98,23 +98,9 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
                             ),
                             TextButton(
                               onPressed: () async {
-                                showDialog(
-                                  context: context,
-                                  barrierColor: Colors.black.withOpacity(0.5),
-                                  barrierDismissible: false,
-                                  builder: (BuildContext context) {
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.blue,
-                                      ),
-                                    );
-                                  },
-                                );
-
                                 await viewModel.startDownload(widget.resumeUrl,
                                     fileName: "${widget.name}-${widget.job.Title}.pdf");
                                 Navigator.of(context).pop();
-                                Navigator.pop(context);
                                 showTopToastification(content: "Đã tải thành công ${widget.name}-${widget.job.Title}.pdf", title: "Thành công", color: Colors.green, icon: Icons.save_alt);
                               },
                               style: TextButton.styleFrom(
@@ -137,22 +123,8 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
                       },
                     );
                   } else {
-                    showDialog(
-                      context: context,
-                      barrierColor: Colors.black.withOpacity(0.5),
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.blue,
-                          ),
-                        );
-                      },
-                    );
-
                     await viewModel.startDownload(widget.resumeUrl,
                         fileName: "${widget.name}-${widget.job.Title}.pdf");
-                    Navigator.of(context).pop();
                     showTopToastification(content: "Đã tải thành công ${widget.name}-${widget.job.Title}.pdf", title: "Thành công", color: Colors.green, icon: Icons.save_alt);
                   }
                 },
@@ -160,7 +132,7 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
               )
             ],
           ),
-          bottom: displaySelection(context: context, viewModel: widget.viewModel, Id: widget.Id, status: widget.status),
+          bottom: displaySelection(viewModel: widget.viewModel, Id: widget.Id, status: widget.status),
         ),
       ),
       body: SfPdfViewer.network(
@@ -173,281 +145,293 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
 }
 
 
-PreferredSize? displaySelection({required BuildContext context, required CandidatesAppliesViewModel viewModel, required String Id, required String status}) {
+PreferredSize? displaySelection({
+  required CandidatesAppliesViewModel viewModel,
+  required String Id,
+  required String status,
+}) {
   if (status != 'pending') {
     return null;
   } else {
     return PreferredSize(
-    preferredSize: Size.fromHeight(40),
-    child: Container(
-      color: Colors.transparent,
-      alignment: Alignment.center,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          TextButton(
-            style: TextButton.styleFrom().copyWith(
-              overlayColor: MaterialStateProperty.all(
-                Color(0x15fa3a4b),
-              ),
-            ),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return Dialog(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    insetPadding: EdgeInsets.all(9),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width - 10,
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Lý do từ chối',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Container(
-                            height: 150,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 5,
-                            ),
-                            child: SizedBox.expand(
-                              child: TextField(
-                                autofocus: true,
-                                maxLines: null,
-                                minLines: null,
-                                expands: true,
-                                controller: viewModel.rejectReason,
-                                textAlignVertical:
-                                TextAlignVertical.top,
-                                keyboardType: TextInputType.text,
-                                style: TextStyle(fontSize: 14),
-                                decoration: InputDecoration(
-                                  hintText: 'Nhập lý do từ chối...',
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      5,
-                                    ),
-                                  ),
-                                  isDense: true,
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      5,
-                                    ),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey,
-                                      width: 0.5,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      5,
-                                    ),
-                                    borderSide: BorderSide(
-                                      color: Colors.blue,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+      preferredSize: Size.fromHeight(40),
+      child: Builder(builder: (buttonContext) {
+        return Container(
+          color: Colors.transparent,
+          alignment: Alignment.center,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                style: TextButton.styleFrom().copyWith(
+                  overlayColor: MaterialStateProperty.all(
+                    Color(0x15fa3a4b),
+                  ),
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: buttonContext,
+                    builder: (dialogContext) {
+                      return Dialog(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        insetPadding: EdgeInsets.all(9),
+                        child: Container(
+                          width: MediaQuery.of(dialogContext).size.width - 10,
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                style: TextButton.styleFrom(
-                                  overlayColor: Colors.transparent,
+                              Text(
+                                'Lý do từ chối',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
                                 ),
-                                child: Text(
-                                  'Hủy',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                height: 150,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                ),
+                                child: SizedBox.expand(
+                                  child: TextField(
+                                    autofocus: true,
+                                    maxLines: null,
+                                    minLines: null,
+                                    expands: true,
+                                    controller: viewModel.rejectReason,
+                                    textAlignVertical:
+                                    TextAlignVertical.top,
+                                    keyboardType: TextInputType.text,
+                                    style: TextStyle(fontSize: 14),
+                                    decoration: InputDecoration(
+                                      hintText: 'Nhập lý do từ chối...',
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          5,
+                                        ),
+                                      ),
+                                      isDense: true,
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          5,
+                                        ),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey,
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          5,
+                                        ),
+                                        borderSide: BorderSide(
+                                          color: Colors.blue,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 6,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                              TextButton(
-                                onPressed: () async {
-                                  print(
-                                    viewModel.rejectReason.text,
-                                  );
-                                  showDialog(
-                                    context: context,
-                                    barrierColor: Colors.black
-                                        .withOpacity(0.5),
-                                    barrierDismissible: false,
-                                    builder: (BuildContext context) {
-                                      return Center(
-                                        child:
-                                        CircularProgressIndicator(
-                                          color: Colors.blue,
-                                        ),
-                                      );
+                              SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(dialogContext);
                                     },
-                                  );
-                                  if (viewModel.rejectReason.text.isEmpty) {
-                                    showErrorToastification(
-                                        message: 'Lý do từ chối không được để trống', title: 'Lỗi');
-                                    Navigator.of(context).pop();
-                                  }
-                                  else {
-                                    final result = await viewModel.rejectApplication(
-                                      applicationId: Id,
-                                      reason: viewModel
-                                          .rejectReason
-                                          .text,
-                                    );
-                                    Navigator.of(context).pop();
+                                    style: TextButton.styleFrom(
+                                      overlayColor: Colors.transparent,
+                                    ),
+                                    child: Text(
+                                      'Hủy',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      final currentDialogContext = dialogContext;
 
-                                    if (result) {
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                    }
-                                  }
-                                },
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Color(0xeef5797a),
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                      if (viewModel.rejectReason.text.isEmpty) {
+                                        showErrorToastification(
+                                            message: 'Lý do từ chối không được để trống',
+                                            title: 'Lỗi'
+                                        );
+                                      } else {
+                                        showDialog(
+                                          context: currentDialogContext,
+                                          barrierColor: Colors.black.withOpacity(0.5),
+                                          barrierDismissible: false,
+                                          builder: (BuildContext loadingContext) {
+                                            return Center(
+                                              child: CircularProgressIndicator(
+                                                color: Colors.blue,
+                                              ),
+                                            );
+                                          },
+                                        );
+
+                                        final result = await viewModel.rejectApplication(
+                                          context: currentDialogContext,
+                                          applicationId: Id,
+                                          reason: viewModel.rejectReason.text,
+                                        );
+                                        if (currentDialogContext.mounted) {
+                                          Navigator.of(currentDialogContext).pop();
+
+                                          if (result) {
+                                            Navigator.of(currentDialogContext).pop();
+                                            Navigator.of(buttonContext).pop();
+                                          }
+                                        }
+                                      }
+                                    },
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Color(0xeef5797a),
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Xác nhận từ chối',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                child: Text(
-                                  'Xác nhận từ chối',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   );
                 },
-              );
-            },
-            child: Text(
-              'Từ chối',
-              style: TextStyle(color: Color(0xfffa3a4b), fontWeight: FontWeight.bold),
-            ),
-          ),
-
-          SizedBox(width: 5),
-
-          TextButton(
-            style: TextButton.styleFrom().copyWith(
-              overlayColor: MaterialStateProperty.all(
-                Color(0x1565c29c),
+                child: Text(
+                  'Từ chối',
+                  style: TextStyle(color: Color(0xfffa3a4b), fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    backgroundColor: Colors.white,
-                    title: Text(
-                      "Xác nhận",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    content: Text(
-                      "Bạn có chắc chắn muốn chấp nhận ứng viên này không?",
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        style: TextButton.styleFrom(
-                          overlayColor: Colors.transparent,
-                        ),
-                        child: Text(
-                          'Không đồng ý',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          showDialog(
-                            context: context,
-                            barrierColor: Colors.black.withOpacity(0.5),
-                            barrierDismissible: false,
-                            builder: (BuildContext context) {
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.blue,
-                                ),
-                              );
-                            },
-                          );
 
-                          await viewModel.approveApplication(Id,);
-                          Navigator.of(context).pop();
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: Color(0xee65c29c),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: Text(
-                          'Đồng ý',
+              SizedBox(width: 5),
+
+              TextButton(
+                style: TextButton.styleFrom().copyWith(
+                  overlayColor: MaterialStateProperty.all(
+                    Color(0x1565c29c),
+                  ),
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: buttonContext,
+                    builder: (dialogContext) {
+                      return AlertDialog(
+                        backgroundColor: Colors.white,
+                        title: Text(
+                          "Xác nhận",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 22,
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                    ],
+                        content: Text(
+                          "Bạn có chắc chắn muốn chấp nhận ứng viên này không?",
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(dialogContext);
+                            },
+                            style: TextButton.styleFrom(
+                              overlayColor: Colors.transparent,
+                            ),
+                            child: Text(
+                              'Không đồng ý',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              final currentDialogContext = dialogContext;
+                              final currentButtonContext = buttonContext;
+
+                              showDialog(
+                                context: currentDialogContext,
+                                barrierColor: Colors.black.withOpacity(0.5),
+                                barrierDismissible: false,
+                                builder: (BuildContext loadingContext) {
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.blue,
+                                    ),
+                                  );
+                                },
+                              );
+
+                              await viewModel.approveApplication(applicationId: Id, context: currentDialogContext);
+                              if (currentDialogContext.mounted) {
+                                Navigator.of(currentDialogContext).pop();
+                                Navigator.of(currentDialogContext).pop();
+                              }
+                              if (currentButtonContext.mounted) {
+                                Navigator.of(currentButtonContext).pop();
+                              }
+                            },
+                            style: TextButton.styleFrom(
+                              backgroundColor: Color(0xee65c29c),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              'Đồng ý',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   );
                 },
-              );
-            },
-            child: Text(
-              'Chấp nhận',
-              style: TextStyle(color: Color(0xff65c29c), fontWeight: FontWeight.bold),
-            ),
-          ),
+                child: Text(
+                  'Chấp nhận',
+                  style: TextStyle(color: Color(0xff65c29c), fontWeight: FontWeight.bold),
+                ),
+              ),
 
-          SizedBox(width: 5),
-        ],
-      ),
-    ),
-  );
+              SizedBox(width: 5),
+            ],
+          ),
+        );
+      }),
+    );
   }
 }

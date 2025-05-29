@@ -55,6 +55,7 @@ class cCompanyLocation_RecruiterInfo {
     required this.BranchName,
   });
 
+
   factory cCompanyLocation_RecruiterInfo.fromJson(Map<String, dynamic> json) {
     return cCompanyLocation_RecruiterInfo(
       ID: json['ID'],

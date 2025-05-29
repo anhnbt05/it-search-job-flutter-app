@@ -9,17 +9,16 @@ class DetailJobViewModel extends ChangeNotifier {
   String? error;
   cJobs? jobDetail;
 
-  Future<void> fetchJobDetail(String jobId) async {
+  Future<void> fetchJobDetail(String jobId, BuildContext context) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      final accessToken = APIConstants.accessToken;
 
       jobDetail = await _jobService.getDetailJobs(
         jobId: jobId,
-        accessToken: accessToken,
+        context: context,
       );
 
       if (jobDetail == null) {

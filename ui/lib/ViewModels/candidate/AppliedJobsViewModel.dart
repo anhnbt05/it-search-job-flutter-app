@@ -25,16 +25,15 @@ class AppliedJobsViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  Future<void> fetchAllAppliedJobsWithDetails() async {
+  Future<void> fetchAllAppliedJobsWithDetails(BuildContext context) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final accessToken = APIConstants.accessToken;
 
       final applications = await _service.getApplicationsForCandidate(
-        accessToken: accessToken,
+        context: context,
       );
 
       if (applications == null) {
@@ -48,8 +47,8 @@ class AppliedJobsViewModel extends ChangeNotifier {
 
       for (var app in applications) {
         final details = await _service.getDetailApplicationForCandidate(
-          accessToken: accessToken,
           applicationID: app.ID,
+          context: context,
         );
 
         final detail = details != null && details.isNotEmpty ? details.first : null;

@@ -1,5 +1,3 @@
-
-import 'Companies.dart';
 import 'Recruiters.dart';
 
 class cJobs_recruiter {
@@ -115,7 +113,7 @@ class cJobs_recruiter {
 class cJobs {
   final String ID;
   final String Title;
-  final String Description;
+  final String? Description;
   final String Address;
   final String Salary;
   final int Vacancies;

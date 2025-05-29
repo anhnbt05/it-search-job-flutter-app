@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:path/path.dart';
+import 'package:ui/Helpers/helpers.dart';
 import 'package:ui/Models/Jobs.dart';
 
 import '../../Constants/api_constants.dart';
@@ -17,14 +19,13 @@ class FindJobsViewModel extends ChangeNotifier {
   bool hasFetched = false;
   String? error;
 
-  Future<void> fetchRecommendedJobs() async {
+  Future<void> fetchRecommendedJobs(BuildContext context) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
       final userId = await _storage.read(key: 'userID');
-      final accessToken = APIConstants.accessToken;
 
       if (userId == null) {
         error = "Không tìm thấy userID";
@@ -34,7 +35,7 @@ class FindJobsViewModel extends ChangeNotifier {
       }
 
       recommendedjobs = await _jobService.getRecommendedJobs(
-        accessToken: accessToken,
+        context: context,
         candidateID: userId,
       );
     } catch (e) {
@@ -45,11 +46,10 @@ class FindJobsViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchFavoriteJobs() async {
+  Future<void> fetchFavoriteJobs(BuildContext context) async {
     try {
-      final accessToken = APIConstants.accessToken;
       final favoriteJobs = await _jobService.getFavoritesJobs(
-        accessToken: accessToken,
+        context: context,
       );
       favoriteJobIds = favoriteJobs.map((job) => job.Job!.ID.toString()).toSet();
       print("Favorite Job IDs loaded: $favoriteJobIds");
@@ -60,19 +60,17 @@ class FindJobsViewModel extends ChangeNotifier {
   }
 
 
-  Future<void> fetchJobs() async {
+  Future<void> fetchJobs(BuildContext context) async {
     if (hasFetched) return;
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      final accessToken = APIConstants.accessToken;
-
-      final fetchedJobs = await _jobService.getJobs(accessToken: accessToken);
+      final fetchedJobs = await _jobService.getJobs(context: context);
       _allJobs = fetchedJobs;
       jobs = fetchedJobs;
-      await fetchFavoriteJobs();
+      await fetchFavoriteJobs(context);
       hasFetched = true;
 
 
@@ -84,20 +82,19 @@ class FindJobsViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchJobsByLocation(String locationId) async {
+  Future<void> fetchJobsByLocation(String locationId, BuildContext context) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      final accessToken = APIConstants.accessToken;
       final fetchedJobs = await _jobService.getJobsbyLocation(
-        accessToken: accessToken,
         locationID: locationId,
+        context: context,
       );
       _allJobs = fetchedJobs;
       jobs = fetchedJobs;
-      await fetchFavoriteJobs();
+      await fetchFavoriteJobs(context);
     } catch (e) {
       error = "Đã xảy ra lỗi khi lọc theo địa điểm: $e";
     } finally {
@@ -106,21 +103,20 @@ class FindJobsViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchJobsByCategory(String categoryName) async {
+  Future<void> fetchJobsByCategory(String categoryName, BuildContext context) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      final accessToken = APIConstants.accessToken;
       final fetchedJobs = await _jobService.getJobsbyCategory(
-        accessToken: accessToken,
         categoryName: categoryName,
+        context: context,
       );
 
       _allJobs = fetchedJobs;
       jobs = fetchedJobs;
-      await fetchFavoriteJobs();
+      await fetchFavoriteJobs(context);
 
     } catch (e) {
       error = "Đã xảy ra lỗi khi lọc theo ngành nghề: $e";
@@ -143,12 +139,11 @@ class FindJobsViewModel extends ChangeNotifier {
     return favoriteJobIds.contains(jobId);
   }
 
-  Future<void> addFavoriteJob(String jobId) async {
-    final accessToken = APIConstants.accessToken;
+  Future<void> addFavoriteJob(String jobId, BuildContext context) async {
 
     final success = await _jobService.postFavoriteJob(
-      accessToken: accessToken,
       jobId: jobId,
+      context: context,
     );
 
     if (success) {
@@ -157,12 +152,11 @@ class FindJobsViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> removeFavoriteJob(String jobId) async {
-    final accessToken = APIConstants.accessToken;
+  Future<void> removeFavoriteJob(String jobId, BuildContext context) async {
 
     final success = await _jobService.deleteFavoriteJob(
-      accessToken: accessToken,
       jobId: jobId,
+      context: context,
     );
 
     if (success) {

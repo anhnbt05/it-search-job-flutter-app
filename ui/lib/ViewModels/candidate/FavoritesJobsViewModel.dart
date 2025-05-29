@@ -13,16 +13,15 @@ class FavoritesJobsViewModel extends ChangeNotifier {
   bool isLoading = false;
   String? error;
 
-  Future<void> fetchFavoritesJobs() async {
+  Future<void> fetchFavoritesJobs(BuildContext context) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      final accessToken = APIConstants.accessToken;
 
       jobs = await _jobService.getFavoritesJobs(
-        accessToken: accessToken,
+        context: context,
       );
     } catch (e) {
       error = "Đã xảy ra lỗi khi tải danh sách công việc: $e";

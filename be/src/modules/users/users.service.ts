@@ -298,6 +298,31 @@ export class UsersService {
         }
       }
 
+      const { PhoneNumber } = res;
+
+      if (PhoneNumber) {
+        const { data: existingPhoneNumber, error } =
+          await this.anonSupabaseClient
+            .from('Users')
+            .select('*')
+            .eq('PhoneNumber', PhoneNumber)
+            .neq('ID', currentUserId)
+            .maybeSingle<Users>();
+
+        if (error) {
+          console.error(error);
+
+          throw new InternalServerErrorException(
+            'Đã xảy ra lỗi khi kiểm tra số điện thoại.',
+          );
+        }
+
+        if (existingPhoneNumber)
+          throw new BadRequestException(
+            `Số điện thoại mới này đã được sử dụng bởi người dùng khác.`,
+          );
+      }
+
       const { error } = await this.adminSupabaseClient
         .from('Users')
         .update([res])

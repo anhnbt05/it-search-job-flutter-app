@@ -70,6 +70,8 @@ export class JobsController {
           Recruiter: {
             ID: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
             Position: 'Trưởng phòng nhân sự',
+            AvatarUrl:
+              'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files/1747550944599-1747494653748-1747154111462-1747150754868-1747070271297-1000003940.jpg',
             DeletedAt: null,
             FullName: 'Lê Văn Nam',
             Company: {
@@ -386,7 +388,18 @@ export class JobsController {
             'Hỗ trợ chi phí, có cơ hội trở thành nhân viên chính thức.',
             'Môi trường làm việc thân thiện, linh hoạt giờ giấc.',
           ],
-          RecruiterID: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
+          Recruiter: {
+            ID: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
+            Position: 'Trưởng phòng nhân sự',
+            FullName: 'Lê Văn Nam',
+            PhoneNumber: '+84393873632',
+            Email: 'lengocanhpyne363@gmail.com',
+            Company: {
+              Name: 'Công ty phần mềm FPT Software',
+              LogoUrl:
+                'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//logo-fpt-software_043151683.png',
+            },
+          },
           WorkingTimes: 'Thứ 3 - Thứ 6, 8:30 - 17:30',
           JobDescriptions: [
             'Tham gia phát triển giao diện người dùng bằng HTML, CSS, JavaScript.',
@@ -420,7 +433,18 @@ export class JobsController {
             'Hỗ trợ chi phí, có cơ hội trở thành nhân viên chính thức.',
             'Môi trường làm việc thân thiện, linh hoạt giờ giấc.',
           ],
-          RecruiterID: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
+          Recruiter: {
+            ID: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
+            Position: 'Trưởng phòng nhân sự',
+            FullName: 'Lê Văn Nam',
+            PhoneNumber: '+84393873632',
+            Email: 'lengocanhpyne363@gmail.com',
+            Company: {
+              Name: 'Công ty phần mềm FPT Software',
+              LogoUrl:
+                'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//logo-fpt-software_043151683.png',
+            },
+          },
           WorkingTimes: 'Thứ 3 - Thứ 6, 8:30 - 17:30',
           JobDescriptions: [
             'Tham gia phát triển giao diện người dùng bằng HTML, CSS, JavaScript.',
@@ -872,7 +896,18 @@ export class JobsController {
         ExpiredAt: '2025-06-15T23:59:59',
         Level: 'intern',
         DeletedAt: null,
-        RecruiterID: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
+        Recruiter: {
+          ID: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
+          Position: 'Trưởng phòng nhân sự',
+          FullName: 'Lê Văn Nam',
+          PhoneNumber: '+84393873632',
+          Email: 'lengocanhpyne363@gmail.com',
+          Company: {
+            Name: 'Công ty phần mềm FPT Software',
+            LogoUrl:
+              'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//logo-fpt-software_043151683.png',
+          },
+        },
         JobDescriptions: [
           'Có ít nhất 1 năm kinh nghiệm với Spring Boot (Java)',
           'Sử dụng thành thạo framework Next.js',

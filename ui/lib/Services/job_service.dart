@@ -1,8 +1,12 @@
 import 'dart:convert';
-import 'package:uuid/uuid.dart';
+import '../Models/JobFavorites.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Helpers/toastification.dart';
-import '../Models/JobFavorites.dart';
+import 'package:ui/ViewModels/login/SignInViewModel.dart';
+import '../Helpers/helpers.dart';
+import '../Models/ResponseModel.dart';
 import 'api_service.dart';
 import 'package:ui/Models/Jobs.dart';
 
@@ -10,14 +14,16 @@ class JobService {
   final ApiService _apiService = ApiService();
 
   Future<cJobs_recruiter?> postJob({
-    required String accessToken,
     required Map<String, dynamic> jobData,
+    required BuildContext context,
   }) async {
     try {
+      final validToken = await getValidAccessToken(context);
+
       final response = await _apiService.postWithToken(
         endpoint: APIConstants.postJob_endpoint,
         body: jobData,
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
@@ -30,7 +36,8 @@ class JobService {
         var job = (latestJob == null) ? null : cJobs_recruiter.fromJson(latestJob);
         showSuccessToastification(title: 'Thành công', message: 'Bài đăng của bạn đã được gửi đền quản trị viên để chờ duyệt');
         return job;
-      } else {
+      }
+      else{
         print("Failed to post job: ${response.body}");
         showErrorToastification(title: 'Lỗi', message: jsonDecode(response.body)['message']);
         return null;
@@ -43,10 +50,11 @@ class JobService {
   }
 
   Future<bool> postFavoriteJob({
-    required String accessToken,
     required String jobId,
+    required BuildContext context,
   }) async {
     try {
+      final validToken = await getValidAccessToken(context);
       final body = {'jobIds': [jobId]};
 
       print("Sending body: ${jsonEncode(body)}");
@@ -54,7 +62,7 @@ class JobService {
       final response = await _apiService.postWithToken(
         endpoint: APIConstants.FavoritesJobs_endpoint,
         body: body,
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -81,12 +89,14 @@ class JobService {
 
 
   Future<List<cJobs_recruiter?>> getJobs({
-    required String accessToken,
+    required BuildContext context,
   }) async {
     try {
+      final validToken = await getValidAccessToken(context);
+
       final response = await _apiService.getWithToken(
         endpoint: APIConstants.getJob_endpoint,
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 200) {
@@ -108,12 +118,13 @@ class JobService {
     }
   }
   Future<List<cJobFavorites>> getFavoritesJobs({
-    required String accessToken,
+    required BuildContext context,
   }) async {
     try {
+      final validToken = await getValidAccessToken(context);
       final response = await _apiService.getWithToken(
         endpoint: APIConstants.FavoritesJobs_endpoint,
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 200) {
@@ -145,13 +156,14 @@ class JobService {
 
 
   Future<List<cJobs_recruiter?>> getRecommendedJobs({
-    required String accessToken,
     required String candidateID,
+    required BuildContext context,
   }) async {
     try {
+      final validToken = await getValidAccessToken(context);
       final response = await _apiService.getWithToken(
         endpoint: APIConstants.getRecommendedJobs_candidate_endpoint(candidateID),
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 200) {
@@ -182,13 +194,14 @@ class JobService {
     }
   }
   Future<List<cJobs_recruiter?>> getJobsbyLocation({
-    required String accessToken,
     required String locationID,
+    required BuildContext context,
   }) async {
     try {
+      final validToken = await getValidAccessToken(context);
       final response = await _apiService.getWithToken(
         endpoint: APIConstants.getJobsbyLocations_endpoint(locationID),
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 200) {
@@ -214,13 +227,14 @@ class JobService {
     }
   }
   Future<List<cJobs_recruiter?>> getJobsbyCategory({
-    required String accessToken,
     required String categoryName,
+    required BuildContext context,
   }) async {
     try {
+      final validToken = await getValidAccessToken(context);
       final response = await _apiService.getWithToken(
         endpoint: APIConstants.getJobsbyCategories_endpoint(categoryName),
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 200) {
@@ -249,12 +263,13 @@ class JobService {
 
   Future<cJobs?> getDetailJobs({
     required String jobId,
-    required String accessToken,
+    required BuildContext context,
   }) async {
     try {
+      final validToken = await getValidAccessToken(context);
       final response = await _apiService.getWithToken(
         endpoint: APIConstants.getDetailJob_candidate_endpoint(jobId),
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 200) {
@@ -279,14 +294,16 @@ class JobService {
 
 
   Future<bool> deleteJob({
-    required String accessToken,
     required String Id,
+    required BuildContext context,
   }) async {
     try {
+      final validToken = await getValidAccessToken(context);
+
       final response = await _apiService.deleteJobWithToken(
           endpoint: APIConstants.deleteJob_endpoint,
           Id: Id,
-          accessToken: accessToken);
+          accessToken: validToken!);
       if (response.statusCode == 200) {
         print("Job deleted successfully.");
         showSuccessToastification(title: 'Xoá thành công', message: "Bài tuyển dụng đã được xóa");
@@ -304,15 +321,16 @@ class JobService {
   }
 
   Future<bool> deleteFavoriteJob({
-    required String accessToken,
     required String jobId,
+    required BuildContext context,
   }) async {
     final body = {'jobIds': [jobId]};
     try {
+      final validToken = await getValidAccessToken(context);
       final response = await _apiService.deleteFavoriteJobWithToken(
         endpoint: APIConstants.FavoritesJobs_endpoint,
         body: body,
-        accessToken: accessToken,
+        accessToken: validToken!,
       );
 
       if (response.statusCode == 200) {
@@ -338,11 +356,13 @@ class JobService {
   }
 
   Future<cJobs?> getJobByID(
-      {required String Id, required String accessToken}) async {
+      {required String Id, required BuildContext context}) async {
     try {
+      final validToken = await getValidAccessToken(context);
+
       final response = await _apiService.getWithToken(
           endpoint: '${APIConstants.getJob_endpoint}/$Id',
-          accessToken: accessToken);
+          accessToken: validToken!);
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
         print("Successfully fetched job.");
@@ -358,9 +378,11 @@ class JobService {
     return null;
   }
 
-  Future<bool> editJob({required String Id, required Map<String, dynamic> jobData, required String accessToken}) async {
+  Future<bool> editJob({required String Id, required Map<String, dynamic> jobData, required BuildContext context}) async {
     try {
-      final response = await _apiService.patchWithToken(endpoint: APIConstants.patchJob_endpoint, body: jobData, accessToken: accessToken, Id: Id);
+      final validToken = await getValidAccessToken(context);
+
+      final response = await _apiService.patchWithToken(endpoint: APIConstants.patchJob_endpoint, body: jobData, accessToken: validToken!, Id: Id);
       if (response.statusCode == 200) {
         showSuccessToastification(title: 'Hoàn tất', message: "Nội dung bài tuyển dụng đã được cập nhật\nVui lòng chờ quản trị viên phê duyệt");
         return true;
@@ -374,6 +396,53 @@ class JobService {
       showErrorToastification(title: 'Lỗi', message: e.toString());
       return false;
     }
+  }
+
+  Future<ResponseModel> approveJob({required String Id, required BuildContext context}) async {
+    final validToken = await getValidAccessToken(context);
+    final response = await http.patch(
+      Uri.parse('${APIConstants.baseUrl}/${APIConstants.patchJob_admin_endpoint}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${validToken}',
+      },
+      body: jsonEncode({
+        "openJobIds": [Id]
+      }),
+    );
+    final responseData = json.decode(response.body);
+    if (response.statusCode != 200) {
+      showErrorToastification(title: "Lỗi", message: responseData['message'][0]['message']);
+    } else {
+      showSuccessToastification(title: 'Hoàn tất', message: 'Đã chấp nhận thành công bài đăng tuyển dụng');
+    }
+    return ResponseModel.fromJson(responseData);
+  }
+
+  Future<ResponseModel> rejectJob({required String Id, required String reason, required BuildContext context}) async {
+    final validToken = await getValidAccessToken(context);
+    final response = await http.patch(
+      Uri.parse('${APIConstants.baseUrl}/${APIConstants.patchJob_admin_endpoint}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${validToken}',
+      },
+      body: jsonEncode({
+        "rejectedJobs": [
+          {
+            "jobId": Id,
+            "reason": reason
+          }
+        ]
+      }),
+    );
+    final responseData = json.decode(response.body);
+    if (response.statusCode != 200) {
+      showErrorToastification(title: "Lỗi", message: responseData['message'][0]['message']);
+    } else {
+      showSuccessToastification(title: 'Hoàn tất', message: 'Đã từ chối thành công bài đăng tuyển dụng');
+    }
+    return ResponseModel.fromJson(responseData);
   }
 }
 

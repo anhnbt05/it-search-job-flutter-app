@@ -424,7 +424,7 @@ export class UsersController {
           FullName: 'Trần Thị B',
           PhoneNumber: '+84909876543',
           updateRecruiterDto: {
-            Postion: 'Trưởng phòng nhân sự',
+            Position: 'Trưởng phòng nhân sự',
           },
         },
       },

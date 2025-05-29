@@ -29,7 +29,7 @@
     @override
     Widget build(BuildContext context) {
       return ChangeNotifierProvider(
-        create: (_) => FindJobsViewModel()..fetchJobs(),
+        create: (_) => FindJobsViewModel()..fetchJobs(context),
         child: Scaffold(
           backgroundColor: const Color(0xFFF9FAFB),
           body: Consumer<FindJobsViewModel>(
@@ -185,9 +185,9 @@
                     IconButton(
                       onPressed: () async {
                         if (isFavorite) {
-                          viewModel.removeFavoriteJob(jobId);
+                          viewModel.removeFavoriteJob(jobId,context);
                         } else {
-                           viewModel.addFavoriteJob(jobId);
+                           viewModel.addFavoriteJob(jobId,context);
                         }
                       },
                       icon: Icon(
@@ -237,8 +237,8 @@
                       onPressed: () async {
                         final applicationService = ApplicationCandidateService();
                         await applicationService.applyForJob(
-                          accessToken: APIConstants.accessToken,
                           jobId: job.ID,
+                          context: context,
                         );
                       },
                       icon: const Icon(Icons.send),

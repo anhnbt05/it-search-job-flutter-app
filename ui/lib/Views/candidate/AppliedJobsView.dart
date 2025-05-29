@@ -12,7 +12,7 @@ class AppliedJobsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => AppliedJobsViewModel()..fetchAllAppliedJobsWithDetails(),
+      create: (_) => AppliedJobsViewModel()..fetchAllAppliedJobsWithDetails(context),
       child: Scaffold(
         backgroundColor: const Color(0xFFF9FAFB),
         body: Consumer<AppliedJobsViewModel>(

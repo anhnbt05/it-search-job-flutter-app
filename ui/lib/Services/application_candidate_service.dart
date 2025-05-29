@@ -1,23 +1,26 @@
   import 'dart:convert';
-  import 'package:ui/Helpers/toastification.dart';
+  import 'package:flutter/cupertino.dart';
+import 'package:ui/Helpers/toastification.dart';
   import 'package:ui/Constants/api_constants.dart';
-  import '../Models/Applications.dart';
+  import '../Helpers/helpers.dart';
+import '../Models/Applications.dart';
   import 'api_service.dart';
 
   class ApplicationCandidateService {
     final ApiService _apiService = ApiService();
 
     Future<bool> applyForJob({
-      required String accessToken,
+      required BuildContext context,
       required String jobId,
     }) async {
       try {
+        final validToken = await getValidAccessToken(context);
         final response = await _apiService.postWithToken(
           endpoint: APIConstants.postApplication_endpoint,
           body: {
             "JobId": jobId,
           },
-          accessToken: accessToken,
+          accessToken: validToken!,
         );
 
         final statusCode = response.statusCode;
@@ -60,12 +63,13 @@
     }
 
     Future<List<cApplications_candidate>?> getApplicationsForCandidate({
-      required String accessToken,
+      required BuildContext context,
     }) async {
       try {
+        final validToken = await getValidAccessToken(context);
         final response = await _apiService.getWithToken(
           endpoint: APIConstants.getApplication_endpoint,
-          accessToken: accessToken,
+          accessToken: validToken!,
         );
 
         if (response.statusCode == 200) {
@@ -102,14 +106,15 @@
 
 
     Future<List<cApplications_candidate>?> getDetailApplicationForCandidate({
-      required String accessToken,
       required String applicationID,
+      required BuildContext context,
     }) async {
       try {
+        final validToken = await getValidAccessToken(context);
         final response = await _apiService.getWithToken(
           endpoint: APIConstants.getDetailApplication_candidate_endpoint(
               applicationID),
-          accessToken: accessToken,
+          accessToken: validToken!,
         );
 
         if (response.statusCode == 200) {

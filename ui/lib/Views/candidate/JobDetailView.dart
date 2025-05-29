@@ -10,7 +10,7 @@ class JobDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => DetailJobViewModel()..fetchJobDetail(jobId),
+      create: (_) => DetailJobViewModel()..fetchJobDetail(jobId,context),
       child: Consumer<DetailJobViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isLoading) {

@@ -17,6 +17,7 @@ class AuthForgetPasswordService {
       body: json.encode({"email": email}),
     );
     final responseData = json.decode(response.body);
+    print(responseData);
     return ResponseModel.fromJson(responseData);
   }
 }

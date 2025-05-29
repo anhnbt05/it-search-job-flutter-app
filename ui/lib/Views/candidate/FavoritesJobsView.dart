@@ -14,7 +14,7 @@ class FavoritesJobsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => FavoritesJobsViewModel()..fetchFavoritesJobs(),
+      create: (_) => FavoritesJobsViewModel()..fetchFavoritesJobs(context),
       child: Scaffold(
         backgroundColor: const Color(0xFFF9FAFB),
         body: Consumer<FavoritesJobsViewModel>(
@@ -207,8 +207,8 @@ class JobCard extends StatelessWidget {
                 onPressed: () async {
                   final applicationService = ApplicationCandidateService();
                   await applicationService.applyForJob(
-                    accessToken: APIConstants.accessToken,
                     jobId: favoritejob.Job!.ID,
+                    context: context,
                   );
                 },
                 icon: const Icon(Icons.send),
