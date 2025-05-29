@@ -7,4 +7,6 @@ class cCategories {
   DateTime? UpdatedAt;
   DateTime? DeletedAt;
   List<cJobCategories>? JobCategories;
+
+  cCategories({required this.ID, required this.CategoryName});
 }

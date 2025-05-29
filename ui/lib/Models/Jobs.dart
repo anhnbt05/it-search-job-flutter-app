@@ -128,7 +128,7 @@ class cJobs {
   final List<String> JobRequirements;
   final List<String> Categories;
   final cRecruiter_Job Recruiter;
-
+  final String? DeletedAt;
   cJobs({
     required this.ID,
     required this.Title,
@@ -147,6 +147,7 @@ class cJobs {
     required this.JobRequirements,
     required this.Categories,
     required this.Recruiter,
+    this.DeletedAt,
   });
 
   factory cJobs.fromJson(Map<String, dynamic> json) {
@@ -168,6 +169,7 @@ class cJobs {
       JobRequirements: List<String>.from(json['JobRequirements']),
       Categories: List<String>.from(json['Categories']),
       Recruiter: cRecruiter_Job.fromJson(json['Recruiter']),
+      DeletedAt: json['DeletedAt'],
     );
   }
 }

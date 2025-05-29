@@ -37,14 +37,17 @@ class SignInViewModel extends ChangeNotifier {
           return null;
         }
 
+
         await APIConstants.storage.write(key: 'accessToken', value: accessToken);
         await APIConstants.storage.write(key: 'refreshToken', value: refreshToken);
 
         final Map<String, dynamic> payload = Jwt.parseJwt(accessToken);
+
         print('Decoded JWT Payload: $payload');
 
         final String? role = payload['app_metadata']['role'];
         final String? userId = payload['sub'];
+        await APIConstants.storage.write(key: 'userID', value: userId);
         if (role == null) {
           errorMessage = "Không tìm thấy vai trò người dùng.";
           return null;
