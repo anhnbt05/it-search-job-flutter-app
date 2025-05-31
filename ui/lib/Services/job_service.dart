@@ -226,19 +226,53 @@ class JobService {
       return [];
     }
   }
-  Future<List<cJobs_recruiter?>> getJobsbyCategory({
-    required String categoryName,
+  Future<List<cJobs_recruiter?>> getJobsbyCategories({
+    required List<String> categoryNames,
     required BuildContext context,
   }) async {
     try {
       final validToken = await getValidAccessToken(context);
       final response = await _apiService.getWithToken(
-        endpoint: APIConstants.getJobsbyCategories_endpoint(categoryName),
+        endpoint: APIConstants.getJobsbyCategories_endpoint(categoryNames),
         accessToken: validToken!,
       );
 
       if (response.statusCode == 200) {
         print("Successfully fetched full jobs by category list.");
+        List<dynamic>? data = jsonDecode(response.body);
+
+        var result = data
+            ?.map((e) => cJobs_recruiter.fromJson(e))
+            .where((e) =>
+        e.DeletedAt == null && e.ExpiredAt.isAfter(DateTime.now()))
+            .toList() ??
+            [];
+
+        result.sort((a, b) => b.PostedAt.compareTo(a.PostedAt));
+        return result;
+      } else {
+        print("Failed to fetch full jobs by category list: ${response.body}");
+        return [];
+      }
+    } catch (e) {
+      print("Error: $e");
+      return [];
+    }
+  }
+  Future<List<cJobs_recruiter?>> getJobsBothLocationCategory({
+    required String locationID,
+    required List<String> categoryNames,
+    required BuildContext context,
+  }) async {
+    try {
+      final validToken = await getValidAccessToken(context);
+      final response = await _apiService.getWithToken(
+        endpoint: APIConstants.getJobsbyBothLocationCategory_endpoint(locationID, categoryNames),
+        accessToken: validToken!,
+      );
+
+      if (response.statusCode == 200) {
+        print("Successfully fetched full jobs by location and category list.");
         List<dynamic>? data = jsonDecode(response.body);
 
         var result = data
@@ -259,7 +293,6 @@ class JobService {
       return [];
     }
   }
-
 
   Future<cJobs?> getDetailJobs({
     required String jobId,

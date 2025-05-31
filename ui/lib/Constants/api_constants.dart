@@ -28,10 +28,17 @@ class APIConstants {
   }
   static final String FavoritesJobs_endpoint = 'jobs/candidates/favorites';
   static String getJobsbyLocations_endpoint(String locationId) {
-    return 'jobs/locations/$locationId';
+    return 'jobs/?locationId=$locationId';
   }
-  static String getJobsbyCategories_endpoint(String categoryName) {
-    return 'jobs/categories/$categoryName';
+  static String getJobsbyCategories_endpoint(List<String> categoryNames) {
+    final query = categoryNames.map((e) => 'categoryNames=${Uri.encodeComponent(e)}').join('&');
+    return 'jobs/?$query';
+  }
+  static String getJobsbyBothLocationCategory_endpoint(String locationId, List<String> categoryNames)
+  {
+    final query1 = 'locationId=$locationId';
+    final query2 = categoryNames.map((e) => 'categoryNames=${Uri.encodeComponent(e)}').join('&');
+    return 'jobs/?$query1&$query2';
   }
   static final String postApplication_endpoint = 'applications';
   static final String getApplication_endpoint = 'applications';
