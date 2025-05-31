@@ -42,4 +42,5 @@ class APIConstants {
     return 'applications/$applicationId';
   }
   static final String patchJob_admin_endpoint = 'jobs/process/status';
+  static final String getUser_admin_endpoint = 'users';
 }

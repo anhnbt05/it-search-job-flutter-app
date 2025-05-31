@@ -1,20 +1,20 @@
 import 'package:flutter/cupertino.dart';
 
 class JoblistNavigationViewModel extends ChangeNotifier{
-  int _joblistIndex = 0;
-  final PageController _joblistController = PageController();
+  int _index = 0;
+  final PageController _pageController = PageController();
 
-  int get joblistIndex => _joblistIndex;
-  PageController get joblistController => _joblistController;
+  int get index => _index;
+  PageController get pageController => _pageController;
 
   void onTapAppliedJob_FavJob(int index) {
-    if (_joblistIndex != index) {
-      _joblistIndex = index;
+    if (_index != index) {
+      _index = index;
       notifyListeners();
     }
 
-    if (_joblistController.hasClients) {
-      _joblistController.animateToPage(
+    if (_pageController.hasClients) {
+      _pageController.animateToPage(
         index,
         duration: Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -24,7 +24,7 @@ class JoblistNavigationViewModel extends ChangeNotifier{
 
   @override
   void dispose() {
-    _joblistController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 }

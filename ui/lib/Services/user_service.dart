@@ -7,9 +7,11 @@ import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Helpers/toastification.dart';
+import 'package:ui/Models/ResponseModel.dart';
 
 import '../Helpers/helpers.dart';
 import '../Models/Recruiters.dart';
+import '../Models/Users.dart';
 import '../ViewModels/login/SignInViewModel.dart';
 import 'api_service.dart';
 
@@ -28,7 +30,8 @@ class UserService {
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
         print(data);
-        return cRecruiters.fromJson(data);
+        cRecruiters r = cRecruiters.fromJson(data);
+        return r;
       }
       return null;
     } catch (e) {
@@ -79,5 +82,22 @@ class UserService {
       showErrorToastification(title: "Lỗi", message: e.toString());
       return null;
     }
+  }
+
+  Future<List<cUsers>> getAllUser(BuildContext context) async {
+    var validToken = await getValidAccessToken(context);
+
+    final response = await http.get(
+      Uri.parse('${APIConstants.baseUrl}/${APIConstants.getUser_admin_endpoint}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $validToken',
+      },
+    );
+
+    List<dynamic> userList = jsonDecode(response.body);
+    List<cUsers> r = userList.map((e) => cUsers.fromJson(e)).toList();
+    print(r[0].Role);
+    return r;
   }
 }
