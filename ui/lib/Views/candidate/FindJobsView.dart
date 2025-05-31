@@ -10,7 +10,7 @@
   import 'JobDetailView.dart';
 
   class FindJobsView extends StatelessWidget {
-  //   const FindJobsView({super.key});
+    const FindJobsView({super.key});
   //
   //   @override
   //   State<FindJobsView> createState() => _FindJobsViewState();

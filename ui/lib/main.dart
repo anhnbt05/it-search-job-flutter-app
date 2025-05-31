@@ -9,6 +9,7 @@ import 'package:ui/ViewModels/candidate/AppliedJobsViewModel.dart';
 import 'package:ui/ViewModels/candidate/FavoritesJobsViewModel.dart';
 import 'package:ui/ViewModels/candidate/FindJobsViewModel.dart';
 import 'package:ui/ViewModels/AuthViewModel.dart';
+import 'package:ui/ViewModels/candidate/ProfileCandidateViewModel.dart';
 import 'package:ui/ViewModels/login/CompaniesViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import 'package:ui/ViewModels/login/ProvincesViewModel.dart';
@@ -59,6 +60,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => FavoritesJobsViewModel()),
         ChangeNotifierProvider(create: (_) => AppliedJobsViewModel()),
         ChangeNotifierProvider(create: (_) => JoblistNavigationViewModel()),
+        ChangeNotifierProvider(create: (_) => ProfileCandidateViewModel()),
 
         if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'recruiter') ...[
           ChangeNotifierProvider(create: (_) => ProvincesViewModel()),

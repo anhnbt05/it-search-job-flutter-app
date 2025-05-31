@@ -7,6 +7,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 import 'package:ui/Constants/api_constants.dart';
 import 'package:ui/Helpers/toastification.dart';
+import 'package:ui/Models/Candidates.dart';
 
 import '../Helpers/helpers.dart';
 import '../Models/Recruiters.dart';
@@ -77,6 +78,26 @@ class UserService {
       }
     } catch (e) {
       showErrorToastification(title: "Lỗi", message: e.toString());
+      return null;
+    }
+  }
+  Future<cCandidates_cApplication_recruiter?> getCandidateInfo(
+      {required String Id, required BuildContext context}) async {
+    try {
+      final validToken = await getValidAccessToken(context);
+
+      final response = await _apiService.getWithToken(
+        accessToken: validToken!,
+        endpoint: APIConstants.getProfile_candidate_endpoint(Id),);
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
+        print(data);
+        return cCandidates_cApplication_recruiter.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      print("Error: $e");
       return null;
     }
   }
