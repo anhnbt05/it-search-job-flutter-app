@@ -75,7 +75,7 @@ export class UsersService {
 
       return data
         .map((data: Users) => omit(data, ['Password']))
-        .filter((user) => user.Role !== Role.admin && user.Status === 'active')
+        .filter((user) => user.Role !== Role.admin)
         .sort(
           (a, b) =>
             new Date(b.CreatedAt).getTime() - new Date(a.CreatedAt).getTime(),
@@ -401,7 +401,7 @@ export class UsersService {
         .from('Users')
         .update([
           {
-            DeleteAt: new Date(),
+            DeletedAt: new Date(),
             Status: UserStatus.inactive,
           },
         ])
