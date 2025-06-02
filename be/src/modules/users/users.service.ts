@@ -33,7 +33,7 @@ export class UsersService {
     try {
       const { data, error } = await this.anonSupabaseClient
         .from('Users')
-        .select('*');
+        .select('*, Recruiters(*), Candidates(*)');
 
       if (error) {
         console.error(error);
@@ -74,11 +74,23 @@ export class UsersService {
       }
 
       return data
-        .map((data: Users) => omit(data, ['Password']))
         .filter((user) => user.Role !== Role.admin)
+        .map((data: any) =>
+          omit(
+            {
+              ...data,
+              ID:
+                data.Role === Role.recruiter
+                  ? data.Recruiters[0].ID
+                  : data.Candidates[0].ID,
+            },
+            ['Password', 'Recruiters', 'Candidates'],
+          ),
+        )
         .sort(
           (a, b) =>
-            new Date(b.CreatedAt).getTime() - new Date(a.CreatedAt).getTime(),
+            new Date(b.CreatedAt as string).getTime() -
+            new Date(a.CreatedAt as string).getTime(),
         );
     } catch (err) {
       console.error(err);
