@@ -26,10 +26,28 @@ class UserService {
       final response = await _apiService.getWithToken(
         accessToken: validToken!,
         endpoint: '${APIConstants.getUser_endpoint}/$Id',);
-
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(data);
+        cRecruiters r = cRecruiters.fromJson(data);
+        return r;
+      }
+      return null;
+    } catch (e) {
+      print("Error: $e");
+      return null;
+    }
+  }
+
+  Future<cRecruiters?> getRecruiterInfo_admin(
+      {required String Id, required BuildContext context}) async {
+    try {
+      final validToken = await getValidAccessToken(context);
+
+      final response = await _apiService.getWithToken(
+        accessToken: validToken!,
+        endpoint: 'users?recruiterId=$Id',);
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
         cRecruiters r = cRecruiters.fromJson(data);
         return r;
       }

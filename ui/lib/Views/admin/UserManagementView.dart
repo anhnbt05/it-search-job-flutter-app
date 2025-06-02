@@ -83,7 +83,7 @@ Widget recruiterPage(BuildContext context, UserManagementViewModel viewModel) {
 
 double calculateTextWidth(BuildContext context) {
   final textPainter = TextPainter(
-    text: TextSpan(text: "M" * 8, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+    text: TextSpan(text: "M" * 9, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
     maxLines: 1,
     textDirection: TextDirection.ltr,
   )..layout();
@@ -187,10 +187,17 @@ Widget candidateItem(BuildContext context, cUsers user, UserManagementViewModel 
                           children: [
                             Icon(Icons.email_outlined, size: 13, color: Color(0xff0c3093),),
                             SizedBox(width: 2,),
-                            Text(user.Email!, style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.normal,
-                            ),)
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 3),
+                                child: Text(user.Email!, style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,),
+                              ),
+                            )
                           ],
                         ),
                         Row(
@@ -219,7 +226,7 @@ Widget candidateItem(BuildContext context, cUsers user, UserManagementViewModel 
 Widget recruiterItem(BuildContext context, cUsers user, UserManagementViewModel viewModel) {
   return GestureDetector(
     onTap: () {
-      /*Navigator.push(
+      Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => ChangeNotifierProvider(
@@ -227,7 +234,7 @@ Widget recruiterItem(BuildContext context, cUsers user, UserManagementViewModel 
             child: RecruiterInforScreen(),
           ),
         ),
-      );*/
+      );
     },
     child: Padding(
       padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
@@ -319,10 +326,17 @@ Widget recruiterItem(BuildContext context, cUsers user, UserManagementViewModel 
                           children: [
                             Icon(Icons.email_outlined, size: 13, color: Color(0xff0c3093),),
                             SizedBox(width: 2,),
-                            Text(user.Email!, style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.normal,
-                            ),)
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 3),
+                                child: Text(user.Email!, style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,),
+                              ),
+                            )
                           ],
                         ),
                         Row(

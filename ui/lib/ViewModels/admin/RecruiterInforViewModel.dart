@@ -10,7 +10,7 @@ class RecruiterInforViewModel extends ChangeNotifier {
   Future<cRecruiters?> get recruiterFuture => _recruiterFuture;
 
   RecruiterInforViewModel(BuildContext context, String userId) {
-    _recruiterFuture = UserService().getRecruiterInfo(Id: userId, context: context).then((value) {
+    _recruiterFuture = UserService().getRecruiterInfo_admin(Id: userId, context: context).then((value) {
       _recruiter = value;
       print(_recruiter!.Email);
       return value;
