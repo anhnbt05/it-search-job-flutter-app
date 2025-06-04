@@ -51,6 +51,35 @@ class cUsers {
     );
   }
 
+  cUsers copyWith({
+    String? ID,
+    String? Email,
+    String? FullName,
+    String? AvatarUrl,
+    String? PhoneNumber,
+    eUserStatus? Status,
+    DateTime? CreatedAt,
+    DateTime? UpdatedAt,
+    eRole? Role,
+    DateTime? DeletedAt,
+    bool? IsEmailVerified,
+  }) {
+    return cUsers(
+      ID: ID ?? this.ID,
+      Email: Email ?? this.Email,
+      FullName: FullName ?? this.FullName,
+      AvatarUrl: AvatarUrl ?? this.AvatarUrl,
+      PhoneNumber: PhoneNumber ?? this.PhoneNumber,
+      Status: Status ?? this.Status,
+      CreatedAt: CreatedAt ?? this.CreatedAt,
+      UpdatedAt: UpdatedAt ?? this.UpdatedAt,
+      Role: Role ?? this.Role,
+      DeletedAt: DeletedAt ?? this.DeletedAt,
+      IsEmailVerified: IsEmailVerified ?? this.IsEmailVerified,
+    );
+  }
+
+
   Map<String, dynamic> toJson() => {
     'ID': ID,
     'Email': Email,

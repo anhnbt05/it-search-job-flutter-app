@@ -48,6 +48,7 @@ class UserService {
         endpoint: 'users?recruiterId=$Id',);
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
+        print(data);
         cRecruiters r = cRecruiters.fromJson(data);
         return r;
       }
@@ -115,7 +116,26 @@ class UserService {
 
     List<dynamic> userList = jsonDecode(response.body);
     List<cUsers> r = userList.map((e) => cUsers.fromJson(e)).toList();
-    print(r[0].Role);
     return r;
+  }
+
+  Future<bool> deleteUser(String userId, BuildContext context) async {
+    var validToken = await getValidAccessToken(context);
+
+    final url = Uri.parse('${APIConstants.baseUrl}/${APIConstants.deleteUser_endpoint}/$userId');
+    final response = await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer $validToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      showErrorToastification(title: "Lỗi", message: jsonDecode(response.body)["message"]);
+      return false;
+    }
   }
 }

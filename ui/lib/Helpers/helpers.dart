@@ -10,6 +10,7 @@ import 'package:ui/Constants/color_constants.dart';
 
 import '../Constants/api_constants.dart';
 import '../ViewModels/BottomNavigationViewModel.dart';
+import '../ViewModels/admin/UserNavigationViewModel.dart';
 import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
 import '../ViewModels/login/SignInViewModel.dart';
 
@@ -91,7 +92,7 @@ PreferredSize? candidateBottomBar(String Role, int index, BuildContext context) 
 }
 
 PreferredSize? adminBottomBar(String Role, int index, BuildContext context) {
-  var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(
+  var joblistNavigationProvider = Provider.of<UserNavigationViewModel>(
     context,
   );
   if (index != 1)

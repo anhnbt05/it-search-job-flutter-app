@@ -1,9 +1,11 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/Models/Enum.dart';
 import 'package:ui/Services/user_service.dart';
+import 'package:ui/ViewModels/admin/UserNavigationViewModel.dart';
 import 'package:ui/ViewModels/candidate/JoblistNavigationViewModel.dart';
 import 'package:ui/Views/admin/RecruiterInforScreen.dart';
 
@@ -13,26 +15,36 @@ import '../../ViewModels/admin/UserManagementViewModel.dart';
 
 Widget UserManagementScreen(BuildContext context) {
   var viewModel = Provider.of<UserManagementViewModel>(context);
-  var controller = Provider.of<JoblistNavigationViewModel>(context);
+  var controller = Provider.of<UserNavigationViewModel>(context);
 
-  return PageView(
-    controller: controller.pageController,
-    physics: NeverScrollableScrollPhysics(),
-    children: [
-      candidatePage(context, viewModel),
-      recruiterPage(context, viewModel),
-    ],
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (controller.pageController.hasClients) {
+      int currentPage = controller.pageController.page?.round() ?? 0;
+      if (currentPage != controller.index) {
+        controller.pageController.jumpToPage(controller.index);
+      }
+    }
+  });
+
+  return GestureDetector(
+    behavior: HitTestBehavior.opaque,
+    onTap: () {
+      FocusScope.of(context).unfocus();
+    },
+    child: PageView(
+      controller: controller.pageController,
+      physics: NeverScrollableScrollPhysics(),
+      children: [
+        candidatePage(context, viewModel),
+        recruiterPage(context, viewModel),
+      ],
+    ),
   );
 }
 
 Widget candidatePage(BuildContext context, UserManagementViewModel viewModel) {
   if (viewModel.userCandidates != null) {
-    return ListView.builder(
-      itemCount: viewModel.userCandidates!.length,
-      itemBuilder: (context, index) {
-        return candidateItem(context, viewModel.userCandidates![index]!, viewModel);
-      },
-    );
+    return candidateBody(viewModel);
   }
   return FutureBuilder(
     future: viewModel.usersFuture,
@@ -42,25 +54,109 @@ Widget candidatePage(BuildContext context, UserManagementViewModel viewModel) {
           child: CircularProgressIndicator(color: Colors.blue),
         );
       } else {
-        return ListView.builder(
-          itemCount: viewModel.userCandidates!.length,
-          itemBuilder: (context, index) {
-            return candidateItem(context, viewModel.userCandidates![index]!, viewModel);
-          },
-        );
+        return candidateBody(viewModel);
       }
     },
   );
 }
 
+Widget candidateBody(UserManagementViewModel viewModel) {
+  return Column(
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(32),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.search, color: Colors.grey),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  onChanged: (value) {
+                    viewModel.filterCandidateByName(value);
+                  },
+                  cursorColor: Colors.grey,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      Align(
+        alignment: Alignment.centerRight,
+        child: Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton2<String>(
+              isDense: true,
+              value: viewModel.statusFilter_candidate,
+              items: [
+                DropdownMenuItem<String>(
+                  value: "all",
+                  child: Text("Tất cả", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                ),
+                DropdownMenuItem<String>(
+                  value: "active",
+                  child: Text("Còn hoạt động", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                ),
+                DropdownMenuItem<String>(
+                  value: "inactive",
+                  child: Text("Đã bị khóa", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                ),
+              ],
+              buttonStyleData: ButtonStyleData(
+                overlayColor: MaterialStateProperty.all(Colors.transparent),
+              ),
+              dropdownStyleData: DropdownStyleData(
+                elevation: 1,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.white
+                ),
+              ),
+              onChanged: (value){
+                viewModel.filterCandidateByStatus(value);
+              },
+              iconStyleData: IconStyleData(
+                icon: Icon(Icons.arrow_drop_down),
+              ),
+            ),
+          ),
+        ),
+      ),
+      Expanded(
+        child: (viewModel.userCandidates!.isNotEmpty) ? ListView.builder(
+          itemCount: viewModel.userCandidates!.length,
+          itemBuilder: (context, index) {
+            return candidateItem(context, viewModel.userCandidates![index]!, viewModel);
+          },
+        ) : Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Text("Không tìm thấy người dùng", style: TextStyle(fontSize: 14, color: Colors.grey.shade600),),
+        ),
+      ),
+    ],
+  );
+}
+
 Widget recruiterPage(BuildContext context, UserManagementViewModel viewModel) {
   if (viewModel.userCandidates != null) {
-    return ListView.builder(
-      itemCount: viewModel.userRecruiter!.length,
-      itemBuilder: (context, index) {
-        return recruiterItem(context, viewModel.userRecruiter![index]!, viewModel);
-      },
-    );
+    return recruiterBody(viewModel);
   }
   return FutureBuilder(
     future: viewModel.usersFuture,
@@ -70,14 +166,103 @@ Widget recruiterPage(BuildContext context, UserManagementViewModel viewModel) {
           child: CircularProgressIndicator(color: Colors.blue),
         );
       } else {
-        return ListView.builder(
+        return recruiterBody(viewModel);
+      }
+    },
+  );
+}
+
+Widget recruiterBody(UserManagementViewModel viewModel) {
+  return Column(
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(32),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.search, color: Colors.grey),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  onChanged: (value) {
+                    viewModel.filterRecruiterByName(value);
+                  },
+                  cursorColor: Colors.grey,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      Align(
+        alignment: Alignment.centerRight,
+        child: Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton2<String>(
+              isDense: true,
+              value: viewModel.statusFilter_recruiter,
+              items: [
+                DropdownMenuItem<String>(
+                  value: "all",
+                  child: Text("Tất cả", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                ),
+                DropdownMenuItem<String>(
+                  value: "active",
+                  child: Text("Còn hoạt động", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                ),
+                DropdownMenuItem<String>(
+                  value: "inactive",
+                  child: Text("Đã bị khóa", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                ),
+              ],
+              buttonStyleData: ButtonStyleData(
+                overlayColor: MaterialStateProperty.all(Colors.transparent),
+              ),
+              dropdownStyleData: DropdownStyleData(
+                elevation: 1,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.white
+                ),
+              ),
+              onChanged: (value){
+                viewModel.filterRecruiterByStatus(value);
+              },
+              iconStyleData: IconStyleData(
+                icon: Icon(Icons.arrow_drop_down),
+              ),
+            ),
+          ),
+        ),
+      ),
+      Expanded(
+        child: (viewModel.userRecruiter!.isNotEmpty) ? ListView.builder(
           itemCount: viewModel.userRecruiter!.length,
           itemBuilder: (context, index) {
             return recruiterItem(context, viewModel.userRecruiter![index]!, viewModel);
           },
-        );
-      }
-    },
+        ) : Padding (
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Text("Không tìm thấy người dùng", style: TextStyle(fontSize: 14, color: Colors.grey.shade600),),
+        ),
+      ),
+    ],
   );
 }
 

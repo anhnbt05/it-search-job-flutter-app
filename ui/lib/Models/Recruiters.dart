@@ -1,3 +1,5 @@
+import 'package:ui/Models/Enum.dart';
+
 import 'Companies.dart';
 import 'CompanyLocations.dart';
 
@@ -28,33 +30,39 @@ class cRecruiterPost {
 }
 
 class cRecruiters {
+  final String ID;
   final String Position;
   final String FullName;
   final String Email;
   final String AvatarUrl;
   final String PhoneNumber;
+  final String Status;
   final bool IsEmailVerified;
   late cCompany_RecruiterInfo Company;
   final cCompanyLocation_RecruiterInfo CompanyLocations;
 
   cRecruiters({
+    required this.ID,
     required this.Position,
     required this.FullName,
     required this.Email,
     required this.AvatarUrl,
     required this.PhoneNumber,
     required this.IsEmailVerified,
+    required this.Status,
     required this.Company,
     required this.CompanyLocations,
   });
 
   factory cRecruiters.fromJson(Map<String, dynamic> json) {
     return cRecruiters(
+      ID: json['ID'],
       Position: json['Position'],
       FullName: json['FullName'],
       Email: json['Email'],
       AvatarUrl: json['AvatarUrl'],
       PhoneNumber: json['PhoneNumber'],
+      Status: json['Status'],
       IsEmailVerified: json['IsEmailVerified'],
       Company: cCompany_RecruiterInfo.fromJson(json['Company']),
       CompanyLocations: cCompanyLocation_RecruiterInfo.fromJson(json['CompanyLocations']),
@@ -66,10 +74,13 @@ class cRecruiters {
     required String newPhoneNumber,
     required String newPosition,
     required String newAvatarUrl,
+    required String Status,
   }) {
     return cRecruiters(
+      ID: ID,
       Position: newPosition,
       FullName: newFullName,
+      Status: Status,
       Email: Email,
       AvatarUrl: newAvatarUrl,
       PhoneNumber: newPhoneNumber,
