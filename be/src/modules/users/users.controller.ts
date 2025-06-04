@@ -595,7 +595,7 @@ export class UsersController {
   })
   @ApiParam({
     name: 'id',
-    description: 'Mã định danh (Id) duy nhất của người dùng.',
+    description: 'Mã định danh (Id) duy nhất theo role của người dùng.',
     example: 'b820f7cb-dbf7-4897-8962-f3d2b8e93815',
   })
   @ApiResponse({
