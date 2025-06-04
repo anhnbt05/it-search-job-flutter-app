@@ -116,11 +116,6 @@ export class UsersService {
           `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
         );
 
-      if (data.Status === 'inactive')
-        throw new NotFoundException(
-          `Tài khoản của người dùng có tên '${data.FullName}' đã bị khoá bởi quản trị viên của hệ thống.`,
-        );
-
       const { data: currentUser } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
