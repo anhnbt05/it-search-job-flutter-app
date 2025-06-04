@@ -27,6 +27,7 @@ import { FileValidationDecorator, Roles } from 'src/libs/common/decorators';
 import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
 import { API_TAGS, RoleEnum } from 'src/libs/common/utils';
 import {
+  DeleteUserQueryDto,
   SearchUsersDto,
   UpdateCandidateDto,
   UpdateRecruiterDto,
@@ -594,7 +595,7 @@ export class UsersController {
   })
   @ApiParam({
     name: 'id',
-    description: 'Mã định danh (Id) duy nhất của người dùng.',
+    description: 'Mã định danh (Id) duy nhất theo role của người dùng.',
     example: 'b820f7cb-dbf7-4897-8962-f3d2b8e93815',
   })
   @ApiResponse({
@@ -633,8 +634,11 @@ export class UsersController {
     },
   })
   @Roles(RoleEnum.ADMIN)
-  async deleteUser(@Param('id', ParseUUIDPipe) userId: string) {
-    return this.usersService.handleDeleteUser(userId);
+  async deleteUser(
+    @Param('id', ParseUUIDPipe) roleId: string,
+    @Query() deleteUserQueryDto: DeleteUserQueryDto,
+  ) {
+    return this.usersService.handleDeleteUser(roleId, deleteUserQueryDto);
   }
 
   @Get(':id/notifications')
