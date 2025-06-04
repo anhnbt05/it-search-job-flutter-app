@@ -274,6 +274,7 @@ export class UsersController {
             'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
           PhoneNumber: '+84393873632',
           IsEmailVerified: true,
+          Status: 'active',
           Company: {
             ID: '2180647a-d0e5-4062-a4a1-28de8bdf539e',
             Name: 'Công ty ABC',
@@ -307,6 +308,8 @@ export class UsersController {
           AvatarUrl:
             'https://res.cloudinary.com/daiqcjyk9/image/upload/v1735465375/default_user_logo_b1f7pd.png',
           Role: 'candidate',
+          Status: 'active',
+          IsEmailVerified: true,
           WorkExperiences: [
             {
               ID: 'fddf389e-a341-46bb-9c52-0a1f818c738f',

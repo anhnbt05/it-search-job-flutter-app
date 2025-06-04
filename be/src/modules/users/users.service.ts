@@ -141,7 +141,7 @@ export class UsersService {
         const { data: candidate } = await this.anonSupabaseClient
           .from('Candidates')
           .select(
-            '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role) ,Applications(*, Jobs(*, Recruiters(*)))',
+            '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role, Status, IsEmailVerified) ,Applications(*, Jobs(*, Recruiters(*)))',
           )
           .eq('UserID', userId)
           .maybeSingle<any>();
@@ -190,7 +190,7 @@ export class UsersService {
         const { data: candidate } = await this.anonSupabaseClient
           .from('Candidates')
           .select(
-            '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role) ,Applications(*)',
+            '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role, Status, IsEmailVerified) ,Applications(*)',
           )
           .eq('UserID', userId)
           .maybeSingle<any>();
@@ -230,6 +230,7 @@ export class UsersService {
         AvatarUrl: recruiter.Users.AvatarUrl,
         PhoneNumber: recruiter.Users.PhoneNumber,
         IsEmailVerified: recruiter.Users.IsEmailVerified,
+        Status: recruiter.Users.Status,
         Company: recruiter.CompanyLocations.Companies,
         CompanyLocations: {
           ...omit(recruiter.CompanyLocations, [
@@ -460,6 +461,8 @@ export class UsersService {
       WorkExperiences: candidate.WorkExperiences.map((we: any) =>
         omit(we, ['CandidateID']),
       ),
+      Status: candidate.Users.Status,
+      IsEmailVerified: candidate.Users.IsEmailVerified,
     };
   };
 
