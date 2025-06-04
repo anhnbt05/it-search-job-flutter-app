@@ -16,8 +16,13 @@ import {
 import { SupabaseClient } from '@supabase/supabase-js';
 import { omit } from 'lodash';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
+import { RoleEnum } from 'src/libs/common/utils';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
-import { SearchUsersDto, UpdateUserDto } from 'src/modules/users/dtos';
+import {
+  DeleteUserQueryDto,
+  SearchUsersDto,
+  UpdateUserDto,
+} from 'src/modules/users/dtos';
 
 @Injectable()
 export class UsersService {
@@ -388,23 +393,27 @@ export class UsersService {
     }
   };
 
-  public handleDeleteUser = async (userId: string) => {
+  public handleDeleteUser = async (
+    roleId: string,
+    deleteUserQueryDto: DeleteUserQueryDto,
+  ) => {
     try {
+      const { role } = deleteUserQueryDto;
       const { data, error: findUserError } = await this.anonSupabaseClient
-        .from('Users')
-        .select('*')
-        .eq('ID', userId)
-        .maybeSingle<Users>();
+        .from(`${role === RoleEnum.CANDIDATE ? 'Candidates' : 'Recruiters'}`)
+        .select('*, Users(*)')
+        .eq('ID', roleId)
+        .maybeSingle<any>();
 
       if (!data || findUserError)
         throw new NotFoundException(
-          `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
+          `Không tìm thấy người dùng mà bạn yêu cầu cần xoá.`,
         );
 
-      if (data.Status === 'inactive')
+      if (data.Users.Status === UserStatus.inactive)
         throw new BadRequestException('Tài khoản này đã bị khoá rồi.');
 
-      if (data.Role === Role.admin)
+      if (data.Users.Role === Role.admin)
         throw new ForbiddenException(
           'Bạn không thể tự khoá chính tài khoản của mình.',
         );
@@ -417,7 +426,7 @@ export class UsersService {
             Status: UserStatus.inactive,
           },
         ])
-        .eq('ID', userId);
+        .eq('ID', data.Users.ID);
 
       if (error) {
         console.error(error);

@@ -27,6 +27,7 @@ import { FileValidationDecorator, Roles } from 'src/libs/common/decorators';
 import { RoleAuthGuard, SupabaseGuard } from 'src/libs/common/guards';
 import { API_TAGS, RoleEnum } from 'src/libs/common/utils';
 import {
+  DeleteUserQueryDto,
   SearchUsersDto,
   UpdateCandidateDto,
   UpdateRecruiterDto,
@@ -633,8 +634,11 @@ export class UsersController {
     },
   })
   @Roles(RoleEnum.ADMIN)
-  async deleteUser(@Param('id', ParseUUIDPipe) userId: string) {
-    return this.usersService.handleDeleteUser(userId);
+  async deleteUser(
+    @Param('id', ParseUUIDPipe) roleId: string,
+    @Query() deleteUserQueryDto: DeleteUserQueryDto,
+  ) {
+    return this.usersService.handleDeleteUser(roleId, deleteUserQueryDto);
   }
 
   @Get(':id/notifications')
