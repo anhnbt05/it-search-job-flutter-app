@@ -533,8 +533,7 @@ return PreferredSize(
                             textAlign: TextAlign.center,
                           ),
                           content: Text(
-                            "Bạn có chắc chắn muốn chấp nhận đơn ứng tuyển ${viewModel
-                                .job!.Title} không?",
+                            "Bạn có chắc chắn muốn chấp nhận duyệt bài tuyển dụng ${viewModel.job!.Title} không?",
                           ),
                           actions: [
                             TextButton(

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-class JoblistNavigationViewModel extends ChangeNotifier{
+class UserNavigationViewModel extends ChangeNotifier {
   int _index = 0;
   final PageController _pageController = PageController();
 

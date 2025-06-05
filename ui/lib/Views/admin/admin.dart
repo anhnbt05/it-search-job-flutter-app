@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../Helpers/helpers.dart';
 import 'RecruitmentApprovalView.dart';
+import 'UserManagementView.dart';
 
 List<BottomNavigationBarItem> bottomNavigationItem_admin(BuildContext context) {
   return [
@@ -16,14 +17,10 @@ List<BottomNavigationBarItem> bottomNavigationItem_admin(BuildContext context) {
 List<Widget> pageView_admin (BuildContext context) {
   return [
     RecruitmentApprovalScreen(context),
-    page2(context),
+    UserManagementScreen(context),
     page3(context),
     page4(context),
   ];
-}
-
-Widget page2(BuildContext context) {
-  return Center(child: Text("2", style: TextStyle(fontSize: 24)));
 }
 
 Widget page3(BuildContext context) {

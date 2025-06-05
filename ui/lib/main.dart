@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/ViewModels/admin/UserManagementViewModel.dart';
+import 'package:ui/ViewModels/admin/UserNavigationViewModel.dart';
 import 'package:ui/ViewModels/candidate/AppliedJobsViewModel.dart';
 import 'package:ui/ViewModels/candidate/FavoritesJobsViewModel.dart';
 import 'package:ui/ViewModels/candidate/FindJobsViewModel.dart';
@@ -90,7 +92,9 @@ class _MyAppState extends State<MyApp> {
           ),
         ],
         if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'admin') ...[
-          ChangeNotifierProvider(create: (context) => RecruiterApprovalViewModel(context))
+          ChangeNotifierProvider(create: (context) => RecruiterApprovalViewModel(context)),
+          ChangeNotifierProvider(create: (context) => UserManagementViewModel(context)),
+          ChangeNotifierProvider(create: (_) => UserNavigationViewModel()),
         ]
       ],
       child: MaterialApp(
@@ -193,11 +197,11 @@ class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
           backgroundColor: ColorConstants.appbarColor,
           centerTitle: true,
           title: appbarTitle(_role, bottomNavigationViewModel.selectedIndex),
-          bottom: bottomJobBar(
+          bottom: (_role == 'candidate') ? candidateBottomBar(
             _role,
             bottomNavigationViewModel.selectedIndex,
             context,
-          ),
+          ) : (_role == 'recruiter') ? null : (_role == 'admin') ? adminBottomBar(_role, bottomNavigationViewModel.selectedIndex, context) : null
         ),
         body: PageView(
           physics: const NeverScrollableScrollPhysics(),
