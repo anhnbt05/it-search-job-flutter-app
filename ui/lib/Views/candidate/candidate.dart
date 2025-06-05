@@ -56,19 +56,6 @@ Widget NotificationsScreen() {
   );
 }
 
-Widget ProfileScreen() {
-  // TODO: Modify section below
-  return Container(
-    color: Colors.purple.shade100,
-    child: Center(
-      child: Text(
-        "Hồ sơ",
-        style: TextStyle(fontSize: 24),
-      ),
-    ),
-  );
-}
-
 List<BottomNavigationBarItem> bottomNavigationItem_candidate(
     BuildContext context,
     ) {

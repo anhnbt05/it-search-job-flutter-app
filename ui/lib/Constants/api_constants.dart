@@ -52,4 +52,5 @@ class APIConstants {
   static String getProfile_candidate_endpoint(String Id) {
     return 'users/$Id';
   }
+  static final String WorkExperiences_endpoint = 'work-experiences';
 }

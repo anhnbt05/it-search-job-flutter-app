@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/ViewModels/candidate/ProfileCandidateViewModel.dart';
+import 'package:ui/Views/candidate/PostWorkExperiencesView.dart';
 
 class ProfileCandidateView extends StatelessWidget {
   const ProfileCandidateView({super.key});
@@ -115,6 +116,18 @@ class ProfileCandidateView extends StatelessWidget {
                       ),
                     );
                   }).toList(),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => PostWorkExperiencesView()));
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text("Thêm kinh nghiệm làm việc"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
                 ],
               ),
             ),
