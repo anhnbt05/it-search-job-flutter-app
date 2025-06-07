@@ -1,9 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:ui/Constants/api_constants.dart';
+import 'package:ui/Models/Categories.dart';
 
 import '../Helpers/helpers.dart';
+import '../Helpers/toastification.dart';
+import '../Models/ResponseModel.dart';
 import 'api_service.dart';
 
 class CategoryService {
@@ -34,6 +38,7 @@ class CategoryService {
       return null;
     }
   }
+
   Future<List<Map<String, dynamic>>?> getCategory2({
     required BuildContext context,
   }) async {
@@ -67,6 +72,32 @@ class CategoryService {
     }
   }
 
+  Future<ResponseModel> addCategory({
+    required BuildContext context,
+    required String categoryName,
+  }) async {
+    final validToken = await getValidAccessToken(context);
+    final url = Uri.parse('${APIConstants.baseUrl}/${APIConstants.postCategory_endpoint}');
 
-
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $validToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'CategoryName': categoryName
+      }),
+    );
+    if (response.statusCode == 201) {
+      showSuccessToastification(title: "Hoàn tất", message: "Thêm danh mục thành công");
+      List<cCategories> data = (jsonDecode(response.body) as List)
+          .map((e) => cCategories.fromJson(e as Map<String, dynamic>))
+          .toList();
+      return ResponseModel(success: true, message: "Thêm danh mục thành công", messageList: ["Thêm danh mục thành công"], data: data);
+    } else {
+      showErrorToastification(title: "Lỗi", message: jsonDecode(response.body)["message"]);
+      return ResponseModel(success: false, message: jsonDecode(response.body)["message"], messageList: [jsonDecode(response.body)["message"]], data: null);
+    }
+  }
 }
