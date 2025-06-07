@@ -22,6 +22,7 @@ import 'package:ui/Views/candidate/candidate.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
 
 import 'ViewModels/BottomNavigationViewModel.dart';
+import 'ViewModels/admin/CategoryManagementViewModel.dart';
 import 'ViewModels/admin/RecruimentApprovalViewModel.dart';
 import 'ViewModels/candidate/JoblistNavigationViewModel.dart';
 import 'ViewModels/recruiter/JobPostViewModel.dart';
@@ -95,6 +96,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context) => RecruiterApprovalViewModel(context)),
           ChangeNotifierProvider(create: (context) => UserManagementViewModel(context)),
           ChangeNotifierProvider(create: (_) => UserNavigationViewModel()),
+          ChangeNotifierProvider(create: (context) => CategoryManagementViewModel(context)),
         ]
       ],
       child: MaterialApp(

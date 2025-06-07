@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../Helpers/helpers.dart';
+import 'CategoryManagementView.dart';
 import 'RecruitmentApprovalView.dart';
 import 'UserManagementView.dart';
 
@@ -18,13 +19,9 @@ List<Widget> pageView_admin (BuildContext context) {
   return [
     RecruitmentApprovalScreen(context),
     UserManagementScreen(context),
-    page3(context),
+    CategoryManagementScreen(context),
     page4(context),
   ];
-}
-
-Widget page3(BuildContext context) {
-  return Center(child: Text("3", style: TextStyle(fontSize: 24)));
 }
 
 Widget page4(BuildContext context) {
