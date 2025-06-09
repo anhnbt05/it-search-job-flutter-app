@@ -45,5 +45,28 @@ class cCandidates_cApplication_recruiter {
           .toList(),
     );
   }
+  cCandidates_cApplication_recruiter CopyCandidateInfor({
+    String? newFullName,
+    String? newPhoneNumber,
+    String? newBio,
+    String? newLevel,
+    List<String>? newCertifications,
+    String? newAvatarUrl,
+  }) {
+    return cCandidates_cApplication_recruiter(
+      ID: ID,
+      Bio: newBio ?? Bio,
+      Level: newLevel ?? Level,
+      ResumeUrl: ResumeUrl,
+      Certifications: newCertifications ?? Certifications,
+      FullName: newFullName ?? FullName,
+      Email: Email,
+      PhoneNumber: newPhoneNumber ?? PhoneNumber,
+      AvatarUrl: newAvatarUrl ?? AvatarUrl,
+      Role: Role,
+      WorkExperiences: WorkExperiences,
+    );
+  }
+  String get id => ID;
 }
 

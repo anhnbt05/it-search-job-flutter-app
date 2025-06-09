@@ -9,6 +9,7 @@ import '../../Services/auth_signout_service.dart';
 import '../AuthViewModel.dart';
 
 class ProfileCandidateViewModel extends ChangeNotifier {
+  late String? userId;
   final UserService _userService = UserService();
   final FlutterSecureStorage _storage = APIConstants.storage;
 
@@ -17,6 +18,10 @@ class ProfileCandidateViewModel extends ChangeNotifier {
   String? _error;
 
   cCandidates_cApplication_recruiter? get candidate => _candidate;
+  set candidate(cCandidates_cApplication_recruiter? value)
+  {
+     _candidate = value;
+  }
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -28,7 +33,7 @@ class ProfileCandidateViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId= await _storage.read(key: 'userID');
+      userId= await _storage.read(key: 'userID');
       final result = await _userService.getCandidateInfo(
         Id: userId!,
         context: context,

@@ -101,4 +101,52 @@ class UserService {
       return null;
     }
   }
+  Future<String?> patchCandidateInfo({
+    required String userId,
+    required Map<String, dynamic> updateCandidateDto,
+    required File file,
+    required String newName,
+    required String newPhoneNumber,
+    required BuildContext context,
+  }) async {
+    try {
+      final validToken = await getValidAccessToken(context);
+      final request = http.MultipartRequest(
+        'PATCH',
+        Uri.parse("${APIConstants.baseUrl}/users/$userId"),
+      );
+      request.headers['Authorization'] = 'Bearer $validToken';
+      request.fields['updateCandidateDto'] = jsonEncode(updateCandidateDto);
+      request.fields['FullName'] = newName;
+      request.fields['PhoneNumber'] = newPhoneNumber;
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'avatarFile',
+          file.path,
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      );
+
+      final response = await request.send();
+      final responseString = await response.stream.bytesToString();
+      final decoded = jsonDecode(responseString);
+
+      if (response.statusCode == 200) {
+        showSuccessToastification(
+            title: "Hoàn tất",
+            message: "Cập nhật thông tin của người dùng thành công");
+        return decoded['AvatarUrl'];
+      } else {
+        print(decoded);
+        showErrorToastification(
+            title: "Lỗi", message: decoded['message'][0]['message']);
+        return null;
+      }
+    } catch (e) {
+      showErrorToastification(title: "Lỗi", message: e.toString());
+      return null;
+    }
+  }
+
 }

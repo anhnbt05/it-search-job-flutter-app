@@ -58,12 +58,15 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => LoginNavigationViewModel()),
         ChangeNotifierProvider(create: (_) => SignUpViewModel()),
         ChangeNotifierProvider(create: (_) => SignInViewModel()),
-        ChangeNotifierProvider(create: (_) => FindJobsViewModel()),
-        ChangeNotifierProvider(create: (_) => FavoritesJobsViewModel()),
-        ChangeNotifierProvider(create: (_) => AppliedJobsViewModel()),
         ChangeNotifierProvider(create: (_) => JoblistNavigationViewModel()),
-        ChangeNotifierProvider(create: (_) => ProfileCandidateViewModel()),
-        ChangeNotifierProvider(create: (_) => WorkExperiencesViewModel()),
+
+        if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'candidate') ...[
+          ChangeNotifierProvider(create: (_) => FindJobsViewModel()),
+          ChangeNotifierProvider(create: (_) => FavoritesJobsViewModel()),
+          ChangeNotifierProvider(create: (_) => AppliedJobsViewModel()),
+          ChangeNotifierProvider(create: (_) => ProfileCandidateViewModel()),
+          ChangeNotifierProvider(create: (_) => WorkExperiencesViewModel()),
+        ],
         if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'recruiter') ...[
           ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
           ChangeNotifierProvider(create: (_) => CompaniesViewModel()),
