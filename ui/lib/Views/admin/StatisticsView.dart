@@ -32,6 +32,8 @@ Widget body({required StatisticsViewModel viewModel, required BuildContext conte
       jobStatistics(viewModel: viewModel, context: context),
       SizedBox(height: 5,),
       applicationStatistics(viewModel: viewModel, context: context),
+      SizedBox(height: 5,),
+      userStatistics(viewModel: viewModel, context: context),
     ],
   );
 }
@@ -195,16 +197,16 @@ Widget jobStatistics({required StatisticsViewModel viewModel, required BuildCont
                 child: Align(
                   child: (viewModel.jobStatistics!.total > 0) ? SfCircularChart(
                     margin: EdgeInsets.zero,
-                    series: <PieSeries<PieData, String>>[
-                      PieSeries<PieData, String>(
+                    series: <PieSeries<ChartData, String>>[
+                      PieSeries<ChartData, String>(
                         explode: true,
                         animationDuration: 300,
                         radius: '90%',
-                        dataSource: viewModel.job_pieData,
-                        xValueMapper: (PieData data, _) => data.xData,
-                        yValueMapper: (PieData data, _) => data.yData,
-                        dataLabelMapper: (PieData data, _) => data.text,
-                        pointColorMapper: (PieData data, _) => data.color,
+                        dataSource: viewModel.job_chartData,
+                        xValueMapper: (ChartData data, _) => data.xData,
+                        yValueMapper: (ChartData data, _) => data.yData,
+                        dataLabelMapper: (ChartData data, _) => data.text,
+                        pointColorMapper: (ChartData data, _) => data.color,
                         dataLabelSettings: const DataLabelSettings(isVisible: true),
                       )
                     ],
@@ -235,7 +237,7 @@ Widget jobStatistics({required StatisticsViewModel viewModel, required BuildCont
                     SizedBox(height: 5,),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: viewModel.job_pieData.map((item) {
+                      children: viewModel.job_chartData.map((item) {
                         return Row(
                           children: [
                             Text("●", style: TextStyle(fontSize: 16, color: item.color)),
@@ -456,16 +458,16 @@ Widget applicationStatistics({required StatisticsViewModel viewModel, required B
                 child: Align(
                   child: (viewModel.applicationStatistics!.total > 0) ? SfCircularChart(
                     margin: EdgeInsets.zero,
-                    series: <PieSeries<PieData, String>>[
-                      PieSeries<PieData, String>(
+                    series: <PieSeries<ChartData, String>>[
+                      PieSeries<ChartData, String>(
                         explode: true,
                         animationDuration: 300,
                         radius: '90%',
-                        dataSource: viewModel.application_pieData,
-                        xValueMapper: (PieData data, _) => data.xData,
-                        yValueMapper: (PieData data, _) => data.yData,
-                        dataLabelMapper: (PieData data, _) => data.text,
-                        pointColorMapper: (PieData data, _) => data.color,
+                        dataSource: viewModel.application_chartData,
+                        xValueMapper: (ChartData data, _) => data.xData,
+                        yValueMapper: (ChartData data, _) => data.yData,
+                        dataLabelMapper: (ChartData data, _) => data.text,
+                        pointColorMapper: (ChartData data, _) => data.color,
                         dataLabelSettings: const DataLabelSettings(isVisible: true),
                       )
                     ],
@@ -496,7 +498,7 @@ Widget applicationStatistics({required StatisticsViewModel viewModel, required B
                     SizedBox(height: 5,),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: viewModel.application_pieData.map((item) {
+                      children: viewModel.application_chartData.map((item) {
                         return Row(
                           children: [
                             Text("●", style: TextStyle(fontSize: 16, color: item.color)),
@@ -542,6 +544,268 @@ Widget applicationStatistics({required StatisticsViewModel viewModel, required B
                   ),
                 ),
                 child: (viewModel.isApplicationLoading) ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white,)) : Text(
+                  'Thống kê',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ),
+          )
+              : SizedBox.shrink(),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget userStatistics({required StatisticsViewModel viewModel, required BuildContext context}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(padding: const EdgeInsets.only(top: 5, left: 7), child: Text("Thống kê người dùng",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              )
+              ),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: (){
+                      viewModel.updateUserFilterVisible();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          color: (!viewModel.isUserFilterVisible) ? Colors.black : Colors.red,
+                          width: 1.0,
+                        ),
+                        color: Colors.white,
+                      ),
+                      child: (!viewModel.isUserFilterVisible) ? Icon(Icons.filter_alt_outlined) : Icon(Icons.filter_alt_off_outlined, color: Colors.red,),
+                    ),
+                  ),
+                  SizedBox(width: 10,),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          (viewModel.isUserFilterVisible)
+              ? Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      color: Colors.black,
+                      width: 1.0,
+                    ),
+                  ),
+                  width: (MediaQuery.of(context).size.width - 40) / 2,
+                  height: 30,
+                  child: Builder(
+                      builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 5),
+                          child: TextField(
+                            readOnly: true,
+                            textAlign: TextAlign.left,
+                            controller: viewModel.user_startDate,
+                            decoration: InputDecoration(
+                              hintText: 'Ngày bắt đầu',
+                              suffixIcon: Icon(Icons.calendar_today, size: 15),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              isCollapsed: true,
+                              contentPadding: EdgeInsets.only(top: 2),
+                            ),
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                locale: Locale('vi', 'VN'),
+                                context: context,
+                                initialDate: viewModel.selectedStartDate_user??DateTime.now(),
+                                firstDate: DateTime(2024),
+                                lastDate: DateTime(2100),
+                              );
+
+                              if (pickedDate != null) {
+                                viewModel.setSelectedStartDate_user(pickedDate);
+                              }
+                            },
+                          ),
+                        );
+                      }
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      color: Colors.black,
+                      width: 1.0,
+                    ),
+                  ),
+                  width: (MediaQuery.of(context).size.width - 40) / 2,
+                  height: 30,
+                  child: Builder(
+                      builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 5),
+                          child: TextField(
+                            readOnly: true,
+                            textAlign: TextAlign.left,
+                            controller: viewModel.user_endDate,
+                            decoration: InputDecoration(
+                              hintText: 'Ngày kết thúc',
+                              suffixIcon: Icon(Icons.calendar_today, size: 15),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              isCollapsed: true,
+                              contentPadding: EdgeInsets.only(top: 2),
+                            ),
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                locale: Locale('vi', 'VN'),
+                                context: context,
+                                initialDate: viewModel.selectedEndDate_user??DateTime.now(),
+                                firstDate: DateTime(2024),
+                                lastDate: DateTime(2100),
+                              );
+
+                              if (pickedDate != null) {
+                                viewModel.setSelectedEndDate_user(pickedDate);
+                              }
+                            },
+                          ),
+                        );
+                      }
+                  ),
+                ),
+              )
+            ],
+          )
+              : SizedBox.shrink(),
+          (viewModel.isUserFilterVisible) ? SizedBox(height: 20,) : SizedBox(height: 15,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width / 2,
+                height: MediaQuery.of(context).size.width / 2 + 20,
+                child: Align(
+                  child: (viewModel.userStatistics!.total > 0) ? SfCartesianChart(
+                    margin: EdgeInsets.zero,
+                    primaryXAxis: CategoryAxis(),
+                    series: <CartesianSeries<ChartData, String>>[
+                      ColumnSeries<ChartData, String>(
+                        dataSource: viewModel.user_chartData,
+                        animationDuration: 300,
+                        xValueMapper: (ChartData data, _) => data.xData,
+                        yValueMapper: (ChartData data, _) => data.yData,
+                        pointColorMapper: (ChartData data, _) => data.color,
+                        dataLabelMapper: (ChartData data, _) => data.text,
+                        dataLabelSettings: const DataLabelSettings(isVisible: true),
+                      )
+                    ],
+                  )
+                      : SizedBox.shrink(),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 30, left: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                        decoration:
+                        BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: Color(0xffffa11d)
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
+                          child: Text(
+                            "Tổng: ${viewModel.userStatistics!.total}",
+                            style: TextStyle(fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                                fontSize: 17),),
+                        )
+                    ),
+                    SizedBox(height: 5,),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: viewModel.userStatus_chartData.map((item) {
+                        return Row(
+                          children: [
+                            Text("●", style: TextStyle(fontSize: 16, color: item.color)),
+                            const SizedBox(width: 4),
+                            Text("${item.xData}: ${item.yData}"),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+          (viewModel.isUserFilterVisible)
+              ? Padding(
+            padding: const EdgeInsets.only(right: 10, left: 10),
+            child: SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () async {
+                  viewModel.setIsUserLoading(true);
+                  if (viewModel.selectedStartDate_user == null) {
+                    showErrorToastification(title: 'Lỗi', message: 'Vui lòng chọn ngày bắt đầu');
+                    viewModel.setIsUserLoading(false);
+                    return;
+                  }
+                  if (viewModel.selectedEndDate_user == null) {
+                    showErrorToastification(title: 'Lỗi', message: 'Vui lòng chọn ngày kết thúc');
+                    viewModel.setIsUserLoading(false);
+                    return;
+                  }
+                  await viewModel.getStatistics_user_applyFilter(context);
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: Color(0xee65c29c),
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                  minimumSize: Size(0, 0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius
+                        .circular(7),
+                  ),
+                ),
+                child: (viewModel.isUserLoading) ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white,)) : Text(
                   'Thống kê',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,

@@ -13,7 +13,6 @@ Future<ResponseModel> getStatistic(BuildContext context)  async {
   final response = await ApiService().getWithToken(endpoint: APIConstants.getStatistic_endpoint, accessToken: validToken??'');
   if (response.statusCode == 200) {
     Map<String, dynamic> data = json.decode(response.body);
-    print(response.body);
     cJobStatistics jobStatistics = cJobStatistics.fromJson(data['jobStats']);
     cApplicationStatistics applicationStatistics = cApplicationStatistics.fromJson(data['applicationStats']);
     cUserStatistics userStatistics = cUserStatistics.fromJson(data['userStats']);
@@ -31,10 +30,8 @@ Future<ResponseModel> getStatistic_filter(BuildContext context, DateTime startDa
   final response = await ApiService().getWithToken(endpoint: "${APIConstants.getStatistic_endpoint}"
       "?StartDate=${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}"
       "&EndDate=${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}", accessToken: validToken??'');
-  print(response.body);
   if (response.statusCode == 200) {
     Map<String, dynamic> data = json.decode(response.body);
-    print(response.body);
     cJobStatistics jobStatistics = cJobStatistics.fromJson(data['jobStats']);
     cApplicationStatistics applicationStatistics = cApplicationStatistics.fromJson(data['applicationStats']);
     cUserStatistics userStatistics = cUserStatistics.fromJson(data['userStats']);
