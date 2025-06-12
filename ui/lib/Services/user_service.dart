@@ -104,7 +104,8 @@ class UserService {
   Future<String?> patchCandidateInfo({
     required String userId,
     required Map<String, dynamic> updateCandidateDto,
-    required File file,
+    required File fileAvatar,
+    required File fileCV,
     required String newName,
     required String newPhoneNumber,
     required BuildContext context,
@@ -123,8 +124,16 @@ class UserService {
       request.files.add(
         await http.MultipartFile.fromPath(
           'avatarFile',
-          file.path,
+          fileAvatar.path,
           contentType: MediaType('image', 'jpeg'),
+        ),
+      );
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'resumeFile',
+          fileCV.path,
+          contentType: MediaType('pdf', 'docx'),
         ),
       );
 

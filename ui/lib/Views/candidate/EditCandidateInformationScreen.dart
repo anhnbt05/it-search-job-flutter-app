@@ -71,104 +71,100 @@ class _EditCandidateInformationScreenState
                                 ),
                                 Column(
                                   children: [
-                                    SizedBox(height: 20),
-                                    Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 28),
-                                        child: Container(
-                                          width: 140,
-                                          height: 140,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 2,
-                                            ),
-                                          ),
-                                          child: CircleAvatar(
-                                            radius: 70,
-                                            backgroundColor: Colors.white,
-                                            child: viewModel.avtImage != null
-                                                ? ClipOval(
-                                              child: Image.file(
-                                                viewModel.avtImage!,
-                                                fit: BoxFit.cover,
+                                    const SizedBox(height: 20),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          // -------- BÊN TRÁI --------
+                                          Column(
+                                            children: [
+                                              // Avatar
+                                              Container(
                                                 width: 140,
                                                 height: 140,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(color: Colors.white, width: 2),
+                                                ),
+                                                child: CircleAvatar(
+                                                  radius: 70,
+                                                  backgroundColor: Colors.white,
+                                                  child: viewModel.avtImage != null
+                                                      ? ClipOval(
+                                                    child: Image.file(
+                                                      viewModel.avtImage!,
+                                                      fit: BoxFit.cover,
+                                                      width: 140,
+                                                      height: 140,
+                                                    ),
+                                                  )
+                                                      : const CircularProgressIndicator(color: Colors.blue),
+                                                ),
                                               ),
-                                            )
-                                                : CircularProgressIndicator(
-                                              color: Colors.blue,),
-                                          ),
-                                        ),
+                                              const SizedBox(height: 8),
 
-                                      ),
-                                    ),
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10),
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            viewModel.pickImage();
-                                          },
-                                          style: ButtonStyle(
-                                            backgroundColor:
-                                            WidgetStateProperty.all(
-                                              Colors.white,
-                                            ),
-                                            elevation: WidgetStateProperty.all(
-                                                0),
-                                            splashFactory: NoSplash
-                                                .splashFactory,
-                                            shadowColor: MaterialStateProperty
-                                                .all(
-                                              Colors.transparent,
-                                            ),
-                                            overlayColor: WidgetStateProperty
-                                                .all(
-                                              Colors.transparent,
-                                            ),
-                                            minimumSize: WidgetStateProperty
-                                                .all(
-                                              Size(120, 32),
-                                            ),
-                                            shape: WidgetStateProperty.all(
-                                              RoundedRectangleBorder(
-                                                borderRadius: BorderRadius
-                                                    .circular(
-                                                  5,
+                                              ElevatedButton(
+                                                onPressed: viewModel.pickImage,
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.white,
+                                                  elevation: 0,
+                                                  side: const BorderSide(color: Colors.grey),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(5),
+                                                  ),
                                                 ),
-                                                side: BorderSide(
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.camera_alt,
-                                                color: Colors.grey,
-                                              ),
-                                              SizedBox(width: 5),
-                                              Text(
-                                                "Đổi ảnh đại diện",
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.grey,
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: const [
+                                                    Icon(Icons.camera_alt, size: 16, color: Colors.grey),
+                                                    SizedBox(width: 5),
+                                                    Text(
+                                                      "Đổi ảnh đại diện",
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ],
                                           ),
-                                        ),
+
+                                          // -------- BÊN PHẢI --------
+                                          ElevatedButton.icon(
+                                            onPressed: () {
+                                              // Navigator.push(
+                                              //   context,
+                                              //   MaterialPageRoute(builder: (_) => const ResumeScreen()),
+                                              // );
+                                            },
+                                            icon: const Icon(Icons.picture_as_pdf, size: 18, color: Colors.grey),
+                                            label: const Text(
+                                              "Tải CV",
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.white,
+                                              elevation: 0,
+                                              side: const BorderSide(color: Colors.grey),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(5),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
+                                    const SizedBox(height: 12),
                                     Padding(
                                       padding: const EdgeInsets.only(
                                         left: 7,

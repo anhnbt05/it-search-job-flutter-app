@@ -5,6 +5,7 @@
 
   import '../../ViewModels/candidate/EditCandidateInformationViewModel.dart';
   import 'EditCandidateInformationScreen.dart';
+import 'ReadResumeCandidateScreen.dart';
 
   class ProfileCandidateView extends StatelessWidget {
     const ProfileCandidateView({super.key});
@@ -136,6 +137,25 @@
                       ],
                     ),
                   ),
+                  Positioned(
+                    top: 16,
+                    left: 16,
+                    child: IconButton(
+                      iconSize: 28,
+                      icon: const Icon(Icons.article_outlined, color: Colors.black),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReadResumeCandidateScreen(
+                                  name:  candidate.FullName,
+                                 resumeUrl: candidate.ResumeUrl,
+                                )
+                            )
+                        );
+                      },
+                    ),
+                  ),
 
                   Positioned(
                     top: 16,
@@ -143,7 +163,7 @@
                     child: Column(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          icon: const Icon(Icons.edit, color: Colors.black),
                           onPressed: () {
                             final candidate = viewModel.candidate;
                             if (candidate == null) {

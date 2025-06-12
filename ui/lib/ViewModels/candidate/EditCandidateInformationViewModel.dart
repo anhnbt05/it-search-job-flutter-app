@@ -26,6 +26,8 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
 
   File? _avtImage;
   File? _oldAvtImage;
+  File? _CVImage;
+  File? _oldCVImage;
   Uint8List? _imageBytes;
 
   TextEditingController get fullNameController => _fullNameController;
@@ -38,8 +40,10 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
   TextEditingController get confirmNewPasswordController => _confirmNewPasswordController;
 
   File? get avtImage => _avtImage;
+  File? get CVImage => _CVImage;
   Uint8List? get imageBytes => _imageBytes;
   File? get oldAvtImage => _oldAvtImage;
+  File? get oldCVImage => _oldCVImage;
 
   EditCandidateInformationViewModel(BuildContext context, this.userId) {
     final profileVM = Provider.of<ProfileCandidateViewModel>(context, listen: false);
@@ -57,6 +61,7 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
     _otpController = TextEditingController();
     downloadImage(info.AvatarUrl);
     _oldAvtImage = _avtImage;
+    _oldCVImage = _CVImage;
   }
 
   Future<File> downloadImageAsFile(String imageUrl, String fileName) async {
@@ -100,7 +105,8 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
         "Level": levelController.text,
         "Certifications": _certificationControllers.map((c) => c.text.trim()).where((c) => c.isNotEmpty).toList(),
       },
-      file: avtImage!,
+      fileAvatar: avtImage!,
+      fileCV: CVImage!,
       newName: fullNameController.text,
       newPhoneNumber: phoneNumberController.text,
       context: context,
