@@ -640,22 +640,20 @@ export class UsersService {
         );
       }
 
-      const total = data.length;
-
       const candidates = data.filter((u) => u.Role === Role.candidate).length;
 
       const recruiters = data.filter((u) => u.Role === Role.recruiter).length;
 
       const activeUsers = data.filter(
-        (u) => u.Status === UserStatus.active,
+        (u) => u.Status === UserStatus.active && u.Role !== RoleEnum.ADMIN,
       ).length;
 
       const blockedUsers = data.filter(
-        (u) => u.Status === UserStatus.inactive,
+        (u) => u.Status === UserStatus.inactive && u.Role !== RoleEnum.ADMIN,
       ).length;
 
       return {
-        total,
+        total: candidates + recruiters,
         candidates,
         recruiters,
         activeUsers,

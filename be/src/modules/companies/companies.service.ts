@@ -102,7 +102,9 @@ export class CompaniesService {
       const { data: companies, error: companyError } =
         await this.anonSupabaseClient
           .from('Companies')
-          .select('ID, Name, CompanyLocations(*, Recruiters(*, Jobs(*)))');
+          .select(
+            'ID, Name, LogoUrl, CompanyLocations(*, Recruiters(*, Jobs(*)))',
+          );
 
       if (companyError) {
         console.error(companyError);
@@ -135,6 +137,7 @@ export class CompaniesService {
           result.push({
             companyId: company.ID,
             companyName: company.Name,
+            companyLogoUrl: company.LogoUrl,
             totalJobs: 0,
             totalApplications: 0,
             totalPendingApplications: 0,
@@ -217,6 +220,7 @@ export class CompaniesService {
         result.push({
           companyId: company.ID,
           companyName: company.Name,
+          companyLogoUrl: company.LogoUrl,
           totalJobs,
           totalApplications,
           totalPendingApplications,
