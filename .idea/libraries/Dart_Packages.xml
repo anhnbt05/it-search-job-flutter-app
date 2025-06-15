@@ -89,7 +89,7 @@
         <entry key="built_value">
           <value>
             <list>
-              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/built_value-8.9.5/lib" />
+              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/built_value-8.10.1/lib" />
             </list>
           </value>
         </entry>
@@ -236,7 +236,7 @@
         <entry key="file_selector_macos">
           <value>
             <list>
-              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_macos-0.9.4+2/lib" />
+              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_macos-0.9.4+3/lib" />
             </list>
           </value>
         </entry>
@@ -404,7 +404,7 @@
         <entry key="iconsax_flutter">
           <value>
             <list>
-              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/iconsax_flutter-1.0.0/lib" />
+              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/iconsax_flutter-1.0.1/lib" />
             </list>
           </value>
         </entry>
@@ -586,7 +586,7 @@
         <entry key="onesignal_flutter">
           <value>
             <list>
-              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/onesignal_flutter-5.3.2/lib" />
+              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/onesignal_flutter-5.3.3/lib" />
             </list>
           </value>
         </entry>
@@ -842,6 +842,13 @@
             </list>
           </value>
         </entry>
+        <entry key="syncfusion_flutter_charts">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/syncfusion_flutter_charts-28.2.12/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="syncfusion_flutter_core">
           <value>
             <list>
@@ -922,7 +929,7 @@
         <entry key="toastification">
           <value>
             <list>
-              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/toastification-3.0.2/lib" />
+              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/toastification-3.0.3/lib" />
             </list>
           </value>
         </entry>
@@ -1093,7 +1100,7 @@
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/build_runner-2.4.13/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/build_runner_core-7.3.2/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/built_collection-5.1.1/lib" />
-      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/built_value-8.9.5/lib" />
+      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/built_value-8.10.1/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/characters-1.4.0/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/checked_yaml-2.0.3/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/clock-1.1.2/lib" />
@@ -1114,7 +1121,7 @@
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/ffi-2.1.4/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file-7.0.1/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_linux-0.9.3+2/lib" />
-      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_macos-0.9.4+2/lib" />
+      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_macos-0.9.4+3/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_platform_interface-2.6.2/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_windows-0.9.3+4/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/fixnum-1.1.1/lib" />
@@ -1134,7 +1141,7 @@
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/http-1.4.0/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/http_multi_server-3.2.2/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/http_parser-4.1.2/lib" />
-      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/iconsax_flutter-1.0.0/lib" />
+      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/iconsax_flutter-1.0.1/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/image_picker-1.1.2/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/image_picker_android-0.8.12+23/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/image_picker_for_web-3.0.6/lib" />
@@ -1160,7 +1167,7 @@
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/meta-1.16.0/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/mime-1.0.6/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/nested-1.0.0/lib" />
-      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/onesignal_flutter-5.3.2/lib" />
+      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/onesignal_flutter-5.3.3/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/open_file-3.5.10/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/open_file_android-1.0.6/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/open_file_ios-1.0.3/lib" />
@@ -1196,6 +1203,7 @@
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/stream_channel-2.1.4/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/stream_transform-2.1.1/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/string_scanner-1.4.1/lib" />
+      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/syncfusion_flutter_charts-28.2.12/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/syncfusion_flutter_core-28.2.12/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/syncfusion_flutter_pdf-28.2.12/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/syncfusion_flutter_pdfviewer-28.1.37/lib" />
@@ -1207,7 +1215,7 @@
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/term_glyph-1.2.2/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/test_api-0.7.4/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/timing-1.0.2/lib" />
-      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/toastification-3.0.2/lib" />
+      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/toastification-3.0.3/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/typed_data-1.4.0/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/url_launcher-6.3.1/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/url_launcher_android-6.3.16/lib" />
