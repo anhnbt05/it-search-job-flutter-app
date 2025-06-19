@@ -17,20 +17,27 @@ class ChartData {
 
 class StatisticsViewModel extends ChangeNotifier {
   cStatistics? _statistics;
+  List<cCompanyStatistics>? _baseCompanyStatistics;
+  List<cCompanyStatistics>? _companyStatistics;
 
   cStatistics? get statistics => _statistics;
+  List<cCompanyStatistics>? get companyStatistics => _companyStatistics;
 
   bool _isJobLoading = false;
   bool _isApplicationLoading = false;
   bool _isUserLoading = false;
+  bool _isCompanyLoading = false;
 
-  Future<cStatistics?>? _statisticsF;
+  late Future<cStatistics?> _statisticsF;
+  late Future<List<cCompanyStatistics?>> _companyStatisticsF;
+
   cJobStatistics? _jobStatistics;
   cApplicationStatistics? _applicationStatistics;
   cUserStatistics? _userStatistics;
   bool _isJobFilterVisible = false;
   bool _isApplicationFilterVisible = false;
   bool _isUserFilterVisible = false;
+  bool _isCompanyFilterVisible = false;
 
   final TextEditingController _job_startDate = TextEditingController();
   final TextEditingController _job_endDate = TextEditingController();
@@ -38,6 +45,8 @@ class StatisticsViewModel extends ChangeNotifier {
   final TextEditingController _application_endDate = TextEditingController();
   final TextEditingController _user_startDate = TextEditingController();
   final TextEditingController _user_endDate = TextEditingController();
+  final TextEditingController _company_startDate = TextEditingController();
+  final TextEditingController _company_endDate = TextEditingController();
 
   DateTime? _selectedStartDate_job;
   DateTime? _selectedEndDate_job;
@@ -45,8 +54,11 @@ class StatisticsViewModel extends ChangeNotifier {
   DateTime? _selectedEndDate_application;
   DateTime? _selectedStartDate_user;
   DateTime? _selectedEndDate_user;
+  DateTime? _selectedStartDate_company;
+  DateTime? _selectedEndDate_company;
 
-  Future<cStatistics?> get statisticsF => _statisticsF!;
+  Future<cStatistics?> get statisticsF => _statisticsF;
+  Future<List<cCompanyStatistics?>> get companyStatisticsF => _companyStatisticsF;
 
   cJobStatistics? get jobStatistics => _jobStatistics;
   cApplicationStatistics? get applicationStatistics => _applicationStatistics;
@@ -55,6 +67,7 @@ class StatisticsViewModel extends ChangeNotifier {
   bool get isJobFilterVisible => _isJobFilterVisible;
   bool get isApplicationFilterVisible => _isApplicationFilterVisible;
   bool get isUserFilterVisible => _isUserFilterVisible;
+  bool get isCompanyFilterVisible => _isCompanyFilterVisible;
 
   TextEditingController get job_startDate => _job_startDate;
   TextEditingController get job_endDate => _job_endDate;
@@ -62,6 +75,8 @@ class StatisticsViewModel extends ChangeNotifier {
   TextEditingController get application_endDate => _application_endDate;
   TextEditingController get user_startDate => _user_startDate;
   TextEditingController get user_endDate => _user_endDate;
+  TextEditingController get company_startDate => _company_startDate;
+  TextEditingController get company_endDate => _company_endDate;
 
   DateTime? get selectedStartDate_job => _selectedStartDate_job;
   DateTime? get selectedEndDate_job => _selectedEndDate_job;
@@ -69,6 +84,8 @@ class StatisticsViewModel extends ChangeNotifier {
   DateTime? get selectedEndDate_application => _selectedEndDate_application;
   DateTime? get selectedStartDate_user => _selectedStartDate_user;
   DateTime? get selectedEndDate_user => _selectedEndDate_user;
+  DateTime? get selectedStartDate_company => _selectedStartDate_company;
+  DateTime? get selectedEndDate_company => _selectedEndDate_company;
 
   List<ChartData> job_getChartData(cJobStatistics stats) {
     return [
@@ -177,6 +194,7 @@ class StatisticsViewModel extends ChangeNotifier {
   bool get isJobLoading => _isJobLoading;
   bool get isApplicationLoading => _isApplicationLoading;
   bool get isUserLoading => _isUserLoading;
+  bool get isCompanyLoading => _isCompanyLoading;
 
   void setIsJobLoading(bool value) {
     _isJobLoading = value;
@@ -193,6 +211,11 @@ class StatisticsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setIsCompanyLoading(bool value) {
+    _isCompanyLoading = value;
+    notifyListeners();
+  }
+
   StatisticsViewModel(BuildContext context) {
     _statisticsF = getStatistic(context).then((value) {
       final cStatistics data = value.data as cStatistics;
@@ -204,6 +227,15 @@ class StatisticsViewModel extends ChangeNotifier {
       _application_chartData = application_getChartData(_applicationStatistics!);
       _userRole_chartData = userRole_getChartData(_userStatistics!);
       _userStatus_chartData = userStatus_getChartData(_userStatistics!);
+      notifyListeners();
+      return value.data;
+    });
+
+    _companyStatisticsF = getCompanyStatistic(context).then((value) {
+      final List<cCompanyStatistics> data = value.data as List<cCompanyStatistics>;
+      _baseCompanyStatistics = data;
+      _companyStatistics = data;
+      _companyStatistics?.sort((a, b) => b.totalJobs.compareTo(a.totalJobs));
       notifyListeners();
       return value.data;
     });
@@ -251,6 +283,20 @@ class StatisticsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSelectedStartDate_company(DateTime pickedDate) {
+    _selectedStartDate_company = pickedDate;
+    _company_startDate.text =
+    "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+    notifyListeners();
+  }
+
+  void setSelectedEndDate_company(DateTime pickedDate) {
+    _selectedEndDate_company = pickedDate;
+    _company_endDate.text =
+    "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+    notifyListeners();
+  }
+
   void updateJobFilterVisible() {
     _isJobFilterVisible = !_isJobFilterVisible;
     _job_startDate.clear();
@@ -287,6 +333,19 @@ class StatisticsViewModel extends ChangeNotifier {
       _userStatistics = _statistics!.userStatistics;
       _userRole_chartData = userRole_getChartData(_userStatistics!);
       _userStatus_chartData = userStatus_getChartData(_userStatistics!);
+    }
+    notifyListeners();
+  }
+
+  void updateCompanyFilterVisible() {
+    _isCompanyFilterVisible = !_isCompanyFilterVisible;
+    _company_startDate.clear();
+    _company_endDate.clear();
+    _selectedStartDate_company = null;
+    _selectedEndDate_company = null;
+    if (!_isCompanyFilterVisible) {
+      _companyStatistics = _baseCompanyStatistics;
+      _companyStatistics?.sort((a, b) => b.totalAcceptedApplications.compareTo(a.totalAcceptedApplications));
     }
     notifyListeners();
   }
@@ -350,6 +409,26 @@ class StatisticsViewModel extends ChangeNotifier {
         showErrorToastification(title: 'Lỗi', message: value.message);
         _isUserLoading = false;
         notifyListeners();
+      }
+      return value.data;
+    });
+  }
+
+  Future<void> getStatistics_company_applyFilter(BuildContext context) async {
+    _companyStatisticsF = getCompanyStatistic_filter(
+      context,
+      _selectedStartDate_company!,
+      _selectedEndDate_company!,
+    ).then((value) {
+      if (value.success) {
+        List<cCompanyStatistics> data = value.data as List<cCompanyStatistics>;
+        _companyStatistics = data;
+        _companyStatistics?.sort((a, b) => b.totalJobs.compareTo(a.totalJobs));
+        _isCompanyLoading = false;
+        notifyListeners();
+      } else {
+        showErrorToastification(title: 'Lỗi', message: value.message);
+        _isCompanyLoading = false;
       }
       return value.data;
     });

@@ -106,6 +106,88 @@ class cUserStatistics {
   }
 }
 
+class cCompanyStatistics {
+  final String companyId;
+  final String companyName;
+  final String? companyLogoUrl;
+  final int totalJobs;
+  final int totalApplications;
+  final int totalPendingApplications;
+  final int totalAcceptedApplications;
+  final int totalRejectedApplications;
+  final double acceptanceRate;
+  final String mostAppliedJobTitle;
+  final List<cApplicationTrends> applicationTrendMonthly;
+
+  cCompanyStatistics({
+    required this.companyId,
+    required this.companyName,
+    required this.companyLogoUrl,
+    required this.totalJobs,
+    required this.totalApplications,
+    required this.totalPendingApplications,
+    required this.totalAcceptedApplications,
+    required this.totalRejectedApplications,
+    required this.acceptanceRate,
+    required this.mostAppliedJobTitle,
+    required this.applicationTrendMonthly,
+  });
+
+  factory cCompanyStatistics.fromJson(Map<String, dynamic> json) {
+    return cCompanyStatistics(
+      companyId: json['companyId'],
+      companyName: json['companyName'],
+      companyLogoUrl: json['companyLogoUrl'],
+      totalJobs: json['totalJobs'],
+      totalApplications: json['totalApplications'],
+      totalPendingApplications: json['totalPendingApplications'],
+      totalAcceptedApplications: json['totalAcceptedApplications'],
+      totalRejectedApplications: json['totalRejectedApplications'],
+      acceptanceRate: (json['acceptanceRate'] as num).toDouble(),
+      mostAppliedJobTitle: json['mostAppliedJobTitle'],
+      applicationTrendMonthly: (json['applicationTrendMonthly'] as List)
+          .map((e) => cApplicationTrends.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'companyId': companyId,
+    'companyName': companyName,
+    'companyLogoUrl': companyLogoUrl,
+    'totalJobs': totalJobs,
+    'totalApplications': totalApplications,
+    'totalPendingApplications': totalPendingApplications,
+    'totalAcceptedApplications': totalAcceptedApplications,
+    'totalRejectedApplications': totalRejectedApplications,
+    'acceptanceRate': acceptanceRate,
+    'mostAppliedJobTitle': mostAppliedJobTitle,
+    'applicationTrendMonthly': applicationTrendMonthly.map((e) => e.toJson()).toList(),
+  };
+}
+
+class cApplicationTrends {
+  final String month;
+  final int totalApplications;
+
+  cApplicationTrends({
+    required this.month,
+    required this.totalApplications,
+  });
+
+  factory cApplicationTrends.fromJson(Map<String, dynamic> json) {
+    return cApplicationTrends(
+      month: json['month'],
+      totalApplications: json['totalApplications'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'month': month,
+    'totalApplications': totalApplications,
+  };
+}
+
 class cStatistics {
   cJobStatistics? jobStatistics;
   cApplicationStatistics? applicationStatistics;

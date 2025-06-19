@@ -47,4 +47,5 @@ class APIConstants {
   static final String postCategory_endpoint = 'auth/categories';
 
   static final getStatistic_endpoint = "dashboards/summary";
+  static final getCompanyStatistic_endpoint = "dashboards/summary/companies";
 }
