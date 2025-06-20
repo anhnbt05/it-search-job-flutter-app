@@ -165,6 +165,10 @@ Widget recruiterPage(BuildContext context, UserManagementViewModel viewModel) {
         return const Center(
           child: CircularProgressIndicator(color: Colors.blue),
         );
+      } else if (!snapshot.hasData) {
+        return const Center(
+          child: CircularProgressIndicator(color: Colors.blue),
+        );
       } else {
         return recruiterBody(viewModel);
       }

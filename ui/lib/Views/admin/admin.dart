@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../Helpers/helpers.dart';
 import 'CategoryManagementView.dart';
 import 'RecruitmentApprovalView.dart';
+import 'StatisticsView.dart';
 import 'UserManagementView.dart';
 
 List<BottomNavigationBarItem> bottomNavigationItem_admin(BuildContext context) {
@@ -20,12 +21,8 @@ List<Widget> pageView_admin (BuildContext context) {
     RecruitmentApprovalScreen(context),
     UserManagementScreen(context),
     CategoryManagementScreen(context),
-    page4(context),
+    StatisticsScreen(context),
   ];
-}
-
-Widget page4(BuildContext context) {
-  return Center(child: Text("4", style: TextStyle(fontSize: 24)));
 }
 
 Widget? appbarTitle_admin(int selectedIndex) {

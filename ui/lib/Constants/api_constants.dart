@@ -45,4 +45,8 @@ class APIConstants {
   static final String getUser_admin_endpoint = 'users';
   static final String deleteUser_endpoint = 'users';
   static final String postCategory_endpoint = 'auth/categories';
+
+  static final getStatistic_endpoint = "dashboards/summary";
+  static final getCompanyStatistic_endpoint = "dashboards/summary/companies";
+  static final postSummaryReport_endpoint = "dashboards/summary/companies/report";
 }

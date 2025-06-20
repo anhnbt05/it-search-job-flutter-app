@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/ViewModels/admin/StatisticsViewModel.dart';
 import 'package:ui/ViewModels/admin/UserManagementViewModel.dart';
 import 'package:ui/ViewModels/admin/UserNavigationViewModel.dart';
 import 'package:ui/ViewModels/candidate/AppliedJobsViewModel.dart';
@@ -97,6 +98,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context) => UserManagementViewModel(context)),
           ChangeNotifierProvider(create: (_) => UserNavigationViewModel()),
           ChangeNotifierProvider(create: (context) => CategoryManagementViewModel(context)),
+          ChangeNotifierProvider(create: (context) => StatisticsViewModel(context)),
         ]
       ],
       child: MaterialApp(

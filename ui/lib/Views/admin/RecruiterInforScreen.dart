@@ -48,7 +48,12 @@ class _RecruiterInforScreenState extends State<RecruiterInforScreen> {
               return const Center(
                 child: CircularProgressIndicator(color: Colors.blue),
               );
-            } else {
+            } else if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.blue),
+              );
+            } else
+            {
               return Container(
                 color: (viewModel.recruiter!.Status == 'active') ? Colors.white : Color(0xfffae7e7),
                 child: Align(
