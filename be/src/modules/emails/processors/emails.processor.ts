@@ -1,14 +1,17 @@
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
+import { NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Job } from 'bullmq';
 import { EMAIL_QUEUE_NAME, EmailTemplateNameEnum } from 'src/libs/common/utils';
 import { EmailsService } from 'src/modules/emails/emails.service';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 
 @Processor(EMAIL_QUEUE_NAME)
 export class EmailsProcessor extends WorkerHost {
   constructor(
     private readonly emailsService: EmailsService,
     private readonly configService: ConfigService,
+    private readonly prismaService: PrismaService,
   ) {
     super();
   }
@@ -42,8 +45,17 @@ export class EmailsProcessor extends WorkerHost {
 
         templateName = EmailTemplateNameEnum.EMAIL_REPORT;
 
+        const admin = await this.prismaService.users.findUnique({
+          where: {
+            Email: email,
+          },
+        });
+
+        if (!admin)
+          throw new NotFoundException('Không tìm thấy quản trị viên này.');
+
         context = {
-          AdminName: this.configService.get<string>('admin.full_name', ''),
+          AdminName: admin.FullName,
           DownloadUrl: uploadResult.url,
           ApplicationLogoUrl: this.configService.get<string>(
             'application.logo_url',

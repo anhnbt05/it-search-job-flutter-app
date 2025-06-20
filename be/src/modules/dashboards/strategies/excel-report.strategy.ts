@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { format } from 'date-fns';
 import * as ExcelJS from 'exceljs';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   handleGenerateTimestamp,
   REPORT_FILE_NAME,
@@ -165,6 +167,12 @@ export class ExcelReportStrategy implements IReportStrategy {
     }
 
     filePath += `.${ReportType.EXCEL.toString()}`;
+
+    const dir = path.dirname(filePath);
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
 
     await workbook.xlsx.writeFile(filePath);
 
