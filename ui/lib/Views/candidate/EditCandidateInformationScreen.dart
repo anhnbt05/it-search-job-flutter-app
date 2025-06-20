@@ -137,25 +137,28 @@ class _EditCandidateInformationScreenState
 
                                           // -------- BÊN PHẢI --------
                                           ElevatedButton.icon(
-                                            onPressed: () {
-                                              // Navigator.push(
-                                              //   context,
-                                              //   MaterialPageRoute(builder: (_) => const ResumeScreen()),
-                                              // );
-                                            },
-                                            icon: const Icon(Icons.picture_as_pdf, size: 18, color: Colors.grey),
-                                            label: const Text(
-                                              "Tải CV",
+                                            onPressed: viewModel.pickCVFile,
+                                            icon: Icon(
+                                              viewModel.CVFile != null ? Icons.check_circle : Icons.picture_as_pdf,
+                                              size: 18,
+                                              color: viewModel.CVFile != null ? Colors.green : Colors.grey,
+                                            ),
+                                            label: Text(
+                                              viewModel.CVFile != null
+                                                  ? "Đã chọn CV"
+                                                  : "Tải CV",
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.w500,
-                                                color: Colors.grey,
+                                                color: viewModel.CVFile != null ? Colors.green : Colors.grey,
                                               ),
                                             ),
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.white,
                                               elevation: 0,
-                                              side: const BorderSide(color: Colors.grey),
+                                              side: BorderSide(
+                                                color: viewModel.CVFile != null ? Colors.green : Colors.grey,
+                                              ),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(5),
                                               ),
@@ -1000,7 +1003,7 @@ class _EditCandidateInformationScreenState
                               child: Padding(
                                 padding: EdgeInsets.only(right: 10),
                                 child: ElevatedButton(
-                                  onPressed: () {
+                                  onPressed: () async {
                                     showDialog(
                                       context: context,
                                       barrierColor: Colors.black.withOpacity(
@@ -1015,9 +1018,10 @@ class _EditCandidateInformationScreenState
                                       },
                                     );
 
-                                    viewModel.updateCandidateInfo(
-                                        context, viewModel.userId).then((
-                                        value) => Navigator.pop(context));
+                                   await viewModel.updateCandidateInfo(
+                                        context);
+                                    Navigator.of(context, rootNavigator: true).pop();
+                                    Navigator.pop(context);
                                   },
                                   style: ButtonStyle(
                                     backgroundColor: WidgetStateProperty.all(

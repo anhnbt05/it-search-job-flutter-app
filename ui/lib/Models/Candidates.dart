@@ -18,7 +18,7 @@ class cCandidates_cApplication_recruiter {
     required this.ID,
     required this.Bio,
     required this.Level,
-    this.ResumeUrl,
+    required this.ResumeUrl,
     required this.Certifications,
     required this.FullName,
     required this.Email,
@@ -33,12 +33,12 @@ class cCandidates_cApplication_recruiter {
       ID: json['ID'],
       Bio: json['Bio'],
       Level: json['Level'],
-      ResumeUrl: json['ResumeUrl'],
+      ResumeUrl: json['ResumeUrl'].toString(),
       Certifications: List<String>.from(json['Certifications']),
       FullName: json['FullName'],
       Email: json['Email'],
       PhoneNumber: json['PhoneNumber'],
-      AvatarUrl: json['AvatarUrl'],
+      AvatarUrl: json['AvatarUrl'].toString(),
       Role: json['Role'],
       WorkExperiences: (json['WorkExperiences'] as List)
           .map((e) => cWorkExperiences.fromJson(e))
@@ -52,12 +52,13 @@ class cCandidates_cApplication_recruiter {
     String? newLevel,
     List<String>? newCertifications,
     String? newAvatarUrl,
+    String? newResumeUrl,
   }) {
     return cCandidates_cApplication_recruiter(
       ID: ID,
       Bio: newBio ?? Bio,
       Level: newLevel ?? Level,
-      ResumeUrl: ResumeUrl,
+      ResumeUrl: newResumeUrl ?? ResumeUrl,
       Certifications: newCertifications ?? Certifications,
       FullName: newFullName ?? FullName,
       Email: Email,

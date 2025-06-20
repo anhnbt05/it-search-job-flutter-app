@@ -69,11 +69,24 @@ class UserService {
       final responseString = await response.stream.bytesToString();
       final decoded = jsonDecode(responseString);
       if (response.statusCode == 200) {
-        showSuccessToastification(title: "Hoàn tất", message: "Cập nhật thông tin của người dùng thành công");
+        showSuccessToastification(title: "Hoàn tất",
+            message: "Cập nhật thông tin của người dùng thành công");
         return decoded['AvatarUrl'];
       } else {
         print(decoded);
-        showErrorToastification(title: "Lỗi", message: decoded['message'][0]['message']);
+        String errorMessage = 'Có lỗi xảy ra';
+        if (decoded['message'] is String) {
+          errorMessage = decoded['message'];
+        } else if (decoded['message'] is Map && decoded['message']['message'] is String) {
+          errorMessage = decoded['message']['message'];
+        } else if (decoded['message'] is List) {
+          errorMessage = decoded['message'][0]['message'] ?? errorMessage;
+        }
+
+        showErrorToastification(
+          title: "Lỗi",
+          message: errorMessage,
+        );
         return null;
       }
     } catch (e) {
@@ -81,6 +94,7 @@ class UserService {
       return null;
     }
   }
+
   Future<cCandidates_cApplication_recruiter?> getCandidateInfo(
       {required String Id, required BuildContext context}) async {
     try {
@@ -101,11 +115,12 @@ class UserService {
       return null;
     }
   }
+
   Future<String?> patchCandidateInfo({
     required String userId,
     required Map<String, dynamic> updateCandidateDto,
-    required File fileAvatar,
-    required File fileCV,
+    File? fileAvatar,
+    File? fileCV,
     required String newName,
     required String newPhoneNumber,
     required BuildContext context,
@@ -121,21 +136,25 @@ class UserService {
       request.fields['FullName'] = newName;
       request.fields['PhoneNumber'] = newPhoneNumber;
 
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'avatarFile',
-          fileAvatar.path,
-          contentType: MediaType('image', 'jpeg'),
-        ),
-      );
+      if (fileAvatar != null && fileAvatar.existsSync()) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'avatarFile',
+            fileAvatar.path,
+            contentType: MediaType('image', 'jpeg'),
+          ),
+        );
+      }
 
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'resumeFile',
-          fileCV.path,
-          contentType: MediaType('pdf', 'docx'),
-        ),
-      );
+      if (fileCV != null && fileCV.existsSync()) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'resumeFile',
+            fileCV.path,
+            contentType: MediaType('docx', 'pdf'),
+          ),
+        );
+      }
 
       final response = await request.send();
       final responseString = await response.stream.bytesToString();
@@ -145,7 +164,7 @@ class UserService {
         showSuccessToastification(
             title: "Hoàn tất",
             message: "Cập nhật thông tin của người dùng thành công");
-        return decoded['AvatarUrl'];
+        return decoded['AvatarUrl'] ?? decoded['ResumeUrl'];
       } else {
         print(decoded);
         showErrorToastification(

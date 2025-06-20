@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
-
+import 'package:file_selector/file_selector.dart';
+import 'package:file_selector/file_selector.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -9,8 +11,10 @@ import 'package:provider/provider.dart';
 import 'package:ui/Models/ResponseModel.dart';
 import 'package:ui/Services/user_service.dart';
 
+import '../../Helpers/toastification.dart';
 import '../../Services/auth_resetpassword_service.dart';
 import '../../Services/auth_verifyresetpasswordotp_service.dart';
+import '../AuthViewModel.dart';
 import 'ProfileCandidateViewModel.dart';
 
 class EditCandidateInformationViewModel extends ChangeNotifier {
@@ -26,8 +30,8 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
 
   File? _avtImage;
   File? _oldAvtImage;
-  File? _CVImage;
-  File? _oldCVImage;
+  File? _CVFile;
+  File? _oldCVFile;
   Uint8List? _imageBytes;
 
   TextEditingController get fullNameController => _fullNameController;
@@ -40,10 +44,10 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
   TextEditingController get confirmNewPasswordController => _confirmNewPasswordController;
 
   File? get avtImage => _avtImage;
-  File? get CVImage => _CVImage;
+  File? get CVFile => _CVFile;
   Uint8List? get imageBytes => _imageBytes;
   File? get oldAvtImage => _oldAvtImage;
-  File? get oldCVImage => _oldCVImage;
+  File? get oldCVFile => _oldCVFile;
 
   EditCandidateInformationViewModel(BuildContext context, this.userId) {
     final profileVM = Provider.of<ProfileCandidateViewModel>(context, listen: false);
@@ -61,7 +65,7 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
     _otpController = TextEditingController();
     downloadImage(info.AvatarUrl);
     _oldAvtImage = _avtImage;
-    _oldCVImage = _CVImage;
+    _oldCVFile = _CVFile;
   }
 
   Future<File> downloadImageAsFile(String imageUrl, String fileName) async {
@@ -93,39 +97,102 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  Future<void> updateCandidateInfo(BuildContext context, String userId) async {
-    final profileVM = Provider.of<ProfileCandidateViewModel>(context, listen: false);
-    final currentCandidate = profileVM.candidate!;
-
-    String? newAvtUrl = await UserService().patchCandidateInfo(
-      userId: userId,
-      updateCandidateDto: {
-        "Bio": bioController.text,
-        "Level": levelController.text,
-        "Certifications": _certificationControllers.map((c) => c.text.trim()).where((c) => c.isNotEmpty).toList(),
-      },
-      fileAvatar: avtImage!,
-      fileCV: CVImage!,
-      newName: fullNameController.text,
-      newPhoneNumber: phoneNumberController.text,
-      context: context,
+  Future<void> pickCVFile() async {
+    final result = await openFile(
+      acceptedTypeGroups: [
+        XTypeGroup(
+          label: 'Documents',
+          extensions: ['pdf', 'docx'],
+        ),
+      ],
     );
-
-    if (newAvtUrl != null) {
-      profileVM.candidate = currentCandidate.CopyCandidateInfor(
-        newFullName: fullNameController.text,
-        newPhoneNumber: phoneNumberController.text,
-        newBio: bioController.text,
-        newLevel: levelController.text,
-        newCertifications: _certificationControllers.map((c) => c.text.trim()).where((c) => c.isNotEmpty).toList(),
-        newAvatarUrl: newAvtUrl,
-      );
-      profileVM.notifyListeners();
-      notifyListeners();
+    if (result != null) {
+      _CVFile = File(result.path);
     }
   }
 
+  Future<void> updateCandidateInfo(BuildContext context) async {
+    final profileVM = Provider.of<ProfileCandidateViewModel>(context, listen: false);
+    final currentCandidate = profileVM.candidate!;
+
+    try {
+      final updateData = <String, dynamic>{};
+
+      if (bioController.text != currentCandidate.Bio) {
+        updateData['Bio'] = bioController.text;
+      }
+
+      if (levelController.text != currentCandidate.Level) {
+        updateData['Level'] = levelController.text;
+      }
+
+      final currentCerts = currentCandidate.Certifications ?? [];
+      final newCerts = _certificationControllers
+          .map((c) => c.text.trim())
+          .where((c) => c.isNotEmpty)
+          .toList();
+
+      if (!_areListsEqual(currentCerts, newCerts)) {
+        updateData['Certifications'] = newCerts;
+      }
+
+      bool hasAvatarChanged = avtImage?.path != _oldAvtImage?.path;
+      bool hasCVChanged = CVFile?.path != _oldCVFile?.path;
+      bool hasBasicChanged = fullNameController.text != currentCandidate.FullName ||
+          phoneNumberController.text != currentCandidate.PhoneNumber;
+
+      if (updateData.isNotEmpty || hasAvatarChanged || hasCVChanged || hasBasicChanged) {
+        final currentUserId = Provider.of<AuthViewModel>(context, listen: false).userId;
+        String? response = await UserService().patchCandidateInfo(
+          userId: currentUserId!,
+          updateCandidateDto: updateData,
+          fileAvatar: hasAvatarChanged ? avtImage : null,
+          fileCV: hasCVChanged ? CVFile : null,
+          newName: fullNameController.text,
+          newPhoneNumber: phoneNumberController.text,
+          context: context,
+        );
+
+        if (response != null) {
+          profileVM.candidate = currentCandidate.CopyCandidateInfor(
+            newFullName: fullNameController.text,
+            newPhoneNumber: phoneNumberController.text,
+            newBio: updateData['Bio'] ?? currentCandidate.Bio,
+            newLevel: updateData['Level'] ?? currentCandidate.Level,
+            newCertifications: updateData['Certifications'] ?? currentCandidate.Certifications,
+            newAvatarUrl: hasAvatarChanged ? response : currentCandidate.AvatarUrl,
+            newResumeUrl: hasCVChanged ? response : currentCandidate.ResumeUrl,
+          );
+
+          _oldAvtImage = avtImage;
+          _oldCVFile = CVFile;
+
+          profileVM.notifyListeners();
+        }
+      } else {
+        showErrorToastification(
+          title: "Thông báo",
+          message: "Không có thay đổi nào để cập nhật",
+        );
+      }
+    } catch (e) {
+      showErrorToastification(
+        title: "Lỗi",
+        message: "Có lỗi xảy ra khi cập nhật: ${e.toString()}",
+      );
+    }
+  }
+
+  bool _areListsEqual(List<String>? list1, List<String>? list2) {
+    if (list1 == null && list2 == null) return true;
+    if (list1 == null || list2 == null) return false;
+    if (list1.length != list2.length) return false;
+
+    for (int i = 0; i < list1.length; i++) {
+      if (list1[i] != list2[i]) return false;
+    }
+    return true;
+  }
   Future<ResponseModel> resetPassword(BuildContext context) async {
     final profileVM = Provider.of<ProfileCandidateViewModel>(context, listen: false);
     return await AuthResetpasswordService().resetPassword(
