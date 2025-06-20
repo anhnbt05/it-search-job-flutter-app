@@ -26,6 +26,10 @@ Widget RecruitmentApprovalScreen(BuildContext context) {
         return const Center(
           child: CircularProgressIndicator(color: Colors.blue),
         );
+      } else if (!snapshot.hasData) {
+        return const Center(
+          child: CircularProgressIndicator(color: Colors.blue),
+        );
       } else {
         return ListView.builder(
           itemCount: viewModel.jobs!.length,

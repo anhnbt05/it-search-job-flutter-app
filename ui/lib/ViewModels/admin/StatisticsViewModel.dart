@@ -16,6 +16,9 @@ class ChartData {
 }
 
 class StatisticsViewModel extends ChangeNotifier {
+  final ScrollController _controller = ScrollController();
+  ScrollController get controller => _controller;
+
   cStatistics? _statistics;
   List<cCompanyStatistics>? _baseCompanyStatistics;
   List<cCompanyStatistics>? _companyStatistics;
@@ -27,6 +30,8 @@ class StatisticsViewModel extends ChangeNotifier {
   bool _isApplicationLoading = false;
   bool _isUserLoading = false;
   bool _isCompanyLoading = false;
+  bool _isExportFileExcelLoading = false;
+  bool _isExportFilePdfLoading = false;
 
   late Future<cStatistics?> _statisticsF;
   late Future<List<cCompanyStatistics?>> _companyStatisticsF;
@@ -38,6 +43,7 @@ class StatisticsViewModel extends ChangeNotifier {
   bool _isApplicationFilterVisible = false;
   bool _isUserFilterVisible = false;
   bool _isCompanyFilterVisible = false;
+  bool _isExportFileFilterVisible = false;
 
   final TextEditingController _job_startDate = TextEditingController();
   final TextEditingController _job_endDate = TextEditingController();
@@ -47,6 +53,8 @@ class StatisticsViewModel extends ChangeNotifier {
   final TextEditingController _user_endDate = TextEditingController();
   final TextEditingController _company_startDate = TextEditingController();
   final TextEditingController _company_endDate = TextEditingController();
+  final TextEditingController _exportFile_startDate = TextEditingController();
+  final TextEditingController _exportFile_endDate = TextEditingController();
 
   DateTime? _selectedStartDate_job;
   DateTime? _selectedEndDate_job;
@@ -56,6 +64,8 @@ class StatisticsViewModel extends ChangeNotifier {
   DateTime? _selectedEndDate_user;
   DateTime? _selectedStartDate_company;
   DateTime? _selectedEndDate_company;
+  DateTime? _selectedStartDate_exportFile;
+  DateTime? _selectedEndDate_exportFile;
 
   Future<cStatistics?> get statisticsF => _statisticsF;
   Future<List<cCompanyStatistics?>> get companyStatisticsF => _companyStatisticsF;
@@ -68,6 +78,7 @@ class StatisticsViewModel extends ChangeNotifier {
   bool get isApplicationFilterVisible => _isApplicationFilterVisible;
   bool get isUserFilterVisible => _isUserFilterVisible;
   bool get isCompanyFilterVisible => _isCompanyFilterVisible;
+  bool get isExportFileFilterVisible => _isExportFileFilterVisible;
 
   TextEditingController get job_startDate => _job_startDate;
   TextEditingController get job_endDate => _job_endDate;
@@ -77,6 +88,8 @@ class StatisticsViewModel extends ChangeNotifier {
   TextEditingController get user_endDate => _user_endDate;
   TextEditingController get company_startDate => _company_startDate;
   TextEditingController get company_endDate => _company_endDate;
+  TextEditingController get exportFile_startDate => _exportFile_startDate;
+  TextEditingController get exportFile_endDate => _exportFile_endDate;
 
   DateTime? get selectedStartDate_job => _selectedStartDate_job;
   DateTime? get selectedEndDate_job => _selectedEndDate_job;
@@ -86,6 +99,8 @@ class StatisticsViewModel extends ChangeNotifier {
   DateTime? get selectedEndDate_user => _selectedEndDate_user;
   DateTime? get selectedStartDate_company => _selectedStartDate_company;
   DateTime? get selectedEndDate_company => _selectedEndDate_company;
+  DateTime? get selectedStartDate_exportFile => _selectedStartDate_exportFile;
+  DateTime? get selectedEndDate_exportFile => _selectedEndDate_exportFile;
 
   List<ChartData> job_getChartData(cJobStatistics stats) {
     return [
@@ -195,6 +210,8 @@ class StatisticsViewModel extends ChangeNotifier {
   bool get isApplicationLoading => _isApplicationLoading;
   bool get isUserLoading => _isUserLoading;
   bool get isCompanyLoading => _isCompanyLoading;
+  bool get isExportFileExcelLoading => _isExportFileExcelLoading;
+  bool get isExportFilePdfLoading => _isExportFilePdfLoading;
 
   void setIsJobLoading(bool value) {
     _isJobLoading = value;
@@ -213,6 +230,16 @@ class StatisticsViewModel extends ChangeNotifier {
 
   void setIsCompanyLoading(bool value) {
     _isCompanyLoading = value;
+    notifyListeners();
+  }
+
+  void setIsExportFileExcelLoading(bool value) {
+    _isExportFileExcelLoading = value;
+    notifyListeners();
+  }
+
+  void setIsExportFilePdfLoading(bool value) {
+    _isExportFilePdfLoading = value;
     notifyListeners();
   }
 
@@ -297,6 +324,20 @@ class StatisticsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSelectedStartDate_exportFile(DateTime pickedDate) {
+    _selectedStartDate_exportFile = pickedDate;
+    _exportFile_startDate.text =
+    "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+    notifyListeners();
+  }
+
+  void setSelectedEndDate_exportFile(DateTime pickedDate) {
+    _selectedEndDate_exportFile = pickedDate;
+    _exportFile_endDate.text =
+    "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+    notifyListeners();
+  }
+
   void updateJobFilterVisible() {
     _isJobFilterVisible = !_isJobFilterVisible;
     _job_startDate.clear();
@@ -334,6 +375,24 @@ class StatisticsViewModel extends ChangeNotifier {
       _userRole_chartData = userRole_getChartData(_userStatistics!);
       _userStatus_chartData = userStatus_getChartData(_userStatistics!);
     }
+    notifyListeners();
+  }
+
+  void updateExportFileFilterVisible() {
+    _isExportFileFilterVisible = !_isExportFileFilterVisible;
+    _exportFile_startDate.clear();
+    _exportFile_endDate.clear();
+    _selectedStartDate_exportFile = null;
+    _selectedEndDate_exportFile = null;
+
+    Future.delayed(Duration(milliseconds: 100), () {
+      _controller.animateTo(
+        _controller.position.maxScrollExtent,
+        duration: Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+    });
+
     notifyListeners();
   }
 
@@ -431,6 +490,22 @@ class StatisticsViewModel extends ChangeNotifier {
         _isCompanyLoading = false;
       }
       return value.data;
+    });
+  }
+
+  Future<void> exportFile({required BuildContext context, required String type}) async {
+    await postSummaryReport(context, _selectedStartDate_exportFile!, _selectedEndDate_exportFile!, type).then((value) {
+      if (type == 'xlsx') {
+        _isExportFileExcelLoading = false;
+      } else if (type == 'pdf') {
+        _isExportFilePdfLoading = false;
+      }
+      notifyListeners();
+      if (value.success) {
+        showSuccessToastification(title: 'Hoàn tất', message: value.message);
+      }  else {
+        showErrorToastification(title: 'Lỗi', message: value.message);
+      }
     });
   }
 }

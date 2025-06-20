@@ -48,4 +48,5 @@ class APIConstants {
 
   static final getStatistic_endpoint = "dashboards/summary";
   static final getCompanyStatistic_endpoint = "dashboards/summary/companies";
+  static final postSummaryReport_endpoint = "dashboards/summary/companies/report";
 }

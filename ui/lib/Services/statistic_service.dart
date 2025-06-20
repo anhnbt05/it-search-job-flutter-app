@@ -97,3 +97,26 @@ Future<ResponseModel> getCompanyStatistic_filter(BuildContext context, DateTime 
     messageList: [errorMsg],
   );
 }
+
+Future<ResponseModel> postSummaryReport(BuildContext context, DateTime startDate, DateTime endDate, String type) async {
+  final validToken = await getValidAccessToken(context);
+  try {
+    final response = await ApiService().postWithToken(
+        endpoint: APIConstants.postSummaryReport_endpoint,
+        body: {
+          "StartDate": "${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
+          "EndDate": "${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}",
+          "Type": type
+        },
+        accessToken: validToken??''
+    );
+    final data = json.decode(response.body);
+    if (response.statusCode == 201) {
+      return ResponseModel(data: null, success: true, message: data['message'], messageList: [data['message']]);
+    } else {
+      return ResponseModel(data: null, success: false, message: data['message'], messageList: [data['message']]);
+    }
+  } catch (e) {
+    return ResponseModel(data: null, success: false, message: 'Lỗi không xác định', messageList: ['Lỗi không xác định']);
+  }
+}

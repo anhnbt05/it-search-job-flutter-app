@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -34,6 +35,7 @@ Widget StatisticsScreen(BuildContext context) {
 
 Widget body({required StatisticsViewModel viewModel, required BuildContext context}) {
   return ListView(
+    controller: viewModel.controller,
     children: [
       SizedBox(height: 5,),
       companyStatistics(viewModel: viewModel, context: context),
@@ -43,7 +45,274 @@ Widget body({required StatisticsViewModel viewModel, required BuildContext conte
       applicationStatistics(viewModel: viewModel, context: context),
       SizedBox(height: 5,),
       userStatistics(viewModel: viewModel, context: context),
+      SizedBox(height: 5,),
+      exportFileSection(viewModel: viewModel, context: context),
     ],
+  );
+}
+
+Widget exportFileSection({required StatisticsViewModel viewModel, required BuildContext context}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 10),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () {
+            if (!viewModel.isExportFileFilterVisible) {
+              viewModel.updateExportFileFilterVisible();
+            }
+          },
+          child: Container(
+            color: Colors.transparent,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(padding: const EdgeInsets.only(top: 5, left: 7), child: Text("Xuất file báo cáo",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                )
+                ),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: (){
+                        viewModel.updateExportFileFilterVisible();
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            color: Colors.transparent,
+                            width: 1.0,
+                          ),
+                          color: Colors.white,
+                        ),
+                        child: (!viewModel.isExportFileFilterVisible)
+                            ? Icon(Icons.keyboard_arrow_down)
+                            : Row(
+                              children: [
+                                Icon(Icons.close, size: 15, color: Colors.red,),
+                                Text('Hủy', style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                      ),
+                    ),
+                    SizedBox(width: 10,),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 10,),
+        (viewModel.isExportFileFilterVisible) ?
+          Column(
+            children: [
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 1.0,
+                        ),
+                      ),
+                      width: (MediaQuery.of(context).size.width - 40) / 2,
+                      height: 30,
+                      child: Builder(
+                          builder: (context) {
+                            return Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: TextField(
+                                readOnly: true,
+                                textAlign: TextAlign.left,
+                                controller: viewModel.exportFile_startDate,
+                                decoration: InputDecoration(
+                                  hintText: 'Từ',
+                                  suffixIcon: Icon(Icons.calendar_today, size: 15),
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  isCollapsed: true,
+                                  contentPadding: EdgeInsets.only(top: 2),
+                                ),
+                                onTap: () async {
+                                  DateTime? pickedDate = await showDatePicker(
+                                    locale: Locale('vi', 'VN'),
+                                    context: context,
+                                    initialDate: viewModel.selectedStartDate_exportFile??DateTime.now(),
+                                    firstDate: DateTime(2024),
+                                    lastDate: DateTime(2100),
+                                  );
+
+                                  if (pickedDate != null) {
+                                    viewModel.setSelectedStartDate_exportFile(pickedDate);
+                                  }
+                                },
+                              ),
+                            );
+                          }
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 1.0,
+                        ),
+                      ),
+                      width: (MediaQuery.of(context).size.width - 40) / 2,
+                      height: 30,
+                      child: Builder(
+                          builder: (context) {
+                            return Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: TextField(
+                                readOnly: true,
+                                textAlign: TextAlign.left,
+                                controller: viewModel.exportFile_endDate,
+                                decoration: InputDecoration(
+                                  hintText: 'Đến',
+                                  suffixIcon: Icon(Icons.calendar_today, size: 15),
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  isCollapsed: true,
+                                  contentPadding: EdgeInsets.only(top: 2),
+                                ),
+                                onTap: () async {
+                                  DateTime? pickedDate = await showDatePicker(
+                                    locale: Locale('vi', 'VN'),
+                                    context: context,
+                                    initialDate: viewModel.selectedEndDate_exportFile??DateTime.now(),
+                                    firstDate: DateTime(2024),
+                                    lastDate: DateTime(2100),
+                                  );
+
+                                  if (pickedDate != null) {
+                                    viewModel.setSelectedEndDate_exportFile(pickedDate);
+                                  }
+                                },
+                              ),
+                            );
+                          }
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  //Excel
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width / 2 - 10,
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: TextButton(
+                        onPressed: () async {
+                          viewModel.setIsExportFileExcelLoading(true);
+                          if (viewModel.selectedStartDate_exportFile == null) {
+                            showErrorToastification(title: 'Lỗi', message: 'Vui lòng chọn ngày bắt đầu');
+                            viewModel.setIsExportFileExcelLoading(false);
+                            return;
+                          }
+                          if (viewModel.selectedEndDate_exportFile == null) {
+                            showErrorToastification(title: 'Lỗi', message: 'Vui lòng chọn ngày kết thúc');
+                            viewModel.setIsExportFileExcelLoading(false);
+                            return;
+                          }
+                          await viewModel.exportFile(context: context, type: 'xlsx');
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color(0xff217346),
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                          minimumSize: Size(0, 0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius
+                                .circular(7),
+                          ),
+                        ),
+                        child: (viewModel.isExportFileExcelLoading)
+                            ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white,))
+                            : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(FontAwesomeIcons.solidFileExcel, color: Colors.white,),
+                            SizedBox(width: 4,),
+                            Text('File Excel',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  //Pdf
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width / 2 - 10,
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: TextButton(
+                        onPressed: () async {
+                          viewModel.setIsExportFilePdfLoading(true);
+                          if (viewModel.selectedStartDate_exportFile == null) {
+                            showErrorToastification(title: 'Lỗi', message: 'Vui lòng chọn ngày bắt đầu');
+                            viewModel.setIsExportFilePdfLoading(false);
+                            return;
+                          }
+                          if (viewModel.selectedEndDate_exportFile == null) {
+                            showErrorToastification(title: 'Lỗi', message: 'Vui lòng chọn ngày kết thúc');
+                            viewModel.setIsExportFilePdfLoading(false);
+                            return;
+                          }
+                          await viewModel.exportFile(context: context, type: 'pdf');
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color(0xFFFF0000),
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                          minimumSize: Size(0, 0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius
+                                .circular(7),
+                          ),
+                        ),
+                        child: (viewModel.isExportFilePdfLoading)
+                            ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white,))
+                            : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(FontAwesomeIcons.solidFilePdf, color: Colors.white,),
+                            SizedBox(width: 4,),
+                            Text('File Pdf',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              )
+            ],
+          )
+        : SizedBox.shrink(),
+      ],
+    ),
   );
 }
 
@@ -292,12 +561,13 @@ companyStatistics({required StatisticsViewModel viewModel, required BuildContext
                                           children: [
                                             Icon(Icons.bar_chart, color: Colors.green, size: 15,),
                                             SizedBox(width: 2,),
-                                            Text("Số bài đăng: ${viewModel.companyStatistics![index].totalAcceptedApplications} bài",),
+                                            Text("Số bài tuyển dụng: ${viewModel.companyStatistics![index].totalJobs} bài",),
                                           ],
                                         )
                                       ],
                                     ),
                                   )
+
                                 ],
                               ),
                               SizedBox(height: 5,),
@@ -308,7 +578,7 @@ companyStatistics({required StatisticsViewModel viewModel, required BuildContext
                                     text: TextSpan(
                                       style: TextStyle(fontSize: 13, color: Colors.black),
                                       children: [
-                                        TextSpan(text: "Tỉ lệ chấp nhận: ", style: TextStyle(fontFamily: "Poppins")),
+                                        TextSpan(text: "Tỉ lệ chấp nhận ứng viên: ", style: TextStyle(fontFamily: "Poppins")),
                                         TextSpan(
                                           text:
                                           "${(viewModel.companyStatistics![index].acceptanceRate * 100).toStringAsFixed(2)}%",
@@ -542,7 +812,7 @@ Widget jobStatistics({required StatisticsViewModel viewModel, required BuildCont
                     margin: EdgeInsets.zero,
                     series: <PieSeries<ChartData, String>>[
                       PieSeries<ChartData, String>(
-                        explode: true,
+                        explode: false,
                         animationDuration: 300,
                         radius: '90%',
                         dataSource: viewModel.job_chartData,
@@ -822,7 +1092,7 @@ Widget applicationStatistics({required StatisticsViewModel viewModel, required B
                     margin: EdgeInsets.zero,
                     series: <PieSeries<ChartData, String>>[
                       PieSeries<ChartData, String>(
-                        explode: true,
+                        explode: false,
                         animationDuration: 300,
                         radius: '90%',
                         dataSource: viewModel.application_chartData,

@@ -26,6 +26,10 @@ Widget CategoryManagementScreen(BuildContext context) {
         return const Center(
           child: CircularProgressIndicator(color: Colors.blue),
         );
+      } else if (!snapshot.hasData) {
+        return const Center(
+          child: CircularProgressIndicator(color: Colors.blue),
+        );
       } else {
         return body(context: context, viewModel: viewModel);
       }

@@ -22,7 +22,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80),
         child: AppBar(
-          automaticallyImplyLeading: false,
+          leading: IconButton(
+            icon: Icon(Icons.chevron_left, color: Colors.white, size: 30),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: ColorConstants.appbarColor,
           title: Center(child: Text('Thông tin bài đăng',style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500,),)),
@@ -39,6 +44,10 @@ Widget JobDetailBody(BuildContext context, JobDetailViewModel viewModel) {
       future: viewModel.jobFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.blue),
+          );
+        } else if (!snapshot.hasData) {
           return const Center(
             child: CircularProgressIndicator(color: Colors.blue),
           );

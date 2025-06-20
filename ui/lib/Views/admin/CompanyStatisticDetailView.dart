@@ -148,7 +148,7 @@ Widget CompanyDetailBody(
                     text: TextSpan(
                       style: TextStyle(fontSize: 18, color: Colors.black),
                       children: [
-                        TextSpan(text: 'Tỉ lệ được duyệt: ', style: TextStyle(fontFamily: 'Poppins', fontSize: 18)),
+                        TextSpan(text: 'Tỉ lệ chấp nhận ứng viên: ', style: TextStyle(fontFamily: 'Poppins', fontSize: 18)),
                         TextSpan(
                           text: '${(viewModel.company.acceptanceRate * 100).toStringAsFixed(2)}%',
                           style: TextStyle(
