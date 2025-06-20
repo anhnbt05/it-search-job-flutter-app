@@ -163,56 +163,57 @@ Widget CompanyDetailBody(
                   ),
                 ],
               ),
-              Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.local_offer_outlined, size: 20, color: Colors.black54),
-                    SizedBox(width: 5,),
-                    Flexible(
-                      child: RichText(
-                        text: TextSpan(
-                          style: TextStyle(fontSize: 18, color: Colors.black),
-                          children: [
-                            TextSpan(
-                              text: 'Vị trí được ứng tuyển nhiều nhất: ',
-                              style: TextStyle(fontFamily: 'Poppins', fontSize: 18),
+                    Row(
+                      children: [
+                        Icon(Icons.local_offer_outlined, size: 20, color: Colors.black54),
+                        SizedBox(width: 5,),
+                        Flexible(
+                          child: RichText(
+                            text: TextSpan(
+                              style: TextStyle(fontSize: 18, color: Colors.black),
+                              children: [
+                                TextSpan(
+                                  text: 'Vị trí được ứng tuyển nhiều nhất: ',
+                                  style: TextStyle(fontFamily: 'Poppins', fontSize: 18),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 5,),
-                    SizedBox(width: 5,),
-                    Container(
-                      constraints: BoxConstraints(
-                        maxWidth: 140,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.blue,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                        child: Text(
-                          viewModel.company.mostAppliedJobTitle,
-                          softWrap: true,
-                          overflow: TextOverflow.visible,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
                           ),
                         ),
-                      ),
-                    )
-
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(width: 25,),
+                        Flexible(
+                          child: RichText(
+                            text: TextSpan(
+                              style: TextStyle(fontSize: 18, color: Colors.black),
+                              children: [
+                                TextSpan(
+                                  text: viewModel.company.mostAppliedJobTitle,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorConstants.subTextColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ]
               ),
-      
             ],
           ),
-          SizedBox(height: 40,),
+          SizedBox(height: 30,),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
