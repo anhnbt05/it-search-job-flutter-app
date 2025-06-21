@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Helpers/helpers.dart';
 import 'package:ui/Views/candidate/AppliedJobsView.dart';
+import 'package:ui/Views/candidate/NotificationView.dart';
 import 'package:ui/Views/candidate/ProfileCandidateView.dart';
 
 import '../../ViewModels/candidate/JoblistNavigationViewModel.dart';
@@ -14,7 +15,7 @@ List<Widget> pageView_candidate(BuildContext context) {
     HomeScreen(),
     FindJobsView(),
     JobListScreen(context),
-    NotificationsScreen(),
+    NotificationView(),
     ProfileCandidateView(),
   ];
 }
@@ -39,19 +40,6 @@ Widget JobListScreen(BuildContext context) {
         AppliedJobsView(),
         FavoritesJobsView(),
       ],
-    ),
-  );
-}
-
-Widget NotificationsScreen() {
-  // TODO: Modify section below
-  return Container(
-    color: Colors.red.shade100,
-    child: Center(
-      child: Text(
-        "Thông báo",
-        style: TextStyle(fontSize: 24),
-      ),
     ),
   );
 }
