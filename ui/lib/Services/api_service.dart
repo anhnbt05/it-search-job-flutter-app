@@ -9,7 +9,6 @@ class ApiService {
     required String accessToken,
   }) async {
     final url = Uri.parse('${APIConstants.baseUrl}/$endpoint');
-
     return await http.post(
       url,
       headers: {

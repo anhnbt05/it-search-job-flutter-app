@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../Helpers/helpers.dart';
+import '../admin/NotificationView.dart';
 import 'CategoryManagementView.dart';
 import 'RecruitmentApprovalView.dart';
 import 'StatisticsView.dart';
@@ -12,7 +13,8 @@ List<BottomNavigationBarItem> bottomNavigationItem_admin(BuildContext context) {
     tabItem(Icons.fact_check_rounded, Icons.fact_check_outlined, 'Kiểm duyệt', 0, context),
     tabItem(Icons.group_rounded, Icons.group_outlined, 'Người dùng', 1, context),
     tabItem(Icons.category_rounded, Icons.category_outlined, 'Danh mục', 2, context),
-    tabItem(Icons.table_chart_rounded, Icons.table_chart_outlined, 'Thống kê', 3, context),
+    tabItem(Icons.notifications_rounded, Icons.notifications_outlined, 'Thông báo', 3, context),
+    tabItem(Icons.table_chart_rounded, Icons.table_chart_outlined, 'Thống kê', 4, context),
   ];
 }
 
@@ -21,6 +23,7 @@ List<Widget> pageView_admin (BuildContext context) {
     RecruitmentApprovalScreen(context),
     UserManagementScreen(context),
     CategoryManagementScreen(context),
+    NotificationScreen(context),
     StatisticsScreen(context),
   ];
 }
@@ -37,6 +40,9 @@ Widget? appbarTitle_admin(int selectedIndex) {
       return Text('Quản lý danh mục',
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
     case 3:
+      return Text('Thông báo',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
+    case 4:
       return Text('Thống kê',
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),);
   }

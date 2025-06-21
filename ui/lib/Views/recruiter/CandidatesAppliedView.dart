@@ -242,13 +242,16 @@ Widget CandidateApplied(int index, cApplications_recruiter application, List<cAp
                         : Colors.red,
                   )
               ),
-              child: Image.network(application.Candidate.AvatarUrl, width: MediaQuery
-                  .of(context)
-                  .size
-                  .width / 10, height: MediaQuery
-                  .of(context)
-                  .size
-                  .width / 10,),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(50),
+                child: Image.network(application.Candidate.AvatarUrl, width: MediaQuery
+                    .of(context)
+                    .size
+                    .width / 10, height: MediaQuery
+                    .of(context)
+                    .size
+                    .width / 10,),
+              ),
             ),
             SizedBox(width: MediaQuery
                 .of(context)

@@ -288,7 +288,7 @@ class JobPostViewModel extends ChangeNotifier {
   }
 
   Future<void> post(BuildContext context) async {
-    var recruiterVM = Provider.of<RecruiterProfileViewModel>(context);
+    var recruiterVM = Provider.of<RecruiterProfileViewModel>(context, listen: false);
     if (_check == false) _check = true;
     notifyListeners();
     if (_nameText.text.isEmpty ||
@@ -333,7 +333,6 @@ class JobPostViewModel extends ChangeNotifier {
       salaryText =
           "Từ ${_salaryNumber1.text} đến ${_salaryNumber2.text} ${_salaryUnitSelected}";
     }
-    final authViewModel = Provider.of<SignInViewModel>(context, listen: false);
     var job = await JobService().postJob(
       context: context,
       jobData: {
