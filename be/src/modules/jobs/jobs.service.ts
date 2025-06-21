@@ -31,6 +31,7 @@ import {
   handleFormatUserNotificationContent,
   RecruiterJobApprovedMetadata,
   RecruiterJobRejectedMetadata,
+  RoleEnum,
 } from 'src/libs/common/utils';
 import {
   CreateJobDto,
@@ -528,13 +529,21 @@ export class JobsService {
           'Đã xảy ra lỗi khi thêm danh mục cho công việc.',
         );
 
-      const { data: admin } = await this.anonSupabaseClient
+      const { data: admin, error: adminError } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
-        .eq('Email', this.configService.get<string>('admin.email', ''))
-        .maybeSingle<Users>();
+        .eq('Role', RoleEnum.ADMIN)
+        .overrideTypes<Users[], { merge: false }>();
 
-      if (!admin)
+      if (adminError) {
+        console.error(adminError);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy danh sách các quản trị viên  trong hệ thống.',
+        );
+      }
+
+      if (!admin?.length)
         throw new NotFoundException(
           `Không tìm thấy quản trị viên trong hệ thống.`,
         );
@@ -548,17 +557,24 @@ export class JobsService {
 
       const { admin_new_job_post } = NotificationType;
 
-      await this.userNotificationsService.handleCreateUserNotification(
-        {
-          Content: handleFormatUserNotificationContent(
-            admin_new_job_post,
-            metadata,
+      if (admin?.length) {
+        await Promise.all(
+          admin.map(
+            async (a) =>
+              await this.userNotificationsService.handleCreateUserNotification(
+                {
+                  Content: handleFormatUserNotificationContent(
+                    admin_new_job_post,
+                    metadata,
+                  ),
+                  Type: admin_new_job_post,
+                  metadata,
+                },
+                a.ID,
+              ),
           ),
-          Type: admin_new_job_post,
-          metadata,
-        },
-        admin.ID,
-      );
+        );
+      }
 
       return this.handleGetJobs(userId);
     } catch (err) {
@@ -733,15 +749,23 @@ export class JobsService {
           },
         });
 
-        const { data: admin } = await this.anonSupabaseClient
+        const { data: admin, error } = await this.anonSupabaseClient
           .from('Users')
           .select('*')
-          .eq('Email', this.configService.get<string>('admin.email', ''))
-          .maybeSingle<Users>();
+          .eq('Role', RoleEnum.ADMIN)
+          .overrideTypes<Users[], { merge: false }>();
 
-        if (!admin)
+        if (error) {
+          console.error(error);
+
+          throw new InternalServerErrorException(
+            'Đã xảy ra lỗi khi lấy danh sách các quản trị viên trong hệ thống.',
+          );
+        }
+
+        if (!admin?.length)
           throw new NotFoundException(
-            `Không tìm thấy quản trị viên trong hệ thống.`,
+            `Không tìm thấy quản trị viên nào trong hệ thống.`,
           );
 
         const metadata: AdminNewJobPostMetadata = {
@@ -753,16 +777,21 @@ export class JobsService {
 
         const { admin_new_job_post } = NotificationType;
 
-        await this.userNotificationsService.handleCreateUserNotification(
-          {
-            Content: handleFormatUserNotificationContent(
-              admin_new_job_post,
-              metadata,
-            ),
-            Type: admin_new_job_post,
-            metadata,
-          },
-          admin.ID,
+        await Promise.all(
+          admin.map(
+            async (a) =>
+              await this.userNotificationsService.handleCreateUserNotification(
+                {
+                  Content: handleFormatUserNotificationContent(
+                    admin_new_job_post,
+                    metadata,
+                  ),
+                  Type: admin_new_job_post,
+                  metadata,
+                },
+                a.ID,
+              ),
+          ),
         );
       }
 

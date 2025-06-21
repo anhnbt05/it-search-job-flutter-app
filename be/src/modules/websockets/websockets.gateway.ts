@@ -55,6 +55,8 @@ export class WebsocketGateway
         DEFAULT_STATUS_USER_ONLINE,
       );
 
+      await client.join(userId);
+
       console.log(`Người dùng có tên '${user.FullName}' đã online.`);
     }
   }
