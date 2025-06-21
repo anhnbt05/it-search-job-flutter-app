@@ -61,13 +61,42 @@ export class ApplicationsService {
           `Không tìm thấy ứng viên mà liên kết với người dùng có id '${userId}' trong hệ thống.`,
         );
 
-      return (
-        await this.anonSupabaseClient
-          .from('Applications')
-          .select('*')
-          .eq('CandidateID', candidate.ID)
-          .is('DeletedAt', null)
-      )?.data;
+      const { data: applications, error } = await this.anonSupabaseClient
+        .from('Applications')
+        .select(
+          '*, Jobs(*, Recruiters(*, Users(FullName, AvatarUrl), CompanyLocations(*, Companies(*))), JobCategories(*, Categories(*)))',
+        )
+        .eq('CandidateID', candidate.ID)
+        .is('DeletedAt', null);
+
+      if (error) {
+        console.error(error);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy danh sách các đơn ứng tuyển của bạn.',
+        );
+      }
+
+      return applications.map((a: any) => ({
+        ...omit(a, ['CandidateID', 'JobID', 'Jobs']),
+        Job: {
+          ...omit(a.Jobs, ['RecruiterID', 'Recruiters', 'JobCategories']),
+          Recruiter: {
+            ...omit(a.Jobs.Recruiters, [
+              'Users',
+              'UserID',
+              'CompanyLocationID',
+              'CompanyLocations',
+            ]),
+            AvatarUrl: a.Jobs.Recruiters.Users.AvatarUrl,
+            FullName: a.Jobs.Recruiters.Users.FullName,
+            Company: a.Jobs.Recruiters.CompanyLocations.Companies,
+          },
+          Categories: a.Jobs.JobCategories.map(
+            (jc: any) => jc.Categories.CategoryName,
+          ),
+        },
+      }));
     } catch (err) {
       console.error(err);
       throw err;
