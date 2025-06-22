@@ -212,3 +212,28 @@ extension LevelExtension on eLevel {
     }
   }
 }
+
+extension JobTypeExtension on eJobType {
+  String toVietnamese() {
+    switch (this) {
+      case eJobType.full_time:
+        return 'Toàn thời gian';
+      case eJobType.part_time:
+        return 'Bán thời gian';
+      case eJobType.remote:
+        return 'Làm việc từ xa';
+      case eJobType.free_lance:
+        return 'Làm việc tự do';
+    }
+  }
+
+  static eJobType? fromString(String jobtype) {
+    try {
+      return eJobType.values.firstWhere(
+            (e) => e.toString().split('.').last == jobtype.toLowerCase(),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+}

@@ -1,10 +1,12 @@
     import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
     import 'package:provider/provider.dart';
     import 'package:ui/ViewModels/candidate/ProfileCandidateViewModel.dart';
   import 'package:ui/Views/candidate/EditWorkExperienceView.dart';
     import 'package:ui/Views/candidate/PostWorkExperiencesView.dart';
 
-    import '../../Models/WorkExperiences.dart';
+    import '../../Helpers/helpers.dart';
+import '../../Models/WorkExperiences.dart';
   import '../../ViewModels/candidate/EditCandidateInformationViewModel.dart';
     import '../../ViewModels/candidate/WorkExperiencesViewModel.dart';
   import 'EditCandidateInformationScreen.dart';
@@ -40,7 +42,8 @@
               }
 
               return Scaffold(
-                body: Stack(
+                body:
+                Stack(
                   children: [
                     SingleChildScrollView(
                       padding: const EdgeInsets.all(16.0),
@@ -62,7 +65,7 @@
                                 const SizedBox(height: 8),
                                 if (candidate.Level != null)
                                   Chip(
-                                    label: Text(candidate.Level!, style: const TextStyle(color: Colors.white)),
+                                    label: Text(LevelExtension.fromString(candidate.Level)!.toVietnamese(), style: const TextStyle(color: Colors.white)),
                                     backgroundColor: Colors.blue,
                                   ),
                               ],
@@ -255,8 +258,16 @@
     class __WorkExperienceItemState extends State<_WorkExperienceItem> {
       bool _showActions = false;
 
+
+      String _formatDate(DateTime? date) {
+          return DateFormat('dd/MM/yyyy').format(date!);
+      }
+
       @override
       Widget build(BuildContext context) {
+        final formattedStartDate = _formatDate(widget.exp.StartDate);
+        final formattedEndDate = _formatDate(widget.exp.EndDate);
+
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 8),
           elevation: 2,
@@ -286,7 +297,7 @@
                             Text(widget.exp.Position ?? "",
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                             Text(widget.exp.CompanyName ?? "", style: const TextStyle(color: Colors.grey)),
-                            Text('${widget.exp.StartDate} - ${widget.exp.EndDate} • ${widget.exp.JobType}'),
+                            Text('${formattedStartDate} - ${formattedEndDate} • ${JobTypeExtension.fromString(widget.exp.JobType)!.toVietnamese()}'),
                             Text(widget.exp.Location ?? "", style: const TextStyle(fontSize: 13)),
                             const SizedBox(height: 8),
                             ...(widget.exp.Descriptions ?? []).map((desc) => Text("• $desc")).toList(),
