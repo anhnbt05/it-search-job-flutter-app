@@ -164,16 +164,16 @@ export class WorkExperiencesService {
     try {
       const { data } = await this.anonSupabaseClient
         .from('WorkExperiences')
-        .select('*')
+        .select('*, Candidates(*)')
         .eq('ID', id)
-        .maybeSingle<WorkExperiences>();
+        .maybeSingle<any>();
 
       if (!data)
         throw new NotFoundException(
           `Không tìm thấy kinh nghiệm làm việc nào có id '${id}' trong hệ thống.`,
         );
 
-      if (data && data.CandidateID !== userId)
+      if (data && data.Candidates.UserID !== userId)
         throw new ForbiddenException(
           'Bạn không có quyền xoá kinh nghiệm làm việc của người khác.',
         );
