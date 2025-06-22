@@ -28,36 +28,26 @@ import '../Models/Applications.dart';
         print("📤 [applyForJob] Status code: $statusCode");
         print("📤 [applyForJob] Raw response body: $body");
 
-
-        String extractMessage(dynamic data, {bool isSuccess = true}) {
-          if (data is Map<String, dynamic> && data.containsKey('message')) {
-            return data['message'].toString();
-          } else if (data is List && data.isNotEmpty) {
-            return data.first.toString();
-          } else if (data is String) {
-            return data;
-          } else {
-            return isSuccess ? 'Đã ứng tuyển thành công.' : 'Đã xảy ra lỗi.';
-          }
-        }
-
         final decodedData = jsonDecode(body);
         print("📤 [applyForJob] Decoded data: $decodedData (${decodedData.runtimeType})");
         if (statusCode == 201 || statusCode == 200) {
           showSuccessToastification(
-            message: extractMessage(decodedData, isSuccess: true),
+            message: "Ứng tuyển công việc thành công",
             title: "Thành công",
           );
           return true;
         } else {
           showErrorToastification(
-            message: extractMessage(decodedData, isSuccess: false),
+            message: "Không thể ứng tuyển. Vui lòng thử lại sau",
             title: "Lỗi",
           );
           return false;
         }
       } catch (e) {
-        showErrorToastification(message: e.toString(), title: "Lỗi");
+        showErrorToastification(
+          message: "Có lỗi xảy ra khi ứng tuyển. Vui lòng kiểm tra kết nối",
+          title: "Lỗi",
+        );
         return false;
       }
     }
@@ -145,6 +135,53 @@ import '../Models/Applications.dart';
       } catch (e) {
         print("Error fetching application detail: $e");
         return null;
+      }
+    }
+    Future<bool> deleteApplication({
+      required BuildContext context,
+      required String applicationId,
+    }) async {
+      try {
+        final validToken = await getValidAccessToken(context);
+        if (validToken == null) {
+          showErrorToastification(
+            message: "Không thể xác thực người dùng",
+            title: "Lỗi",
+          );
+          return false;
+        }
+        final response = await _apiService.deleteApplicationWithToken(
+          applicationId: applicationId,
+          accessToken: validToken,
+        );
+
+        final statusCode = response.statusCode;
+        final body = response.body;
+        print("📤 [deleteApplication] Status code: $statusCode");
+        print("📤 [deleteApplication] Raw response body: $body");
+
+        final decodedData = jsonDecode(body);
+        print("📤 [deleteApplication] Decoded data: $decodedData (${decodedData.runtimeType})");
+
+        if (statusCode == 200 || statusCode == 204) {
+          showSuccessToastification(
+            message: "Đã hủy đơn ứng tuyển thành công",
+            title: "Thành công",
+          );
+          return true;
+        } else {
+          showErrorToastification(
+            message: "Không thể hủy đơn ứng tuyển. Vui lòng thử lại sau",
+            title: "Lỗi",
+          );
+          return false;
+        }
+      } catch (e) {
+        showErrorToastification(
+          message: "Lỗi khi xóa đơn ứng tuyển: ${e.toString()}",
+          title: "Lỗi",
+        );
+        return false;
       }
     }
   }

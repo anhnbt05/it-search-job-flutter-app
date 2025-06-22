@@ -22,7 +22,7 @@ class FilterBottomSheetView extends StatefulWidget {
 
 class _FilterBottomSheetState extends State<FilterBottomSheetView> {
   cProvinces? selectedLocation;
-  cCategories? selectedCategory;
+  List<cCategories?> selectedCategory = [];
 
   List<cProvinces> locations = [];
   List<cCategories> categories = [];
@@ -174,7 +174,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheetView> {
               spacing: 12,
               runSpacing: 12,
               children: categories.map((cat) {
-                final selected = selectedCategory?.ID == cat.ID;
+                final selected = selectedCategory.contains(cat);
                 return ChoiceChip(
                   label: Text(
                     cat.CategoryName ?? '',
@@ -192,7 +192,11 @@ class _FilterBottomSheetState extends State<FilterBottomSheetView> {
                       borderRadius: BorderRadius.circular(20)),
                   onSelected: (val) {
                     setState(() {
-                      selectedCategory = val ? cat : null;
+                      if (val) {
+                        selectedCategory.add(cat);
+                      } else {
+                        selectedCategory.remove(cat);
+                      }
                     });
                   },
                   labelPadding: const EdgeInsets.symmetric(
@@ -234,7 +238,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheetView> {
                   onPressed: () {
                     setState(() {
                       selectedLocation = null;
-                      selectedCategory = null;
+                      selectedCategory.clear();
                     });
                   },
                   style: OutlinedButton.styleFrom(
@@ -252,12 +256,16 @@ class _FilterBottomSheetState extends State<FilterBottomSheetView> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    if (selectedLocation != null) {
+                    if (selectedLocation != null && selectedCategory.isNotEmpty)
+                      {
+                        await widget.viewModel.fetchJobsByBothLocationCategory(selectedLocation!.id, selectedCategory.map((e) => e!.CategoryName!).toList(),context);
+                      }
+                    else if (selectedLocation != null) {
                       await widget.viewModel.fetchJobsByLocation(
                           selectedLocation!.id,context);
-                    } else if (selectedCategory != null) {
+                    } else if (selectedCategory.isNotEmpty) {
                       await widget.viewModel.fetchJobsByCategory(
-                          selectedCategory!.CategoryName!,context);
+                          selectedCategory.map((e) => e!.CategoryName!).toList(),context);
                     } else {
                       await widget.viewModel.fetchJobs(context);
                     }

@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:ui/Constants/color_constants.dart';
 
 import '../Constants/api_constants.dart';
+import '../Models/Enum.dart';
 import '../ViewModels/BottomNavigationViewModel.dart';
 import '../ViewModels/admin/UserNavigationViewModel.dart';
 import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
@@ -227,4 +228,56 @@ Future<String?> getValidAccessToken(BuildContext context) async {
     await authViewModel.refreshAccessToken();
   }
   return await APIConstants.storage.read(key: 'accessToken');
+}
+
+extension LevelExtension on eLevel {
+  String toVietnamese() {
+    switch (this) {
+      case eLevel.intern:
+        return 'Intern';
+      case eLevel.fresher:
+        return 'Fresher';
+      case eLevel.junior:
+        return 'Junior';
+      case eLevel.mid:
+        return 'Mid';
+      case eLevel.senior:
+        return 'Senior';
+    }
+  }
+
+  static eLevel? fromString(String level) {
+    try {
+      return eLevel.values.firstWhere(
+            (e) => e.toString().split('.').last == level.toLowerCase(),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+}
+
+extension JobTypeExtension on eJobType {
+  String toVietnamese() {
+    switch (this) {
+      case eJobType.full_time:
+        return 'Toàn thời gian';
+      case eJobType.part_time:
+        return 'Bán thời gian';
+      case eJobType.remote:
+        return 'Làm việc từ xa';
+      case eJobType.free_lance:
+        return 'Làm việc tự do';
+    }
+  }
+
+  static eJobType? fromString(String jobtype) {
+    try {
+      return eJobType.values.firstWhere(
+            (e) => e.toString().split('.').last == jobtype.toLowerCase(),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 }

@@ -4,13 +4,14 @@
   import 'package:ui/Models/Jobs.dart';
   import 'package:ui/Views/candidate/FillterButtomSheetView.dart';
 
-  import '../../Services/application_candidate_service.dart';
+  import '../../Helpers/helpers.dart';
+import '../../Services/application_candidate_service.dart';
   import '../../Services/job_service.dart';
   import '../../ViewModels/candidate/FindJobsViewModel.dart';
   import 'JobDetailView.dart';
 
   class FindJobsView extends StatelessWidget {
-  //   const FindJobsView({super.key});
+    const FindJobsView({super.key});
   //
   //   @override
   //   State<FindJobsView> createState() => _FindJobsViewState();
@@ -205,6 +206,7 @@
                     _buildInfoRow(Icons.place, job.Address),
                     _buildInfoRow(Icons.monetization_on, job.Salary),
                     _buildInfoRow(Icons.access_time, job.WorkingTimes),
+                    _buildInfoRow(Icons.work_outline, LevelExtension.fromString(job.Level)!.toVietnamese()),
                   ],
                 ),
                 const SizedBox(height: 12),

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/Services/workexperiences_service.dart';
 import 'package:ui/ViewModels/admin/StatisticsViewModel.dart';
 import 'package:ui/ViewModels/admin/UserManagementViewModel.dart';
 import 'package:ui/ViewModels/admin/UserNavigationViewModel.dart';
@@ -12,6 +13,8 @@ import 'package:ui/ViewModels/candidate/AppliedJobsViewModel.dart';
 import 'package:ui/ViewModels/candidate/FavoritesJobsViewModel.dart';
 import 'package:ui/ViewModels/candidate/FindJobsViewModel.dart';
 import 'package:ui/ViewModels/AuthViewModel.dart';
+import 'package:ui/ViewModels/candidate/ProfileCandidateViewModel.dart';
+import 'package:ui/ViewModels/candidate/WorkExperiencesViewModel.dart';
 import 'package:ui/ViewModels/login/CompaniesViewModel.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import 'package:ui/ViewModels/login/ProvincesViewModel.dart';
@@ -59,11 +62,15 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => LoginNavigationViewModel()),
         ChangeNotifierProvider(create: (_) => SignUpViewModel()),
         ChangeNotifierProvider(create: (_) => SignInViewModel()),
-        ChangeNotifierProvider(create: (_) => FindJobsViewModel()),
-        ChangeNotifierProvider(create: (_) => FavoritesJobsViewModel()),
-        ChangeNotifierProvider(create: (_) => AppliedJobsViewModel()),
         ChangeNotifierProvider(create: (_) => JoblistNavigationViewModel()),
 
+        if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'candidate') ...[
+          ChangeNotifierProvider(create: (_) => FindJobsViewModel()),
+          ChangeNotifierProvider(create: (_) => FavoritesJobsViewModel()),
+          ChangeNotifierProvider(create: (_) => AppliedJobsViewModel()),
+          ChangeNotifierProvider(create: (_) => ProfileCandidateViewModel()),
+          ChangeNotifierProvider(create: (_) => WorkExperiencesViewModel()),
+        ],
         if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'recruiter') ...[
           ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
           ChangeNotifierProvider(create: (_) => CompaniesViewModel()),
