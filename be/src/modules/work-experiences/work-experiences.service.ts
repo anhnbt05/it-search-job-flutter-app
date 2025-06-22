@@ -111,16 +111,16 @@ export class WorkExperiencesService {
     try {
       const { data } = await this.anonSupabaseClient
         .from('WorkExperiences')
-        .select('*')
+        .select('*, Candidates(*)')
         .eq('ID', id)
-        .maybeSingle<WorkExperiences>();
+        .maybeSingle<any>();
 
       if (!data)
         throw new NotFoundException(
           `Không tìm thấy bất kỳ kinh nghiệm làm việc nào có id '${id}' trong hệ thống.`,
         );
 
-      if (data.CandidateID !== userId)
+      if (data.Candidates.UserID !== userId)
         throw new ForbiddenException(
           'Bạn không có quyền xoá kinh nghiệm làm việc của ứng viên khác.',
         );
@@ -175,7 +175,7 @@ export class WorkExperiencesService {
 
       if (data && data.Candidates.UserID !== userId)
         throw new ForbiddenException(
-          'Bạn không có quyền xoá kinh nghiệm làm việc của người khác.',
+          'Bạn không có quyền chỉnh sửa kinh nghiệm làm việc của người khác.',
         );
 
       let newLogoFileUrl = '';
