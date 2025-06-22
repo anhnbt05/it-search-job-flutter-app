@@ -16,7 +16,11 @@ export class UploadsService {
 
   public uploadFile = async (file: Express.Multer.File, bucket: string) => {
     try {
-      const fileName = `${Date.now()}-${file.originalname}`;
+      const sanitizedOriginalName = file.originalname
+        .toLowerCase()
+        .replace(/[^a-z0-9.-]/g, '_');
+
+      const fileName = `${Date.now()}-${sanitizedOriginalName}`;
 
       const { error } = await this.adminSupabaseClient.storage
         .from(bucket)
@@ -43,6 +47,12 @@ export class UploadsService {
 
   public handleUploadFilePath = async (filePath: string, bucket: string) => {
     try {
+      if (!fs.existsSync(filePath)) {
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi tạo file báo cáo. Vui lòng thử lại.',
+        );
+      }
+
       const fileBuffer = fs.readFileSync(filePath);
 
       const fileName = path.basename(filePath);
@@ -67,8 +77,18 @@ export class UploadsService {
         url: `${this.configService.get<string>('supabase.url', '')}/storage/v1/object/public/${bucket}/${fileName}`,
       };
     } catch (err) {
-      console.error(err);
-      throw err;
+      if (err.code === 'ENOENT') {
+        console.error('[ENOENT]', err);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi tạo file báo cáo. Vui lòng thử lại.',
+        );
+      }
+
+      console.error('[UPLOAD ERROR]', err);
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi không xác định trong quá trình upload.',
+      );
     }
   };
 }

@@ -35,7 +35,6 @@ class BottomNavigationViewModel extends ChangeNotifier {
     if (_pageController.hasClients) {
       _pageController.jumpToPage(2);
     }
-
   }
 
   void onItemTapped(int index) {

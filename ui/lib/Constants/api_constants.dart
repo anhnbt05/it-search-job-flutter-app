@@ -49,8 +49,17 @@ class APIConstants {
     return 'applications/$applicationId';
   }
   static final String patchJob_admin_endpoint = 'jobs/process/status';
+
   static String getProfile_candidate_endpoint(String Id) {
     return 'users/$Id';
   }
   static final String WorkExperiences_endpoint = 'work-experiences';
+
+  static final String getUser_admin_endpoint = 'users';
+  static final String deleteUser_endpoint = 'users';
+  static final String postCategory_endpoint = 'auth/categories';
+
+  static final getStatistic_endpoint = "dashboards/summary";
+  static final getCompanyStatistic_endpoint = "dashboards/summary/companies";
+  static final postSummaryReport_endpoint = "dashboards/summary/companies/report";
 }

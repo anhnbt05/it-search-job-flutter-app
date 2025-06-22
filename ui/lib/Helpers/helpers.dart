@@ -11,6 +11,7 @@ import 'package:ui/Constants/color_constants.dart';
 import '../Constants/api_constants.dart';
 import '../Models/Enum.dart';
 import '../ViewModels/BottomNavigationViewModel.dart';
+import '../ViewModels/admin/UserNavigationViewModel.dart';
 import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
 import '../ViewModels/login/SignInViewModel.dart';
 
@@ -51,13 +52,13 @@ BottomNavigationBarItem hiddenTabItem() {
   return BottomNavigationBarItem(icon: SizedBox.shrink(), label: '');
 }
 
-PreferredSize? bottomJobBar(String Role, int index, BuildContext context) {
+PreferredSize? candidateBottomBar(String Role, int index, BuildContext context) {
   var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(
     context,
   );
-  if (index != 2 && Role == 'candidate' || Role != 'candidate')
+  if (index != 2)
     return null;
-  else {
+  else if (index == 2) {
     return PreferredSize(
       preferredSize: Size.fromHeight(50),
       child: Container(
@@ -71,7 +72,7 @@ PreferredSize? bottomJobBar(String Role, int index, BuildContext context) {
               fontWeight: FontWeight.bold,
             ),
             showUnselectedLabels: true,
-            currentIndex: joblistNavigationProvider.joblistIndex,
+            currentIndex: joblistNavigationProvider.index,
             type: BottomNavigationBarType.fixed,
             onTap: joblistNavigationProvider.onTapAppliedJob_FavJob,
             items: [
@@ -89,6 +90,49 @@ PreferredSize? bottomJobBar(String Role, int index, BuildContext context) {
       ),
     );
   }
+}
+
+PreferredSize? adminBottomBar(String Role, int index, BuildContext context) {
+  var joblistNavigationProvider = Provider.of<UserNavigationViewModel>(
+    context,
+  );
+  if (index != 1)
+    return null;
+  else if (index == 1) {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(50),
+      child: Container(
+        height: 50,
+        color: Colors.white,
+        child: ClipRect(
+          child: BottomNavigationBar(
+            backgroundColor: Colors.white,
+            selectedItemColor: ColorConstants.appbarColor,
+            unselectedLabelStyle: TextStyle(fontSize: 16),
+            selectedLabelStyle: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+            showUnselectedLabels: true,
+            currentIndex: joblistNavigationProvider.index,
+            type: BottomNavigationBarType.fixed,
+            onTap: joblistNavigationProvider.onTapAppliedJob_FavJob,
+            items: [
+              BottomNavigationBarItem(
+                icon: Container(height: 0, width: 0),
+                label: 'Ứng viên ',
+              ),
+              BottomNavigationBarItem(
+                icon: Container(height: 0, width: 0),
+                label: 'Nhà tuyển dụng',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  return null;
 }
 
 Future<Map<String, String>> getDeviceInfo() async {

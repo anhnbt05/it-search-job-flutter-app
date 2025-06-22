@@ -35,7 +35,7 @@ Widget JobListScreen(BuildContext context) {
   return Container(
     color: Colors.orange.shade100,
     child: PageView(
-      controller: joblistNavigationProvider.joblistController,
+      controller: joblistNavigationProvider.pageController,
       children: [
         AppliedJobsView(),
         FavoritesJobsView(),

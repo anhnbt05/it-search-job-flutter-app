@@ -6,3 +6,4 @@ export * from './search-users.dto';
 export * from './update-candidate.dto';
 export * from './update-recruiter.dto';
 export * from './update-user.dto';
+export * from './delete-user-query.dto';

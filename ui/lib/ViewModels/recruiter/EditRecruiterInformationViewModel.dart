@@ -8,6 +8,7 @@ import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Helpers/toastification.dart';
+import 'package:ui/Models/Enum.dart';
 import 'package:ui/Models/ResponseModel.dart';
 import 'package:ui/Services/api_service.dart';
 import 'package:ui/Services/auth_resetpassword_service.dart';
@@ -113,7 +114,7 @@ class EditRecruiterInformationViewModel extends ChangeNotifier {
       context: context
     );
     if (newAvtUrl != null) {
-      recruiterVM.recruiterInfo = recruiterVM.recruiterInfo!.CopyRecruiterInfor(newFullName: fullNameController.text, newPhoneNumber: phoneNumberController.text, newPosition: positionController.text, newAvatarUrl: newAvtUrl);
+      recruiterVM.recruiterInfo = recruiterVM.recruiterInfo!.CopyRecruiterInfor(newFullName: fullNameController.text, newPhoneNumber: phoneNumberController.text, newPosition: positionController.text, newAvatarUrl: newAvtUrl, Status: "active");
       recruiterVM.notifyListeners();
       notifyListeners();
     }

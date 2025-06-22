@@ -109,6 +109,8 @@ export class DashboardsController {
           {
             companyId: '2180647a-d0e5-4062-a4a1-28de8bdf539e',
             companyName: 'Công ty phần mềm FPT Software',
+            companyLogoUrl:
+              'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//logo-fpt-software_043151683.png',
             totalJobs: 7,
             totalApplications: 3,
             totalPendingApplications: 1,
@@ -132,6 +134,8 @@ export class DashboardsController {
           {
             companyId: '2180647a-d0e5-4062-a4a1-28de8bdf539e',
             companyName: 'Công ty phần mềm FPT Software',
+            companyLogoUrl:
+              'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//logo-fpt-software_043151683.png',
             totalJobs: 0,
             totalApplications: 0,
             totalAccepted: 0,

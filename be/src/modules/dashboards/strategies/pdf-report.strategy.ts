@@ -53,6 +53,12 @@ export class PdfReportStrategy implements IReportStrategy {
     filePath += `.${ReportType.PDF.toString()}`;
 
     try {
+      const dir = path.dirname(filePath);
+
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
       const fontPath = path.join(
         process.cwd(),
         'src',

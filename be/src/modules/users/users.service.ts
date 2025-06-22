@@ -16,8 +16,13 @@ import {
 import { SupabaseClient } from '@supabase/supabase-js';
 import { omit } from 'lodash';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
+import { RoleEnum } from 'src/libs/common/utils';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
-import { SearchUsersDto, UpdateUserDto } from 'src/modules/users/dtos';
+import {
+  DeleteUserQueryDto,
+  SearchUsersDto,
+  UpdateUserDto,
+} from 'src/modules/users/dtos';
 
 @Injectable()
 export class UsersService {
@@ -33,7 +38,7 @@ export class UsersService {
     try {
       const { data, error } = await this.anonSupabaseClient
         .from('Users')
-        .select('*');
+        .select('*, Recruiters(*), Candidates(*)');
 
       if (error) {
         console.error(error);
@@ -74,11 +79,23 @@ export class UsersService {
       }
 
       return data
-        .map((data: Users) => omit(data, ['Password']))
-        .filter((user) => user.Role !== Role.admin && user.Status === 'active')
+        .filter((user) => user.Role !== Role.admin)
+        .map((data: any) =>
+          omit(
+            {
+              ...data,
+              ID:
+                data.Role === Role.recruiter
+                  ? data.Recruiters[0].ID
+                  : data.Candidates[0].ID,
+            },
+            ['Password', 'Recruiters', 'Candidates'],
+          ),
+        )
         .sort(
           (a, b) =>
-            new Date(b.CreatedAt).getTime() - new Date(a.CreatedAt).getTime(),
+            new Date(b.CreatedAt as string).getTime() -
+            new Date(a.CreatedAt as string).getTime(),
         );
     } catch (err) {
       console.error(err);
@@ -97,11 +114,6 @@ export class UsersService {
       if (!data)
         throw new NotFoundException(
           `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
-        );
-
-      if (data.Status === 'inactive')
-        throw new NotFoundException(
-          `Tài khoản của người dùng có tên '${data.FullName}' đã bị khoá bởi quản trị viên của hệ thống.`,
         );
 
       const { data: currentUser } = await this.anonSupabaseClient
@@ -124,7 +136,7 @@ export class UsersService {
         const { data: candidate } = await this.anonSupabaseClient
           .from('Candidates')
           .select(
-            '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role) ,Applications(*, Jobs(*, Recruiters(*)))',
+            '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role, Status, IsEmailVerified) ,Applications(*, Jobs(*, Recruiters(*)))',
           )
           .eq('UserID', userId)
           .maybeSingle<any>();
@@ -173,7 +185,7 @@ export class UsersService {
         const { data: candidate } = await this.anonSupabaseClient
           .from('Candidates')
           .select(
-            '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role) ,Applications(*)',
+            '*, WorkExperiences(*) ,Users(FullName, Email, PhoneNumber, AvatarUrl, Role, Status, IsEmailVerified) ,Applications(*)',
           )
           .eq('UserID', userId)
           .maybeSingle<any>();
@@ -213,6 +225,7 @@ export class UsersService {
         AvatarUrl: recruiter.Users.AvatarUrl,
         PhoneNumber: recruiter.Users.PhoneNumber,
         IsEmailVerified: recruiter.Users.IsEmailVerified,
+        Status: recruiter.Users.Status,
         Company: recruiter.CompanyLocations.Companies,
         CompanyLocations: {
           ...omit(recruiter.CompanyLocations, [
@@ -376,23 +389,27 @@ export class UsersService {
     }
   };
 
-  public handleDeleteUser = async (userId: string) => {
+  public handleDeleteUser = async (
+    roleId: string,
+    deleteUserQueryDto: DeleteUserQueryDto,
+  ) => {
     try {
+      const { role } = deleteUserQueryDto;
       const { data, error: findUserError } = await this.anonSupabaseClient
-        .from('Users')
-        .select('*')
-        .eq('ID', userId)
-        .maybeSingle<Users>();
+        .from(`${role === RoleEnum.CANDIDATE ? 'Candidates' : 'Recruiters'}`)
+        .select('*, Users(*)')
+        .eq('ID', roleId)
+        .maybeSingle<any>();
 
       if (!data || findUserError)
         throw new NotFoundException(
-          `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
+          `Không tìm thấy người dùng mà bạn yêu cầu cần xoá.`,
         );
 
-      if (data.Status === 'inactive')
+      if (data.Users.Status === UserStatus.inactive)
         throw new BadRequestException('Tài khoản này đã bị khoá rồi.');
 
-      if (data.Role === Role.admin)
+      if (data.Users.Role === Role.admin)
         throw new ForbiddenException(
           'Bạn không thể tự khoá chính tài khoản của mình.',
         );
@@ -401,11 +418,11 @@ export class UsersService {
         .from('Users')
         .update([
           {
-            DeleteAt: new Date(),
+            DeletedAt: new Date(),
             Status: UserStatus.inactive,
           },
         ])
-        .eq('ID', userId);
+        .eq('ID', data.Users.ID);
 
       if (error) {
         console.error(error);
@@ -439,6 +456,8 @@ export class UsersService {
       WorkExperiences: candidate.WorkExperiences.map((we: any) =>
         omit(we, ['CandidateID']),
       ),
+      Status: candidate.Users.Status,
+      IsEmailVerified: candidate.Users.IsEmailVerified,
     };
   };
 
@@ -621,22 +640,20 @@ export class UsersService {
         );
       }
 
-      const total = data.length;
-
       const candidates = data.filter((u) => u.Role === Role.candidate).length;
 
       const recruiters = data.filter((u) => u.Role === Role.recruiter).length;
 
       const activeUsers = data.filter(
-        (u) => u.Status === UserStatus.active,
+        (u) => u.Status === UserStatus.active && u.Role !== RoleEnum.ADMIN,
       ).length;
 
       const blockedUsers = data.filter(
-        (u) => u.Status === UserStatus.inactive,
+        (u) => u.Status === UserStatus.inactive && u.Role !== RoleEnum.ADMIN,
       ).length;
 
       return {
-        total,
+        total: candidates + recruiters,
         candidates,
         recruiters,
         activeUsers,

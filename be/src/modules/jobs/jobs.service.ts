@@ -31,6 +31,7 @@ import {
   handleFormatUserNotificationContent,
   RecruiterJobApprovedMetadata,
   RecruiterJobRejectedMetadata,
+  RoleEnum,
 } from 'src/libs/common/utils';
 import {
   CreateJobDto,
@@ -38,6 +39,7 @@ import {
   DeleteJobFavoritesDto,
   ProcessJobStatusDto,
   RejectedJobStatusDto,
+  SearchJobQueryDto,
   UpdateJobDto,
 } from 'src/modules/jobs/dtos';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -170,7 +172,10 @@ export class JobsService {
     }
   }
 
-  public handleGetJobs = async (userId: string) => {
+  public handleGetJobs = async (
+    userId: string,
+    searchJobQueryDto?: SearchJobQueryDto,
+  ) => {
     try {
       const { data: user, error } = await this.anonSupabaseClient
         .from('Users')
@@ -224,7 +229,7 @@ export class JobsService {
           'Đã xảy ra lỗi khi lấy danh sách các công việc.',
         );
 
-      return jobs?.map((job) => {
+      let formattedJobs = jobs?.map((job) => {
         return {
           ...omit(job, ['RecruiterID', 'Recruiters', 'JobCategories']),
           Recruiter: {
@@ -243,6 +248,41 @@ export class JobsService {
           ),
         };
       });
+
+      if (searchJobQueryDto?.categoryNames?.length) {
+        const { categoryNames } = searchJobQueryDto;
+
+        const filtered = formattedJobs.filter((fj) =>
+          fj.Categories.some((jobCategory: string) =>
+            categoryNames.includes(jobCategory),
+          ),
+        );
+
+        formattedJobs = [...filtered];
+      }
+
+      if (searchJobQueryDto?.locationId?.trim()) {
+        const { locationId } = searchJobQueryDto;
+
+        const jobs = await this.handleSearchJobsByLocations(
+          locationId,
+          isAdmin
+            ? JobStatus.pending
+            : !isRecruiter
+              ? JobStatus.open
+              : undefined,
+        );
+
+        const jobIds = jobs.map((job: any) => job.ID);
+
+        const filtered = formattedJobs.filter((fj: any) =>
+          jobIds.includes(fj.ID),
+        );
+
+        formattedJobs = [...filtered];
+      }
+
+      return formattedJobs;
     } catch (err) {
       console.error(err);
       throw err;
@@ -489,13 +529,21 @@ export class JobsService {
           'Đã xảy ra lỗi khi thêm danh mục cho công việc.',
         );
 
-      const { data: admin } = await this.anonSupabaseClient
+      const { data: admin, error: adminError } = await this.anonSupabaseClient
         .from('Users')
         .select('*')
-        .eq('Email', this.configService.get<string>('admin.email', ''))
-        .maybeSingle<Users>();
+        .eq('Role', RoleEnum.ADMIN)
+        .overrideTypes<Users[], { merge: false }>();
 
-      if (!admin)
+      if (adminError) {
+        console.error(adminError);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy danh sách các quản trị viên  trong hệ thống.',
+        );
+      }
+
+      if (!admin?.length)
         throw new NotFoundException(
           `Không tìm thấy quản trị viên trong hệ thống.`,
         );
@@ -509,17 +557,24 @@ export class JobsService {
 
       const { admin_new_job_post } = NotificationType;
 
-      await this.userNotificationsService.handleCreateUserNotification(
-        {
-          Content: handleFormatUserNotificationContent(
-            admin_new_job_post,
-            metadata,
+      if (admin?.length) {
+        await Promise.all(
+          admin.map(
+            async (a) =>
+              await this.userNotificationsService.handleCreateUserNotification(
+                {
+                  Content: handleFormatUserNotificationContent(
+                    admin_new_job_post,
+                    metadata,
+                  ),
+                  Type: admin_new_job_post,
+                  metadata,
+                },
+                a.ID,
+              ),
           ),
-          Type: admin_new_job_post,
-          metadata,
-        },
-        admin.ID,
-      );
+        );
+      }
 
       return this.handleGetJobs(userId);
     } catch (err) {
@@ -694,15 +749,23 @@ export class JobsService {
           },
         });
 
-        const { data: admin } = await this.anonSupabaseClient
+        const { data: admin, error } = await this.anonSupabaseClient
           .from('Users')
           .select('*')
-          .eq('Email', this.configService.get<string>('admin.email', ''))
-          .maybeSingle<Users>();
+          .eq('Role', RoleEnum.ADMIN)
+          .overrideTypes<Users[], { merge: false }>();
 
-        if (!admin)
+        if (error) {
+          console.error(error);
+
+          throw new InternalServerErrorException(
+            'Đã xảy ra lỗi khi lấy danh sách các quản trị viên trong hệ thống.',
+          );
+        }
+
+        if (!admin?.length)
           throw new NotFoundException(
-            `Không tìm thấy quản trị viên trong hệ thống.`,
+            `Không tìm thấy quản trị viên nào trong hệ thống.`,
           );
 
         const metadata: AdminNewJobPostMetadata = {
@@ -714,16 +777,21 @@ export class JobsService {
 
         const { admin_new_job_post } = NotificationType;
 
-        await this.userNotificationsService.handleCreateUserNotification(
-          {
-            Content: handleFormatUserNotificationContent(
-              admin_new_job_post,
-              metadata,
-            ),
-            Type: admin_new_job_post,
-            metadata,
-          },
-          admin.ID,
+        await Promise.all(
+          admin.map(
+            async (a) =>
+              await this.userNotificationsService.handleCreateUserNotification(
+                {
+                  Content: handleFormatUserNotificationContent(
+                    admin_new_job_post,
+                    metadata,
+                  ),
+                  Type: admin_new_job_post,
+                  metadata,
+                },
+                a.ID,
+              ),
+          ),
         );
       }
 
@@ -1108,74 +1176,6 @@ export class JobsService {
     }
   };
 
-  public handleGetJobsByCategoryName = async (categoryName: string) => {
-    try {
-      const { data, error } = await this.anonSupabaseClient
-        .from('Categories')
-        .select('*')
-        .eq('CategoryName', categoryName)
-        .maybeSingle<Categories>();
-
-      if (!data || error)
-        throw new NotFoundException(
-          `Danh mục có tên ${categoryName} không tìm thấy.`,
-        );
-
-      const response = await this.anonSupabaseClient
-        .from('JobCategories')
-        .select(
-          `
-          *,
-          Jobs (
-            *,
-            Recruiters(*, Users(*), CompanyLocations(*, Companies(*))),
-            JobDescriptions(*),
-            JobRequirements(*),
-            JobBenefits(*),
-            JobCategories(*, Categories(*))
-          )
-        `,
-        )
-        .eq('CategoryID', data.ID);
-
-      if (response?.error) {
-        console.error(response.error);
-
-        throw new InternalServerErrorException(
-          'Đã xảy ra lỗi khi lấy danh sách các danh mục của công việc.',
-        );
-      }
-
-      return response?.data?.map((d) => ({
-        ...omit(d.Jobs, ['JobCategories', 'RecruiterID', 'Recruiters']),
-        JobBenefits: d.Jobs.JobBenefits.map((jb: any) => jb.Benefit),
-        JobDescriptions: d.Jobs.JobDescriptions.map(
-          (jd: any) => jd.Description,
-        ),
-        JobRequirements: d.Jobs.JobRequirements.map(
-          (jr: any) => jr.Requirement,
-        ),
-        Categories: d.Jobs.JobCategories.map(
-          (jc: any) => jc.Categories.CategoryName,
-        ),
-        Recruiter: {
-          ID: d.Jobs.Recruiters.ID,
-          Position: d.Jobs.Recruiters.Position,
-          FullName: d.Jobs.Recruiters.Users.FullName,
-          PhoneNumber: d.Jobs.Recruiters.Users.PhoneNumber,
-          Email: d.Jobs.Recruiters.Users.Email,
-          Company: {
-            Name: d.Jobs.Recruiters.CompanyLocations.Companies.Name,
-            LogoUrl: d.Jobs.Recruiters.CompanyLocations.Companies.LogoUrl,
-          },
-        },
-      }));
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  };
-
   public handleGetRecommendedJobsForCandidate = async (
     candidateId: string,
     userId: string,
@@ -1192,10 +1192,7 @@ export class JobsService {
           `Không tìm thấy ứng viên mà liên kết với người dùng có id '${userId}'`,
         );
 
-      if (data.ID !== candidateId)
-        throw new ForbiddenException(
-          'Bạn chỉ có thể lấy các công việc phù hợp với trình độ của chính bạn.',
-        );
+      if (data.ID !== candidateId) return [];
 
       const candidateLevel = data.Level;
 
@@ -1270,7 +1267,10 @@ export class JobsService {
     }
   };
 
-  public handleSearchJobsByLocations = async (locationId: string) => {
+  public handleSearchJobsByLocations = async (
+    locationId: string,
+    status?: JobStatus,
+  ) => {
     try {
       const { data, error } = await this.anonSupabaseClient
         .from('Locations')
@@ -1289,7 +1289,9 @@ export class JobsService {
         data.CompanyLocations?.flatMap(
           (location: any) =>
             location.Recruiters?.flatMap((recruiter: any) =>
-              recruiter.Jobs.filter((job: any) => job.Status === JobStatus.open)
+              recruiter.Jobs.filter(
+                (job: any) => !status || job.Status === status,
+              )
                 .map((item: any) => ({
                   ...omit(item, ['Recruiters', 'RecruiterID', 'JobCategories']),
                   Recruiter: {

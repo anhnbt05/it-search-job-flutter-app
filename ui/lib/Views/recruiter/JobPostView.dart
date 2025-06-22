@@ -668,7 +668,6 @@ Widget PostJobScreen(BuildContext context) {
                 ),
               ),
               Padding(padding: EdgeInsets.only(left: 10), child:
-              // Replace the existing ElevatedButton code in the PostJobScreen function with this:
 
               Builder(
                 builder: (BuildContext dialogContext) {

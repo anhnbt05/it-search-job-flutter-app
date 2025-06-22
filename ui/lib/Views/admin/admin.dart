@@ -2,7 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../Helpers/helpers.dart';
+import 'CategoryManagementView.dart';
 import 'RecruitmentApprovalView.dart';
+import 'StatisticsView.dart';
+import 'UserManagementView.dart';
 
 List<BottomNavigationBarItem> bottomNavigationItem_admin(BuildContext context) {
   return [
@@ -16,22 +19,10 @@ List<BottomNavigationBarItem> bottomNavigationItem_admin(BuildContext context) {
 List<Widget> pageView_admin (BuildContext context) {
   return [
     RecruitmentApprovalScreen(context),
-    page2(context),
-    page3(context),
-    page4(context),
+    UserManagementScreen(context),
+    CategoryManagementScreen(context),
+    StatisticsScreen(context),
   ];
-}
-
-Widget page2(BuildContext context) {
-  return Center(child: Text("2", style: TextStyle(fontSize: 24)));
-}
-
-Widget page3(BuildContext context) {
-  return Center(child: Text("3", style: TextStyle(fontSize: 24)));
-}
-
-Widget page4(BuildContext context) {
-  return Center(child: Text("4", style: TextStyle(fontSize: 24)));
 }
 
 Widget? appbarTitle_admin(int selectedIndex) {
