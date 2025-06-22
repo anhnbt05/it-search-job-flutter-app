@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:ui/Constants/color_constants.dart';
 
 import '../Constants/api_constants.dart';
+import '../Models/Enum.dart';
 import '../ViewModels/BottomNavigationViewModel.dart';
 import '../ViewModels/candidate/JoblistNavigationViewModel.dart';
 import '../ViewModels/login/SignInViewModel.dart';
@@ -183,4 +184,31 @@ Future<String?> getValidAccessToken(BuildContext context) async {
     await authViewModel.refreshAccessToken();
   }
   return await APIConstants.storage.read(key: 'accessToken');
+}
+
+extension LevelExtension on eLevel {
+  String toVietnamese() {
+    switch (this) {
+      case eLevel.intern:
+        return 'Intern';
+      case eLevel.fresher:
+        return 'Fresher';
+      case eLevel.junior:
+        return 'Junior';
+      case eLevel.mid:
+        return 'Mid';
+      case eLevel.senior:
+        return 'Senior';
+    }
+  }
+
+  static eLevel? fromString(String level) {
+    try {
+      return eLevel.values.firstWhere(
+            (e) => e.toString().split('.').last == level.toLowerCase(),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 }

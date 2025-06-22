@@ -16,7 +16,7 @@ class WorkExperiencesViewModel extends ChangeNotifier {
     "Bán thời gian": "part_time",
     "Toàn thời gian": "full_time",
     "Làm việc từ xa": "remote",
-    "Làm việc tự do": "freelance"
+    "Làm việc tự do": "free_lance"
   };
 
   final WorkExperiencesService _workExperiencesService = WorkExperiencesService();

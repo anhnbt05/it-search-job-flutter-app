@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Models/Applications.dart';
 import 'package:ui/ViewModels/candidate/AppliedJobsViewModel.dart';
+import '../../Helpers/helpers.dart';
 import 'JobDetailView.dart';
 
 class AppliedJobsView extends StatelessWidget {
@@ -206,6 +207,7 @@ class JobCard extends StatelessWidget {
               _buildInfoRow(Icons.place, job.Address),
               _buildInfoRow(Icons.monetization_on, job.Salary),
               _buildInfoRow(Icons.access_time, job.WorkingTimes),
+              _buildInfoRow(Icons.work_outline, LevelExtension.fromString(job.Level)!.toVietnamese()),
             ],
           ),
 

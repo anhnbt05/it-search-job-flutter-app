@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:file_selector/file_selector.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -12,12 +13,30 @@ import 'package:ui/Models/ResponseModel.dart';
 import 'package:ui/Services/user_service.dart';
 
 import '../../Helpers/toastification.dart';
+import '../../Models/Enum.dart';
 import '../../Services/auth_resetpassword_service.dart';
 import '../../Services/auth_verifyresetpasswordotp_service.dart';
 import '../AuthViewModel.dart';
 import 'ProfileCandidateViewModel.dart';
 
+
 class EditCandidateInformationViewModel extends ChangeNotifier {
+  String getLevelName(eLevel? level) {
+    switch (level) {
+      case eLevel.intern:
+        return "Intern";
+      case eLevel.fresher:
+        return "Fresher";
+      case eLevel.mid:
+        return "Mid";
+      case eLevel.junior:
+        return "Junior";
+      case eLevel.senior:
+        return "Senior";
+      default:
+        return level.toString().split('.').last;
+    }
+  }
   late String userId;
   late final TextEditingController _fullNameController;
   late final TextEditingController _phoneNumberController;
@@ -52,6 +71,12 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
   EditCandidateInformationViewModel(BuildContext context, this.userId) {
     final profileVM = Provider.of<ProfileCandidateViewModel>(context, listen: false);
     final info = profileVM.candidate;
+    if (info?.Level != null) {
+      levelSelected = eLevel.values.firstWhere(
+            (e) => getLevelName(e).toLowerCase() == info?.Level?.toLowerCase(),
+        orElse: () => eLevel.intern,
+      );
+    }
     if (info == null) {
       throw Exception('Candidate info is null. Make sure it is loaded before using this ViewModel.');
     }
@@ -122,8 +147,8 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
         updateData['Bio'] = bioController.text;
       }
 
-      if (levelController.text != currentCandidate.Level) {
-        updateData['Level'] = levelController.text;
+      if (levelSelected != null) {
+        updateData['Level'] = levelSelected.toString().split('.').last;
       }
 
       final currentCerts = currentCandidate.Certifications ?? [];
@@ -219,4 +244,17 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+  eLevel? levelSelected;
+  Color levelBorderColor = Colors.grey.shade400;
+
+  void setLevelSelected(eLevel? level) {
+    levelSelected = level;
+    notifyListeners();
+  }
+
+  void setLevelBorderColor(Color color) {
+    levelBorderColor = color;
+    notifyListeners();
+  }
+
 }

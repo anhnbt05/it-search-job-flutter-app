@@ -4,6 +4,7 @@ import 'package:ui/Models/JobFavorites.dart';
 import 'package:ui/Models/Jobs.dart';
 
 import '../../Constants/api_constants.dart';
+import '../../Helpers/helpers.dart';
 import '../../Services/application_candidate_service.dart';
 import '../../ViewModels/candidate/FavoritesJobsViewModel.dart';
 import 'JobDetailView.dart';
@@ -175,6 +176,7 @@ class JobCard extends StatelessWidget {
               _buildInfoRow(Icons.place, favoritejob.Job!.Address),
               _buildInfoRow(Icons.monetization_on, favoritejob.Job!.Salary),
               _buildInfoRow(Icons.access_time, favoritejob.Job!.WorkingTimes),
+              _buildInfoRow(Icons.work_outline, LevelExtension.fromString(favoritejob.Job!.Level)!.toVietnamese()),
             ],
           ),
           const SizedBox(height: 12),

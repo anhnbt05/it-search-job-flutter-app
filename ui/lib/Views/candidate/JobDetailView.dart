@@ -1,11 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../Models/Enum.dart';
 import '../../ViewModels/candidate/DetailJobViewModel.dart';
+
+extension JobStatusExtension on eJobStatus {
+  String toVietnamese() {
+    switch (this) {
+      case eJobStatus.open:
+        return 'Đang mở';
+      case eJobStatus.closed:
+        return 'Đã đóng';
+      case eJobStatus.pending:
+        return 'Đang chờ';
+      case eJobStatus.rejected:
+        return 'Bị từ chối';
+    }
+  }
+  static eJobStatus? fromString(String status) {
+    try {
+      return eJobStatus.values.firstWhere(
+            (e) => e.toString().split('.').last == status.toLowerCase(),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+}
 
 class JobDetailView extends StatelessWidget {
   final String jobId;
 
   const JobDetailView({super.key, required this.jobId});
+
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +98,13 @@ class JobDetailView extends StatelessWidget {
                     children: [
                       Expanded(child: _iconText(Icons.school, "Trình độ yêu cầu", job?.Level ?? "N/A")),
                       const SizedBox(width: 16),
-                      Expanded(child: _iconText(Icons.check_circle_outline, "Tình trạng", job?.Status ?? "N/A")),
+                      Expanded(child: _iconText(
+                          Icons.check_circle_outline,
+                          "Tình trạng",
+                          job?.Status != null
+                              ? JobStatusExtension.fromString(job!.Status)?.toVietnamese() ?? "N/A"
+                              : "N/A"
+                      )),
                     ],
                   ),
 

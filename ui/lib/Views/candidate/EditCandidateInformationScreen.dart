@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,7 @@ import 'package:ui/Services/auth_forgetpassword_service.dart';
 
 import '../../Constants/color_constants.dart';
 import '../../Helpers/toastification.dart';
+import '../../Models/Enum.dart';
 import '../../ViewModels/candidate/EditCandidateInformationViewModel.dart';
 import '../../ViewModels/candidate/ProfileCandidateViewModel.dart';
 
@@ -287,25 +289,76 @@ class _EditCandidateInformationScreenState
                                       textInputType: TextInputType.text,
                                       controller: viewModel.bioController,
                                     ),
+                                    // Thêm vào phần Column trong build method của EditCandidateInformationScreen
                                     Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 7,
-                                        top: 7,
-                                        bottom: 5,
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Row(
+                                        children: [
+                                          Text('Trình độ:') ,
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 10),
+                                            child: DropdownButtonHideUnderline(
+                                              child: DropdownButton2<eLevel>(
+                                                isDense: true,
+                                                hint: Text(
+                                                  "Chọn trình độ",
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.normal,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                                value: viewModel.levelSelected,
+                                                items: eLevel.values.map((level) {
+                                                  return DropdownMenuItem<eLevel>(
+                                                    value: level,
+                                                    child: Text(
+                                                    viewModel.getLevelName(level),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.normal,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                                onChanged: (eLevel? newValue) {
+                                                  viewModel.setLevelSelected(newValue);
+                                                },
+                                                buttonStyleData: ButtonStyleData(
+                                                  width: MediaQuery.of(context).size.width - 185,
+                                                  height: 40,
+                                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(color: viewModel.levelBorderColor),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                ),
+                                                dropdownStyleData: DropdownStyleData(
+                                                  width: MediaQuery.of(context).size.width - 185,
+                                                  decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      color: Colors.white
+                                                  ),
+                                                ),
+                                                iconStyleData: IconStyleData(
+                                                  icon: Icon(Icons.arrow_drop_down),
+                                                ),
+                                                onMenuStateChange: (isOpen) {
+                                                  if (isOpen) {
+                                                    viewModel.setLevelBorderColor(Colors.blue);
+                                                  } else {
+                                                    if (viewModel.levelSelected != null) {
+                                                      viewModel.setLevelBorderColor(Colors.grey.shade400);
+                                                    } else {
+                                                      viewModel.setLevelBorderColor(Colors.red);
+                                                    }
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      child: Text(
-                                        "Trình độ:",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    customTextField(
-                                      hintText: "",
-                                      height: 40,
-                                      textInputType: TextInputType.text,
-                                      controller: viewModel.levelController,
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(
