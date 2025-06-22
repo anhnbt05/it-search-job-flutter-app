@@ -1,10 +1,13 @@
   import 'package:flutter/material.dart';
   import 'package:provider/provider.dart';
   import 'package:ui/ViewModels/candidate/ProfileCandidateViewModel.dart';
+import 'package:ui/Views/candidate/EditWorkExperienceView.dart';
   import 'package:ui/Views/candidate/PostWorkExperiencesView.dart';
 
-  import '../../ViewModels/candidate/EditCandidateInformationViewModel.dart';
-  import 'EditCandidateInformationScreen.dart';
+  import '../../Models/WorkExperiences.dart';
+import '../../ViewModels/candidate/EditCandidateInformationViewModel.dart';
+  import '../../ViewModels/candidate/WorkExperiencesViewModel.dart';
+import 'EditCandidateInformationScreen.dart';
 import 'ReadResumeCandidateScreen.dart';
 
   class ProfileCandidateView extends StatelessWidget {
@@ -87,53 +90,61 @@ import 'ReadResumeCandidateScreen.dart';
 
                         const SizedBox(height: 24),
 
-                        _sectionTitle('Kinh nghiệm làm việc'),
-                        ...(candidate.WorkExperiences ?? []).map((exp) {
-                          return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CircleAvatar(
-                                    backgroundImage: NetworkImage(exp.CompanyLogoUrl ?? ""),
-                                    radius: 28,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(exp.Position ?? "",
-                                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                        Text(exp.CompanyName ?? "", style: const TextStyle(color: Colors.grey)),
-                                        Text('${exp.StartDate} - ${exp.EndDate} • ${exp.JobType}'),
-                                        Text(exp.Location ?? "", style: const TextStyle(fontSize: 13)),
-                                        const SizedBox(height: 8),
-                                        ...(exp.Descriptions ?? []).map((desc) => Text("• $desc")).toList(),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            _sectionTitle('Kinh nghiệm làm việc'),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => PostWorkExperiencesView()));
+                              },
+                              icon: const Icon(Icons.add_circle_outline, size: 28),
+                              color: Colors.blueAccent,
+                              tooltip: 'Thêm kinh nghiệm làm việc',
                             ),
+                          ],
+                        ),
+                        ...(candidate.WorkExperiences ?? []).map((exp) {
+                          return _WorkExperienceItem(
+                            exp: exp,
+                            onEdit: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => EditWorkExperienceView(workExperience: exp)));
+                            },
+                            onDelete: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text("Xác nhận xóa"),
+                                  content: const Text("Bạn có chắc chắn muốn xóa kinh nghiệm này?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text("Hủy"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        Navigator.pop(context);
+                                        final workExpViewModel = Provider.of<WorkExperiencesViewModel>(context, listen: false);
+                                        final profileViewModel = Provider.of<ProfileCandidateViewModel>(context, listen: false);
+
+                                        final success = await workExpViewModel.deleteWorkExperience(
+                                          id: exp.ID!,
+                                          context: context,
+                                        );
+
+                                        if (success) {
+                                          await profileViewModel.fetchCandidateInfo(context: context);
+                                        }
+                                      },
+                                      child: const Text("Xóa", style: TextStyle(color: Colors.red)),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           );
                         }).toList(),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => PostWorkExperiencesView()));
-                          },
-                          icon: const Icon(Icons.add),
-                          label: const Text("Thêm kinh nghiệm làm việc"),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -222,6 +233,96 @@ import 'ReadResumeCandidateScreen.dart';
       return Align(
         alignment: Alignment.centerLeft,
         child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      );
+    }
+  }
+
+  class _WorkExperienceItem extends StatefulWidget {
+    final cWorkExperiences exp;
+    final VoidCallback onEdit;
+    final VoidCallback onDelete;
+
+    const _WorkExperienceItem({
+      required this.exp,
+      required this.onEdit,
+      required this.onDelete,
+    });
+
+    @override
+    __WorkExperienceItemState createState() => __WorkExperienceItemState();
+  }
+
+  class __WorkExperienceItemState extends State<_WorkExperienceItem> {
+    bool _showActions = false;
+
+    @override
+    Widget build(BuildContext context) {
+      return Card(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    _showActions = !_showActions;
+                  });
+                },
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: NetworkImage(widget.exp.CompanyLogoUrl ?? ""),
+                      radius: 28,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(widget.exp.Position ?? "",
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text(widget.exp.CompanyName ?? "", style: const TextStyle(color: Colors.grey)),
+                          Text('${widget.exp.StartDate} - ${widget.exp.EndDate} • ${widget.exp.JobType}'),
+                          Text(widget.exp.Location ?? "", style: const TextStyle(fontSize: 13)),
+                          const SizedBox(height: 8),
+                          ...(widget.exp.Descriptions ?? []).map((desc) => Text("• $desc")).toList(),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.more_vert, size: 20),
+                  ],
+                ),
+              ),
+              if (_showActions)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton.icon(
+                        icon: const Icon(Icons.edit, size: 18),
+                        label: const Text("Chỉnh sửa"),
+                        onPressed: widget.onEdit,
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.blue,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton.icon(
+                        icon: const Icon(Icons.delete, size: 18, color: Colors.red),
+                        label: const Text("Xóa", style: TextStyle(color: Colors.red)),
+                        onPressed: widget.onDelete,
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
       );
     }
   }

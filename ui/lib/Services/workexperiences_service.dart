@@ -100,7 +100,6 @@ class WorkExperiencesService {
         Uri.parse('${APIConstants.baseUrl}/${APIConstants.WorkExperiences_endpoint}/$workexperienceId'),
       );
 
-      // Thêm các trường dữ liệu riêng lẻ
       request.fields['CompanyName'] = companyName;
       request.fields['Position'] = position;
       request.fields['StartDate'] = startDate;
