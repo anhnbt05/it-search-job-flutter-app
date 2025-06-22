@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
+import 'package:dropdown_button2/dropdown_button2.dart';
 import '../../Constants/color_constants.dart';
 import '../../ViewModels/candidate/WorkExperiencesViewModel.dart';
 
@@ -15,16 +16,18 @@ class PostWorkExperiencesView extends StatefulWidget {
 
 class _PostWorkExperiencesViewState extends State<PostWorkExperiencesView> {
   final _formKey = GlobalKey<FormState>();
-
   final _companyNameController = TextEditingController();
   final _positionController = TextEditingController();
   final _startDateController = TextEditingController();
   final _endDateController = TextEditingController();
   final _locationController = TextEditingController();
-  final _jobTypeController = TextEditingController();
   final _descriptionsController = TextEditingController();
 
   File? _logoFile;
+  String? _selectedJobType;
+  DateTime? _selectedStartDate;
+  DateTime? _selectedEndDate;
+  Color _jobTypeBorderColor = Colors.grey.shade400;
 
   Future<void> _pickLogo() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -35,233 +38,438 @@ class _PostWorkExperiencesViewState extends State<PostWorkExperiencesView> {
     }
   }
 
-  Widget customTextField({
-    required TextEditingController controller,
+  Widget _buildDatePickerField({
     required String label,
-    int maxLines = 1,
-    TextInputType keyboardType = TextInputType.text, // đã có rồi
-    bool requiredField = true,
+    required DateTime? selectedDate,
+    required Function(DateTime?) onDateSelected,
+    bool isRequired = true,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+          RichText(
+            text: TextSpan(
+              text: label,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: Colors.black,
+                fontFamily: 'Poppins',
+              ),
+              children: [
+                if (isRequired) const TextSpan(
+                  text: '*',
+                  style: TextStyle(color: Colors.red),
+                ),
+                const TextSpan(
+                    text: ':',
+                    style: TextStyle(fontWeight: FontWeight.bold)
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 6),
-          TextFormField(
-            controller: controller,
-            maxLines: maxLines,
-            keyboardType: keyboardType,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-              filled: true,
-              fillColor: Colors.white,
+          Container(
+            height: 50,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade400),
+              borderRadius: BorderRadius.circular(8),
             ),
-            validator: requiredField
-                ? (value) =>
-            (value == null || value.trim().isEmpty) ? 'Vui lòng nhập $label' : null
-                : null,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      selectedDate != null
+                          ? DateFormat('dd/MM/yyyy').format(selectedDate)
+                          : 'Chọn ngày',
+                      style: TextStyle(
+                        color: selectedDate != null ? Colors.black : Colors.grey,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.calendar_today, size: 20),
+                  onPressed: () async {
+                    final pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                      locale: const Locale('vi', 'VN'),
+                    );
+                    if (pickedDate != null) {
+                      onDateSelected(pickedDate);
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildJobTypeDropdown() {
+    final viewModel = Provider.of<WorkExperiencesViewModel>(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RichText(
+            text: TextSpan(
+              text: 'Hình thức làm việc',
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: Colors.black,
+                fontFamily: 'Poppins',
+              ),
+              children: const [
+                TextSpan(text: '*', style: TextStyle(color: Colors.red)),
+                TextSpan(text: ':', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+          DropdownButtonHideUnderline(
+            child: DropdownButton2<String>(
+              isExpanded: true,
+              hint: const Text(
+                'Chọn hình thức làm việc',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+              value: _selectedJobType,
+              items: viewModel.jobTypeOptions.map((option) {
+                return DropdownMenuItem<String>(
+                  value: option,
+                  child: Text(
+                    option,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedJobType = newValue;
+                  _jobTypeBorderColor = Colors.grey.shade400;
+                });
+              },
+              buttonStyleData: ButtonStyleData(
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: _jobTypeBorderColor),
+                  color: Colors.white,
+                ),
+              ),
+              dropdownStyleData: DropdownStyleData(
+                maxHeight: 200,
+                width: MediaQuery.of(context).size.width - 32,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white,
+                ),
+              ),
+              onMenuStateChange: (isOpen) {
+                setState(() {
+                  _jobTypeBorderColor = isOpen ? Colors.blue : Colors.grey.shade400;
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-  @override
-  void dispose() {
-    _companyNameController.dispose();
-    _positionController.dispose();
-    _startDateController.dispose();
-    _endDateController.dispose();
-    _locationController.dispose();
-    _jobTypeController.dispose();
-    _descriptionsController.dispose();
-    super.dispose();
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hintText,
+    int maxLines = 1,
+    bool isRequired = true,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RichText(
+            text: TextSpan(
+              text: label,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: Colors.black,
+                fontFamily: 'Poppins',
+              ),
+              children: [
+                if (isRequired) const TextSpan(
+                  text: '*',
+                  style: TextStyle(color: Colors.red),
+                ),
+                const TextSpan(
+                  text: ':',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade400),
+            ),
+            child: TextFormField(
+              controller: controller,
+              maxLines: maxLines,
+              keyboardType: keyboardType,
+              decoration: InputDecoration(
+                hintText: hintText,
+                hintStyle: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
+                border: InputBorder.none,
+              ),
+              validator: isRequired
+                  ? (value) => (value == null || value.trim().isEmpty)
+                  ? 'Vui lòng nhập $label'
+                  : null
+                  : null,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      behavior: HitTestBehavior.opaque,
       onTap: () => FocusScope.of(context).unfocus(),
-      child: Theme(
-        data: ThemeData(fontFamily: "Poppins"),
-        child: Scaffold(
-          appBar: AppBar(
-            toolbarHeight: 45,
-            automaticallyImplyLeading: false,
-            backgroundColor: ColorConstants.appbarColor,
-            centerTitle: true,
-            title: Center(
-              child: Text(
-                "Thêm kinh nghiệm làm việc",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 50,
+          automaticallyImplyLeading: false,
+          backgroundColor: ColorConstants.appbarColor,
+          centerTitle: true,
+          title: const Text(
+            "Thêm kinh nghiệm làm việc",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          backgroundColor: Colors.grey.shade100,
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const SizedBox(height: 20),
-                          Center(
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: 140,
-                                  height: 140,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade300,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: _logoFile != null
-                                      ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.file(
-                                      _logoFile!,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                      : Center(
-                                    child: Text(
-                                      'Chưa chọn logo',
-                                      style: TextStyle(color: Colors.grey.shade700),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 0,
-                                  bottom: 0,
-                                  child: IconButton(
-                                    onPressed: _pickLogo,
-                                    icon: const Icon(Icons.upload_file, color: Colors.blue),
-                                  ),
-                                ),
-                              ],
-                            ),
+        ),
+        body: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Center(
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 140,
+                        height: 140,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: _logoFile != null
+                            ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(
+                            _logoFile!,
+                            fit: BoxFit.cover,
                           ),
-                          const SizedBox(height: 24),
-
-                          customTextField(label: 'Tên công ty', controller: _companyNameController),
-                          customTextField(label: 'Vị trí công việc', controller: _positionController),
-                          customTextField(
-                            label: 'Ngày bắt đầu (YYYY-MM-DD)',
-                            controller: _startDateController,
-                            keyboardType: TextInputType.datetime,
-                          ),
-                          customTextField(
-                            label: 'Ngày kết thúc (YYYY-MM-DD)',
-                            controller: _endDateController,
-                            keyboardType: TextInputType.datetime,
-                            requiredField: false,
-                          ),
-                          customTextField(label: 'Địa điểm', controller: _locationController),
-                          customTextField(label: 'Hình thức làm việc (full-time, part-time,...)', controller: _jobTypeController),
-                          customTextField(
-                            label: 'Mô tả công việc (nhập tự do)',
-                            controller: _descriptionsController,
-                            maxLines: 4,
-                            keyboardType: TextInputType.multiline,
-                            requiredField: false,
-                          ),
-
-                          const SizedBox(height: 30),
-
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                // Nút Huỷ
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(); // Quay lại
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.grey.shade400,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                                  ),
-                                  child: const Text(
-                                    'Huỷ',
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
-                                  ),
-                                ),
-
-                                // Nút Xác nhận
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      final rawDescriptions = _descriptionsController.text.trim();
-                                      final descriptionsList = rawDescriptions
-                                          .split('\n')
-                                          .map((e) => e.trim())
-                                          .where((e) => e.isNotEmpty)
-                                          .toList()
-                                          .cast<String>();
-                                      final workExperienceDto = {
-                                        "CompanyName": _companyNameController.text.trim(),
-                                        "Position": _positionController.text.trim(),
-                                        "StartDate": _startDateController.text.trim(),
-                                        "EndDate": _endDateController.text.trim(),
-                                        "Location": _locationController.text.trim(),
-                                        "JobType": _jobTypeController.text.trim(),
-                                        "Descriptions": descriptionsList,
-                                      };
-
-                                      final success = await Provider.of<WorkExperiencesViewModel>(context, listen: false)
-                                          .addWorkExperience(workExperienceDto: workExperienceDto, context: context);
-
-                                      if (success) {
-                                        Navigator.of(context).pop();
-                                      }
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue.shade700,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                                    elevation: 4,
-                                    shadowColor: Colors.black.withOpacity(0.1),
-                                  ),
-                                  child: const Text(
-                                    'Xác nhận',
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                        )
+                            : const Icon(
+                          Icons.business,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: IconButton(
+                          onPressed: _pickLogo,
+                          icon: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            padding: const EdgeInsets.all(4),
+                            child: const Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              );
-            },
+                const SizedBox(height: 20),
+
+                _buildTextField(
+                  controller: _companyNameController,
+                  label: 'Tên công ty',
+                  hintText: 'Nhập tên công ty...',
+                ),
+
+                _buildTextField(
+                  controller: _positionController,
+                  label: 'Vị trí công việc',
+                  hintText: 'Nhập vị trí công việc...',
+                ),
+
+                _buildDatePickerField(
+                  label: 'Ngày bắt đầu',
+                  selectedDate: _selectedStartDate,
+                  onDateSelected: (date) {
+                    setState(() {
+                      _selectedStartDate = date;
+                      _startDateController.text =
+                      date != null ? DateFormat('yyyy-MM-dd').format(date) : '';
+                    });
+                  },
+                ),
+
+                _buildDatePickerField(
+                  label: 'Ngày kết thúc',
+                  selectedDate: _selectedEndDate,
+                  onDateSelected: (date) {
+                    setState(() {
+                      _selectedEndDate = date;
+                      _endDateController.text =
+                      date != null ? DateFormat('yyyy-MM-dd').format(date) : '';
+                    });
+                  },
+                  isRequired: false,
+                ),
+
+                _buildTextField(
+                  controller: _locationController,
+                  label: 'Địa điểm',
+                  hintText: 'Nhập địa điểm...',
+                ),
+
+                _buildJobTypeDropdown(),
+
+                _buildTextField(
+                  controller: _descriptionsController,
+                  label: 'Mô tả công việc',
+                  hintText: 'Nhập mô tả công việc...',
+                  maxLines: 4,
+                  keyboardType: TextInputType.multiline,
+                ),
+
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Hủy button
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey.shade300,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text(
+                          'Hủy',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+
+                      // Xác nhận button
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            final viewModel = Provider.of<WorkExperiencesViewModel>(
+                                context,
+                                listen: false);
+                            final jobTypeApiValue =
+                                viewModel.jobTypeApiMapping[_selectedJobType] ?? '';
+
+                            final success = await viewModel.addWorkExperience(
+                              companyName: _companyNameController.text.trim(),
+                              position: _positionController.text.trim(),
+                              startDate: _startDateController.text.trim(),
+                              endDate: _endDateController.text.trim().isEmpty
+                                  ? null
+                                  : _endDateController.text.trim(),
+                              descriptions: _descriptionsController.text.trim(),
+                              location: _locationController.text.trim(),
+                              jobType: jobTypeApiValue,
+                              logoFile: _logoFile,
+                              context: context,
+                            );
+
+                            if (success && mounted) {
+                              Navigator.of(context).pop();
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue.shade700,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text(
+                          'Xác nhận',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
