@@ -16,7 +16,11 @@ export class UploadsService {
 
   public uploadFile = async (file: Express.Multer.File, bucket: string) => {
     try {
-      const fileName = `${Date.now()}-${file.originalname}`;
+      const sanitizedOriginalName = file.originalname
+        .toLowerCase()
+        .replace(/[^a-z0-9.-]/g, '_');
+
+      const fileName = `${Date.now()}-${sanitizedOriginalName}`;
 
       const { error } = await this.adminSupabaseClient.storage
         .from(bucket)

@@ -103,14 +103,14 @@ class FindJobsViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchJobsByCategory(String categoryName, BuildContext context) async {
+  Future<void> fetchJobsByCategory(List<String> categoryNames, BuildContext context) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      final fetchedJobs = await _jobService.getJobsbyCategory(
-        categoryName: categoryName,
+      final fetchedJobs = await _jobService.getJobsbyCategories(
+        categoryNames: categoryNames,
         context: context,
       );
 
@@ -120,6 +120,30 @@ class FindJobsViewModel extends ChangeNotifier {
 
     } catch (e) {
       error = "Đã xảy ra lỗi khi lọc theo ngành nghề: $e";
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchJobsByBothLocationCategory(String locationId, List<String> categoryNames, BuildContext context) async {
+    isLoading = true;
+    error = null;
+    notifyListeners();
+
+    try {
+      final fetchedJobs = await _jobService.getJobsBothLocationCategory(
+        locationID: locationId,
+        categoryNames: categoryNames,
+        context: context,
+      );
+
+      _allJobs = fetchedJobs;
+      jobs = fetchedJobs;
+      await fetchFavoriteJobs(context);
+
+    } catch (e) {
+      error = "Đã xảy ra lỗi khi lọc theo cả địa điểm và ngành nghề: $e";
     } finally {
       isLoading = false;
       notifyListeners();

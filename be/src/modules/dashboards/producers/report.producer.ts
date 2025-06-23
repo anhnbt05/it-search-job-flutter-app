@@ -1,5 +1,9 @@
 import { InjectFlowProducer } from '@nestjs/bullmq';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Users } from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { FlowProducer } from 'bullmq';
@@ -22,15 +26,23 @@ export class ReportProducer {
   ) {}
 
   async createReportFlow(createReportDto: CreateReportDto, userId: string) {
-    const { data: admin } = await this.anonSupabaseClient
+    const { data: admin, error } = await this.anonSupabaseClient
       .from('Users')
       .select('*')
       .eq('ID', userId)
       .maybeSingle<Users>();
 
+    if (error) {
+      console.error(error);
+
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi lấy thông tin quản trị viên hiện tại trong hệ thống.',
+      );
+    }
+
     if (!admin)
       throw new NotFoundException(
-        `Không tìm thấy quản trị viên có id '${userId}' trong hệ thống.`,
+        `Không tìm thấy quản trị viên này trong hệ thống.`,
       );
 
     await this.reportFlowProducer.add({
