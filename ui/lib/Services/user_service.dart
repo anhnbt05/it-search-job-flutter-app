@@ -60,6 +60,27 @@ class UserService {
     }
   }
 
+  Future<Candidate_admin?> getCandidateInfo_admin(
+      {required String Id, required BuildContext context}) async {
+    try {
+      final validToken = await getValidAccessToken(context);
+
+      final response = await _apiService.getWithToken(
+        accessToken: validToken!,
+        endpoint: 'users?candidateId=$Id',);
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
+        print(data);
+        Candidate_admin r = Candidate_admin.fromJson(data);
+        return r;
+      }
+      return null;
+    } catch (e) {
+      print("Error: $e");
+      return null;
+    }
+  }
+
   Future<String?> patchRecruiterInfo({
     required String userId,
     required Map<String, dynamic> updateRecruiterDto,

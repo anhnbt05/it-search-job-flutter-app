@@ -33,22 +33,33 @@ Widget PostJobScreen(BuildContext context) {
                     height: 80,
                     width: 80,
                     margin: EdgeInsets.only(right: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     child: (recruiterVM.recruiterInfo?.Company.LogoUrl != null)
                         ? Image.network(
                       recruiterVM.recruiterInfo!.Company.LogoUrl!,
                       fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(color: Colors.blue),
+                          ),
+                        );
+                      },
                       errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade200,
+                        return Center(
                           child: Icon(Icons.broken_image, color: Colors.grey),
                         );
                       },
                     )
-                        : Container(
-                      color: Colors.grey.shade200,
+                        : Center(
                       child: Icon(Icons.business, color: Colors.grey),
                     ),
-                  ),
+                  )
                 ),
 
                 Expanded(

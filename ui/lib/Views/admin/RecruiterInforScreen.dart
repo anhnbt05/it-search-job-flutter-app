@@ -55,13 +55,13 @@ class _RecruiterInforScreenState extends State<RecruiterInforScreen> {
             } else
             {
               return Container(
-                color: (viewModel.recruiter!.Status == 'active') ? Colors.white : Color(0xfffae7e7),
+                color: Colors.white,
                 child: Align(
                   alignment: Alignment.center,
                   child: Padding(
                     padding: EdgeInsets.all(15),
                     child: Container(
-                      color: (viewModel.recruiter!.Status == 'active') ? Colors.white : Color(0xfffae7e7),
+                      color: Colors.white,
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceAround,

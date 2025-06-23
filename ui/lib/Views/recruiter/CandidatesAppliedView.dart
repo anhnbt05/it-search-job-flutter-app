@@ -9,6 +9,8 @@ import 'package:ui/Models/Jobs.dart';
 import 'package:ui/ViewModels/recruiter/CandidatesAppliesViewModel.dart';
 
 import '../../Models/Applications.dart';
+import '../../ViewModels/recruiter/CandidateProfileViewModel.dart';
+import 'CandidateProfileView.dart';
 import 'ReadResumeScreen.dart';
 
 Widget CandidatesAppliedScreen(BuildContext context) {
@@ -244,14 +246,25 @@ Widget CandidateApplied(int index, cApplications_recruiter application, List<cAp
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(50),
-                child: Image.network(application.Candidate.AvatarUrl, width: MediaQuery
-                    .of(context)
-                    .size
-                    .width / 10, height: MediaQuery
-                    .of(context)
-                    .size
-                    .width / 10,),
+                child: Image.network(
+                  application.Candidate.AvatarUrl,
+                  width: MediaQuery.of(context).size.width / 10,
+                  height: MediaQuery.of(context).size.width / 10,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return SizedBox(
+                      width: MediaQuery.of(context).size.width / 10,
+                      height: MediaQuery.of(context).size.width / 10,
+                      child: Center(child: CircularProgressIndicator(color: Colors.blue)),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(Icons.person, color: Colors.grey,);
+                  },
+                ),
               ),
+
             ),
             SizedBox(width: MediaQuery
                 .of(context)
@@ -322,7 +335,14 @@ Widget CandidateApplied(int index, cApplications_recruiter application, List<cAp
             ),
 
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CandidateProfileView(candidateID: application.Candidate.ID,),
+                  ),
+                );
+              },
               icon: Icon(Icons.person_outline),
               padding: EdgeInsets.zero,
             )

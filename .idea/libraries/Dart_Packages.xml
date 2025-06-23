@@ -226,6 +226,27 @@
             </list>
           </value>
         </entry>
+        <entry key="file_selector">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector-1.0.3/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="file_selector_android">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_android-0.5.1+14/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="file_selector_ios">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_ios-0.5.3+1/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="file_selector_linux">
           <value>
             <list>
@@ -244,6 +265,13 @@
           <value>
             <list>
               <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_platform_interface-2.6.2/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="file_selector_web">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_web-0.9.4+2/lib" />
             </list>
           </value>
         </entry>
@@ -1141,9 +1169,13 @@
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/fake_async-1.3.2/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/ffi-2.1.4/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file-7.0.1/lib" />
+      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector-1.0.3/lib" />
+      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_android-0.5.1+14/lib" />
+      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_ios-0.5.3+1/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_linux-0.9.3+2/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_macos-0.9.4+3/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_platform_interface-2.6.2/lib" />
+      <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_web-0.9.4+2/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/file_selector_windows-0.9.3+4/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/fixnum-1.1.1/lib" />
       <root url="file://$PROJECT_DIR$/../Cache/hosted/pub.dev/fl_downloader-2.0.2/lib" />
