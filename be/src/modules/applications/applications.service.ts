@@ -209,6 +209,7 @@ export class ApplicationsService {
               CandidateID: candidate.ID,
               ResumeUrl: resumeFileUrl,
               JobID: JobId,
+              DeletedAt: null,
             },
           ],
           { onConflict: 'CandidateID,JobID' },

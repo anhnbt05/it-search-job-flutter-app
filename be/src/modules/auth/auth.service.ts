@@ -115,7 +115,7 @@ export class AuthService {
               ID: data.user.id,
               Password: hashedPassword,
               AvatarUrl: this.configService.get<string>(
-                'default_logo_user',
+                'default_user_logo',
                 '',
               ),
             },
