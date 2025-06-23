@@ -193,7 +193,7 @@ class _WorkExperienceItem extends StatefulWidget {
 
 class __WorkExperienceItemState extends State<_WorkExperienceItem> {
   String _formatDate(DateTime? date) {
-    if (date == null) return 'nay';
+    if (date == null) return 'hiện tại';
     return DateFormat('dd/MM/yyyy').format(date!);
   }
 

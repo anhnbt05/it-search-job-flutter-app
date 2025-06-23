@@ -32,7 +32,7 @@ class _CompanyStatisticDetailScreenState
         backgroundColor: ColorConstants.appbarColor,
         title: Center(
           child: Text(
-            'Thông tin bài đăng',
+            'Thông tin thống kê công ty',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontFamily: 'Poppins'),
           ),
         ),

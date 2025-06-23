@@ -6,5 +6,4 @@ class cNotifications {
   String? Title;
   eNotificationType? Type;
   DateTime? DeletedAt;
-  List<cUserNotifications>? UserNotifications;
 }

@@ -1,62 +1,68 @@
 import 'Notifications.dart';
+import 'UserNotifications.dart';
 import 'Users.dart';
 
-class cUserNotifications {
-  String? ID;
-  List<String>? Content;
-  bool? IsRead;
-  DateTime? CreatedAt;
-  DateTime? CeletedAt;
-  cUsers? User;
-  cNotifications? Notification;
+class UserNotification {
+  final String ID;
+  final bool IsRead;
+  final List<String> Content;
+  final Map<String, dynamic> Metadata;
+  final DateTime CreatedAt;
+  final cNotification Notification;
 
-}
-
-class AdminNotification {
-  final String id;
-  final bool isRead;
-  final List<String> content;
-  final AdminMetadata metadata;
-  final DateTime createdAt;
-
-  AdminNotification({
-    required this.id,
-    required this.isRead,
-    required this.content,
-    required this.metadata,
-    required this.createdAt,
+  UserNotification({
+    required this.ID,
+    required this.IsRead,
+    required this.Content,
+    required this.Metadata,
+    required this.CreatedAt,
+    required this.Notification,
   });
 
-  factory AdminNotification.fromJson(Map<String, dynamic> json) {
-    return AdminNotification(
-      id: json['ID'],
-      isRead: json['IsRead'],
-      content: List<String>.from(json['Content']),
-      metadata: AdminMetadata.fromJson(json['Metadata']),
-      createdAt: DateTime.parse(json['CreatedAt']),
+  factory UserNotification.fromJson(Map<String, dynamic> json) {
+    return UserNotification(
+      ID: json['ID'],
+      IsRead: json['IsRead'],
+      Content: List<String>.from(json['Content']),
+      Metadata: Map<String, dynamic>.from(json['Metadata'] ?? {}),
+      CreatedAt: DateTime.parse(json['CreatedAt']),
+      Notification: cNotification.fromJson(json['Notification']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ID': ID,
+      'IsRead': IsRead,
+      'Content': Content,
+      'Metadata': Metadata,
+      'CreatedAt': CreatedAt.toIso8601String(),
+      'Notification': Notification.toJson(),
+    };
   }
 }
 
-class AdminMetadata {
-  final String jobId;
-  final String jobTitle;
-  final String companyName;
-  final String recruiterId;
+class cNotification {
+  final String Title;
+  final String Type;
 
-  AdminMetadata({
-    required this.jobId,
-    required this.jobTitle,
-    required this.companyName,
-    required this.recruiterId,
+  cNotification({
+    required this.Title,
+    required this.Type,
   });
 
-  factory AdminMetadata.fromJson(Map<String, dynamic> json) {
-    return AdminMetadata(
-      jobId: json['jobId'],
-      jobTitle: json['jobTitle'],
-      companyName: json['companyName'],
-      recruiterId: json['recruiterId'],
+  factory cNotification.fromJson(Map<String, dynamic> json) {
+    return cNotification(
+      Title: json['Title'],
+      Type: json['Type'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'Title': Title,
+      'Type': Type,
+    };
+  }
 }
+
