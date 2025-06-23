@@ -333,38 +333,39 @@ class JobPostViewModel extends ChangeNotifier {
       salaryText =
           "Từ ${_salaryNumber1.text} đến ${_salaryNumber2.text} ${_salaryUnitSelected}";
     }
-    var job = await JobService().postJob(
+
+    final jobData = <String, dynamic>{
+      "Title": nameText.text,
+      "Address": recruiterVM.recruiterInfo!.CompanyLocations.Address,
+      "Salary": salaryText,
+      "Vacancies": int.parse(vacancyText.text),
+      "Type": jobTypeSelected.toString().split(".").last,
+      "WorkingTimes": workingTimeText.text,
+      "ExpiredDate": selectedDate!.toUtc().toIso8601String(),
+      "Level": jobLevelSelected.toString().split(".").last,
+      "Categories": List<String>.from(jobCategorySelectedList),
+      "Descriptions": jobDescriptionsText.text
+          .split("\n")
+          .where((line) => line.trim().isNotEmpty)
+          .toList(),
+      "Benefits": jobBenefitsText.text
+          .split("\n")
+          .where((line) => line.trim().isNotEmpty)
+          .toList(),
+      "Requirements": jobRequirementsText.text
+          .split("\n")
+          .where((line) => line.trim().isNotEmpty)
+          .toList(),
+    };
+
+    final desc = descriptionText.text.trim();
+    if (desc.isNotEmpty) {
+      jobData["Description"] = desc;
+    }
+
+    final job = await JobService().postJob(
       context: context,
-      jobData: {
-        "Title": nameText.text,
-        "Description": descriptionText.text,
-        "Address": recruiterVM.recruiterInfo!.CompanyLocations.Address,
-        "Salary": salaryText,
-        "Vacancies": int.parse(vacancyText.text),
-        "Type": jobTypeSelected
-            .toString()
-            .split(".")
-            .last,
-        "WorkingTimes": workingTimeText.text,
-        "ExpiredDate": selectedDate!.toUtc().toIso8601String(),
-        "Level": jobLevelSelected
-            .toString()
-            .split(".")
-            .last,
-        "Categories": List<String>.from(jobCategorySelectedList),
-        "Descriptions": jobDescriptionsText.text.split("\n").where((line) =>
-        line
-            .trim()
-            .isNotEmpty).toList(),
-        "Benefits": jobBenefitsText.text.split("\n").where((line) =>
-        line
-            .trim()
-            .isNotEmpty).toList(),
-        "Requirements": jobRequirementsText.text.split("\n").where((line) =>
-        line
-            .trim()
-            .isNotEmpty).toList(),
-      },
+      jobData: jobData,
     );
     if (job != null) {
       postedJobsManagementViewModel.jobs_pending.add(job);

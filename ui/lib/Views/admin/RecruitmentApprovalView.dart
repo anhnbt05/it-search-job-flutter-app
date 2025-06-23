@@ -183,7 +183,7 @@ Widget JobItem(BuildContext context, int index, RecruiterApprovalViewModel viewM
                             ),
                           ),
                           SizedBox(height: 5,),
-                          Text(viewModel.jobs![index]!.Description,
+                          Text(viewModel.jobs![index]!.Description?? 'Không có',
                             maxLines: 5,
                             textAlign: TextAlign.justify,
                             overflow: TextOverflow.ellipsis,

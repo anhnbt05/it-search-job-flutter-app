@@ -39,10 +39,11 @@ class JobService {
       }
       else{
         print("Failed to post job: ${response.body}");
-        showErrorToastification(title: 'Lỗi', message: jsonDecode(response.body)['message']);
+        showErrorToastification(title: 'Lỗi', message: jsonDecode(response.body)['message'][0]['message']);
         return null;
       }
     } catch (e) {
+      if (e != null)
       print("Error posting job: $e");
       showErrorToastification(title: 'Lỗi', message: e.toString());
       return null;

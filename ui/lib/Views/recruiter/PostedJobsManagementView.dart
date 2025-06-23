@@ -416,7 +416,7 @@ Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, R
                             ),
                           ),
                           SizedBox(height: 5,),
-                          Text(viewModel.jobs[index]!.Description,
+                          Text(viewModel.jobs[index]!.Description ?? '',
                             maxLines: 5,
                             textAlign: TextAlign.justify,
                             overflow: TextOverflow.ellipsis,
