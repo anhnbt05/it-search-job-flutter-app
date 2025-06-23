@@ -289,12 +289,18 @@ class _EditCandidateInformationScreenState
                                       textInputType: TextInputType.text,
                                       controller: viewModel.bioController,
                                     ),
-                                    // Thêm vào phần Column trong build method của EditCandidateInformationScreen
+
                                     Padding(
-                                      padding: EdgeInsets.only(top: 5),
+                                      padding:  const EdgeInsets.only(left: 7, top: 7, bottom: 5),
                                       child: Row(
                                         children: [
-                                          Text('Trình độ:') ,
+                                           Text(
+                                            "Trình độ:",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
                                           Padding(
                                             padding: EdgeInsets.symmetric(horizontal: 10),
                                             child: DropdownButtonHideUnderline(
@@ -393,17 +399,43 @@ class _EditCandidateInformationScreenState
                                               ),
                                             ),
                                             IconButton(
-                                              icon: Icon(Icons.delete, color: Colors.red),
+                                              icon: Icon(Icons.close, size: 18, color: Colors.black),
                                               onPressed: () => viewModel.removeCertification(index),
+                                              style: IconButton.styleFrom(
+                                                backgroundColor: Colors.red[100],
+                                                side: BorderSide(color: Colors.grey, width: 1),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(5),
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         );
                                       },
                                     ),
-                                    ElevatedButton.icon(
-                                      onPressed: viewModel.addCertification,
-                                      icon: Icon(Icons.add),
-                                      label: Text("Thêm chứng chỉ"),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8, right: 8, top: 0, bottom: 8),
+                                      child: ElevatedButton.icon(
+                                        onPressed: viewModel.addCertification,
+                                        icon: Icon(Icons.add, size: 18, color: Colors.grey),
+                                        label: Text(
+                                          "Thêm chứng chỉ",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.white,
+                                          elevation: 0,
+                                          side: BorderSide(color: Colors.grey),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(5),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Thêm padding bên trong button
+                                        ),
+                                      ),
                                     ),
 
                                   ],

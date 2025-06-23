@@ -1,339 +1,525 @@
-    import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-    import 'package:provider/provider.dart';
-    import 'package:ui/ViewModels/candidate/ProfileCandidateViewModel.dart';
-  import 'package:ui/Views/candidate/EditWorkExperienceView.dart';
-    import 'package:ui/Views/candidate/PostWorkExperiencesView.dart';
-
-    import '../../Helpers/helpers.dart';
+import 'package:provider/provider.dart';
+import 'package:ui/ViewModels/candidate/ProfileCandidateViewModel.dart';
+import 'package:ui/Views/candidate/EditWorkExperienceView.dart';
+import 'package:ui/Views/candidate/PostWorkExperiencesView.dart';
+import '../../Helpers/helpers.dart';
 import '../../Models/WorkExperiences.dart';
-  import '../../ViewModels/candidate/EditCandidateInformationViewModel.dart';
-    import '../../ViewModels/candidate/WorkExperiencesViewModel.dart';
-  import 'EditCandidateInformationScreen.dart';
-  import 'ReadResumeCandidateScreen.dart';
+import '../../ViewModels/candidate/EditCandidateInformationViewModel.dart';
+import '../../ViewModels/candidate/WorkExperiencesViewModel.dart';
+import 'EditCandidateInformationScreen.dart';
+import 'ReadResumeCandidateScreen.dart';
 
-    class ProfileCandidateView extends StatelessWidget {
-      const ProfileCandidateView({super.key});
+class ProfileCandidateView extends StatelessWidget {
+  const ProfileCandidateView({super.key});
 
-      @override
-      Widget build(BuildContext context) {
-        return ChangeNotifierProvider(
-          create: (_) => ProfileCandidateViewModel()..fetchCandidateInfo(context: context),
-          child: Consumer<ProfileCandidateViewModel>(
-            builder: (context, viewModel, child) {
-              if (viewModel.isLoading) {
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
-              }
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => ProfileCandidateViewModel()..fetchCandidateInfo(context: context),
+      child: Consumer<ProfileCandidateViewModel>(
+        builder: (context, viewModel, child) {
+          if (viewModel.isLoading) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
 
-              if (viewModel.error != null) {
-                return Scaffold(
-                  body: Center(child: Text(viewModel.error!, style: const TextStyle(color: Colors.red))),
-                );
-              }
+          if (viewModel.error != null) {
+            return Scaffold(
+              body: Center(
+                child: Text(
+                    viewModel.error!,
+                    style: const TextStyle(
+                        color: Colors.red,
+                        fontFamily: 'Poppins'
+                    )
+                ),
+              ),
+            );
+          }
 
-              final candidate = viewModel.candidate;
+          final candidate = viewModel.candidate;
 
-              if (candidate == null) {
-                return const Scaffold(
-                  body: Center(child: Text("Không có dữ liệu ứng viên.")),
-                );
-              }
+          if (candidate == null) {
+            return const Scaffold(
+              body: Center(
+                child: Text(
+                    "Không có dữ liệu ứng viên.",
+                    style: TextStyle(fontFamily: 'Poppins')
+                ),
+              ),
+            );
+          }
 
-              return Scaffold(
-                body:
-                Stack(
-                  children: [
-                    SingleChildScrollView(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Center(
-                            child: Column(
-                              children: [
-                                CircleAvatar(
-                                  radius: 50,
-                                  backgroundImage: NetworkImage(candidate.AvatarUrl ?? ""),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(candidate.FullName ?? "",
-                                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 4),
-                                Text(candidate.Email ?? "", style: const TextStyle(color: Colors.grey)),
-                                Text(candidate.PhoneNumber ?? "", style: const TextStyle(color: Colors.grey)),
-                                const SizedBox(height: 8),
-                                if (candidate.Level != null)
-                                  Chip(
-                                    label: Text(LevelExtension.fromString(candidate.Level)!.toVietnamese(), style: const TextStyle(color: Colors.white)),
-                                    backgroundColor: Colors.blue,
-                                  ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          _sectionTitle('Giới thiệu'),
-                          Text(candidate.Bio ?? ""),
-
-                          const SizedBox(height: 24),
-
-                          _sectionTitle('Chứng chỉ'),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: (candidate.Certifications ?? []).map((cert) {
-                              return Chip(
-                                label: Text(cert),
-                                avatar: const Icon(Icons.workspace_premium, size: 18),
-                              );
-                            }).toList(),
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              _sectionTitle('Kinh nghiệm làm việc'),
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => PostWorkExperiencesView()));
-                                },
-                                icon: const Icon(Icons.add_circle_outline, size: 28),
-                                color: Colors.blueAccent,
-                                tooltip: 'Thêm kinh nghiệm làm việc',
-                              ),
-                            ],
-                          ),
-                          ...(candidate.WorkExperiences ?? []).map((exp) {
-                            return _WorkExperienceItem(
-                              exp: exp,
-                              onEdit: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => EditWorkExperienceView(workExperience: exp)));
-                              },
-                              onDelete: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text("Xác nhận xóa"),
-                                    content: const Text("Bạn có chắc chắn muốn xóa kinh nghiệm làm việc này?"),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text("Hủy"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () async {
-                                          Navigator.pop(context);
-                                          final workExpViewModel = Provider.of<WorkExperiencesViewModel>(context, listen: false);
-                                          final profileViewModel = Provider.of<ProfileCandidateViewModel>(context, listen: false);
-
-                                          final success = await workExpViewModel.deleteWorkExperience(
-                                            id: exp.ID!,
-                                            context: context,
-                                          );
-
-                                          if (success) {
-                                            await profileViewModel.fetchCandidateInfo(context: context);
-                                          }
-                                        },
-                                        child: const Text("Xóa", style: TextStyle(color: Colors.red)),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          }).toList(),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      top: 16,
-                      left: 16,
-                      child: IconButton(
-                        iconSize: 28,
-                        icon: const Icon(Icons.article_outlined, color: Colors.black),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ReadResumeCandidateScreen(
-                                    name:  candidate.FullName,
-                                   resumeUrl: candidate.ResumeUrl,
-                                  )
-                              )
-                          );
-                        },
-                      ),
-                    ),
-
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: Column(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.black),
+          return Scaffold(
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 50,
+                    child: Stack(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: IconButton(
+                            iconSize: 28,
+                            icon: const Icon(Icons.article_outlined, color: Colors.black),
                             onPressed: () {
-                              final candidate = viewModel.candidate;
-                              if (candidate == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Không thể chỉnh sửa, thông tin ứng viên chưa sẵn sàng.")),
-                                );
-                                return;
-                              }
-
                               Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MultiProvider(
-                                    providers: [
-                                      ChangeNotifierProvider(create: (_) => EditCandidateInformationViewModel(context, candidate.ID)),
-                                      ChangeNotifierProvider(create: (_) => ProfileCandidateViewModel()..fetchCandidateInfo(context: context)),
-                                    ],
-                                    child: EditCandidateInformationScreen(),
-                                  ),
-                                ),
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ReadResumeCandidateScreen(
+                                        name: candidate.FullName,
+                                        resumeUrl: candidate.ResumeUrl,
+                                      )
+                                  )
                               );
                             },
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.logout, color: Colors.red),
-                            onPressed: () async {
-                              showDialog(
-                                context: context,
-                                barrierColor: Colors.black.withOpacity(0.5),
-                                barrierDismissible: false,
-                                builder: (_) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.blue,
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.black),
+                                onPressed: () {
+                                  final candidate = viewModel.candidate;
+                                  if (candidate == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            "Không thể chỉnh sửa, thông tin ứng viên chưa sẵn sàng.",
+                                            style: TextStyle(fontFamily: 'Poppins')
+                                        ),
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => MultiProvider(
+                                        providers: [
+                                          ChangeNotifierProvider(create: (_) => EditCandidateInformationViewModel(context, candidate.ID)),
+                                          ChangeNotifierProvider(create: (_) => ProfileCandidateViewModel()..fetchCandidateInfo(context: context)),
+                                        ],
+                                        child: EditCandidateInformationScreen(),
+                                      ),
                                     ),
                                   );
                                 },
-                              );
-                              await viewModel.signOut(context);
-                              Navigator.of(context, rootNavigator: true).pop();
-                            },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.logout, color: Colors.red),
+                                onPressed: () async {
+                                  showDialog(
+                                    context: context,
+                                    barrierColor: Colors.black.withOpacity(0.5),
+                                    barrierDismissible: false,
+                                    builder: (_) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.blue,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                  await viewModel.signOut(context);
+                                  Navigator.of(context, rootNavigator: true).pop();
+                                },
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              );
-            },
-          ),
-
-        );
-      }
-
-      Widget _sectionTitle(String title) {
-        return Align(
-          alignment: Alignment.centerLeft,
-          child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        );
-      }
-    }
-
-    class _WorkExperienceItem extends StatefulWidget {
-      final cWorkExperiences exp;
-      final VoidCallback onEdit;
-      final VoidCallback onDelete;
-
-      const _WorkExperienceItem({
-        required this.exp,
-        required this.onEdit,
-        required this.onDelete,
-      });
-
-      @override
-      __WorkExperienceItemState createState() => __WorkExperienceItemState();
-    }
-
-    class __WorkExperienceItemState extends State<_WorkExperienceItem> {
-      bool _showActions = false;
-
-
-      String _formatDate(DateTime? date) {
-          return DateFormat('dd/MM/yyyy').format(date!);
-      }
-
-      @override
-      Widget build(BuildContext context) {
-        final formattedStartDate = _formatDate(widget.exp.StartDate);
-        final formattedEndDate = _formatDate(widget.exp.EndDate);
-
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              children: [
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      _showActions = !_showActions;
-                    });
-                  },
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: NetworkImage(widget.exp.CompanyLogoUrl ?? ""),
-                        radius: 28,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(widget.exp.Position ?? "",
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                            Text(widget.exp.CompanyName ?? "", style: const TextStyle(color: Colors.grey)),
-                            Text('${formattedStartDate} - ${formattedEndDate} • ${JobTypeExtension.fromString(widget.exp.JobType)!.toVietnamese()}'),
-                            Text(widget.exp.Location ?? "", style: const TextStyle(fontSize: 13)),
-                            const SizedBox(height: 8),
-                            ...(widget.exp.Descriptions ?? []).map((desc) => Text("• $desc")).toList(),
-                          ],
-                        ),
-                      ),
-                      const Icon(Icons.more_vert, size: 20),
-                    ],
-                  ),
-                ),
-                if (_showActions)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton.icon(
-                          icon: const Icon(Icons.edit, size: 18),
-                          label: const Text("Chỉnh sửa"),
-                          onPressed: widget.onEdit,
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.blue,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        TextButton.icon(
-                          icon: const Icon(Icons.delete, size: 18, color: Colors.red),
-                          label: const Text("Xóa", style: TextStyle(color: Colors.red)),
-                          onPressed: widget.onDelete,
                         ),
                       ],
                     ),
                   ),
+
+                  Center(
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: NetworkImage(candidate.AvatarUrl ?? ""),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                            candidate.FullName ?? "",
+                            style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Poppins'
+                            )
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                            candidate.Email ?? "",
+                            style: const TextStyle(
+                                color: Colors.grey,
+                                fontFamily: 'Poppins'
+                            )
+                        ),
+                        Text(
+                            candidate.PhoneNumber ?? "",
+                            style: const TextStyle(
+                                color: Colors.grey,
+                                fontFamily: 'Poppins'
+                            )
+                        ),
+                        const SizedBox(height: 8),
+                        if (candidate.Level != null)
+                          Chip(
+                            label: Text(
+                                LevelExtension.fromString(candidate.Level)!.toVietnamese(),
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Poppins'
+                                )
+                            ),
+                            backgroundColor: Colors.blue,
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  _sectionTitle('Giới thiệu'),
+                  Text(
+                      candidate.Bio ?? "",
+                      style: const TextStyle(fontFamily: 'Poppins')
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  _sectionTitle('Chứng chỉ'),
+                  // Thay thế Wrap Chip bằng Container với style card
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: (candidate.Certifications ?? []).map((cert) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade200),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 3,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.workspace_premium, size: 18, color: Colors.blue),
+                              const SizedBox(width: 6),
+                              Text(
+                                  cert,
+                                  style: const TextStyle(fontFamily: 'Poppins')
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _sectionTitle('Kinh nghiệm làm việc'),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => PostWorkExperiencesView()));
+                        },
+                        icon: const Icon(Icons.add_circle_outline, size: 28),
+                        color: Colors.blueAccent,
+                        tooltip: 'Thêm kinh nghiệm làm việc',
+                      ),
+                    ],
+                  ),
+                  ...(candidate.WorkExperiences ?? []).map((exp) {
+                    return _WorkExperienceItem(
+                      exp: exp,
+                      onEdit: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => EditWorkExperienceView(workExperience: exp)));
+                      },
+                      onDelete: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text(
+                                "Xác nhận xóa",
+                                style: TextStyle(fontFamily: 'Poppins')
+                            ),
+                            content: const Text(
+                                "Bạn có chắc chắn muốn xóa kinh nghiệm làm việc này?",
+                                style: TextStyle(fontFamily: 'Poppins')
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text(
+                                    "Hủy",
+                                    style: TextStyle(fontFamily: 'Poppins')
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  Navigator.pop(context);
+                                  final workExpViewModel = Provider.of<WorkExperiencesViewModel>(context, listen: false);
+                                  final profileViewModel = Provider.of<ProfileCandidateViewModel>(context, listen: false);
+
+                                  final success = await workExpViewModel.deleteWorkExperience(
+                                    id: exp.ID!,
+                                    context: context,
+                                  );
+
+                                  if (success) {
+                                    await profileViewModel.fetchCandidateInfo(context: context);
+                                  }
+                                },
+                                child: const Text(
+                                    "Xóa",
+                                    style: TextStyle(
+                                        color: Colors.red,
+                                        fontFamily: 'Poppins'
+                                    )
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+          title,
+          style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Poppins'
+          )
+      ),
+    );
+  }
+}
+
+class _WorkExperienceItem extends StatefulWidget {
+  final cWorkExperiences exp;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const _WorkExperienceItem({
+    required this.exp,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  __WorkExperienceItemState createState() => __WorkExperienceItemState();
+}
+
+class __WorkExperienceItemState extends State<_WorkExperienceItem> {
+  bool _showActions = false;
+
+  String _formatDate(DateTime? date) {
+    return date != null ? DateFormat('dd/MM/yyyy').format(date) : 'Hiện tại';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final formattedStartDate = _formatDate(widget.exp.StartDate);
+    final formattedEndDate = _formatDate(widget.exp.EndDate);
+    final jobType = JobTypeExtension.fromString(widget.exp.JobType)?.toVietnamese() ?? widget.exp.JobType;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                if (widget.exp.CompanyLogoUrl != null && widget.exp.CompanyLogoUrl!.isNotEmpty)
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundImage: NetworkImage(widget.exp.CompanyLogoUrl!),
+                    backgroundColor: Colors.grey.shade100,
+                  ),
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildInfoRow('Vị trí công việc:', widget.exp.Position ?? ""),
+                      const SizedBox(height: 8),
+                      _buildInfoRow('Công ty:', widget.exp.CompanyName ?? ""),
+                    ],
+                  ),
+                ),
+
+                IconButton(
+                  icon: const Icon(Icons.more_vert, size: 20),
+                  onPressed: () {
+                    setState(() {
+                      _showActions = !_showActions;
+                    });
+                  },
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
               ],
             ),
+
+            Padding(
+              padding: const EdgeInsets.only(left: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  _buildInfoRow('Thời gian:', '$formattedStartDate - $formattedEndDate'),
+                  const SizedBox(height: 8),
+                  _buildInfoRow('Hình thức:', jobType),
+                  const SizedBox(height: 8),
+                  _buildInfoRow('Địa điểm:', widget.exp.Location ?? ""),
+                ],
+              ),
+            ),
+
+            if ((widget.exp.Descriptions ?? []).isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.only(left: 5),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Mô tả công việc:',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins'
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    ...(widget.exp.Descriptions ?? []).map((desc) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('• ', style: TextStyle(fontFamily: 'Poppins')),
+                          Expanded(
+                            child: Text(
+                              desc,
+                              style: const TextStyle(fontFamily: 'Poppins'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )).toList(),
+                  ],
+                ),
+              ),
+            ],
+
+            if (_showActions)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton.icon(
+                      icon: const Icon(Icons.edit, size: 18),
+                      label: const Text(
+                          "Chỉnh sửa",
+                          style: TextStyle(fontFamily: 'Poppins')
+                      ),
+                      onPressed: widget.onEdit,
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.blue,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton.icon(
+                      icon: const Icon(Icons.delete, size: 18, color: Colors.red),
+                      label: const Text(
+                          "Xóa",
+                          style: TextStyle(
+                              color: Colors.red,
+                              fontFamily: 'Poppins'
+                          )
+                      ),
+                      onPressed: widget.onDelete,
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return RichText(
+      text: TextSpan(
+        style: const TextStyle(
+          fontFamily: 'Poppins',
+          color: Colors.black,
+          fontSize: 14,
+        ),
+        children: [
+          TextSpan(
+            text: label,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-        );
-      }
-    }
+          TextSpan(text: ' $value'),
+        ],
+      ),
+    );
+  }
+}
