@@ -718,4 +718,84 @@ export class UsersService {
       );
     }
   };
+
+  public unlockAccount = async (
+    currentUserId: string,
+    id: string,
+    role: RoleEnum,
+  ) => {
+    const { data: admin, error } = await this.anonSupabaseClient
+      .from('Users')
+      .select('*')
+      .eq('ID', currentUserId)
+      .maybeSingle<Users>();
+
+    if (error) {
+      console.error(error);
+
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi lấy thông tin hiện tại của bạn.',
+      );
+    }
+
+    if (!admin)
+      throw new NotFoundException(
+        'Không tìm thấy thông tin của bạn trong hệ thống.',
+      );
+
+    if (role === RoleEnum.ADMIN)
+      throw new ForbiddenException(
+        'Bạn không thể mở khoá tài khoản của quản trị viên.',
+      );
+
+    const { data: user, error: userError } = await this.anonSupabaseClient
+      .from(`${role === RoleEnum.CANDIDATE ? 'Candidates' : 'Recruiters'}`)
+      .select('*, Users(*)')
+      .eq('ID', id)
+      .maybeSingle<any>();
+
+    if (userError) {
+      console.error(userError);
+
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi lấy thông tin người dùng cần mở khoá.',
+      );
+    }
+
+    if (!user)
+      throw new NotFoundException(
+        'Không tìm thấy tài khoản người dùng cần mở khoá.',
+      );
+
+    if (user.UserID === admin.ID)
+      throw new BadRequestException(
+        'Bạn không thể tự mở khoá tài khoản của chính mình.',
+      );
+
+    if (user.Users.Status === UserStatus.active)
+      throw new BadRequestException(
+        'Tài khoản của người này hiện không bị khoá.',
+      );
+
+    const { error: errorUpdate } = await this.adminSupabaseClient
+      .from('Users')
+      .update({
+        Status: UserStatus.active,
+        DeletedAt: null,
+      })
+      .eq('ID', user.UserID);
+
+    if (errorUpdate) {
+      console.error(errorUpdate);
+
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi cập nhật thông tin tài khoản của người dùng cần mở khoá tài khoản.',
+      );
+    }
+
+    return {
+      success: true,
+      message: `Tài khoản của người dùng '${user.Users.FullName}' đã được mở khoá.`,
+    };
+  };
 }

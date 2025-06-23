@@ -65,23 +65,35 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => SignInViewModel()),
         ChangeNotifierProvider(create: (_) => JoblistNavigationViewModel()),
 
-        if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'candidate') ...[
+        if (authVM.isLoggedIn &&
+            authVM.userId != null &&
+            authVM.userRole == 'candidate') ...[
           ChangeNotifierProvider(create: (_) => FindJobsViewModel()),
           ChangeNotifierProvider(create: (_) => FavoritesJobsViewModel()),
           ChangeNotifierProvider(create: (_) => AppliedJobsViewModel()),
           ChangeNotifierProvider(create: (_) => ProfileCandidateViewModel()),
           ChangeNotifierProvider(create: (_) => WorkExperiencesViewModel()),
         ],
-        if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'recruiter') ...[
+        if (authVM.isLoggedIn &&
+            authVM.userId != null &&
+            authVM.userRole == 'recruiter') ...[
           ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
           ChangeNotifierProvider(create: (_) => CompaniesViewModel()),
-          ChangeNotifierProvider(create: (context) => RecruiterProfileViewModel(authVM.userId!, context)),
           ChangeNotifierProvider(
-            create: (context) => PostedJobsManagementViewModel(authVM.userId!, context),
+            create:
+                (context) => RecruiterProfileViewModel(authVM.userId!, context),
+          ),
+          ChangeNotifierProvider(
+            create:
+                (context) =>
+                    PostedJobsManagementViewModel(authVM.userId!, context),
           ),
           ChangeNotifierProvider(
             create: (context) {
-              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false,);
+              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(
+                context,
+                listen: false,
+              );
               return JobPostViewModel(
                 postedJobsManagementViewModel: postedJobsVM,
                 context: context,
@@ -96,28 +108,42 @@ class _MyAppState extends State<MyApp> {
               );
               return CandidatesAppliesViewModel(
                 postedJobsManagementViewModel: postedJobsVM,
-                context: context
+                context: context,
               );
             },
           ),
         ],
-        if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'admin') ...[
-          ChangeNotifierProvider(create: (context) => RecruiterApprovalViewModel(context)),
-          ChangeNotifierProvider(create: (context) => UserManagementViewModel(context)),
+        if (authVM.isLoggedIn &&
+            authVM.userId != null &&
+            authVM.userRole == 'admin') ...[
+          ChangeNotifierProvider(
+            create: (context) => RecruiterApprovalViewModel(context),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => UserManagementViewModel(context),
+          ),
           ChangeNotifierProvider(create: (_) => UserNavigationViewModel()),
-          ChangeNotifierProvider(create: (context) => CategoryManagementViewModel(context)),
-          ChangeNotifierProvider(create: (context) => StatisticsViewModel(context)),
-          ChangeNotifierProvider(create: (context) => NotificationViewModel(context)),
-        ]
+          ChangeNotifierProvider(
+            create: (context) => CategoryManagementViewModel(context),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => StatisticsViewModel(context),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => NotificationViewModel(context),
+          ),
+        ],
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home:
-        authVM.isLoggedIn && authVM.userRole != null
-            ? _MainApp(role: authVM.userRole!, userId: authVM.userId!)
-            : LoginPage(onLoginSuccess: (role, id) {
-          authVM.login(role, id);
-        }),
+            authVM.isLoggedIn && authVM.userRole != null
+                ? _MainApp(role: authVM.userRole!, userId: authVM.userId!)
+                : LoginPage(
+                  onLoginSuccess: (role, id) {
+                    authVM.login(role, id);
+                  },
+                ),
       ),
     );
   }
@@ -210,11 +236,22 @@ class _MainAppState extends State<_MainApp> with TickerProviderStateMixin {
           backgroundColor: ColorConstants.appbarColor,
           centerTitle: true,
           title: appbarTitle(_role, bottomNavigationViewModel.selectedIndex),
-          bottom: (_role == 'candidate') ? candidateBottomBar(
-            _role,
-            bottomNavigationViewModel.selectedIndex,
-            context,
-          ) : (_role == 'recruiter') ? null : (_role == 'admin') ? adminBottomBar(_role, bottomNavigationViewModel.selectedIndex, context) : null
+          bottom:
+              (_role == 'candidate')
+                  ? candidateBottomBar(
+                    _role,
+                    bottomNavigationViewModel.selectedIndex,
+                    context,
+                  )
+                  : (_role == 'recruiter')
+                  ? null
+                  : (_role == 'admin')
+                  ? adminBottomBar(
+                    _role,
+                    bottomNavigationViewModel.selectedIndex,
+                    context,
+                  )
+                  : null,
         ),
         body: PageView(
           physics: const NeverScrollableScrollPhysics(),
