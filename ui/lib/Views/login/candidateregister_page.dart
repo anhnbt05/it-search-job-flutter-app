@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Views/login/verifyemail_page.dart';
-
 import '../../Helpers/toastification.dart';
 import '../../Models/ResponseModel.dart';
 import '../../ViewModels/login/SignUpViewModel.dart';
+import '../../Constants/color_constants.dart';
+import '../../ViewModels/login/VerifyEmailViewModel.dart';
 
 class CandidateRegisterPage extends StatefulWidget {
   final String email;
@@ -67,7 +68,10 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => VerifyemailPage(email: widget.email),
+            builder: (_) => ChangeNotifierProvider(
+              create: (_) => VerifyEmailViewModel(),
+              child: VerifyemailPage(email: widget.email),
+            ),
           ),
         );
       } else {
@@ -84,118 +88,302 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
   @override
   Widget build(BuildContext context) {
     final isLoading = Provider.of<SignUpViewModel>(context).isLoading;
-    final size = MediaQuery.of(context).size;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(size.width * 0.08, size.height * 0.1, size.width * 0.08, 20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(child: Icon(Icons.person, size: 70, color: Colors.blueAccent)),
-              SizedBox(height: 40),
-              Text("Đăng ký ứng viên", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26)),
-              SizedBox(height: 10),
-              Text("Vui lòng điền thông tin bên dưới để tiếp tục", style: TextStyle(color: Colors.grey[700], fontSize: 16)),
-              SizedBox(height: 30),
-
-              _buildDisplayText("Email", widget.email),
-              _buildDisplayText("Họ và tên", widget.fullName),
-              _buildDisplayText("Số điện thoại", widget.phone),
-              SizedBox(height: 16),
-
-              _buildMultilineField(_bioController, "Giới thiệu bản thân", Icons.info),
-              SizedBox(height: 20),
-
-              DropdownButtonFormField<String>(
-                value: selectedLevel,
-                decoration: InputDecoration(
-                  labelText: "Cấp độ (Level)",
-                  prefixIcon: Icon(Icons.star),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.08,
+            vertical: screenHeight * 0.05,
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Center(
+                  child: Container(
+                    width: 70,
+                    height: 70,
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          ColorConstants.primaryColor,
+                          ColorConstants.primaryColor.withOpacity(0.8)
+                        ],
+                      ),
+                    ),
+                    child: Icon(Icons.person, size: 35, color: Colors.white),
+                  ),
                 ),
-                items: [
-                  DropdownMenuItem(value: "junior", child: Text("Junior")),
-                  DropdownMenuItem(value: "mid", child: Text("Mid")),
-                  DropdownMenuItem(value: "senior", child: Text("Senior")),
-                ],
-                onChanged: (value) => setState(() => selectedLevel = value),
-                validator: (value) => value == null ? "Vui lòng chọn cấp độ" : null,
-              ),
-              SizedBox(height: 20),
 
-              _buildTextField(
-                _certificationsController,
-                "Chứng chỉ (ngăn cách bởi dấu phẩy)",
-                Icons.workspace_premium,
-                "Ví dụ: AWS Certified Developer, Google Cloud Associate",
-              ),
-              SizedBox(height: 30),
+                SizedBox(height: screenHeight * 0.04),
 
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : _submitCandidate,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                  child: isLoading
-                      ? CircularProgressIndicator(color: Colors.white)
-                      : Text("Đăng ký", style: TextStyle(color: Colors.white, fontSize: 16)),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Đăng ký ứng viên",
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.bold,
+                      fontSize: screenHeight * 0.035,
+                      color: Colors.black87,
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              Center(
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("← Quay lại", style: TextStyle(fontSize: 15, color: Colors.blue)),
+
+                SizedBox(height: screenHeight * 0.015),
+
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Vui lòng điền thông tin bên dưới để hoàn tất đăng ký",
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Colors.grey[700],
+                      fontSize: screenHeight * 0.018,
+                      height: 1.5,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+
+                SizedBox(height: screenHeight * 0.05),
+
+                _buildDisplayText("Email", widget.email),
+                SizedBox(height: screenHeight * 0.02),
+                _buildDisplayText("Họ và tên", widget.fullName),
+                SizedBox(height: screenHeight * 0.02),
+                _buildDisplayText("Số điện thoại", widget.phone),
+                SizedBox(height: screenHeight * 0.04),
+
+                _buildMultilineField(
+                  controller: _bioController,
+                  label: "GIỚI THIỆU BẢN THÂN",
+                  icon: Icons.info,
+                ),
+                SizedBox(height: screenHeight * 0.025),
+
+                DropdownButtonFormField<String>(
+                  value: selectedLevel,
+                  dropdownColor: Colors.white,
+                  decoration: InputDecoration(
+                    labelText: "TRÌNH ĐỘ",
+                    labelStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Colors.grey.shade600,
+                      fontSize: screenHeight * 0.016,
+                    ),
+                    prefixIcon: Icon(Icons.star, color: Colors.grey.shade600),
+                    filled: true,
+                    fillColor: Colors.grey.shade100,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02,
+                      horizontal: 20,
+                    ),
+                  ),
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: screenHeight * 0.02,
+                    color: Colors.black87,
+                  ),
+                  hint: Text("Chọn trình độ", style: TextStyle(fontFamily: 'Poppins')),
+                  items: [
+                    DropdownMenuItem(
+                      value: "intern",
+                      child: Text("Intern", style: TextStyle(fontFamily: 'Poppins')),
+                    ),
+                    DropdownMenuItem(
+                      value: "fresher",
+                      child: Text("Fresher", style: TextStyle(fontFamily: 'Poppins')),
+                    ),
+                    DropdownMenuItem(
+                      value: "mid",
+                      child: Text("Mid", style: TextStyle(fontFamily: 'Poppins')),
+                    ),
+                    DropdownMenuItem(
+                      value: "junior",
+                      child: Text("Junior", style: TextStyle(fontFamily: 'Poppins')),
+                    ),
+                    DropdownMenuItem(
+                      value: "senior",
+                      child: Text("Senior", style: TextStyle(fontFamily: 'Poppins')),
+                    ),
+                  ],
+                  validator: (value) => value == null ? "Vui lòng chọn cấp độ" : null,
+                  onChanged: (value) => setState(() => selectedLevel = value),
+                ),
+                SizedBox(height: screenHeight * 0.025),
+
+                _buildTextField(
+                  controller: _certificationsController,
+                  label: "CHỨNG CHỈ (NGĂN CÁCH BỞI DẤU PHẨY)",
+                  icon: Icons.workspace_premium,
+                  hint: "Ví dụ: AWS Certified Developer, Google Cloud Associate",
+                ),
+                SizedBox(height: screenHeight * 0.06),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: screenHeight * 0.065,
+                  child: ElevatedButton(
+                    onPressed: isLoading ? null : _submitCandidate,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorConstants.primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: isLoading
+                        ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                        : Text(
+                      "ĐĂNG KÝ",
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        color: Colors.white,
+                        fontSize: screenHeight * 0.018,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: screenHeight * 0.04),
+
+                Center(
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      "Quay lại",
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: screenHeight * 0.016,
+                        color: ColorConstants.primaryColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon, [String? hint]) {
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    String? hint,
+  }) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return TextFormField(
       controller: controller,
+      style: TextStyle(
+        fontFamily: 'Poppins',
+        fontSize: screenHeight * 0.02,
+        color: Colors.black87,
+      ),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        labelStyle: TextStyle(
+          fontFamily: 'Poppins',
+          color: Colors.grey.shade600,
+          fontSize: screenHeight * 0.016,
+        ),
+        prefixIcon: Icon(icon, color: Colors.grey.shade600),
+        filled: true,
+        fillColor: Colors.grey.shade100,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.02,
+          horizontal: 20,
+        ),
       ),
       validator: (value) => value == null || value.isEmpty ? "Không được để trống" : null,
     );
   }
 
-  Widget _buildMultilineField(TextEditingController controller, String label, IconData icon) {
+  Widget _buildMultilineField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+  }) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return TextFormField(
       controller: controller,
       maxLines: 4,
+      style: TextStyle(
+        fontFamily: 'Poppins',
+        fontSize: screenHeight * 0.02,
+        color: Colors.black87,
+      ),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        labelStyle: TextStyle(
+          fontFamily: 'Poppins',
+          color: Colors.grey.shade600,
+          fontSize: screenHeight * 0.016,
+        ),
+        prefixIcon: Icon(icon, color: Colors.grey.shade600),
+        filled: true,
+        fillColor: Colors.grey.shade100,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.02,
+          horizontal: 20,
+        ),
       ),
       validator: (value) => value == null || value.isEmpty ? "Không được để trống" : null,
     );
   }
 
   Widget _buildDisplayText(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Text("$title: ", style: TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value)),
-        ],
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: screenHeight * 0.018,
+            color: Colors.black87,
+          ),
+          children: [
+            TextSpan(
+              text: "$title: ",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            TextSpan(text: value),
+          ],
+        ),
       ),
     );
   }

@@ -4,11 +4,12 @@ import '../../Helpers/toastification.dart';
 import '../../Models/Provinces.dart';
 import '../../ViewModels/login/CompaniesViewModel.dart';
 import '../../ViewModels/login/ProvincesViewModel.dart';
+import '../../Constants/color_constants.dart';
 
 class CreateBranchPage extends StatefulWidget {
   final String companyId;
 
-  const CreateBranchPage({required this.companyId});
+  const CreateBranchPage({required this.companyId, Key? key}) : super(key: key);
 
   @override
   State<CreateBranchPage> createState() => _CreateBranchPageState();
@@ -16,22 +17,31 @@ class CreateBranchPage extends StatefulWidget {
 
 class _CreateBranchPageState extends State<CreateBranchPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _branchNameController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
+  final _branchNameController = TextEditingController();
+  final _addressController = TextEditingController();
 
   String? _selectedProvinceId;
-  bool isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
-    Provider.of<ProvincesViewModel>(context, listen: false).fetchProvinces();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        Provider.of<ProvincesViewModel>(context, listen: false).fetchProvinces();
+      }
+    });
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate() || _selectedProvinceId == null) return;
-
-    setState(() => isSubmitting = true);
+    if (!_formKey.currentState!.validate() || _selectedProvinceId == null) {
+      showTopToastification(
+        title: "Thiếu thông tin",
+        content: "Vui lòng điền đầy đủ thông tin",
+        color: Colors.orange,
+        icon: Icons.warning_amber_rounded,
+      );
+      return;
+    }
 
     final vm = Provider.of<CompaniesViewModel>(context, listen: false);
     final response = await vm.addBranch(
@@ -40,8 +50,6 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
       address: _addressController.text,
       locationId: _selectedProvinceId!,
     );
-
-    setState(() => isSubmitting = false);
 
     if (response.success) {
       await vm.fetchBranches(widget.companyId);
@@ -65,83 +73,203 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
   @override
   Widget build(BuildContext context) {
     final provinceVM = Provider.of<ProvincesViewModel>(context);
-    final size = MediaQuery.of(context).size;
+    final companyVM = Provider.of<CompaniesViewModel>(context);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Tạo chi nhánh mới"),
-        backgroundColor: Colors.blue,
+        title: Text(
+          'Thêm chi nhánh mới',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: ColorConstants.primaryColor,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(size.width * 0.08, 24, size.width * 0.08, 16),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              Center(child: Icon(Icons.location_city, size: 70, color: Colors.blueAccent)),
-              SizedBox(height: 24),
-              Text("Thông tin chi nhánh", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              SizedBox(height: 16),
-
-              _buildTextField(_branchNameController, "Tên chi nhánh", Icons.business),
-              _buildTextField(_addressController, "Địa chỉ", Icons.location_on),
-
-              SizedBox(height: 16),
-              provinceVM.isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : DropdownButtonFormField<String>(
-                value: _selectedProvinceId,
-                decoration: InputDecoration(
-                  labelText: "Tỉnh/Thành phố",
-                  prefixIcon: Icon(Icons.map),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                items: provinceVM.provinces.map((cProvinces provinces) {
-                  return DropdownMenuItem<String>(
-                    value: provinces.id,
-                    child: Text(provinces.name),
-                  );
-                }).toList(),
-                onChanged: (value) => setState(() => _selectedProvinceId = value),
-                validator: (value) =>
-                value == null ? "Vui lòng chọn tỉnh/thành" : null,
-              ),
-
-              SizedBox(height: 30),
-              SizedBox(
-                height: 50,
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: isSubmitting ? null : _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.08,
+            vertical: screenHeight * 0.03,
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Center(
+                  child: Container(
+                    width: 70,
+                    height: 70,
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          ColorConstants.primaryColor,
+                          ColorConstants.primaryColor.withOpacity(0.8)
+                        ],
+                      ),
+                    ),
+                    child: Icon(Icons.location_city, size: 35, color: Colors.white),
                   ),
-                  child: isSubmitting
-                      ? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.white))
-                      : Text("Tạo", style: TextStyle(fontSize: 16, color: Colors.white)),
                 ),
-              ),
-            ],
+
+                SizedBox(height: screenHeight * 0.04),
+
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Thông tin chi nhánh",
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.bold,
+                      fontSize: screenHeight * 0.028,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: screenHeight * 0.025),
+
+                _buildTextField(
+                  controller: _branchNameController,
+                  label: "TÊN CHI NHÁNH",
+                  icon: Icons.business,
+                ),
+                SizedBox(height: screenHeight * 0.025),
+
+                _buildTextField(
+                  controller: _addressController,
+                  label: "ĐỊA CHỈ",
+                  icon: Icons.home,
+                ),
+                SizedBox(height: screenHeight * 0.025),
+
+                provinceVM.isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : DropdownButtonFormField<String>(
+                  value: _selectedProvinceId,
+                  dropdownColor: Colors.white,
+                  decoration: InputDecoration(
+                    labelText: 'TỈNH/THÀNH PHỐ',
+                    labelStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Colors.grey.shade600,
+                      fontSize: screenHeight * 0.016,
+                    ),
+                    prefixIcon: Icon(Icons.map, color: Colors.grey.shade600),
+                    filled: true,
+                    fillColor: Colors.grey.shade100,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02,
+                      horizontal: 20,
+                    ),
+                  ),
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: screenHeight * 0.02,
+                    color: Colors.black87,
+                  ),
+                  items: provinceVM.provinces.map((cProvinces prov) {
+                    return DropdownMenuItem<String>(
+                      value: prov.id,
+                      child: Text(
+                        prov.name,
+                        style: TextStyle(fontFamily: 'Poppins'),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (v) => setState(() => _selectedProvinceId = v),
+                  validator: (v) => v == null ? 'Vui lòng chọn tỉnh/thành phố' : null,
+                ),
+
+                SizedBox(height: screenHeight * 0.06),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: screenHeight * 0.065,
+                  child: ElevatedButton(
+                    onPressed: companyVM.isLoading ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorConstants.primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: companyVM.isLoading
+                        ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                        : Text(
+                      "LƯU CHI NHÁNH",
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        color: Colors.white,
+                        fontSize: screenHeight * 0.018,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: screenHeight * 0.04),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-        validator: (value) => value == null || value.isEmpty ? "Không được để trống" : null,
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+  }) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return TextFormField(
+      controller: controller,
+      style: TextStyle(
+        fontFamily: 'Poppins',
+        fontSize: screenHeight * 0.02,
+        color: Colors.black87,
       ),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(
+          fontFamily: 'Poppins',
+          color: Colors.grey.shade600,
+          fontSize: screenHeight * 0.016,
+        ),
+        prefixIcon: Icon(icon, color: Colors.grey.shade600),
+        filled: true,
+        fillColor: Colors.grey.shade100,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.02,
+          horizontal: 20,
+        ),
+      ),
+      validator: (v) => v == null || v.isEmpty ? 'Không được để trống' : null,
     );
   }
 }
