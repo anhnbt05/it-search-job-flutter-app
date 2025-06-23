@@ -1414,9 +1414,12 @@ export class JobsService {
       return (
         job?.Applications.map((application: any) => ({
           ...omit(application, 'CandidateID', 'Candidates'),
-          Candidate: this.usersService.handleFormattedProfileCandidateResponse(
-            application.Candidates,
-          ),
+          Candidate: {
+            ...this.usersService.handleFormattedProfileCandidateResponse(
+              application.Candidates,
+            ),
+            ID: application.Candidates.UserID,
+          },
         })) ?? []
       );
     } catch (err) {
