@@ -468,7 +468,7 @@ export class UsersService {
     try {
       const { data: user } = await this.anonSupabaseClient
         .from('Users')
-        .select('*, UserNotifications(*)')
+        .select('*, UserNotifications(*, Notifications(*))')
         .eq('ID', userId)
         .maybeSingle<any>();
 
@@ -483,9 +483,18 @@ export class UsersService {
         );
 
       return (
-        user?.UserNotifications.map((un: any) =>
-          omit(un, ['UserID', 'DeletedAt', 'NotificationID']),
-        ).sort(
+        user?.UserNotifications.map((un: any) => ({
+          ...omit(un, [
+            'UserID',
+            'DeletedAt',
+            'NotificationID',
+            'Notifications',
+          ]),
+          Notification: {
+            Title: un.Notifications.Title,
+            Type: un.Notifications.Type,
+          },
+        })).sort(
           (a: any, b: any) =>
             new Date(b.CreatedAt as string).getTime() -
             new Date(a.CreatedAt as string).getTime(),
@@ -518,7 +527,7 @@ export class UsersService {
         .from('UserNotifications')
         .select('*')
         .eq('ID', notificationId)
-        .maybeSingle<UserNotifications>();
+        .maybeSingle<any>();
 
       if (!userNotification)
         throw new NotFoundException(
@@ -547,13 +556,31 @@ export class UsersService {
         );
       }
 
-      return (
+      const { data: notification, error: notificationError } =
         await this.anonSupabaseClient
           .from('UserNotifications')
-          .select('*')
+          .select('*, Notifications(*)')
           .eq('ID', notificationId)
-          .maybeSingle<UserNotifications>()
-      )?.data;
+          .maybeSingle<any>();
+
+      if (notificationError) {
+        console.error(notificationError);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy thông báo chi tiết của bạn.',
+        );
+      }
+
+      if (!notification)
+        throw new NotFoundException('Không tìm thấy thông báo này.');
+
+      return {
+        ...omit(notification, ['Notifications']),
+        Notification: {
+          Title: notification.Notifications.Title,
+          Type: notification.Notifications.Type,
+        },
+      };
     } catch (err) {
       console.error(err);
       throw err;

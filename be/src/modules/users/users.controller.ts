@@ -675,6 +675,10 @@ export class UsersController {
             recruiterId: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
           },
           CreatedAt: '2025-04-09T00:51:06.838',
+          Notification: {
+            Title: 'Có ứng viên mới ứng tuyển bài đăng của bạn',
+            Type: 'recruiter_new_application',
+          },
         },
         {
           ID: '97c2d084-9495-4fd8-9c4e-f5fd13351f43',
@@ -691,6 +695,10 @@ export class UsersController {
             recruiterId: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
           },
           CreatedAt: '2025-04-09T00:56:45.876',
+          Notification: {
+            Title: 'Có ứng viên mới ứng tuyển bài đăng của bạn',
+            Type: 'recruiter_new_application',
+          },
         },
       ],
     },
@@ -729,6 +737,10 @@ export class UsersController {
           recruiterId: 'a8631991-bac3-491b-a5d1-90d1acff95a2',
         },
         CreatedAt: '2025-04-09T00:51:06.838',
+        Notification: {
+          Title: 'Có ứng viên mới ứng tuyển bài đăng của bạn',
+          Type: 'recruiter_new_application',
+        },
       },
     },
   })
