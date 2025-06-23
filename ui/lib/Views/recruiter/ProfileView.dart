@@ -79,8 +79,32 @@ Widget RecruiterInfo(BuildContext context) {
               children: [
                 CircleAvatar(
                   radius: 50,
-                  child: ClipOval(child: Image.network(viewModel.recruiterInfo!.AvatarUrl, fit: BoxFit.cover, width: 100, height: 100,),),
-
+                  child: (viewModel.recruiterInfo?.AvatarUrl != null &&
+                      viewModel.recruiterInfo!.AvatarUrl.isNotEmpty)
+                      ? ClipOval(
+                    child: Image.network(
+                      viewModel.recruiterInfo!.AvatarUrl,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(color: Colors.blue),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Icon(Icons.person, color: Colors.grey, size: 40),
+                        );
+                      },
+                    ),
+                  )
+                      : Icon(Icons.person, color: Colors.grey, size: 40),
                 ),
                 SizedBox(height: 5),
                 Text(
@@ -227,11 +251,30 @@ Widget CompanyInfo(BuildContext context) {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(width: 1, color: Colors.black12),
                   ),
-                  child: Image.network(
+                  child: (viewModel.recruiterInfo?.Company.LogoUrl != null)
+                      ? Image.network(
                     viewModel.recruiterInfo!.Company.LogoUrl!,
                     width: 100,
                     height: 100,
                     fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(color: Colors.blue),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Icon(Icons.broken_image, color: Colors.grey),
+                      );
+                    },
+                  )
+                      : Center(
+                    child: Icon(Icons.business, color: Colors.grey),
                   ),
                 ),
                 SizedBox(height: 5),
