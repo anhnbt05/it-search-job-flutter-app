@@ -32,7 +32,12 @@ class _EditRecruiterInformationScreenState
         child: Scaffold(
           appBar: AppBar(
             toolbarHeight: 45,
-            automaticallyImplyLeading: false,
+            leading: IconButton(
+              icon: Icon(Icons.chevron_left, color: Colors.white, size: 30),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
             backgroundColor: ColorConstants.appbarColor,
             centerTitle: true,
             title: Center(

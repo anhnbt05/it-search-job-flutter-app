@@ -35,12 +35,17 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
   @override
   Widget build(BuildContext context) {
     var viewModel = widget.viewModel;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: (widget.status == 'pending') ? Size.fromHeight(90) : Size.fromHeight(50),
         child: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.chevron_left, color: Colors.white, size: 30),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: ColorConstants.appbarColor,
           title: Row(

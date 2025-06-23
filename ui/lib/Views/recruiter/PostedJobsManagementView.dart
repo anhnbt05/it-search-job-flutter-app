@@ -11,6 +11,7 @@ import '../../Models/Jobs.dart';
 import '../../ViewModels/recruiter/EditJobViewModel.dart';
 import '../../ViewModels/recruiter/PostedJobsManagementViewModel.dart';
 import '../../ViewModels/recruiter/ProfileViewModel.dart';
+import 'DetailJobView.dart';
 import 'EditJobScreen.dart';
 
 Widget PostedJobsManagementScreen(BuildContext context) {
@@ -48,11 +49,11 @@ Widget body({required BuildContext context, required PostedJobsManagementViewMod
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        border: Border.all(
-                          width: 2.2,
-                          color: Colors.transparent
-                        )
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border.all(
+                        width: 2.2,
+                        color: Colors.transparent,
+                      ),
                     ),
                     child: ClipOval(
                       child: Image.network(
@@ -60,6 +61,28 @@ Widget body({required BuildContext context, required PostedJobsManagementViewMod
                         width: 50,
                         height: 50,
                         fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(color: Colors.blue),
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 50,
+                            height: 50,
+                            color: Colors.grey.shade200,
+                            child: Icon(Icons.person, color: Colors.grey),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -293,7 +316,12 @@ Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel, R
 Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, RecruiterProfileViewModel recruiterVM, int index,) {
   return GestureDetector(
     onTap: () {
-      print(viewModel.jobs[index]!.Title);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DetailJobView(jobId: viewModel.jobs[index]!.ID),
+        ),
+      );
     },
     child: Padding(
       padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
@@ -332,6 +360,16 @@ Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, R
                           ? Image.network(
                         recruiterVM.recruiterInfo!.Company.LogoUrl!,
                         fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(color: Colors.blue),
+                            ),
+                          );
+                        },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: Colors.grey.shade200,
@@ -344,7 +382,6 @@ Widget JobsItem(BuildContext context, PostedJobsManagementViewModel viewModel, R
                         child: Icon(Icons.business, color: Colors.grey),
                       ),
                     ),
-
                     Expanded(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,

@@ -25,7 +25,7 @@ class JobService {
         body: jobData,
         accessToken: validToken!,
       );
-
+      print(jsonDecode(response.body));
       if (response.statusCode == 201 || response.statusCode == 200) {
         print("Job posted successfully.");
         List<dynamic> data = jsonDecode(response.body);

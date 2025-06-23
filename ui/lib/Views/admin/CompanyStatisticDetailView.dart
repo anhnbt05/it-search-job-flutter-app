@@ -47,12 +47,13 @@ Widget CompanyDetailBody(
   CompanyStatisticViewModel viewModel,
 ) {
   return Padding(
-    padding: const EdgeInsets.only(top: 5, left: 10, right: 10),
+    padding: const EdgeInsets.only(left: 10, right: 10),
     child: SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 5,),
           Row(
             children: [
               SizedBox(width: 10,),

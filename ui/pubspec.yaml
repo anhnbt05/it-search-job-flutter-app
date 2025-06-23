@@ -31,6 +31,7 @@ dependencies:
   provider: ^6.0.5
   syncfusion_flutter_pdfviewer: any
   open_file: ^3.3.2
+  socket_io_client: ^2.0.3+1
   path_provider: ^2.1.1
   dio: ^5.4.0
   toastification: ^3.0.2

@@ -12,6 +12,7 @@ import 'package:ui/Views/admin/RecruiterInforScreen.dart';
 import '../../Models/Users.dart';
 import '../../ViewModels/admin/RecruiterInforViewModel.dart';
 import '../../ViewModels/admin/UserManagementViewModel.dart';
+import 'CandidateInforScreen.dart';
 
 Widget UserManagementScreen(BuildContext context) {
   var viewModel = Provider.of<UserManagementViewModel>(context);
@@ -284,7 +285,12 @@ double calculateTextWidth(BuildContext context) {
 Widget candidateItem(BuildContext context, cUsers user, UserManagementViewModel viewModel) {
   return GestureDetector(
     onTap: () {
-      print("OK");
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CandidateInforView(candidateID: user.ID!),
+        ),
+      );
     },
     child: Padding(
       padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
@@ -332,8 +338,8 @@ Widget candidateItem(BuildContext context, cUsers user, UserManagementViewModel 
                             backgroundImage: (user.AvatarUrl != null)
                                 ? NetworkImage(user.AvatarUrl!)
                                 : null,
-                            child: (user.AvatarUrl == null)
-                                ? Icon(Icons.business, color: Colors.grey)
+                            child: (user.AvatarUrl == null || user.AvatarUrl!.isEmpty)
+                                ? Icon(Icons.person, color: Colors.grey, size: 35,)
                                 : null,
                           ),
                           SizedBox(height: 5),
@@ -471,8 +477,8 @@ Widget recruiterItem(BuildContext context, cUsers user, UserManagementViewModel 
                             backgroundImage: (user.AvatarUrl != null)
                                 ? NetworkImage(user.AvatarUrl!)
                                 : null,
-                            child: (user.AvatarUrl == null)
-                                ? Icon(Icons.business, color: Colors.grey)
+                            child: (user.AvatarUrl == null || user.AvatarUrl!.isEmpty)
+                                ? Icon(Icons.person, color: Colors.grey, size: 35,)
                                 : null,
                           ),
                           SizedBox(height: 5),
