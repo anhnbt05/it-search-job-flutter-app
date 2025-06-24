@@ -12,6 +12,7 @@ import {
   Users,
 } from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { omit } from 'lodash';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import { CreateUserNotificationDto } from 'src/modules/user-notifications/dtos';
 import { PushNotificaitonProducer } from 'src/modules/user-notifications/producers';
@@ -74,8 +75,8 @@ export class UserNotificationsService {
             NotificationID: notification.ID,
           },
         ])
-        .select()
-        .single<UserNotifications>();
+        .select('*, Notifications(*)')
+        .single<any>();
 
       if (error) {
         console.error(error);
@@ -95,7 +96,18 @@ export class UserNotificationsService {
         this.websocketsGateway.sendNotificationToUserRealTime(
           user,
           createUserNotificationDto.Type,
-          data,
+          {
+            ...omit(data, [
+              'UserID',
+              'DeletedAt',
+              'NotificationID',
+              'Notifications',
+            ]),
+            Notification: {
+              Title: data.Notifications.Title,
+              Type: data.Notifications.Type,
+            },
+          },
         );
       } else if (userDevices?.length)
         await this.pushNotificationProducer.handleAddPushNotificationToQueue({

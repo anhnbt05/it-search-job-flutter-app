@@ -85,7 +85,7 @@ export class WebsocketGateway
   public sendNotificationToUserRealTime = (
     user: Users,
     type: NotificationType,
-    notification: UserNotifications,
+    notification: any,
   ) => {
     const event = handleGetNotificationEventByType(type);
 

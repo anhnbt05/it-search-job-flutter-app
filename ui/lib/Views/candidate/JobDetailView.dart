@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:ui/Helpers/helpers.dart';
 import '../../Models/Enum.dart';
 import '../../ViewModels/candidate/DetailJobViewModel.dart';
 
@@ -84,7 +85,7 @@ class JobDetailView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: _iconText(Icons.work_outline, "Hình thức làm việc", job?.Type ?? "N/A"),
+                          child: _iconText(Icons.work_outline, "Hình thức làm việc",JobTypeExtension.fromString(job!.Type)?.toVietnamese() ?? "N/A"),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -96,7 +97,7 @@ class JobDetailView extends StatelessWidget {
 
                   Row(
                     children: [
-                      Expanded(child: _iconText(Icons.school, "Trình độ yêu cầu", job?.Level ?? "N/A")),
+                      Expanded(child: _iconText(Icons.school, "Trình độ yêu cầu", LevelExtension.fromString(job!.Level)?.toVietnamese() ?? "N/A")),
                       const SizedBox(width: 16),
                       Expanded(child: _iconText(
                           Icons.check_circle_outline,

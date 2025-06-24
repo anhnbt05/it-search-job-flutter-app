@@ -1,11 +1,14 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
+  Post,
   Query,
   Req,
   UseGuards,
@@ -18,6 +21,7 @@ import {
   ApiExtraModels,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -29,6 +33,7 @@ import { API_TAGS, RoleEnum } from 'src/libs/common/utils';
 import {
   DeleteUserQueryDto,
   SearchUsersDto,
+  UnlockUserQueryDto,
   UpdateCandidateDto,
   UpdateRecruiterDto,
   UpdateUserDto,
@@ -835,6 +840,41 @@ export class UsersController {
       userId,
       notificationId,
       currentUserId,
+    );
+  }
+
+  @Post('unlock/:id')
+  @ApiOperation({
+    summary: 'Mở khoá tài khoản người dùng',
+    description: 'Đường dẫn này dùng để mở khoá tài khoản của người dùng.',
+  })
+  @ApiParam({
+    name: 'id',
+    description:
+      'Mã định danh (ID) của người dùng (theo role) cần mở khoá tài khoản',
+    example: '30e4c46a-9817-486e-966a-f8457aaf5e41',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      'Dữ liệu trả về sau khi mở khoá tài khoản người dùng thành công.',
+    example: {
+      success: true,
+      message: `Tài khoản của người dùng 'Lê Ngọc Anh' đã được mở khoá.`,
+    },
+  })
+  @Roles(RoleEnum.ADMIN)
+  async unlockUser(
+    @Req() req: Request,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query() unlockUserQueryDto: UnlockUserQueryDto,
+  ) {
+    const currentUserId = (req.user as User).id;
+
+    return this.usersService.unlockAccount(
+      currentUserId,
+      id,
+      unlockUserQueryDto.role,
     );
   }
 }
