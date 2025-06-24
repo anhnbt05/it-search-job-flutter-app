@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../../Helpers/toastification.dart';
+import '../../Models/UserNotifications.dart';
+import '../../ViewModels/NotificationViewModel2.dart';
 
 class NotificationView extends StatefulWidget {
   const NotificationView({super.key});
@@ -7,136 +13,305 @@ class NotificationView extends StatefulWidget {
   State<NotificationView> createState() => _NotificationViewState();
 }
 
-class _NotificationViewState extends State<NotificationView> {
-  List<Map<String, dynamic>> notifications = [
-    {
-      "ID": "f7f12038-d244-414d-b367-6594f19aa82b",
-      "IsRead": false,
-      "Content": [
-        "Bài đăng mới: Frontend Developer (Junior)",
-        "Tạo bởi: Công ty ABC",
-        "Vào lúc: 09/04/2025 08:56:24 AM"
-      ],
-      "Metadata": {
-        "jobId": "12bfb97c-a3d1-404c-8002-045e5417ef39",
-        "jobTitle": "Frontend Developer (Junior)",
-        "companyName": "Công ty ABC",
-        "recruiterId": "a8631991-bac3-491b-a5d1-90d1acff95a2"
-      },
-      "CreatedAt": "2025-04-09T00:51:06.838"
-    },
-    {
-      "ID": "97c2d084-9495-4fd8-9c4e-f5fd13351f43",
-      "IsRead": false,
-      "Content": [
-        "Bài đăng mới: AI Engineer (Junior)",
-        "Tạo bởi: Công ty ABC",
-        "Vào lúc: 09/04/2025 08:56:24 AM"
-      ],
-      "Metadata": {
-        "jobId": "aeb5e508-9c97-4cdd-98b5-8ec8d2b62e13",
-        "jobTitle": "AI Engineer (Junior)",
-        "companyName": "Công ty ABC",
-        "recruiterId": "a8631991-bac3-491b-a5d1-90d1acff95a2"
-      },
-      "CreatedAt": "2025-04-09T00:56:45.876"
-    },
-  ];
+class _NotificationViewState extends State<NotificationView> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _initNotifications();
+  }
 
-  void _handleNotificationTap(Map<String, dynamic> noti) {
-    setState(() {
-      noti["IsRead"] = true;
-    });
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
-    // Show detail
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(noti["Content"][0] ?? "Chi tiết thông báo"),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(noti["Content"][1]),
-            const SizedBox(height: 4),
-            Text(noti["Content"][2]),
-            const SizedBox(height: 12),
-            const Divider(),
-            Text("Công ty: ${noti["Metadata"]["companyName"]}"),
-            Text("Vị trí: ${noti["Metadata"]["jobTitle"]}"),
-            Text("Mã công việc: ${noti["Metadata"]["jobId"]}"),
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _initNotifications();
+    }
+  }
+
+  Future<void> _initNotifications() async {
+    final viewModel = Provider.of<NotificationViewModel2>(context, listen: false);
+    await viewModel.initialize(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Consumer<NotificationViewModel2>(
+        builder: (context, viewModel, child) {
+          if (viewModel.isLoading && viewModel.notifications.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (viewModel.errorMessage != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(viewModel.errorMessage!),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => _initNotifications(),
+                    child: const Text('Thử lại'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (viewModel.notifications.isEmpty) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.notifications_off, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text('Không có thông báo nào', style: TextStyle(fontSize: 18)),
+                ],
+              ),
+            );
+          }
+
+          return _buildNotificationList(viewModel);
+        },
+      ),
+    );
+  }
+
+  Widget _buildNotificationList(NotificationViewModel2 viewModel) {
+    return ListView.separated(
+      padding: const EdgeInsets.only(top: 20, left: 8, right: 8, bottom: 8),
+      itemCount: viewModel.notifications.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      itemBuilder: (context, index) {
+        final notification = viewModel.notifications[index];
+        return _buildNotificationItem(context, notification);
+      },
+    );
+  }
+
+  Widget _buildNotificationItem(BuildContext context, UserNotification notification) {
+    final isRead = notification.IsRead ?? false;
+
+    return Dismissible(
+      key: Key(notification.ID ?? 'key_${notification.hashCode}'),
+      background: _buildDismissibleBackground(),
+      dismissThresholds: const {DismissDirection.endToStart: 0.5},
+      confirmDismiss: (direction) => _showDeleteConfirmationDialog(context),
+      onDismissed: (direction) => _handleNotificationDeletion(context, notification),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isRead ? Colors.white : Colors.blue[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isRead ? Colors.grey.withOpacity(0.2) : Colors.blue[100]!,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 1),
+            ),
           ],
         ),
+        child: ListTile(
+          leading: Icon(
+            Icons.notifications,
+            color: isRead ? Colors.grey : Colors.blue[700],
+          ),
+          title: Text(
+            notification.Notification?.Title ?? 'Thông báo',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: isRead ? Colors.grey[700] : Colors.black,
+            ),
+          ),
+          subtitle: _buildNotificationSubtitle(notification),
+          onTap: () => _handleNotificationTap(context, notification),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationSubtitle(UserNotification notification) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            const Icon(Icons.access_time, size: 14, color: Colors.grey),
+            const SizedBox(width: 4),
+            Text(
+              _formatNotificationDate(notification.CreatedAt),
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDismissibleBackground() {
+    return Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+    decoration: BoxDecoration(
+    color: Colors.red,
+    borderRadius: BorderRadius.circular(8),
+    ),
+    alignment: Alignment.centerRight,
+    padding: const EdgeInsets.only(right: 20),
+    child: const Icon(Icons.delete, color: Colors.white),
+    );
+  }
+
+  Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Xác nhận'),
+        content: const Text('Bạn có chắc muốn xóa thông báo này?'),
         actions: [
           TextButton(
-            child: const Text("Đóng"),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Hủy', style: TextStyle(color: Colors.blue)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Xóa', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
   }
 
-  void _deleteNotification(int index) {
-    setState(() {
-      notifications.removeAt(index);
-    });
+  void _handleNotificationDeletion(BuildContext context, UserNotification notification) {
+    final viewModel = Provider.of<NotificationViewModel2>(context, listen: false);
+    viewModel.deleteNotification(context, notification.ID!);
+    showSuccessToastification(title: "Thành công", message: "Đã xoá thông báo");
   }
+
+  void _handleNotificationTap(BuildContext context, UserNotification notification) {
+    final viewModel = Provider.of<NotificationViewModel2>(context, listen: false);
+    viewModel.markAsRead(context, notification.ID!);
+    _showNotificationDetail(context, notification);
+  }
+
+  void _showNotificationDetail(BuildContext context, UserNotification notification) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) => NotificationDetailSheet(notification: notification),
+      isScrollControlled: true,
+    );
+  }
+
+  String _formatNotificationDate(DateTime? date) {
+    if (date == null) return '';
+    final dateFormat = DateFormat('dd/MM/yyyy');
+    final timeFormat = DateFormat('hh:mm a');
+    return '${dateFormat.format(date)}, ${timeFormat.format(date)}';
+  }
+}
+
+class NotificationDetailSheet extends StatelessWidget {
+  final UserNotification notification;
+
+  const NotificationDetailSheet({super.key, required this.notification});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: notifications.isEmpty
-          ? const Center(child: Text("Không có thông báo"))
-          : ListView.builder(
-        itemCount: notifications.length,
-        itemBuilder: (context, index) {
-          final noti = notifications[index];
-          final isRead = noti["IsRead"] == true;
-          final content = noti["Content"] as List<dynamic>;
+    final content = notification.Content ?? [];
+    final notificationData = notification.Notification;
 
-          return Dismissible(
-            key: Key(noti["ID"]),
-            direction: DismissDirection.endToStart,
-            background: Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              color: Colors.red,
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            onDismissed: (_) => _deleteNotification(index),
-            child: Card(
-              elevation: 2,
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              color: isRead ? Colors.white : const Color(0xFFE3F2FD),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                leading: Icon(
-                  Icons.notifications,
-                  color: isRead ? Colors.grey : Colors.blue,
-                  size: 30,
-                ),
-                title: Text(
-                  content[0],
-                  style: TextStyle(
-                    fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(content[1], style: const TextStyle(fontSize: 13)),
-                    Text(content[2], style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                  ],
-                ),
-                onTap: () => _handleNotificationTap(noti),
-              ),
-            ),
-          );
-        },
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildDragHandle(),
+          const SizedBox(height: 16),
+          _buildNotificationTitle(notificationData?.Title),
+          const SizedBox(height: 16),
+          if (content.isNotEmpty) ..._buildContentLines(content),
+          const SizedBox(height: 16),
+          _buildNotificationTime(notification.CreatedAt),
+          const SizedBox(height: 24),
+          _buildCloseButton(context),
+        ],
       ),
     );
+  }
+
+  Widget _buildDragHandle() {
+    return Center(
+      child: Container(
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationTitle(String? title) {
+    return Text(
+      title ?? 'Thông báo',
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    );
+  }
+
+  List<Widget> _buildContentLines(List<String> content) {
+    return content.map((line) => Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(line, style: const TextStyle(fontSize: 15)),
+    )).toList();
+  }
+
+  Widget _buildNotificationTime(DateTime? date) {
+    return Row(
+      children: [
+        const Icon(Icons.access_time, size: 16, color: Colors.grey),
+        const SizedBox(width: 4),
+        Text(
+          _formatDate(date),
+          style: const TextStyle(fontSize: 14, color: Colors.grey),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCloseButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Đóng', style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return '';
+    final dateFormat = DateFormat('dd/MM/yyyy');
+    final timeFormat = DateFormat('hh:mm a');
+    return '${dateFormat.format(date)}, ${timeFormat.format(date)}';
   }
 }
