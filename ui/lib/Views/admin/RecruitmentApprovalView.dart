@@ -11,33 +11,15 @@ import 'JobDetailScreen.dart';
 
 Widget RecruitmentApprovalScreen(BuildContext context) {
   var viewModel = Provider.of<RecruiterApprovalViewModel>(context);
-  if (viewModel.jobs != null) {
-    return ListView.builder(
-      itemCount: viewModel.jobs!.length,
-      itemBuilder: (context, index) {
-        return JobItem(context, index, viewModel);
-      },
-    );
+
+  if (viewModel.jobs == null) {
+    return const Center(child: CircularProgressIndicator(color: Colors.blue));
   }
-  return FutureBuilder(
-    future: viewModel.jobsFuture,
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(
-          child: CircularProgressIndicator(color: Colors.blue),
-        );
-      } else if (!snapshot.hasData) {
-        return const Center(
-          child: CircularProgressIndicator(color: Colors.blue),
-        );
-      } else {
-        return ListView.builder(
-          itemCount: viewModel.jobs!.length,
-          itemBuilder: (context, index) {
-            return JobItem(context, index, viewModel);
-          },
-        );
-      }
+
+  return ListView.builder(
+    itemCount: viewModel.jobs!.length,
+    itemBuilder: (context, index) {
+      return JobItem(context, index, viewModel);
     },
   );
 }

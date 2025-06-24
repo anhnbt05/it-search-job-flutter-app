@@ -27,12 +27,13 @@ import 'package:ui/Views/recruiter/recruiter.dart';
 
 import 'ViewModels/BottomNavigationViewModel.dart';
 import 'ViewModels/admin/CategoryManagementViewModel.dart';
-import 'ViewModels/admin/NotificationViewModel.dart';
+import 'ViewModels/admin/NotificationViewModel.dart' as adminNoti;
 import 'ViewModels/admin/RecruimentApprovalViewModel.dart';
 import 'ViewModels/candidate/JoblistNavigationViewModel.dart';
 import 'ViewModels/recruiter/JobPostViewModel.dart';
 import 'ViewModels/recruiter/PostedJobsManagementViewModel.dart';
 import 'ViewModels/recruiter/ProfileViewModel.dart';
+import 'ViewModels/recruiter/NotificationViewModel.dart' as recruiterNoti;
 import 'Views/login/login_page.dart';
 
 Future<void> main() async {
@@ -90,16 +91,14 @@ class _MyAppState extends State<MyApp> {
           ),
           ChangeNotifierProvider(
             create: (context) {
-              final postedJobsVM = Provider.of<PostedJobsManagementViewModel>(
-                context,
-                listen: false,
-              );
+              var postedJobsVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
               return CandidatesAppliesViewModel(
                 postedJobsManagementViewModel: postedJobsVM,
                 context: context
               );
             },
           ),
+          ChangeNotifierProvider(create: (context) => recruiterNoti.NotificationViewModel(context))
         ],
         if (authVM.isLoggedIn && authVM.userId != null && authVM.userRole == 'admin') ...[
           ChangeNotifierProvider(create: (context) => RecruiterApprovalViewModel(context)),
@@ -107,7 +106,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (_) => UserNavigationViewModel()),
           ChangeNotifierProvider(create: (context) => CategoryManagementViewModel(context)),
           ChangeNotifierProvider(create: (context) => StatisticsViewModel(context)),
-          ChangeNotifierProvider(create: (context) => NotificationViewModel(context)),
+          ChangeNotifierProvider(create: (context) => adminNoti.NotificationViewModel(context)),
         ]
       ],
       child: MaterialApp(

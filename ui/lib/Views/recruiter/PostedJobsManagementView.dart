@@ -15,26 +15,21 @@ import 'DetailJobView.dart';
 import 'EditJobScreen.dart';
 
 Widget PostedJobsManagementScreen(BuildContext context) {
-  var viewModel = Provider.of<PostedJobsManagementViewModel>(context);
-  var recruiterVM = Provider.of<RecruiterProfileViewModel>(context);
-  if (recruiterVM.recruiterInfo != null) {
-    return body(
-        context: context, viewModel: viewModel, recruiterVM: recruiterVM);
+  final viewModel = Provider.of<PostedJobsManagementViewModel>(context);
+  final recruiterVM = Provider.of<RecruiterProfileViewModel>(context);
+
+  final isLoading = !viewModel.isLoaded || recruiterVM.recruiterInfo == null;
+
+  if (isLoading) {
+    return const Center(
+      child: CircularProgressIndicator(color: Colors.blue),
+    );
   }
-  return FutureBuilder(
-    future: Future.wait([
-      viewModel.jobsFuture!,
-      recruiterVM.recruiterFuture!,
-    ]),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(
-            child: CircularProgressIndicator(color: Colors.blue));
-      } else {
-        return body(
-            context: context, viewModel: viewModel, recruiterVM: recruiterVM);
-      }
-    },
+
+  return body(
+    context: context,
+    viewModel: viewModel,
+    recruiterVM: recruiterVM,
   );
 }
 
