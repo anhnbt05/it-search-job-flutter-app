@@ -26,6 +26,7 @@ import 'package:ui/Views/candidate/candidate.dart';
 import 'package:ui/Views/recruiter/recruiter.dart';
 
 import 'ViewModels/BottomNavigationViewModel.dart';
+import 'ViewModels/NotificationViewModel2.dart';
 import 'ViewModels/admin/CategoryManagementViewModel.dart';
 import 'ViewModels/admin/NotificationViewModel.dart' as adminNoti;
 import 'ViewModels/admin/RecruimentApprovalViewModel.dart';
@@ -66,6 +67,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => SignInViewModel()),
         ChangeNotifierProvider(create: (_) => JoblistNavigationViewModel()),
 
+
         if (authVM.isLoggedIn &&
             authVM.userId != null &&
             authVM.userRole == 'candidate') ...[
@@ -74,6 +76,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (_) => AppliedJobsViewModel()),
           ChangeNotifierProvider(create: (_) => ProfileCandidateViewModel()),
           ChangeNotifierProvider(create: (_) => WorkExperiencesViewModel()),
+          ChangeNotifierProvider(create: (_) => NotificationViewModel2()),
         ],
         if (authVM.isLoggedIn &&
             authVM.userId != null &&

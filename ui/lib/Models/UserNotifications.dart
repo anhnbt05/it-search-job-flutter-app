@@ -4,7 +4,7 @@ import 'Users.dart';
 
 class UserNotification {
   final String ID;
-  final bool IsRead;
+  late final bool IsRead;
   final List<String> Content;
   final Map<String, dynamic> Metadata;
   final DateTime CreatedAt;
@@ -65,4 +65,3 @@ class cNotification {
     };
   }
 }
-
