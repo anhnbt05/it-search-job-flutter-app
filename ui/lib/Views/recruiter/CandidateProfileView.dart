@@ -147,9 +147,34 @@ class CandidateProfileView extends StatelessWidget {
                         spacing: 8,
                         runSpacing: 8,
                         children: (candidate.Certifications ?? []).map((cert) {
-                          return Chip(
-                            label: Text(cert),
-                            avatar: const Icon(Icons.workspace_premium, size: 18),
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.grey.shade200),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.workspace_premium, size: 18, color: Colors.blue),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                      cert,
+                                      style: const TextStyle(fontFamily: 'Poppins')
+                                  ),
+                                ],
+                              ),
+                            ),
                           );
                         }).toList(),
                       ),
@@ -201,22 +226,34 @@ class __WorkExperienceItemState extends State<_WorkExperienceItem> {
   Widget build(BuildContext context) {
     final formattedStartDate = _formatDate(widget.exp.StartDate);
     final formattedEndDate = _formatDate(widget.exp.EndDate);
+    final jobType = JobTypeExtension.fromString(widget.exp.JobType)?.toVietnamese() ?? widget.exp.JobType;
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 56,
-                  height: 56,
-                  child: ClipOval(
+
+                if (widget.exp.CompanyLogoUrl != null && widget.exp.CompanyLogoUrl!.isNotEmpty)
+                  ClipOval(
                     child: Image.network(
                       widget.exp.CompanyLogoUrl ?? '',
                       fit: BoxFit.cover,
@@ -230,6 +267,8 @@ class __WorkExperienceItemState extends State<_WorkExperienceItem> {
                       },
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
+                          width: 56,
+                          height: 56,
                           color: Colors.grey[200],
                           child: const Center(
                             child: Icon(Icons.business, size: 28, color: Colors.grey),
@@ -238,26 +277,91 @@ class __WorkExperienceItemState extends State<_WorkExperienceItem> {
                       },
                     ),
                   ),
-                ),
                 const SizedBox(width: 12),
+
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.exp.Position ?? "",
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      Text(widget.exp.CompanyName ?? "", style: const TextStyle(color: Colors.grey)),
-                      Text('${formattedStartDate} - ${formattedEndDate} • ${JobTypeExtension.fromString(widget.exp.JobType)!.toVietnamese()}'),
-                      Text(widget.exp.Location ?? "", style: const TextStyle(fontSize: 13)),
+                      _buildInfoRow('Vị trí công việc:', widget.exp.Position ?? ""),
                       const SizedBox(height: 8),
-                      ...(widget.exp.Descriptions ?? []).map((desc) => Text("• $desc")).toList(),
+                      _buildInfoRow('Công ty:', widget.exp.CompanyName ?? ""),
                     ],
                   ),
                 ),
               ],
             ),
+
+            Padding(
+              padding: const EdgeInsets.only(left: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  _buildInfoRow('Thời gian:', '$formattedStartDate - $formattedEndDate'),
+                  const SizedBox(height: 8),
+                  _buildInfoRow('Hình thức:', jobType),
+                  const SizedBox(height: 8),
+                  _buildInfoRow('Địa điểm:', widget.exp.Location ?? ""),
+                ],
+              ),
+            ),
+
+            if ((widget.exp.Descriptions ?? []).isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.only(left: 5),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Mô tả công việc:',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins'
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    ...(widget.exp.Descriptions ?? []).map((desc) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('• ', style: TextStyle(fontFamily: 'Poppins')),
+                          Expanded(
+                            child: Text(
+                              desc,
+                              style: const TextStyle(fontFamily: 'Poppins'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )).toList(),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return RichText(
+      text: TextSpan(
+        style: const TextStyle(
+          fontFamily: 'Poppins',
+          color: Colors.black,
+          fontSize: 14,
+        ),
+        children: [
+          TextSpan(
+            text: label,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          TextSpan(text: ' $value'),
+        ],
       ),
     );
   }

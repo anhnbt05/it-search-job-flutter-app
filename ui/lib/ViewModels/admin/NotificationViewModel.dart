@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:ui/Constants/api_constants.dart';
@@ -17,7 +18,8 @@ import 'RecruimentApprovalViewModel.dart';
 class NotificationViewModel extends ChangeNotifier {
   WebSocketService webSocketService = WebSocketService();
 
-  late List<UserNotification> notifications;
+  List<UserNotification>? _notifications;
+  List<UserNotification>? get notifications => _notifications;
   late Future<List<UserNotification>?> notificationsF;
 
   NotificationViewModel(BuildContext context) {
@@ -25,12 +27,12 @@ class NotificationViewModel extends ChangeNotifier {
     webSocketService.connect("${APIConstants.baseUrl}/websockets/gateway", loginVM.userId!, (data) {
       var jobVM = Provider.of<RecruiterApprovalViewModel>(context, listen: false);
       var newNoti = UserNotification.fromJson(data);
-      notifications.insert(0, newNoti);
+      _notifications?.insert(0, newNoti);
       notifyListeners();
       jobVM.loadJobsWithoutContext();
     },);
     notificationsF = NotificationService().getNotifications(context, loginVM.userId!).then((value) {
-      notifications = value.data;
+      _notifications = value.data;
       notifyListeners();
       return value.data;
     });
@@ -38,11 +40,22 @@ class NotificationViewModel extends ChangeNotifier {
 
   Future<void> delete(BuildContext context, String notificationId) async {
     var loginVM = Provider.of<AuthViewModel>(context, listen: false);
-    await NotificationService().deleteNotification(context, loginVM.userId!, notificationId);
+    var response = await NotificationService().deleteNotification(context, loginVM.userId!, notificationId);
+
+    if (response.success) {
+      _notifications!.removeWhere((n) => n.ID == notificationId);
+      notifyListeners();
+    }
   }
 
   Future<void> read(BuildContext context, String notificationId) async {
     var loginVM = Provider.of<AuthViewModel>(context, listen: false);
     await NotificationService().readNotification(context, loginVM.userId!, notificationId);
+
+    final index = _notifications!.indexWhere((n) => n.ID == notificationId);
+    if (index != -1) {
+      _notifications![index].IsRead = true;
+      notifyListeners();
+    }
   }
 }

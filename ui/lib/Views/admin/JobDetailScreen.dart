@@ -59,6 +59,7 @@ Widget JobDetailBody(BuildContext context, JobDetailViewModel viewModel) {
                       children: [
                         Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Padding(
                                 padding: EdgeInsets.only(
@@ -222,9 +223,12 @@ Widget JobDetailBody(BuildContext context, JobDetailViewModel viewModel) {
                         ),
                         SizedBox(height: 10,),
                         titleinJD(title: 'Thông tin công việc', isCompulsory: false, context: context),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(viewModel.job!.Description??"", textAlign: TextAlign.justify,),
+                        (viewModel.job!.Description == null) ? SizedBox.shrink():Align(
+                          alignment: Alignment.topLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Text(viewModel.job!.Description??"", textAlign: TextAlign.justify,),
+                          ),
                         ),
                         SizedBox(height: 10,),
                         ...iconTitle(icon: Icons.location_on_outlined, title: viewModel.job!.Address),
@@ -233,51 +237,60 @@ Widget JobDetailBody(BuildContext context, JobDetailViewModel viewModel) {
                         ...iconTitle(icon: Icons.groups_outlined, title: "Số lượng tuyển: ${viewModel.job!.Vacancies} người"),
                         SizedBox(height: 10,),
                         titleinJD(title: 'Mô tả công việc', context: context),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 18, right: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: viewModel.job!.JobDescriptions.map((desc) => Padding(
-                              padding: const EdgeInsets.only(bottom: 5),
-                              child: Text(
-                                '- $desc',
-                                style: TextStyle(
-                                  fontSize: 14,
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 18, right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: viewModel.job!.JobDescriptions.map((desc) => Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: Text(
+                                  '- $desc',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                  ),
                                 ),
-                              ),
-                            )).toList(),
+                              )).toList(),
+                            ),
                           ),
                         ),
                         titleinJD(title: 'Yêu cầu công việc', context: context),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 18, right: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: viewModel.job!.JobRequirements.map((desc) => Padding(
-                              padding: const EdgeInsets.only(bottom: 5),
-                              child: Text(
-                                '- $desc',
-                                style: TextStyle(
-                                  fontSize: 14,
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 18, right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: viewModel.job!.JobRequirements.map((desc) => Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: Text(
+                                  '- $desc',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                  ),
                                 ),
-                              ),
-                            )).toList(),
+                              )).toList(),
+                            ),
                           ),
                         ),
                         titleinJD(title: 'Phúc lợi', context: context),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 18, right: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: viewModel.job!.JobBenefits.map((desc) => Padding(
-                              padding: const EdgeInsets.only(bottom: 5),
-                              child: Text(
-                                '- $desc',
-                                style: TextStyle(
-                                  fontSize: 14,
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 18, right: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: viewModel.job!.JobBenefits.map((desc) => Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: Text(
+                                  '- $desc',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                  ),
                                 ),
-                              ),
-                            )).toList(),
+                              )).toList(),
+                            ),
                           ),
                         ),
                       ]
@@ -323,7 +336,7 @@ Align titleinJD({required String title, bool isCompulsory = true, required Build
             children: [
               (isCompulsory == false && viewModel.job!.Description == null) ?
               TextSpan(
-                  text: ' Không có',
+                  text: '',
                   style: TextStyle(
                     color: Colors.black,
                     fontStyle: FontStyle.italic,
