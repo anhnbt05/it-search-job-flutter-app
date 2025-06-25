@@ -63,13 +63,28 @@ class CandidateInforViewModel extends ChangeNotifier {
 
   Future<bool> banUser(BuildContext context) async {
     var parent = Provider.of<UserManagementViewModel>(context, listen: false);
-    bool success = await UserService().deleteUser('${_candidate!.ID}?role=candidate', context);
+    bool success = await UserService().lockUser('${_candidate!.ID}?role=candidate', context);
     if (success == true) {
       showSuccessToastification(title: "Hoàn tất", message: "Xóa thành công tài khoản của ${_candidate!.FullName}");
       final index = parent.userCandidates!.indexWhere((u) => u!.ID == _candidate!.ID);
       if (index != -1) {
         parent.userCandidates![index] =
             parent.userCandidates![index]!.copyWith(Status: eUserStatus.inactive);
+        parent.notifyListeners();
+      }
+    }
+    return success;
+  }
+
+  Future<bool> unbanUser(BuildContext context) async {
+    var parent = Provider.of<UserManagementViewModel>(context, listen: false);
+    bool success = await UserService().unlockUser('${_candidate!.ID}?role=candidate', context);
+    if (success == true) {
+      final index = parent.userCandidates!.indexWhere((u) =>
+      u!.ID == _candidate!.ID);
+      if (index != -1) {
+        parent.userCandidates![index] =
+            parent.userCandidates![index]!.copyWith(Status: eUserStatus.active);
         parent.notifyListeners();
       }
     }

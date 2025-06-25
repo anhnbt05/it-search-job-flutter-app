@@ -10,8 +10,9 @@ import '../../Services/job_service.dart';
 import '../login/SignInViewModel.dart';
 
 class PostedJobsManagementViewModel extends ChangeNotifier {
+  late BuildContext context;
   late final String userId;
-  late final Future<List<cJobs_recruiter?>>? _jobsFuture;
+  Future<List<cJobs_recruiter?>>? _jobsFuture;
   List<cJobs_recruiter?> _jobs_open = [];
   List<cJobs_recruiter?> _jobs_closed = [];
   List<cJobs_recruiter?> _jobs_pending = [];
@@ -52,6 +53,7 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
   late final Future<void> loadFuture;
 
   PostedJobsManagementViewModel(this.userId, BuildContext context) {
+    this.context = context;
     loadFuture = initFutures(context).then((_) {
       isLoaded = true;
       notifyListeners();
@@ -59,7 +61,6 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
   }
 
   Future<void> initFutures(BuildContext context) async {
-    var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
     _jobsFuture = JobService().getJobs(context: context).then((value) {
       _jobs = value.map((e) => e).toList();
       _jobs.sort((a,b) => b!.PostedAt.compareTo(a!.PostedAt));
@@ -73,8 +74,23 @@ class PostedJobsManagementViewModel extends ChangeNotifier {
     await _jobsFuture;
   }
 
+  Future<void> loadWithoutContext() async {
+    _jobsFuture = JobService().getJobs(context: context).then((value) {
+      _jobs = value.map((e) => e).toList();
+      _jobs.sort((a,b) => b!.PostedAt.compareTo(a!.PostedAt));
+
+      _jobs_open = value.where((element) => element!.Status == 'open').toList();
+      _jobs_pending = value.where((element) => element!.Status == 'pending').toList();
+      _jobs_closed = value.where((element) => element!.Status == 'closed').toList();
+      _jobs_rejected = value.where((element) => element!.Status == 'rejected').toList();
+      return value;
+    });
+    await _jobsFuture;
+    Filter(statusFilter);
+    notifyListeners();
+  }
+
   Future<void> deleteJob({required String Id, required BuildContext context}) async {
-    var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
     final success = await JobService().deleteJob(Id: Id, context: context);
     if (success) {
       cJobs_recruiter? job = _jobs.firstWhere((e) => e!.ID == Id);

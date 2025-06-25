@@ -11,33 +11,15 @@ import 'JobDetailScreen.dart';
 
 Widget RecruitmentApprovalScreen(BuildContext context) {
   var viewModel = Provider.of<RecruiterApprovalViewModel>(context);
-  if (viewModel.jobs != null) {
-    return ListView.builder(
-      itemCount: viewModel.jobs!.length,
-      itemBuilder: (context, index) {
-        return JobItem(context, index, viewModel);
-      },
-    );
+
+  if (viewModel.jobs == null) {
+    return const Center(child: CircularProgressIndicator(color: Colors.blue));
   }
-  return FutureBuilder(
-    future: viewModel.jobsFuture,
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(
-          child: CircularProgressIndicator(color: Colors.blue),
-        );
-      } else if (!snapshot.hasData) {
-        return const Center(
-          child: CircularProgressIndicator(color: Colors.blue),
-        );
-      } else {
-        return ListView.builder(
-          itemCount: viewModel.jobs!.length,
-          itemBuilder: (context, index) {
-            return JobItem(context, index, viewModel);
-          },
-        );
-      }
+
+  return ListView.builder(
+    itemCount: viewModel.jobs!.length,
+    itemBuilder: (context, index) {
+      return JobItem(context, index, viewModel);
     },
   );
 }
@@ -56,7 +38,7 @@ Widget JobItem(BuildContext context, int index, RecruiterApprovalViewModel viewM
       );
     },
     child: Padding(
-      padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+      padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 5),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -183,7 +165,7 @@ Widget JobItem(BuildContext context, int index, RecruiterApprovalViewModel viewM
                             ),
                           ),
                           SizedBox(height: 5,),
-                          Text(viewModel.jobs![index]!.Description?? 'Không có',
+                          (viewModel.jobs![index]!.Description == null) ? SizedBox.shrink() : Text(viewModel.jobs![index]!.Description!,
                             maxLines: 5,
                             textAlign: TextAlign.justify,
                             overflow: TextOverflow.ellipsis,

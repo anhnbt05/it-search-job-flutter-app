@@ -15,26 +15,21 @@ import 'DetailJobView.dart';
 import 'EditJobScreen.dart';
 
 Widget PostedJobsManagementScreen(BuildContext context) {
-  var viewModel = Provider.of<PostedJobsManagementViewModel>(context);
-  var recruiterVM = Provider.of<RecruiterProfileViewModel>(context);
-  if (recruiterVM.recruiterInfo != null) {
-    return body(
-        context: context, viewModel: viewModel, recruiterVM: recruiterVM);
+  final viewModel = Provider.of<PostedJobsManagementViewModel>(context);
+  final recruiterVM = Provider.of<RecruiterProfileViewModel>(context);
+
+  final isLoading = !viewModel.isLoaded || recruiterVM.recruiterInfo == null;
+
+  if (isLoading) {
+    return const Center(
+      child: CircularProgressIndicator(color: Colors.blue),
+    );
   }
-  return FutureBuilder(
-    future: Future.wait([
-      viewModel.jobsFuture!,
-      recruiterVM.recruiterFuture!,
-    ]),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(
-            child: CircularProgressIndicator(color: Colors.blue));
-      } else {
-        return body(
-            context: context, viewModel: viewModel, recruiterVM: recruiterVM);
-      }
-    },
+
+  return body(
+    context: context,
+    viewModel: viewModel,
+    recruiterVM: recruiterVM,
   );
 }
 
@@ -565,12 +560,16 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 22,
+                                fontFamily: 'Poppins'
                               ),
                               textAlign: TextAlign.center,
                             ),
                             content: Text(
                               "Bạn có chắc chắn muốn xoá bài tuyển dụng ${viewModel
                                   .jobs[index]!.Title} không?",
+                              style: TextStyle(
+                                  fontFamily: 'Poppins'
+                              ),
                             ),
                             actions: [
                               TextButton(
@@ -585,6 +584,7 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,
+                                    fontFamily: 'Poppins'
                                   ),
                                 ),
                               ),
@@ -622,6 +622,7 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
+                                    fontFamily: 'Poppins'
                                   ),
                                 ),
                               ),
@@ -649,7 +650,8 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                           style: TextStyle(
                               fontSize: 13,
                               color: Colors.black,
-                              fontWeight: FontWeight.normal
+                              fontWeight: FontWeight.normal,
+                              fontFamily: 'Poppins'
                           ),
                         ),
                       ],

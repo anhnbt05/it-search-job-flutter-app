@@ -52,305 +52,307 @@ class _EditCompanyInformationScreenState
               ),
             ),
           ),
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Container(
-                    color: Colors.white,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Stack(
-                          children: [
-                            Container(height: 120, color: Color(0x3fBBD6FF)),
-                            Column(
-                              children: [
-                                SizedBox(height: 20),
-                                Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 28),
-                                    child: Container(
-                                      width: 140,
-                                      height: 140,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
+          body: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Container(
+                      color: Colors.white,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Stack(
+                            children: [
+                              Container(height: 120, color: Color(0x3fBBD6FF)),
+                              Column(
+                                children: [
+                                  SizedBox(height: 20),
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 28),
+                                      child: Container(
+                                        width: 140,
+                                        height: 140,
+                                        decoration: BoxDecoration(
                                           color: Colors.white,
-                                          width: 2,
-                                        ),
-                                      ),
-                                      child:
-                                          profileViewModel
-                                                      .recruiterInfo!
-                                                      .Company
-                                                      .LogoUrl !=
-                                                  null
-                                              ? ClipOval(
-                                                child: Image.network(
-                                                  profileViewModel
-                                                      .recruiterInfo!
-                                                      .Company
-                                                      .LogoUrl!,
-                                                  fit: BoxFit.cover,
-                                                  width: 140,
-                                                  height: 140,
-                                                ),
-                                              )
-                                              : CircularProgressIndicator(
-                                                color: Colors.blue,
-                                              ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.all(3),
-                          child: Container(
-                            width: double.infinity,
-                            margin: EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: Colors.white,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 7,
-                                    top: 5,
-                                    bottom: 5,
-                                  ),
-                                  child: Text(
-                                    "Tên công ty:",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                                customTextField(
-                                  hintText: "",
-                                  height: 40,
-                                  textInputType: TextInputType.text,
-                                  controller: viewModel.nameController,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 7,
-                                    top: 7,
-                                    bottom: 5,
-                                  ),
-                                  child: Text(
-                                    "Địa chỉ trang web:",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                                customTextField(
-                                  hintText: "",
-                                  height: 40,
-                                  textInputType: TextInputType.text,
-                                  controller: viewModel.websiteURLController,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 7,
-                                    top: 7,
-                                    bottom: 5,
-                                  ),
-                                  child: Text(
-                                    "Mô tả:",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                                customTextField(
-                                  hintText: "",
-                                  height: 120,
-                                  textInputType: TextInputType.multiline,
-                                  controller: viewModel.descriptionController,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 7,
-                                        top: 10,
-                                        bottom: 5,
-                                      ),
-                                      child: Text(
-                                        "Danh sách chi nhánh:",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        showAddBranchDialog(context);
-                                      },
-                                      style: ButtonStyle(
-                                        backgroundColor:
-                                            WidgetStateProperty.all(
-                                              Colors.white,
-                                            ),
-                                        shape: WidgetStateProperty.all(
-                                          RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              5,
-                                            ),
-                                            side: BorderSide(
-                                              color: Colors.transparent,
-                                            ),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 2,
                                           ),
                                         ),
-                                        elevation: WidgetStateProperty.all(0),
-                                        splashFactory: NoSplash.splashFactory,
-                                        shadowColor: MaterialStateProperty.all(
-                                          Colors.transparent,
+                                        child:
+                                            profileViewModel
+                                                        .recruiterInfo!
+                                                        .Company
+                                                        .LogoUrl !=
+                                                    null
+                                                ? ClipOval(
+                                                  child: Image.network(
+                                                    profileViewModel
+                                                        .recruiterInfo!
+                                                        .Company
+                                                        .LogoUrl!,
+                                                    fit: BoxFit.cover,
+                                                    width: 140,
+                                                    height: 140,
+                                                  ),
+                                                )
+                                                : CircularProgressIndicator(
+                                                  color: Colors.blue,
+                                                ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+            
+                          Padding(
+                            padding: const EdgeInsets.all(3),
+                            child: Container(
+                              width: double.infinity,
+                              margin: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: Colors.white,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 7,
+                                      top: 5,
+                                      bottom: 5,
+                                    ),
+                                    child: Text(
+                                      "Tên công ty:",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  customTextField(
+                                    hintText: "",
+                                    height: 40,
+                                    textInputType: TextInputType.text,
+                                    controller: viewModel.nameController,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 7,
+                                      top: 7,
+                                      bottom: 5,
+                                    ),
+                                    child: Text(
+                                      "Địa chỉ trang web:",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  customTextField(
+                                    hintText: "",
+                                    height: 40,
+                                    textInputType: TextInputType.text,
+                                    controller: viewModel.websiteURLController,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 7,
+                                      top: 7,
+                                      bottom: 5,
+                                    ),
+                                    child: Text(
+                                      "Mô tả:",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  customTextField(
+                                    hintText: "",
+                                    height: 120,
+                                    textInputType: TextInputType.multiline,
+                                    controller: viewModel.descriptionController,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 7,
+                                          top: 10,
+                                          bottom: 5,
                                         ),
-                                        overlayColor: WidgetStateProperty.all(
-                                          Colors.transparent,
-                                        ),
-                                        padding: WidgetStateProperty.all(
-                                          EdgeInsets.zero,
-                                        ),
-                                        tapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                        minimumSize: WidgetStateProperty.all(
-                                          Size(0, 0),
+                                        child: Text(
+                                          "Danh sách chi nhánh:",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 4),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              "Thêm chi nhánh",
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w300,
+                                      TextButton(
+                                        onPressed: () {
+                                          showAddBranchDialog(context);
+                                        },
+                                        style: ButtonStyle(
+                                          backgroundColor:
+                                              WidgetStateProperty.all(
+                                                Colors.white,
+                                              ),
+                                          shape: WidgetStateProperty.all(
+                                            RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                5,
+                                              ),
+                                              side: BorderSide(
+                                                color: Colors.transparent,
+                                              ),
+                                            ),
+                                          ),
+                                          elevation: WidgetStateProperty.all(0),
+                                          splashFactory: NoSplash.splashFactory,
+                                          shadowColor: MaterialStateProperty.all(
+                                            Colors.transparent,
+                                          ),
+                                          overlayColor: WidgetStateProperty.all(
+                                            Colors.transparent,
+                                          ),
+                                          padding: WidgetStateProperty.all(
+                                            EdgeInsets.zero,
+                                          ),
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          minimumSize: WidgetStateProperty.all(
+                                            Size(0, 0),
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(top: 4),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                "Thêm chi nhánh",
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w300,
+                                                  color:
+                                                      ColorConstants.subTextColor,
+                                                ),
+                                              ),
+                                              Icon(
+                                                Icons
+                                                    .keyboard_double_arrow_right_outlined,
                                                 color:
                                                     ColorConstants.subTextColor,
                                               ),
-                                            ),
-                                            Icon(
-                                              Icons
-                                                  .keyboard_double_arrow_right_outlined,
-                                              color:
-                                                  ColorConstants.subTextColor,
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 7),
+                                  SizedBox(
+                                    height: 100,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: profileViewModel.branches.length,
+                                      itemBuilder: (context, index) {
+                                        return branchItems(context, index);
+                                      },
                                     ),
-                                  ],
-                                ),
-                                SizedBox(height: 7),
-                                SizedBox(
-                                  height: 100,
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: profileViewModel.branches.length,
-                                    itemBuilder: (context, index) {
-                                      return branchItems(context, index);
+                                  ),
+                                  SizedBox(height: 10),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 10,
+                                    offset: Offset(0, 0),
+                                  ),
+                                ],
+                                borderRadius: BorderRadius.circular(5),
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Padding(
+                              padding: EdgeInsets.only(right: 10),
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  showDialog(
+                                    context: context,
+                                    barrierColor: Colors.black.withOpacity(0.5),
+                                    barrierDismissible: false,
+                                    builder: (BuildContext context) {
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.blue,
+                                        ),
+                                      );
                                     },
+                                  );
+                                  await viewModel.editCompany(context);
+                                  Navigator.pop(context);
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                    Colors.blue,
+                                  ),
+                                  shape: WidgetStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                      side: BorderSide(color: Colors.transparent),
+                                    ),
+                                  ),
+                                  elevation: WidgetStateProperty.all(0),
+                                  splashFactory: NoSplash.splashFactory,
+                                  shadowColor: MaterialStateProperty.all(
+                                    Colors.transparent,
+                                  ),
+                                  overlayColor: WidgetStateProperty.all(
+                                    Colors.transparent,
                                   ),
                                 ),
-                                SizedBox(height: 10),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 0),
-                                ),
-                              ],
-                              borderRadius: BorderRadius.circular(5),
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 10),
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                showDialog(
-                                  context: context,
-                                  barrierColor: Colors.black.withOpacity(0.5),
-                                  barrierDismissible: false,
-                                  builder: (BuildContext context) {
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.blue,
-                                      ),
-                                    );
-                                  },
-                                );
-                                await viewModel.editCompany(context);
-                                Navigator.pop(context);
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(
-                                  Colors.blue,
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
-                                    side: BorderSide(color: Colors.transparent),
+                                child: Text(
+                                  "Lưu thay đổi",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
-                                ),
-                                elevation: WidgetStateProperty.all(0),
-                                splashFactory: NoSplash.splashFactory,
-                                shadowColor: MaterialStateProperty.all(
-                                  Colors.transparent,
-                                ),
-                                overlayColor: WidgetStateProperty.all(
-                                  Colors.transparent,
-                                ),
-                              ),
-                              child: Text(
-                                "Lưu thay đổi",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),

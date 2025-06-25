@@ -31,10 +31,12 @@ class WebSocketService {
 
     _socket.on('candidate_notification', (data) {
       print('📩 Nhận notification từ candidate: $data');
+      onNotificationReceived(data);
     });
 
     _socket.on('recruiter_notification', (data) {
       print('📩 Nhận notification từ recruiter: $data');
+      onNotificationReceived(data);
     });
 
     _socket.on('admin_notification', (data) {

@@ -35,11 +35,13 @@ class _ReadResumeCandidateScreenState
         ),
       ),
       body: isResumeAvailable
-          ? SfPdfViewer.network(
-        widget.resumeUrl!,
-        canShowScrollStatus: true,
-        canShowPaginationDialog: true,
-      )
+          ? SafeArea(
+            child: SfPdfViewer.network(
+                    widget.resumeUrl!,
+                    canShowScrollStatus: true,
+                    canShowPaginationDialog: true,
+                  ),
+          )
           : const Center(
         child: Text(
           "Bạn chưa upload file CV.",
