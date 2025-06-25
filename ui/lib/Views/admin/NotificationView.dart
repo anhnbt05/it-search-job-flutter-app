@@ -43,47 +43,104 @@ Widget _buildNotificationList(AdminNotificationViewModel viewModel) {
 Widget _buildNotificationItem(BuildContext context,
     UserNotification notification) {
   final isRead = notification.IsRead ?? false;
+  final notificationKey = notification.ID ?? 'key_${notification.hashCode}';
 
-  return Dismissible(
-    key: Key(notification.ID ?? 'key_${notification.hashCode}'),
-    background: _buildDismissibleBackground(),
-    dismissThresholds: const {DismissDirection.endToStart: 0.5},
-    confirmDismiss: (direction) => _showDeleteConfirmationDialog(context),
-    onDismissed: (direction) =>
-        _handleNotificationDeletion(context, notification),
-    child: Container(
-      decoration: BoxDecoration(
-        color: isRead ? Colors.white : Colors.blue[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isRead ? Colors.grey.withOpacity(0.2) : Colors.blue[100]!,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
+  final dragOffset = ValueNotifier<double>(0.0);
+  final isDialogShowing = ValueNotifier<bool>(false);
+
+  return ValueListenableBuilder<double>(
+    valueListenable: dragOffset,
+    builder: (context, offset, child) {
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.red[400],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Transform.translate(
+            offset: Offset(offset, 0),
+            child: GestureDetector(
+              onHorizontalDragUpdate: (details) {
+                if (isDialogShowing.value) return;
+                if (details.delta.dx < 0) {
+                  dragOffset.value += details.delta.dx;
+                  double maxDrag = -MediaQuery.of(context).size.width * 0.15;
+                  if (dragOffset.value <= maxDrag) {
+                    dragOffset.value = maxDrag;
+                    if (!isDialogShowing.value) {
+                      isDialogShowing.value = true;
+                      _showDeleteConfirmationDialog(context).then((result) {
+                        isDialogShowing.value = false;
+                        if (result == true) {
+                          _handleNotificationDeletion(context, notification);
+                        }
+                        dragOffset.value = 0.0;
+                      });
+                    }
+                  }
+                }
+              },
+              onHorizontalDragEnd: (details) {
+                if (!isDialogShowing.value &&
+                    dragOffset.value > -MediaQuery.of(context).size.width * 0.15) {
+                  dragOffset.value = 0.0;
+                }
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isRead ? Colors.white : Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isRead ? Colors.grey.withOpacity(0.2) : Colors.blue[100]!,
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  leading: Icon(
+                    Icons.notifications,
+                    color: isRead ? Colors.grey : Colors.blue[700],
+                  ),
+                  title: Text(
+                    notification.Notification?.Title ?? 'Thông báo',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: isRead ? Colors.grey[700] : Colors.black,
+                    ),
+                  ),
+                  subtitle: _buildNotificationSubtitle(notification),
+                  onTap: () => _handleNotificationTap(context, notification),
+                ),
+              ),
+            ),
           ),
         ],
-      ),
-      child: ListTile(
-        leading: Icon(
-          Icons.notifications,
-          color: isRead ? Colors.grey : Colors.blue[700],
-        ),
-        title: Text(
-          notification.Notification?.Title ?? 'Thông báo',
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            color: isRead ? Colors.grey[700] : Colors.black,
-          ),
-        ),
-        subtitle: _buildNotificationSubtitle(notification),
-        onTap: () => _handleNotificationTap(context, notification),
-      ),
-    ),
+      );
+    },
   );
 }
 
@@ -106,7 +163,7 @@ Widget _buildNotificationSubtitle(UserNotification notification) {
   );
 }
 
-Widget _buildDismissibleBackground() {
+/*Widget _buildDismissibleBackground() {
   return Container(
     margin: const EdgeInsets.symmetric(vertical: 8),
     decoration: BoxDecoration(
@@ -117,7 +174,7 @@ Widget _buildDismissibleBackground() {
     padding: const EdgeInsets.only(right: 20),
     child: const Icon(Icons.delete, color: Colors.white),
   );
-}
+}*/
 
 Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
   return showDialog<bool>(

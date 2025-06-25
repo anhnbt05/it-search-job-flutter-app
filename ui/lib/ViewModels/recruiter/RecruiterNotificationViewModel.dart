@@ -45,23 +45,19 @@ class RecruiterNotificationViewModel extends ChangeNotifier {
   }
 
   Future<void> delete(BuildContext context, String notificationId) async {
+    _notifications!.removeWhere((n) => n.ID == notificationId);
+    notifyListeners();
     var loginVM = Provider.of<AuthViewModel>(context, listen: false);
-    var response = await NotificationService().deleteNotification(context, loginVM.userId!, notificationId);
-
-    if (response.success) {
-      _notifications!.removeWhere((n) => n.ID == notificationId);
-      notifyListeners();
-    }
+    await NotificationService().deleteNotification(context, loginVM.userId!, notificationId);
   }
 
   Future<void> read(BuildContext context, String notificationId) async {
-    var loginVM = Provider.of<AuthViewModel>(context, listen: false);
-    await NotificationService().readNotification(context, loginVM.userId!, notificationId);
-
     final index = _notifications!.indexWhere((n) => n.ID == notificationId);
     if (index != -1) {
       _notifications![index].IsRead = true;
       notifyListeners();
     }
+    var loginVM = Provider.of<AuthViewModel>(context, listen: false);
+    await NotificationService().readNotification(context, loginVM.userId!, notificationId);
   }
 }
