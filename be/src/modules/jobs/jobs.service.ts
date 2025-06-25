@@ -1207,7 +1207,9 @@ export class JobsService {
           json_agg(DISTINCT jb) AS job_benefits,
           json_agg(DISTINCT jd) AS job_descriptions,
           json_agg(DISTINCT jr) AS job_requirements,
-          json_agg(DISTINCT c) AS company
+          json_agg(DISTINCT c) AS company,
+          json_agg(DISTINCT jc) AS job_categories,
+          json_agg(DISTINCT cg) AS categories
         FROM "Jobs" j
           LEFT JOIN "Recruiters" r ON r."ID" = j."RecruiterID"
           LEFT JOIN "Users" u ON u."ID" = r."UserID"
@@ -1216,6 +1218,8 @@ export class JobsService {
           LEFT JOIN "JobBenefits" jb ON jb."JobID" = j."ID"
           LEFT JOIN "JobDescriptions" jd ON jd."JobID" = j."ID"
           LEFT JOIN "JobRequirements" jr ON jr."JobID" = j."ID"
+          LEFT JOIN "JobCategories" jc ON jc."JobID" = j."ID"
+          LEFT JOIN "Categories" cg ON cg."ID" = jc."CategoryID"
         GROUP BY j."ID", r."ID"
         ORDER BY
           CASE 
@@ -1228,6 +1232,8 @@ export class JobsService {
           j."PostedAt" DESC
       `;
 
+      console.log(jobs);
+
       return (
         jobs
           ?.filter((job: any) => job.Status === JobStatus.open)
@@ -1236,12 +1242,14 @@ export class JobsService {
               'job_benefits',
               'job_descriptions',
               'job_requirements',
+              'job_categories',
               'CompanyLocationID',
               'UserID',
               'user',
               'recruiter',
               'company',
               'RecruiterID',
+              'categories',
             ]),
             JobBenefits: job.job_benefits.map((jb: any) => jb.Benefit),
             JobDescriptions: job.job_descriptions.map(
@@ -1262,6 +1270,7 @@ export class JobsService {
                 LogoUrl: job.company[0].LogoUrl,
               },
             },
+            Categories: job.categories.map((j: any) => j.CategoryName),
           })) ?? []
       );
     } catch (err) {
