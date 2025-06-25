@@ -91,104 +91,106 @@ class CandidateProfileView extends StatelessWidget {
               ),
             ),
             body:
-            Stack(
-              children: [
-                SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Center(
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                              radius: 50,
-                              backgroundColor: Colors.grey[200],
-                              child: ClipOval(
-                                child: Image.network(
-                                  candidate.AvatarUrl,
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder: (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return const Center(child: CircularProgressIndicator(color: Colors.blue));
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Icon(Icons.person, color: Colors.grey, size: 60,);
-                                  },
+            SafeArea(
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Center(
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                radius: 50,
+                                backgroundColor: Colors.grey[200],
+                                child: ClipOval(
+                                  child: Image.network(
+                                    candidate.AvatarUrl,
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const Center(child: CircularProgressIndicator(color: Colors.blue));
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(Icons.person, color: Colors.grey, size: 60,);
+                                    },
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(candidate.FullName ?? "",
-                                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 4),
-                            Text(candidate.Email ?? "", style: const TextStyle(color: Colors.grey)),
-                            Text(candidate.PhoneNumber ?? "", style: const TextStyle(color: Colors.grey)),
-                            const SizedBox(height: 8),
-                            if (candidate.Level != null)
-                              Chip(
-                                label: Text(LevelExtension.fromString(candidate.Level)!.toVietnamese(), style: const TextStyle(color: Colors.white)),
-                                backgroundColor: Colors.blue,
-                              ),
-                          ],
+                              const SizedBox(height: 12),
+                              Text(candidate.FullName ?? "",
+                                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 4),
+                              Text(candidate.Email ?? "", style: const TextStyle(color: Colors.grey)),
+                              Text(candidate.PhoneNumber ?? "", style: const TextStyle(color: Colors.grey)),
+                              const SizedBox(height: 8),
+                              if (candidate.Level != null)
+                                Chip(
+                                  label: Text(LevelExtension.fromString(candidate.Level)!.toVietnamese(), style: const TextStyle(color: Colors.white)),
+                                  backgroundColor: Colors.blue,
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      _sectionTitle('Giới thiệu'),
-                      Text(candidate.Bio ?? ""),
-
-                      const SizedBox(height: 24),
-
-                      _sectionTitle('Chứng chỉ'),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: (candidate.Certifications ?? []).map((cert) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.grey.shade200),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.1),
-                                  spreadRadius: 1,
-                                  blurRadius: 3,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.workspace_premium, size: 18, color: Colors.blue),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                      cert,
-                                      style: const TextStyle(fontFamily: 'Poppins')
+              
+                        const SizedBox(height: 24),
+              
+                        _sectionTitle('Giới thiệu'),
+                        Text(candidate.Bio ?? ""),
+              
+                        const SizedBox(height: 24),
+              
+                        _sectionTitle('Chứng chỉ'),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: (candidate.Certifications ?? []).map((cert) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.grey.shade200),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    spreadRadius: 1,
+                                    blurRadius: 3,
+                                    offset: const Offset(0, 1),
                                   ),
                                 ],
                               ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      _sectionTitle('Kinh nghiệm làm việc'),
-                      ...(candidate.WorkExperiences ?? []).map((exp) {
-                        return _WorkExperienceItem(exp: exp);
-                      }),
-                    ],
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.workspace_premium, size: 18, color: Colors.blue),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                        cert,
+                                        style: const TextStyle(fontFamily: 'Poppins')
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+              
+                        const SizedBox(height: 24),
+              
+                        _sectionTitle('Kinh nghiệm làm việc'),
+                        ...(candidate.WorkExperiences ?? []).map((exp) {
+                          return _WorkExperienceItem(exp: exp);
+                        }),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

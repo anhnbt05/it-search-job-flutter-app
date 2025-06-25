@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../Constants/api_constants.dart';
-import '../Models/UserNotifications.dart';
-import '../Services/notification_service.dart';
-import '../Services/websocket_service.dart';
-import 'AuthViewModel.dart';
+import '../../Constants/api_constants.dart';
+import '../../Models/UserNotifications.dart';
+import '../../Services/notification_service.dart';
+import '../../Services/websocket_service.dart';
+import '../AuthViewModel.dart';
 
-class NotificationViewModel2 extends ChangeNotifier {
+class CandidateNotificationViewModel extends ChangeNotifier {
   final WebSocketService _webSocketService = WebSocketService();
   final NotificationService _notificationService = NotificationService();
 

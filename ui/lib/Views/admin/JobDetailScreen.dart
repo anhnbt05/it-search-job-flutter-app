@@ -52,250 +52,252 @@ Widget JobDetailBody(BuildContext context, JobDetailViewModel viewModel) {
             child: CircularProgressIndicator(color: Colors.blue),
           );
         } else {
-          return Container(
-              color: Colors.white,
-              child: SingleChildScrollView(
-                  child: Column(
-                      children: [
-                        Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: 12, top: 15),
-                                child: Container(
-                                  height: 80,
-                                  width: 80,
-                                  decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  margin: EdgeInsets.only(right: 10),
-                                  child: (viewModel.job!.Recruiter.Company
-                                      .LogoUrl != null)
-                                      ? Image.network(
-                                    viewModel.job!.Recruiter.Company.LogoUrl!,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        color: Colors.grey.shade200,
-                                        child: Icon(
-                                            Icons.broken_image,
-                                            color: Colors.grey),
-                                      );
-                                    },
-                                  )
-                                      : Container(
-                                    color: Colors.grey.shade200,
-                                    child: Icon(
-                                        Icons.business, color: Colors.grey),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 7, right: 5),
-                                      child: Text(viewModel.job!.Title,
-                                        softWrap: true,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          height: 1.2,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 7),
-                                      child: Text(viewModel.job!.Recruiter.Company.Name,
-                                        style: TextStyle(fontSize: 15),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    Row(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 5),
-                                            child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: Color(0xffe5f1fb),
-                                                  borderRadius: BorderRadius.circular(5),
-                                                ),
-                                                child: Padding(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                                                  child: Text(viewModel.job!.Level.toString()[0].toUpperCase() +
-                                                      viewModel.job!.Level.toString().substring(1),
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: ColorConstants.subTextColor,
-                                                    ),
-                                                  ),
-                                                )
-                                            ),
-                                          ),
-
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 5),
-                                            child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: Color(0xffe5f1fb),
-                                                  borderRadius: BorderRadius.circular(5),
-                                                ),
-                                                child: Padding(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                                                  child: Text(() {
-                                                    switch (viewModel.job!.Type) {
-                                                      case 'full_time':
-                                                        return 'Toàn thời gian';
-                                                      case 'part_time':
-                                                        return 'Bán thời gian';
-                                                      case 'remote':
-                                                        return 'Làm việc từ xa';
-                                                      case 'free_lance':
-                                                        return 'Làm việc tự do';
-                                                      default:
-                                                        return 'Khác';
-                                                    }
-                                                  }(),
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: ColorConstants.subTextColor,
-                                                    ),
-                                                  ),
-                                                )
-                                            ),
-                                          ),
-                                        ]
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ]
-                        ),
-                        SizedBox(height: 7,),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Container(
-                            constraints: BoxConstraints(
-                              minHeight: 25,
-                              maxHeight: 30,
-                            ),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                shrinkWrap: true,
-                                itemCount: viewModel.job!.Categories.length,
-                                itemBuilder: (context, idx) {
-                                  return Container(
-                                    margin: EdgeInsets.only(left: 5),
-                                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+          return SafeArea(
+            child: Container(
+                color: Colors.white,
+                child: SingleChildScrollView(
+                    child: Column(
+                        children: [
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 12, top: 15),
+                                  child: Container(
+                                    height: 80,
+                                    width: 80,
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                            width: 0.5,
-                                            color: Colors.grey.shade700
-                                        )
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: Center(
-                                      child: Text(
-                                        viewModel.job!.Categories[idx],
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey.shade700,
-                                          height: 1.0,
+                                    margin: EdgeInsets.only(right: 10),
+                                    child: (viewModel.job!.Recruiter.Company
+                                        .LogoUrl != null)
+                                        ? Image.network(
+                                      viewModel.job!.Recruiter.Company.LogoUrl!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey.shade200,
+                                          child: Icon(
+                                              Icons.broken_image,
+                                              color: Colors.grey),
+                                        );
+                                      },
+                                    )
+                                        : Container(
+                                      color: Colors.grey.shade200,
+                                      child: Icon(
+                                          Icons.business, color: Colors.grey),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 7, right: 5),
+                                        child: Text(viewModel.job!.Title,
+                                          softWrap: true,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            height: 1.2,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(vertical: 7),
+                                        child: Text(viewModel.job!.Recruiter.Company.Name,
+                                          style: TextStyle(fontSize: 15),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Row(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 5),
+                                              child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xffe5f1fb),
+                                                    borderRadius: BorderRadius.circular(5),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                                    child: Text(viewModel.job!.Level.toString()[0].toUpperCase() +
+                                                        viewModel.job!.Level.toString().substring(1),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: ColorConstants.subTextColor,
+                                                      ),
+                                                    ),
+                                                  )
+                                              ),
+                                            ),
+            
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 5),
+                                              child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xffe5f1fb),
+                                                    borderRadius: BorderRadius.circular(5),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                                    child: Text(() {
+                                                      switch (viewModel.job!.Type) {
+                                                        case 'full_time':
+                                                          return 'Toàn thời gian';
+                                                        case 'part_time':
+                                                          return 'Bán thời gian';
+                                                        case 'remote':
+                                                          return 'Làm việc từ xa';
+                                                        case 'free_lance':
+                                                          return 'Làm việc tự do';
+                                                        default:
+                                                          return 'Khác';
+                                                      }
+                                                    }(),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: ColorConstants.subTextColor,
+                                                      ),
+                                                    ),
+                                                  )
+                                              ),
+                                            ),
+                                          ]
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ]
+                          ),
+                          SizedBox(height: 7,),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Container(
+                              constraints: BoxConstraints(
+                                minHeight: 25,
+                                maxHeight: 30,
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  shrinkWrap: true,
+                                  itemCount: viewModel.job!.Categories.length,
+                                  itemBuilder: (context, idx) {
+                                    return Container(
+                                      margin: EdgeInsets.only(left: 5),
+                                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(5),
+                                          border: Border.all(
+                                              width: 0.5,
+                                              color: Colors.grey.shade700
+                                          )
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          viewModel.job!.Categories[idx],
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey.shade700,
+                                            height: 1.0,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 10,),
-                        titleinJD(title: 'Thông tin công việc', isCompulsory: false, context: context),
-                        (viewModel.job!.Description == null) ? SizedBox.shrink():Align(
-                          alignment: Alignment.topLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text(viewModel.job!.Description??"", textAlign: TextAlign.justify,),
-                          ),
-                        ),
-                        SizedBox(height: 10,),
-                        ...iconTitle(icon: Icons.location_on_outlined, title: viewModel.job!.Address),
-                        ...iconTitle(icon: Icons.attach_money, title: viewModel.job!.Salary),
-                        ...iconTitle(icon: Icons.access_time_outlined, title: 'Thời gian làm việc: ${viewModel.job!.WorkingTimes}'),
-                        ...iconTitle(icon: Icons.groups_outlined, title: "Số lượng tuyển: ${viewModel.job!.Vacancies} người"),
-                        SizedBox(height: 10,),
-                        titleinJD(title: 'Mô tả công việc', context: context),
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 18, right: 15),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: viewModel.job!.JobDescriptions.map((desc) => Padding(
-                                padding: const EdgeInsets.only(bottom: 5),
-                                child: Text(
-                                  '- $desc',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              )).toList(),
+                          SizedBox(height: 10,),
+                          titleinJD(title: 'Thông tin công việc', isCompulsory: false, context: context),
+                          (viewModel.job!.Description == null) ? SizedBox.shrink():Align(
+                            alignment: Alignment.topLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              child: Text(viewModel.job!.Description??"", textAlign: TextAlign.justify,),
                             ),
                           ),
-                        ),
-                        titleinJD(title: 'Yêu cầu công việc', context: context),
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 18, right: 15),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: viewModel.job!.JobRequirements.map((desc) => Padding(
-                                padding: const EdgeInsets.only(bottom: 5),
-                                child: Text(
-                                  '- $desc',
-                                  style: TextStyle(
-                                    fontSize: 14,
+                          SizedBox(height: 10,),
+                          ...iconTitle(icon: Icons.location_on_outlined, title: viewModel.job!.Address),
+                          ...iconTitle(icon: Icons.attach_money, title: viewModel.job!.Salary),
+                          ...iconTitle(icon: Icons.access_time_outlined, title: 'Thời gian làm việc: ${viewModel.job!.WorkingTimes}'),
+                          ...iconTitle(icon: Icons.groups_outlined, title: "Số lượng tuyển: ${viewModel.job!.Vacancies} người"),
+                          SizedBox(height: 10,),
+                          titleinJD(title: 'Mô tả công việc', context: context),
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 18, right: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: viewModel.job!.JobDescriptions.map((desc) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: Text(
+                                    '- $desc',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                ),
-                              )).toList(),
+                                )).toList(),
+                              ),
                             ),
                           ),
-                        ),
-                        titleinJD(title: 'Phúc lợi', context: context),
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 18, right: 15),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: viewModel.job!.JobBenefits.map((desc) => Padding(
-                                padding: const EdgeInsets.only(bottom: 5),
-                                child: Text(
-                                  '- $desc',
-                                  style: TextStyle(
-                                    fontSize: 14,
+                          titleinJD(title: 'Yêu cầu công việc', context: context),
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 18, right: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: viewModel.job!.JobRequirements.map((desc) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: Text(
+                                    '- $desc',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                ),
-                              )).toList(),
+                                )).toList(),
+                              ),
                             ),
                           ),
-                        ),
-                      ]
-                  )
-              )
+                          titleinJD(title: 'Phúc lợi', context: context),
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 18, right: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: viewModel.job!.JobBenefits.map((desc) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: Text(
+                                    '- $desc',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                )).toList(),
+                              ),
+                            ),
+                          ),
+                        ]
+                    )
+                )
+            ),
           );
         }
       }

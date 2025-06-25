@@ -54,261 +54,263 @@ class ProfileCandidateView extends StatelessWidget {
           }
 
           return Scaffold(
-            body: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 50,
-                    child: Stack(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: IconButton(
-                            iconSize: 28,
-                            icon: const Icon(Icons.article_outlined, color: Colors.black),
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ReadResumeCandidateScreen(
-                                        name: candidate.FullName,
-                                        resumeUrl: candidate.ResumeUrl,
-                                      )
-                                  )
-                              );
-                            },
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 50,
+                      child: Stack(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: IconButton(
+                              iconSize: 28,
+                              icon: const Icon(Icons.article_outlined, color: Colors.black),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ReadResumeCandidateScreen(
+                                          name: candidate.FullName,
+                                          resumeUrl: candidate.ResumeUrl,
+                                        )
+                                    )
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.black),
-                                onPressed: () {
-                                  final candidate = viewModel.candidate;
-                                  if (candidate == null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            "Không thể chỉnh sửa, thông tin ứng viên chưa sẵn sàng.",
-                                            style: TextStyle(fontFamily: 'Poppins')
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit, color: Colors.black),
+                                  onPressed: () {
+                                    final candidate = viewModel.candidate;
+                                    if (candidate == null) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "Không thể chỉnh sửa, thông tin ứng viên chưa sẵn sàng.",
+                                              style: TextStyle(fontFamily: 'Poppins')
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+              
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => MultiProvider(
+                                          providers: [
+                                            ChangeNotifierProvider(create: (_) => EditCandidateInformationViewModel(context, candidate.ID)),
+                                            ChangeNotifierProvider(create: (_) => ProfileCandidateViewModel()..fetchCandidateInfo(context: context)),
+                                          ],
+                                          child: EditCandidateInformationScreen(),
                                         ),
                                       ),
                                     );
-                                    return;
-                                  }
-
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => MultiProvider(
-                                        providers: [
-                                          ChangeNotifierProvider(create: (_) => EditCandidateInformationViewModel(context, candidate.ID)),
-                                          ChangeNotifierProvider(create: (_) => ProfileCandidateViewModel()..fetchCandidateInfo(context: context)),
-                                        ],
-                                        child: EditCandidateInformationScreen(),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.logout, color: Colors.red),
-                                onPressed: () async {
-                                  showDialog(
-                                    context: context,
-                                    barrierColor: Colors.black.withOpacity(0.5),
-                                    barrierDismissible: false,
-                                    builder: (_) {
-                                      return const Center(
-                                        child: CircularProgressIndicator(
-                                          color: Colors.blue,
-                                        ),
-                                      );
-                                    },
-                                  );
-                                  await viewModel.signOut(context);
-                                  Navigator.of(context, rootNavigator: true).pop();
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Center(
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundImage: NetworkImage(candidate.AvatarUrl ?? ""),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                            candidate.FullName ?? "",
-                            style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Poppins'
-                            )
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                            candidate.Email ?? "",
-                            style: const TextStyle(
-                                color: Colors.grey,
-                                fontFamily: 'Poppins'
-                            )
-                        ),
-                        Text(
-                            candidate.PhoneNumber ?? "",
-                            style: const TextStyle(
-                                color: Colors.grey,
-                                fontFamily: 'Poppins'
-                            )
-                        ),
-                        const SizedBox(height: 8),
-                        if (candidate.Level != null)
-                          Chip(
-                            label: Text(
-                                LevelExtension.fromString(candidate.Level)!.toVietnamese(),
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Poppins'
-                                )
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.logout, color: Colors.red),
+                                  onPressed: () async {
+                                    showDialog(
+                                      context: context,
+                                      barrierColor: Colors.black.withOpacity(0.5),
+                                      barrierDismissible: false,
+                                      builder: (_) {
+                                        return const Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.blue,
+                                          ),
+                                        );
+                                      },
+                                    );
+                                    await viewModel.signOut(context);
+                                    Navigator.of(context, rootNavigator: true).pop();
+                                  },
+                                ),
+                              ],
                             ),
-                            backgroundColor: Colors.blue,
                           ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  _sectionTitle('Giới thiệu'),
-                  Text(
-                      candidate.Bio ?? "",
-                      style: const TextStyle(fontFamily: 'Poppins')
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  _sectionTitle('Chứng chỉ'),
-                  // Thay thế Wrap Chip bằng Container với style card
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: (candidate.Certifications ?? []).map((cert) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey.shade200),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 3,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.workspace_premium, size: 18, color: Colors.blue),
-                              const SizedBox(width: 6),
-                              Text(
-                                  cert,
-                                  style: const TextStyle(fontFamily: 'Poppins')
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _sectionTitle('Kinh nghiệm làm việc'),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => PostWorkExperiencesView()));
-                        },
-                        icon: const Icon(Icons.add_circle_outline, size: 28),
-                        color: Colors.blueAccent,
-                        tooltip: 'Thêm kinh nghiệm làm việc',
+                        ],
                       ),
-                    ],
-                  ),
-                  ...(candidate.WorkExperiences ?? []).map((exp) {
-                    return _WorkExperienceItem(
-                      exp: exp,
-                      onEdit: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => EditWorkExperienceView(workExperience: exp)));
-                      },
-                      onDelete: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text(
-                                "Xác nhận xóa",
-                                style: TextStyle(fontFamily: 'Poppins')
-                            ),
-                            content: const Text(
-                                "Bạn có chắc chắn muốn xóa kinh nghiệm làm việc này?",
-                                style: TextStyle(fontFamily: 'Poppins')
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text(
-                                    "Hủy",
-                                    style: TextStyle(fontFamily: 'Poppins')
-                                ),
+                    ),
+              
+                    Center(
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage(candidate.AvatarUrl ?? ""),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                              candidate.FullName ?? "",
+                              style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Poppins'
+                              )
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                              candidate.Email ?? "",
+                              style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontFamily: 'Poppins'
+                              )
+                          ),
+                          Text(
+                              candidate.PhoneNumber ?? "",
+                              style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontFamily: 'Poppins'
+                              )
+                          ),
+                          const SizedBox(height: 8),
+                          if (candidate.Level != null)
+                            Chip(
+                              label: Text(
+                                  LevelExtension.fromString(candidate.Level)!.toVietnamese(),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'Poppins'
+                                  )
                               ),
-                              TextButton(
-                                onPressed: () async {
-                                  Navigator.pop(context);
-                                  final workExpViewModel = Provider.of<WorkExperiencesViewModel>(context, listen: false);
-                                  final profileViewModel = Provider.of<ProfileCandidateViewModel>(context, listen: false);
-
-                                  final success = await workExpViewModel.deleteWorkExperience(
-                                    id: exp.ID!,
-                                    context: context,
-                                  );
-
-                                  if (success) {
-                                    await profileViewModel.fetchCandidateInfo(context: context);
-                                  }
-                                },
-                                child: const Text(
-                                    "Xóa",
-                                    style: TextStyle(
-                                        color: Colors.red,
-                                        fontFamily: 'Poppins'
-                                    )
-                                ),
+                              backgroundColor: Colors.blue,
+                            ),
+                        ],
+                      ),
+                    ),
+              
+                    const SizedBox(height: 24),
+              
+                    _sectionTitle('Giới thiệu'),
+                    Text(
+                        candidate.Bio ?? "",
+                        style: const TextStyle(fontFamily: 'Poppins')
+                    ),
+              
+                    const SizedBox(height: 24),
+              
+                    _sectionTitle('Chứng chỉ'),
+                    // Thay thế Wrap Chip bằng Container với style card
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: (candidate.Certifications ?? []).map((cert) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.grey.shade200),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                spreadRadius: 1,
+                                blurRadius: 3,
+                                offset: const Offset(0, 1),
                               ),
                             ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.workspace_premium, size: 18, color: Colors.blue),
+                                const SizedBox(width: 6),
+                                Text(
+                                    cert,
+                                    style: const TextStyle(fontFamily: 'Poppins')
+                                ),
+                              ],
+                            ),
                           ),
                         );
-                      },
-                    );
-                  }).toList(),
-                ],
+                      }).toList(),
+                    ),
+              
+                    const SizedBox(height: 24),
+              
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _sectionTitle('Kinh nghiệm làm việc'),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => PostWorkExperiencesView()));
+                          },
+                          icon: const Icon(Icons.add_circle_outline, size: 28),
+                          color: Colors.blueAccent,
+                          tooltip: 'Thêm kinh nghiệm làm việc',
+                        ),
+                      ],
+                    ),
+                    ...(candidate.WorkExperiences ?? []).map((exp) {
+                      return _WorkExperienceItem(
+                        exp: exp,
+                        onEdit: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => EditWorkExperienceView(workExperience: exp)));
+                        },
+                        onDelete: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text(
+                                  "Xác nhận xóa",
+                                  style: TextStyle(fontFamily: 'Poppins')
+                              ),
+                              content: const Text(
+                                  "Bạn có chắc chắn muốn xóa kinh nghiệm làm việc này?",
+                                  style: TextStyle(fontFamily: 'Poppins')
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text(
+                                      "Hủy",
+                                      style: TextStyle(fontFamily: 'Poppins')
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    final workExpViewModel = Provider.of<WorkExperiencesViewModel>(context, listen: false);
+                                    final profileViewModel = Provider.of<ProfileCandidateViewModel>(context, listen: false);
+              
+                                    final success = await workExpViewModel.deleteWorkExperience(
+                                      id: exp.ID!,
+                                      context: context,
+                                    );
+              
+                                    if (success) {
+                                      await profileViewModel.fetchCandidateInfo(context: context);
+                                    }
+                                  },
+                                  child: const Text(
+                                      "Xóa",
+                                      style: TextStyle(
+                                          color: Colors.red,
+                                          fontFamily: 'Poppins'
+                                      )
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ],
+                ),
               ),
             ),
           );

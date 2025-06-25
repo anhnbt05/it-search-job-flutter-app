@@ -6,10 +6,10 @@ import '../../Helpers/toastification.dart';
 import '../../Models/UserNotifications.dart';
 import '../../Services/notification_service.dart';
 import '../../ViewModels/AuthViewModel.dart';
-import '../../ViewModels/recruiter/NotificationViewModel.dart';
+import '../../ViewModels/recruiter/RecruiterNotificationViewModel.dart';
 
 Widget NotificationScreen(BuildContext context) {
-  var viewModel = Provider.of<NotificationViewModel>(context);
+  var viewModel = Provider.of<RecruiterNotificationViewModel>(context);
   if (viewModel.notifications == null) {
     return const Center(child: CircularProgressIndicator());
   }
@@ -30,7 +30,7 @@ Widget NotificationScreen(BuildContext context) {
   return _buildNotificationList(viewModel);
 }
 
-Widget _buildNotificationList(NotificationViewModel viewModel) {
+Widget _buildNotificationList(RecruiterNotificationViewModel viewModel) {
   return ListView.separated(
     padding: const EdgeInsets.only(top: 20, left: 8, right: 8, bottom: 8),
     itemCount: viewModel.notifications!.length,
@@ -144,14 +144,14 @@ Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
 
 void _handleNotificationDeletion(BuildContext context,
     UserNotification notification) {
-  final viewModel = Provider.of<NotificationViewModel>(context);
+  final viewModel = Provider.of<RecruiterNotificationViewModel>(context, listen: false);
   viewModel.delete(context, notification.ID!);
   showSuccessToastification(title: "Thành công", message: "Đã xoá thông báo");
 }
 
 void _handleNotificationTap(BuildContext context,
     UserNotification notification) {
-  final viewModel = Provider.of<NotificationViewModel>(context);
+  final viewModel = Provider.of<RecruiterNotificationViewModel>(context, listen: false);
   viewModel.read(context, notification.ID!);
   _showNotificationDetail(context, notification);
 }
@@ -183,22 +183,24 @@ class NotificationDetailSheet extends StatelessWidget {
     final content = notification.Content ?? [];
     final notificationData = notification.Notification;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildDragHandle(),
-          const SizedBox(height: 16),
-          _buildNotificationTitle(notificationData?.Title),
-          const SizedBox(height: 16),
-          if (content.isNotEmpty) ..._buildContentLines(content),
-          const SizedBox(height: 16),
-          _buildNotificationTime(notification.CreatedAt),
-          const SizedBox(height: 24),
-          _buildCloseButton(context),
-        ],
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDragHandle(),
+            const SizedBox(height: 16),
+            _buildNotificationTitle(notificationData?.Title),
+            const SizedBox(height: 16),
+            if (content.isNotEmpty) ..._buildContentLines(content),
+            const SizedBox(height: 16),
+            _buildNotificationTime(notification.CreatedAt),
+            const SizedBox(height: 24),
+            _buildCloseButton(context),
+          ],
+        ),
       ),
     );
   }

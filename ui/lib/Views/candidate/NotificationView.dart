@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../Helpers/toastification.dart';
 import '../../Models/UserNotifications.dart';
-import '../../ViewModels/NotificationViewModel2.dart';
+import '../../ViewModels/candidate/CandidateNotificationViewModel.dart';
 
 class NotificationView extends StatefulWidget {
   const NotificationView({super.key});
@@ -35,14 +35,14 @@ class _NotificationViewState extends State<NotificationView> with WidgetsBinding
   }
 
   Future<void> _initNotifications() async {
-    final viewModel = Provider.of<NotificationViewModel2>(context, listen: false);
+    final viewModel = Provider.of<CandidateNotificationViewModel>(context, listen: false);
     await viewModel.initialize(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<NotificationViewModel2>(
+      body: Consumer<CandidateNotificationViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isLoading && viewModel.notifications.isEmpty) {
             return const Center(child: CircularProgressIndicator());
@@ -83,7 +83,7 @@ class _NotificationViewState extends State<NotificationView> with WidgetsBinding
     );
   }
 
-  Widget _buildNotificationList(NotificationViewModel2 viewModel) {
+  Widget _buildNotificationList(CandidateNotificationViewModel viewModel) {
     return ListView.separated(
       padding: const EdgeInsets.only(top: 20, left: 8, right: 8, bottom: 8),
       itemCount: viewModel.notifications.length,
@@ -193,13 +193,13 @@ class _NotificationViewState extends State<NotificationView> with WidgetsBinding
   }
 
   void _handleNotificationDeletion(BuildContext context, UserNotification notification) {
-    final viewModel = Provider.of<NotificationViewModel2>(context, listen: false);
+    final viewModel = Provider.of<CandidateNotificationViewModel>(context, listen: false);
     viewModel.deleteNotification(context, notification.ID!);
     showSuccessToastification(title: "Thành công", message: "Đã xoá thông báo");
   }
 
   void _handleNotificationTap(BuildContext context, UserNotification notification) {
-    final viewModel = Provider.of<NotificationViewModel2>(context, listen: false);
+    final viewModel = Provider.of<CandidateNotificationViewModel>(context, listen: false);
     viewModel.markAsRead(context, notification.ID!);
     _showNotificationDetail(context, notification);
   }
@@ -231,22 +231,24 @@ class NotificationDetailSheet extends StatelessWidget {
     final content = notification.Content ?? [];
     final notificationData = notification.Notification;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildDragHandle(),
-          const SizedBox(height: 16),
-          _buildNotificationTitle(notificationData?.Title),
-          const SizedBox(height: 16),
-          if (content.isNotEmpty) ..._buildContentLines(content),
-          const SizedBox(height: 16),
-          _buildNotificationTime(notification.CreatedAt),
-          const SizedBox(height: 24),
-          _buildCloseButton(context),
-        ],
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDragHandle(),
+            const SizedBox(height: 16),
+            _buildNotificationTitle(notificationData?.Title),
+            const SizedBox(height: 16),
+            if (content.isNotEmpty) ..._buildContentLines(content),
+            const SizedBox(height: 16),
+            _buildNotificationTime(notification.CreatedAt),
+            const SizedBox(height: 24),
+            _buildCloseButton(context),
+          ],
+        ),
       ),
     );
   }

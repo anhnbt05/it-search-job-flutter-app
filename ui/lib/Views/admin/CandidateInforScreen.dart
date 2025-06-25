@@ -92,240 +92,353 @@ class CandidateInforView extends StatelessWidget {
               ),
             ),
             body:
-            SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Center(
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: Offset(3, 3),
-                          )
-                        ],
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ), child : Column(
-                      children: [
-                        SizedBox(height: 8),
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Colors.grey[200],
-                          child: ClipOval(
-                            child: Image.network(
-                              candidate.AvatarUrl,
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Center(child: CircularProgressIndicator(color: Colors.blue));
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(Icons.person, color: Colors.grey, size: 60,);
-                              },
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(candidate.FullName,
-                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 4),
-                        Text(candidate.Email, style: TextStyle(color: Colors.grey[600])),
-                        Text(candidate.PhoneNumber, style: TextStyle(color: Colors.grey[600])),
-                        const SizedBox(height: 5),
-                        Text(LevelExtension.fromString(candidate.Level)!.toVietnamese(), style: TextStyle(color: Colors.grey[600])),
-                        const SizedBox(height: 5),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: (viewModel.candidate!.Status == 'active') ? Color(0x80d4ffd3) : Color(0x80ffd1d1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            child: Text(
-                              (viewModel.candidate!.Status == 'active') ? "Hoạt động" : "Bị khóa",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: (viewModel.candidate!.Status == 'active') ? Color(0xff368313) : Color(0xffbf2929)
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 5,),
-                        (viewModel.candidate!.Status == 'active') ? Align(
-                            alignment: Alignment.centerRight,
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 10),
-                              child: TextButton(
-                                onPressed: () async {
-                                  BuildContext? loadingContext;
-                                  BuildContext? alertContext;
-                                  showDialog(
-                                    context: context,
-                                    builder: (alertContext) {
-                                      return AlertDialog(
-                                        backgroundColor: Colors.white,
-                                        title: Text(
-                                          "Xác nhận",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 22,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        content: Text(
-                                          "Bạn có chắc chắn muốn khóa tài khoản người dùng ${viewModel.candidate!.FullName} không?",
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(alertContext);
-                                            },
-                                            style: TextButton.styleFrom(
-                                              overlayColor: Colors.transparent,
-                                            ),
-                                            child: Text(
-                                              'Không đồng ý',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ),
-                                          TextButton(
-                                            onPressed: () async {
-                                              showDialog(
-                                                context: context,
-                                                barrierColor: Colors.black.withOpacity(0.5),
-                                                barrierDismissible: false,
-                                                builder: (BuildContext ctx) {
-                                                  loadingContext = ctx;
-                                                  return Center(
-                                                    child: CircularProgressIndicator(color: Colors.blue),
-                                                  );
-                                                },
-                                              );
-
-                                              bool success = await viewModel.banUser(context);
-                                              Navigator.pop(alertContext);
-                                              if (loadingContext != null) {
-                                                Navigator.pop(loadingContext!);
-                                              }
-                                              if (success) {
-                                                Navigator.pop(context);
-                                              }
-                                            },
-                                            style: TextButton.styleFrom(
-                                              backgroundColor: Color(0xee65c29c),
-                                              foregroundColor: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                            ),
-                                            child: Text(
-                                              'Đồng ý',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Color(0xffff5656),
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                                  minimumSize: Size(0, 0),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius
-                                        .circular(10),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.lock_outline),
-                                    SizedBox(width: 5,),
-                                    Text(
-                                      'Khoá tài khoản',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                        ) : SizedBox.shrink(),
-                        const SizedBox(height: 5),
-                      ],
-                    ),
-                  ),
-                  ),
-                  SizedBox(height: 15,),
-                  _sectionTitle('Giới thiệu'),
-                  Text(candidate.Bio ?? ""),
-
-                  const SizedBox(height: 24),
-
-                  _sectionTitle('Chứng chỉ'),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: (candidate.Certifications ?? []).map((cert) {
-                      return Container(
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Center(
+                      child: Container(
+                        width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey.shade200),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 3,
-                              offset: const Offset(0, 1),
-                            ),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: Offset(3, 3),
+                            )
                           ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.workspace_premium, size: 18, color: Colors.blue),
-                              const SizedBox(width: 6),
-                              Text(
-                                  cert,
-                                  style: const TextStyle(fontFamily: 'Poppins')
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ), child : Column(
+                        children: [
+                          SizedBox(height: 8),
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundColor: Colors.grey[200],
+                            child: ClipOval(
+                              child: Image.network(
+                                candidate.AvatarUrl,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return const Center(child: CircularProgressIndicator(color: Colors.blue));
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(Icons.person, color: Colors.grey, size: 60,);
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(candidate.FullName,
+                              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
+                          Text(candidate.Email, style: TextStyle(color: Colors.grey[600])),
+                          Text(candidate.PhoneNumber, style: TextStyle(color: Colors.grey[600])),
+                          const SizedBox(height: 5),
+                          Text(LevelExtension.fromString(candidate.Level)!.toVietnamese(), style: TextStyle(color: Colors.grey[600])),
+                          const SizedBox(height: 5),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: (viewModel.candidate!.Status == 'active') ? Color(0x80d4ffd3) : Color(0x80ffd1d1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              child: Text(
+                                (viewModel.candidate!.Status == 'active') ? "Hoạt động" : "Bị khóa",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: (viewModel.candidate!.Status == 'active') ? Color(0xff368313) : Color(0xffbf2929)
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 5,),
+                          (viewModel.candidate!.Status == 'active')
+                              ? Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: TextButton(
+                                  onPressed: () async {
+                                    BuildContext? loadingContext;
+                                    BuildContext? alertContext;
+                                    showDialog(
+                                      context: context,
+                                      builder: (alertContext) {
+                                        return AlertDialog(
+                                          backgroundColor: Colors.white,
+                                          title: Text(
+                                            "Xác nhận",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 22,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          content: Text(
+                                            "Bạn có chắc chắn muốn khóa tài khoản người dùng ${viewModel.candidate!.FullName} không?",
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(alertContext);
+                                              },
+                                              style: TextButton.styleFrom(
+                                                overlayColor: Colors.transparent,
+                                              ),
+                                              child: Text(
+                                                'Không đồng ý',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () async {
+                                                showDialog(
+                                                  context: context,
+                                                  barrierColor: Colors.black.withOpacity(0.5),
+                                                  barrierDismissible: false,
+                                                  builder: (BuildContext ctx) {
+                                                    loadingContext = ctx;
+                                                    return Center(
+                                                      child: CircularProgressIndicator(color: Colors.blue),
+                                                    );
+                                                  },
+                                                );
+              
+                                                bool success = await viewModel.banUser(context);
+                                                Navigator.pop(alertContext);
+                                                if (loadingContext != null) {
+                                                  Navigator.pop(loadingContext!);
+                                                }
+                                                if (success) {
+                                                  Navigator.pop(context);
+                                                }
+                                              },
+                                              style: TextButton.styleFrom(
+                                                backgroundColor: Color(0xee65c29c),
+                                                foregroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                'Đồng ý',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Color(0xffff5656),
+                                    foregroundColor: Colors.white,
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                                    minimumSize: Size(0, 0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius
+                                          .circular(10),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.lock_outline),
+                                      SizedBox(width: 5,),
+                                      Text(
+                                        'Khoá tài khoản',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                          )
+                              : Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: EdgeInsets.only(right: 10),
+                                child: TextButton(
+                                  onPressed: () async {
+                                    BuildContext? loadingContext;
+                                    BuildContext? alertContext;
+                                    showDialog(
+                                      context: context,
+                                      builder: (alertContext) {
+                                        return AlertDialog(
+                                          backgroundColor: Colors.white,
+                                          title: Text(
+                                            "Xác nhận",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 22,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          content: Text(
+                                            "Bạn có chắc chắn muốn mở khóa tài khoản người dùng ${viewModel.candidate!.FullName} không?",
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(alertContext);
+                                              },
+                                              style: TextButton.styleFrom(
+                                                overlayColor: Colors.transparent,
+                                              ),
+                                              child: Text(
+                                                'Không đồng ý',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () async {
+                                                showDialog(
+                                                  context: context,
+                                                  barrierColor: Colors.black.withOpacity(0.5),
+                                                  barrierDismissible: false,
+                                                  builder: (BuildContext ctx) {
+                                                    loadingContext = ctx;
+                                                    return Center(
+                                                      child: CircularProgressIndicator(color: Colors.blue),
+                                                    );
+                                                  },
+                                                );
+              
+                                                bool success = await viewModel.unbanUser(context);
+                                                Navigator.pop(alertContext);
+                                                if (loadingContext != null) {
+                                                  Navigator.pop(loadingContext!);
+                                                }
+                                                if (success) {
+                                                  Navigator.pop(context);
+                                                }
+                                              },
+                                              style: TextButton.styleFrom(
+                                                backgroundColor: Color(0xee65c29c),
+                                                foregroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                'Đồng ý',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    foregroundColor: Colors.white,
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                                    minimumSize: Size(0, 0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius
+                                          .circular(10),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.lock_open_outlined),
+                                      SizedBox(width: 5,),
+                                      Text(
+                                        'Mở khoá tài khoản',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                          ),
+                          const SizedBox(height: 5),
+                        ],
+                      ),
+                    ),
+                    ),
+                    SizedBox(height: 15,),
+                    _sectionTitle('Giới thiệu'),
+                    Text(candidate.Bio ?? ""),
+              
+                    const SizedBox(height: 24),
+              
+                    _sectionTitle('Chứng chỉ'),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: (candidate.Certifications ?? []).map((cert) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.grey.shade200),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                spreadRadius: 1,
+                                blurRadius: 3,
+                                offset: const Offset(0, 1),
                               ),
                             ],
                           ),
-                        ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.workspace_premium, size: 18, color: Colors.blue),
+                                const SizedBox(width: 6),
+                                Text(
+                                    cert,
+                                    style: const TextStyle(fontFamily: 'Poppins')
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+              
+                    const SizedBox(height: 24),
+              
+                    _sectionTitle('Kinh nghiệm làm việc'),
+                    ...(candidate.WorkExperiences ?? []).map((exp) {
+                      return _WorkExperienceItem(
+                        exp: exp,
                       );
                     }).toList(),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  _sectionTitle('Kinh nghiệm làm việc'),
-                  ...(candidate.WorkExperiences ?? []).map((exp) {
-                    return _WorkExperienceItem(
-                      exp: exp,
-                    );
-                  }).toList(),
-                ],
+                  ],
+                ),
               ),
             ),
           );

@@ -38,7 +38,7 @@ Widget JobItem(BuildContext context, int index, RecruiterApprovalViewModel viewM
       );
     },
     child: Padding(
-      padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+      padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 5),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(

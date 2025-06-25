@@ -140,10 +140,12 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
           bottom: displaySelection(viewModel: widget.viewModel, Id: widget.Id, status: widget.status),
         ),
       ),
-      body: SfPdfViewer.network(
-        widget.resumeUrl,
-        canShowScrollStatus: true,
-        canShowPaginationDialog: true,
+      body: SafeArea(
+        child: SfPdfViewer.network(
+          widget.resumeUrl,
+          canShowScrollStatus: true,
+          canShowPaginationDialog: true,
+        ),
       ),
     );
   }

@@ -560,12 +560,16 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 22,
+                                fontFamily: 'Poppins'
                               ),
                               textAlign: TextAlign.center,
                             ),
                             content: Text(
                               "Bạn có chắc chắn muốn xoá bài tuyển dụng ${viewModel
                                   .jobs[index]!.Title} không?",
+                              style: TextStyle(
+                                  fontFamily: 'Poppins'
+                              ),
                             ),
                             actions: [
                               TextButton(
@@ -580,6 +584,7 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,
+                                    fontFamily: 'Poppins'
                                   ),
                                 ),
                               ),
@@ -617,6 +622,7 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
+                                    fontFamily: 'Poppins'
                                   ),
                                 ),
                               ),
@@ -644,7 +650,8 @@ Widget ActionField(BuildContext context, PostedJobsManagementViewModel viewModel
                           style: TextStyle(
                               fontSize: 13,
                               color: Colors.black,
-                              fontWeight: FontWeight.normal
+                              fontWeight: FontWeight.normal,
+                              fontFamily: 'Poppins'
                           ),
                         ),
                       ],

@@ -32,30 +32,32 @@ Widget ProfileScreen(BuildContext context) {
 
 Widget body(BuildContext context) {
   var viewModel = Provider.of<RecruiterProfileViewModel>(context);
-  return SingleChildScrollView(
-    child: Column(
-      children: [
-        Container(
-          height:
-              MediaQuery.of(context).size.height -
-              kToolbarHeight -
-              kBottomNavigationBarHeight -
-              45,
-          child: PageView(
+  return SafeArea(
+    child: SingleChildScrollView(
+      child: Column(
+        children: [
+          Container(
+            height:
+                MediaQuery.of(context).size.height -
+                kToolbarHeight -
+                kBottomNavigationBarHeight -
+                70,
+            child: PageView(
+              controller: viewModel.pageController,
+              children: [RecruiterInfo(context), CompanyInfo(context)],
+            ),
+          ),
+          SmoothPageIndicator(
             controller: viewModel.pageController,
-            children: [RecruiterInfo(context), CompanyInfo(context)],
+            count: 2,
+            effect: const WormEffect(
+              dotHeight: 4,
+              dotWidth: 4,
+              activeDotColor: Colors.blue,
+            ),
           ),
-        ),
-        SmoothPageIndicator(
-          controller: viewModel.pageController,
-          count: 2,
-          effect: const WormEffect(
-            dotHeight: 4,
-            dotWidth: 4,
-            activeDotColor: Colors.blue,
-          ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
