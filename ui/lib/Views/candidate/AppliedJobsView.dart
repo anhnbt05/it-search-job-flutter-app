@@ -68,15 +68,11 @@ class AppliedJobsView extends StatelessWidget {
                   ),
                   DropdownMenuItem<String>(
                     value: "pending",
-                    child: Text("Đang chờ", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                    child: Text("Đang chờ xử lý", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
                   ),
                   DropdownMenuItem<String>(
-                    value: "approved",
+                    value: "accepted",
                     child: Text("Đã chấp nhận", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: "interview",
-                    child: Text("Mời phỏng vấn", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
                   ),
                   DropdownMenuItem<String>(
                     value: "rejected",

@@ -167,6 +167,8 @@ class JobService {
         accessToken: validToken!,
       );
 
+      print("API Response: ${response.statusCode} - ${response.body}");
+
       if (response.statusCode == 200) {
         print("Successfully fetched recommended full jobs list.");
         List<dynamic>? data = jsonDecode(response.body);

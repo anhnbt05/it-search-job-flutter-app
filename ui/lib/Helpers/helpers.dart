@@ -56,9 +56,9 @@ PreferredSize? candidateBottomBar(String Role, int index, BuildContext context) 
   var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(
     context,
   );
-  if (index != 2)
+  if (index != 1)
     return null;
-  else if (index == 2) {
+  else if (index == 1) {
     return PreferredSize(
       preferredSize: Size.fromHeight(50),
       child: Container(
@@ -275,6 +275,29 @@ extension JobTypeExtension on eJobType {
     try {
       return eJobType.values.firstWhere(
             (e) => e.toString().split('.').last == jobtype.toLowerCase(),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+}
+
+extension ApplicationExtension on eApplicationStatus {
+  String toVietnamese() {
+    switch (this) {
+      case eApplicationStatus.pending:
+        return 'Đang chờ xử lý';
+      case eApplicationStatus.accepted:
+        return 'Đã chấp nhận';
+      case eApplicationStatus.rejected:
+        return 'Đã từ chối';
+    }
+  }
+
+  static eApplicationStatus? fromString(String applicationstatus) {
+    try {
+      return eApplicationStatus.values.firstWhere(
+            (e) => e.toString().split('.').last == applicationstatus.toLowerCase(),
       );
     } catch (e) {
       return null;

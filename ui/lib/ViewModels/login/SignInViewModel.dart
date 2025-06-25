@@ -10,11 +10,13 @@ import 'package:ui/Views/recruiter/recruiter.dart';
 import '../../Models/ResponseModel.dart';
 import '../../Services/auth_refreshtoken_service.dart';
 import '../../Services/auth_signin_service.dart';
+import '../../Services/user_service.dart';
 
 
 class SignInViewModel extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
+  final UserService _userService = UserService();
 
   Future<Map<String, dynamic>?> signIn(BuildContext context, String email,
       String password) async {
@@ -52,6 +54,11 @@ class SignInViewModel extends ChangeNotifier {
           errorMessage = "Không tìm thấy vai trò người dùng.";
           return null;
         }
+
+        if (role == 'candidate' && userId != null) {
+          await _fetchAndSaveCandidateInfo(userId, context);
+        }
+
         return payload;
       } else {
         errorMessage = result.message ??
@@ -118,6 +125,27 @@ class SignInViewModel extends ChangeNotifier {
     } catch (e) {
       print('Error checking token expiry: $e');
       return true;
+    }
+  }
+
+  Future<void> _fetchAndSaveCandidateInfo(String userId, BuildContext context) async {
+    try {
+      final candidateInfo = await _userService.getCandidateInfo(
+          Id: userId,
+          context: context
+      );
+
+      if (candidateInfo != null && candidateInfo.ID != null) {
+        await APIConstants.storage.write(
+            key: 'candidateID',
+            value: candidateInfo.ID
+        );
+        print('✅ Đã lưu candidateID: ${candidateInfo.ID}');
+      } else {
+        print('⚠️ Không thể lấy candidateID');
+      }
+    } catch (e) {
+      print('Lỗi khi lấy candidate info: $e');
     }
   }
 }

@@ -133,6 +133,7 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
     );
     if (result != null) {
       _CVFile = File(result.path);
+      notifyListeners();
     }
   }
 
