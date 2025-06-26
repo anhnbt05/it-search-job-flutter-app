@@ -143,9 +143,64 @@ Widget exportFileSection({required StatisticsViewModel viewModel, required Build
                                   DateTime? pickedDate = await showDatePicker(
                                     locale: Locale('vi', 'VN'),
                                     context: context,
-                                    initialDate: viewModel.selectedStartDate_exportFile??DateTime.now(),
+                                    initialDate: viewModel.selectedStartDate_exportFile ?? DateTime.now(),
                                     firstDate: DateTime(2024),
                                     lastDate: DateTime(2100),
+                                    builder: (BuildContext context, Widget? child) {
+                                      return Theme(
+                                        data: Theme.of(context).copyWith(
+                                          colorScheme: Theme.of(context).colorScheme.copyWith(
+                                            primary: Colors.blue,
+                                            onPrimary: Colors.white,
+                                            surface: Colors.white,
+                                            onSurface: Colors.black,
+                                          ),
+                                          datePickerTheme: DatePickerThemeData(
+                                              backgroundColor: Colors.white,
+                                              headerBackgroundColor: Colors.blue,
+                                              headerForegroundColor: Colors.white,
+                                              weekdayStyle: TextStyle(
+                                                color: Colors.grey,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              dayStyle: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 14,
+                                              ),
+                                              todayBackgroundColor: MaterialStateProperty.all(
+                                                Colors.blue.withOpacity(0.1),
+                                              ),
+                                              todayForegroundColor: MaterialStateProperty.all(
+                                                Colors.blue.shade600,
+                                              ),
+                                              dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+                                                if (states.contains(MaterialState.selected)) {
+                                                  return Colors.blue;
+                                                }
+                                                return null;
+                                              }),
+                                              dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                                                if (states.contains(MaterialState.selected)) {
+                                                  return Colors.white;
+                                                }
+                                                return Colors.black87;
+                                              }),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(16),
+                                              ),
+                                              dayShape: MaterialStateProperty.all(
+                                                CircleBorder(),
+                                              ),
+                                              cancelButtonStyle: ButtonStyle(
+                                                foregroundColor: MaterialStateProperty.all(
+                                                  Colors.grey,
+                                                ),
+                                              )
+                                          ),
+                                        ),
+                                        child: child!,
+                                      );
+                                    },
                                   );
 
                                   if (pickedDate != null) {
@@ -191,9 +246,64 @@ Widget exportFileSection({required StatisticsViewModel viewModel, required Build
                                   DateTime? pickedDate = await showDatePicker(
                                     locale: Locale('vi', 'VN'),
                                     context: context,
-                                    initialDate: viewModel.selectedEndDate_exportFile??DateTime.now(),
+                                    initialDate: viewModel.selectedEndDate_exportFile?? DateTime.now(),
                                     firstDate: DateTime(2024),
                                     lastDate: DateTime(2100),
+                                    builder: (BuildContext context, Widget? child) {
+                                      return Theme(
+                                        data: Theme.of(context).copyWith(
+                                          colorScheme: Theme.of(context).colorScheme.copyWith(
+                                            primary: Colors.blue,
+                                            onPrimary: Colors.white,
+                                            surface: Colors.white,
+                                            onSurface: Colors.black,
+                                          ),
+                                          datePickerTheme: DatePickerThemeData(
+                                              backgroundColor: Colors.white,
+                                              headerBackgroundColor: Colors.blue,
+                                              headerForegroundColor: Colors.white,
+                                              weekdayStyle: TextStyle(
+                                                color: Colors.grey,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              dayStyle: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 14,
+                                              ),
+                                              todayBackgroundColor: MaterialStateProperty.all(
+                                                Colors.blue.withOpacity(0.1),
+                                              ),
+                                              todayForegroundColor: MaterialStateProperty.all(
+                                                Colors.blue.shade600,
+                                              ),
+                                              dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+                                                if (states.contains(MaterialState.selected)) {
+                                                  return Colors.blue;
+                                                }
+                                                return null;
+                                              }),
+                                              dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                                                if (states.contains(MaterialState.selected)) {
+                                                  return Colors.white;
+                                                }
+                                                return Colors.black87;
+                                              }),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(16),
+                                              ),
+                                              dayShape: MaterialStateProperty.all(
+                                                CircleBorder(),
+                                              ),
+                                              cancelButtonStyle: ButtonStyle(
+                                                foregroundColor: MaterialStateProperty.all(
+                                                  Colors.grey,
+                                                ),
+                                              )
+                                          ),
+                                        ),
+                                        child: child!,
+                                      );
+                                    },
                                   );
 
                                   if (pickedDate != null) {
@@ -389,9 +499,64 @@ companyStatistics({required StatisticsViewModel viewModel, required BuildContext
                             DateTime? pickedDate = await showDatePicker(
                               locale: Locale('vi', 'VN'),
                               context: context,
-                              initialDate: viewModel.selectedStartDate_company??DateTime.now(),
+                              initialDate: viewModel.selectedStartDate_company ?? DateTime.now(),
                               firstDate: DateTime(2024),
                               lastDate: DateTime(2100),
+                              builder: (BuildContext context, Widget? child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: Theme.of(context).colorScheme.copyWith(
+                                      primary: Colors.blue,
+                                      onPrimary: Colors.white,
+                                      surface: Colors.white,
+                                      onSurface: Colors.black,
+                                    ),
+                                    datePickerTheme: DatePickerThemeData(
+                                        backgroundColor: Colors.white,
+                                        headerBackgroundColor: Colors.blue,
+                                        headerForegroundColor: Colors.white,
+                                        weekdayStyle: TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        dayStyle: TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 14,
+                                        ),
+                                        todayBackgroundColor: MaterialStateProperty.all(
+                                          Colors.blue.withOpacity(0.1),
+                                        ),
+                                        todayForegroundColor: MaterialStateProperty.all(
+                                          Colors.blue.shade600,
+                                        ),
+                                        dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+                                          if (states.contains(MaterialState.selected)) {
+                                            return Colors.blue;
+                                          }
+                                          return null;
+                                        }),
+                                        dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                                          if (states.contains(MaterialState.selected)) {
+                                            return Colors.white;
+                                          }
+                                          return Colors.black87;
+                                        }),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        dayShape: MaterialStateProperty.all(
+                                          CircleBorder(),
+                                        ),
+                                        cancelButtonStyle: ButtonStyle(
+                                          foregroundColor: MaterialStateProperty.all(
+                                            Colors.grey,
+                                          ),
+                                        )
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              },
                             );
 
                             if (pickedDate != null) {
@@ -437,9 +602,64 @@ companyStatistics({required StatisticsViewModel viewModel, required BuildContext
                             DateTime? pickedDate = await showDatePicker(
                               locale: Locale('vi', 'VN'),
                               context: context,
-                              initialDate: viewModel.selectedEndDate_company??DateTime.now(),
+                              initialDate: viewModel.selectedEndDate_company ?? DateTime.now(),
                               firstDate: DateTime(2024),
                               lastDate: DateTime(2100),
+                              builder: (BuildContext context, Widget? child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: Theme.of(context).colorScheme.copyWith(
+                                      primary: Colors.blue,
+                                      onPrimary: Colors.white,
+                                      surface: Colors.white,
+                                      onSurface: Colors.black,
+                                    ),
+                                    datePickerTheme: DatePickerThemeData(
+                                        backgroundColor: Colors.white,
+                                        headerBackgroundColor: Colors.blue,
+                                        headerForegroundColor: Colors.white,
+                                        weekdayStyle: TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        dayStyle: TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 14,
+                                        ),
+                                        todayBackgroundColor: MaterialStateProperty.all(
+                                          Colors.blue.withOpacity(0.1),
+                                        ),
+                                        todayForegroundColor: MaterialStateProperty.all(
+                                          Colors.blue.shade600,
+                                        ),
+                                        dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+                                          if (states.contains(MaterialState.selected)) {
+                                            return Colors.blue;
+                                          }
+                                          return null;
+                                        }),
+                                        dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                                          if (states.contains(MaterialState.selected)) {
+                                            return Colors.white;
+                                          }
+                                          return Colors.black87;
+                                        }),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        dayShape: MaterialStateProperty.all(
+                                          CircleBorder(),
+                                        ),
+                                        cancelButtonStyle: ButtonStyle(
+                                          foregroundColor: MaterialStateProperty.all(
+                                            Colors.grey,
+                                          ),
+                                        )
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              },
                             );
 
                             if (pickedDate != null) {
@@ -735,9 +955,64 @@ Widget jobStatistics({required StatisticsViewModel viewModel, required BuildCont
                             DateTime? pickedDate = await showDatePicker(
                               locale: Locale('vi', 'VN'),
                               context: context,
-                              initialDate: viewModel.selectedStartDate_job??DateTime.now(),
+                              initialDate: viewModel.selectedStartDate_job ?? DateTime.now(),
                               firstDate: DateTime(2024),
                               lastDate: DateTime(2100),
+                              builder: (BuildContext context, Widget? child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: Theme.of(context).colorScheme.copyWith(
+                                      primary: Colors.blue,
+                                      onPrimary: Colors.white,
+                                      surface: Colors.white,
+                                      onSurface: Colors.black,
+                                    ),
+                                    datePickerTheme: DatePickerThemeData(
+                                        backgroundColor: Colors.white,
+                                        headerBackgroundColor: Colors.blue,
+                                        headerForegroundColor: Colors.white,
+                                        weekdayStyle: TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        dayStyle: TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 14,
+                                        ),
+                                        todayBackgroundColor: MaterialStateProperty.all(
+                                          Colors.blue.withOpacity(0.1),
+                                        ),
+                                        todayForegroundColor: MaterialStateProperty.all(
+                                          Colors.blue.shade600,
+                                        ),
+                                        dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+                                          if (states.contains(MaterialState.selected)) {
+                                            return Colors.blue;
+                                          }
+                                          return null;
+                                        }),
+                                        dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                                          if (states.contains(MaterialState.selected)) {
+                                            return Colors.white;
+                                          }
+                                          return Colors.black87;
+                                        }),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        dayShape: MaterialStateProperty.all(
+                                          CircleBorder(),
+                                        ),
+                                        cancelButtonStyle: ButtonStyle(
+                                          foregroundColor: MaterialStateProperty.all(
+                                            Colors.grey,
+                                          ),
+                                        )
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              },
                             );
 
                             if (pickedDate != null) {
@@ -783,9 +1058,64 @@ Widget jobStatistics({required StatisticsViewModel viewModel, required BuildCont
                               DateTime? pickedDate = await showDatePicker(
                                 locale: Locale('vi', 'VN'),
                                 context: context,
-                                initialDate: viewModel.selectedEndDate_job??DateTime.now(),
+                                initialDate: viewModel.selectedEndDate_job ?? DateTime.now(),
                                 firstDate: DateTime(2024),
                                 lastDate: DateTime(2100),
+                                builder: (BuildContext context, Widget? child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: Theme.of(context).colorScheme.copyWith(
+                                        primary: Colors.blue,
+                                        onPrimary: Colors.white,
+                                        surface: Colors.white,
+                                        onSurface: Colors.black,
+                                      ),
+                                      datePickerTheme: DatePickerThemeData(
+                                          backgroundColor: Colors.white,
+                                          headerBackgroundColor: Colors.blue,
+                                          headerForegroundColor: Colors.white,
+                                          weekdayStyle: TextStyle(
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          dayStyle: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 14,
+                                          ),
+                                          todayBackgroundColor: MaterialStateProperty.all(
+                                            Colors.blue.withOpacity(0.1),
+                                          ),
+                                          todayForegroundColor: MaterialStateProperty.all(
+                                            Colors.blue.shade600,
+                                          ),
+                                          dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Colors.blue;
+                                            }
+                                            return null;
+                                          }),
+                                          dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Colors.white;
+                                            }
+                                            return Colors.black87;
+                                          }),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                          dayShape: MaterialStateProperty.all(
+                                            CircleBorder(),
+                                          ),
+                                          cancelButtonStyle: ButtonStyle(
+                                            foregroundColor: MaterialStateProperty.all(
+                                              Colors.grey,
+                                            ),
+                                          )
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
                               );
 
                               if (pickedDate != null) {
@@ -1015,9 +1345,64 @@ Widget applicationStatistics({required StatisticsViewModel viewModel, required B
                               DateTime? pickedDate = await showDatePicker(
                                 locale: Locale('vi', 'VN'),
                                 context: context,
-                                initialDate: viewModel.selectedStartDate_application??DateTime.now(),
+                                initialDate: viewModel.selectedStartDate_application ?? DateTime.now(),
                                 firstDate: DateTime(2024),
                                 lastDate: DateTime(2100),
+                                builder: (BuildContext context, Widget? child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: Theme.of(context).colorScheme.copyWith(
+                                        primary: Colors.blue,
+                                        onPrimary: Colors.white,
+                                        surface: Colors.white,
+                                        onSurface: Colors.black,
+                                      ),
+                                      datePickerTheme: DatePickerThemeData(
+                                          backgroundColor: Colors.white,
+                                          headerBackgroundColor: Colors.blue,
+                                          headerForegroundColor: Colors.white,
+                                          weekdayStyle: TextStyle(
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          dayStyle: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 14,
+                                          ),
+                                          todayBackgroundColor: MaterialStateProperty.all(
+                                            Colors.blue.withOpacity(0.1),
+                                          ),
+                                          todayForegroundColor: MaterialStateProperty.all(
+                                            Colors.blue.shade600,
+                                          ),
+                                          dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Colors.blue;
+                                            }
+                                            return null;
+                                          }),
+                                          dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Colors.white;
+                                            }
+                                            return Colors.black87;
+                                          }),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                          dayShape: MaterialStateProperty.all(
+                                            CircleBorder(),
+                                          ),
+                                          cancelButtonStyle: ButtonStyle(
+                                            foregroundColor: MaterialStateProperty.all(
+                                              Colors.grey,
+                                            ),
+                                          )
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
                               );
 
                               if (pickedDate != null) {
@@ -1063,9 +1448,64 @@ Widget applicationStatistics({required StatisticsViewModel viewModel, required B
                               DateTime? pickedDate = await showDatePicker(
                                 locale: Locale('vi', 'VN'),
                                 context: context,
-                                  initialDate: viewModel.selectedEndDate_application??DateTime.now(),
+                                initialDate: viewModel.selectedEndDate_application ?? DateTime.now(),
                                 firstDate: DateTime(2024),
                                 lastDate: DateTime(2100),
+                                builder: (BuildContext context, Widget? child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: Theme.of(context).colorScheme.copyWith(
+                                        primary: Colors.blue,
+                                        onPrimary: Colors.white,
+                                        surface: Colors.white,
+                                        onSurface: Colors.black,
+                                      ),
+                                      datePickerTheme: DatePickerThemeData(
+                                          backgroundColor: Colors.white,
+                                          headerBackgroundColor: Colors.blue,
+                                          headerForegroundColor: Colors.white,
+                                          weekdayStyle: TextStyle(
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          dayStyle: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 14,
+                                          ),
+                                          todayBackgroundColor: MaterialStateProperty.all(
+                                            Colors.blue.withOpacity(0.1),
+                                          ),
+                                          todayForegroundColor: MaterialStateProperty.all(
+                                            Colors.blue.shade600,
+                                          ),
+                                          dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Colors.blue;
+                                            }
+                                            return null;
+                                          }),
+                                          dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Colors.white;
+                                            }
+                                            return Colors.black87;
+                                          }),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                          dayShape: MaterialStateProperty.all(
+                                            CircleBorder(),
+                                          ),
+                                          cancelButtonStyle: ButtonStyle(
+                                            foregroundColor: MaterialStateProperty.all(
+                                              Colors.grey,
+                                            ),
+                                          )
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
                               );
 
                               if (pickedDate != null) {
@@ -1295,9 +1735,64 @@ Widget userStatistics({required StatisticsViewModel viewModel, required BuildCon
                               DateTime? pickedDate = await showDatePicker(
                                 locale: Locale('vi', 'VN'),
                                 context: context,
-                                initialDate: viewModel.selectedStartDate_user??DateTime.now(),
+                                initialDate: viewModel.selectedStartDate_user ?? DateTime.now(),
                                 firstDate: DateTime(2024),
                                 lastDate: DateTime(2100),
+                                builder: (BuildContext context, Widget? child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: Theme.of(context).colorScheme.copyWith(
+                                        primary: Colors.blue,
+                                        onPrimary: Colors.white,
+                                        surface: Colors.white,
+                                        onSurface: Colors.black,
+                                      ),
+                                      datePickerTheme: DatePickerThemeData(
+                                          backgroundColor: Colors.white,
+                                          headerBackgroundColor: Colors.blue,
+                                          headerForegroundColor: Colors.white,
+                                          weekdayStyle: TextStyle(
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          dayStyle: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 14,
+                                          ),
+                                          todayBackgroundColor: MaterialStateProperty.all(
+                                            Colors.blue.withOpacity(0.1),
+                                          ),
+                                          todayForegroundColor: MaterialStateProperty.all(
+                                            Colors.blue.shade600,
+                                          ),
+                                          dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Colors.blue;
+                                            }
+                                            return null;
+                                          }),
+                                          dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Colors.white;
+                                            }
+                                            return Colors.black87;
+                                          }),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                          dayShape: MaterialStateProperty.all(
+                                            CircleBorder(),
+                                          ),
+                                          cancelButtonStyle: ButtonStyle(
+                                            foregroundColor: MaterialStateProperty.all(
+                                              Colors.grey,
+                                            ),
+                                          )
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
                               );
 
                               if (pickedDate != null) {
