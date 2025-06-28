@@ -11,30 +11,33 @@ class CandidateNotificationViewModel extends ChangeNotifier {
   final WebSocketService _webSocketService = WebSocketService();
   final NotificationService _notificationService = NotificationService();
 
-  List<UserNotification> _notifications = [];
+  List<UserNotification>? _notifications;
   bool _isLoading = false;
   String? _errorMessage;
 
-  List<UserNotification> get notifications => _notifications;
+  List<UserNotification>? get notifications => _notifications;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  Future<void> initialize(BuildContext context) async {
+  CandidateNotificationViewModel(BuildContext context) {
     final authVM = Provider.of<AuthViewModel>(context, listen: false);
     if (authVM.userId == null) {
       _errorMessage = 'Chưa đăng nhập';
       notifyListeners();
       return;
     }
-
-    await _loadInitialNotifications(context, authVM.userId!);
     _setupWebSocket(context, authVM.userId!);
   }
 
+  Future<void> initialize(BuildContext context) async {
+    final authVM = Provider.of<AuthViewModel>(context, listen: false);
+    await _loadInitialNotifications(context, authVM.userId!);
+  }
+
   Future<void> _loadInitialNotifications(BuildContext context, String userId) async {
+    if (_notifications != null) return;
     try {
       _isLoading = true;
-      notifyListeners();
 
       final response = await _notificationService.getNotifications(context, userId);
 
@@ -67,7 +70,7 @@ class CandidateNotificationViewModel extends ChangeNotifier {
   }
 
   void _addNewNotification(UserNotification notification) {
-    _notifications.insert(0, notification);
+    _notifications!.insert(0, notification);
     notifyListeners();
   }
 
@@ -82,27 +85,19 @@ class CandidateNotificationViewModel extends ChangeNotifier {
 
   Future<void> markAsRead(BuildContext context, String notificationId) async {
     final authVM = Provider.of<AuthViewModel>(context, listen: false);
-    await _notificationService.readNotification(context, authVM.userId!, notificationId);
-
-    final index = _notifications.indexWhere((n) => n.ID == notificationId);
+    final index = _notifications!.indexWhere((n) => n.ID == notificationId);
     if (index != -1) {
-      _notifications[index].IsRead = true;
+      _notifications![index].IsRead = true;
       notifyListeners();
     }
+    await _notificationService.readNotification(context, authVM.userId!, notificationId);
   }
 
   Future<void> deleteNotification(BuildContext context, String notificationId) async {
     final authVM = Provider.of<AuthViewModel>(context, listen: false);
-    final response = await _notificationService.deleteNotification(context, authVM.userId!, notificationId);
-
-    if (response.success) {
-      _notifications.removeWhere((n) => n.ID == notificationId);
-      notifyListeners();
-    } else if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response.message ?? 'Lỗi khi xóa thông báo')),
-      );
-    }
+    _notifications!.removeWhere((n) => n.ID == notificationId);
+    notifyListeners();
+    await _notificationService.deleteNotification(context, authVM.userId!, notificationId);
   }
 
   @override

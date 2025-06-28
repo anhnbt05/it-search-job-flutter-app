@@ -76,7 +76,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (_) => AppliedJobsViewModel()),
           ChangeNotifierProvider(create: (_) => ProfileCandidateViewModel()),
           ChangeNotifierProvider(create: (_) => WorkExperiencesViewModel()),
-          ChangeNotifierProvider(create: (_) => CandidateNotificationViewModel()),
+          ChangeNotifierProvider(create: (context) => CandidateNotificationViewModel(context)),
         ],
         if (authVM.isLoggedIn &&
             authVM.userId != null &&

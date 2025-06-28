@@ -44,7 +44,7 @@ class _NotificationViewState extends State<NotificationView> with WidgetsBinding
     return Scaffold(
       body: Consumer<CandidateNotificationViewModel>(
         builder: (context, viewModel, child) {
-          if (viewModel.isLoading && viewModel.notifications.isEmpty) {
+          if (viewModel.notifications == null || (viewModel.isLoading)) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -64,7 +64,7 @@ class _NotificationViewState extends State<NotificationView> with WidgetsBinding
             );
           }
 
-          if (viewModel.notifications.isEmpty) {
+          if (viewModel.notifications!.isEmpty) {
             return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -86,57 +86,118 @@ class _NotificationViewState extends State<NotificationView> with WidgetsBinding
   Widget _buildNotificationList(CandidateNotificationViewModel viewModel) {
     return ListView.separated(
       padding: const EdgeInsets.only(top: 20, left: 8, right: 8, bottom: 8),
-      itemCount: viewModel.notifications.length,
+      itemCount: viewModel.notifications!.length,
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
-        final notification = viewModel.notifications[index];
+        final notification = viewModel.notifications![index];
         return _buildNotificationItem(context, notification);
       },
     );
   }
 
-  Widget _buildNotificationItem(BuildContext context, UserNotification notification) {
+  Widget _buildNotificationItem(BuildContext context,
+      UserNotification notification) {
     final isRead = notification.IsRead ?? false;
+    final notificationKey = notification.ID ?? 'key_${notification.hashCode}';
 
-    return Dismissible(
-      key: Key(notification.ID ?? 'key_${notification.hashCode}'),
-      background: _buildDismissibleBackground(),
-      dismissThresholds: const {DismissDirection.endToStart: 0.5},
-      confirmDismiss: (direction) => _showDeleteConfirmationDialog(context),
-      onDismissed: (direction) => _handleNotificationDeletion(context, notification),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isRead ? Colors.white : Colors.blue[50],
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isRead ? Colors.grey.withOpacity(0.2) : Colors.blue[100]!,
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 1),
+    final dragOffset = ValueNotifier<double>(0.0);
+    final isDialogShowing = ValueNotifier<bool>(false);
+
+    return ValueListenableBuilder<double>(
+      valueListenable: dragOffset,
+      builder: (context, offset, child) {
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.red[400],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Transform.translate(
+              offset: Offset(offset, 0),
+              child: GestureDetector(
+                onHorizontalDragUpdate: (details) {
+                  if (isDialogShowing.value) return;
+                  if (details.delta.dx < 0) {
+                    dragOffset.value += details.delta.dx;
+                    double maxDrag = -MediaQuery.of(context).size.width * 0.15;
+                    if (dragOffset.value <= maxDrag) {
+                      dragOffset.value = maxDrag;
+                      if (!isDialogShowing.value) {
+                        isDialogShowing.value = true;
+                        _showDeleteConfirmationDialog(context).then((result) {
+                          isDialogShowing.value = false;
+                          if (result == true) {
+                            _handleNotificationDeletion(context, notification);
+                          }
+                          dragOffset.value = 0.0;
+                        });
+                      }
+                    }
+                  }
+                },
+                onHorizontalDragEnd: (details) {
+                  if (!isDialogShowing.value &&
+                      dragOffset.value > -MediaQuery.of(context).size.width * 0.15) {
+                    dragOffset.value = 0.0;
+                  }
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isRead ? Colors.white : Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isRead ? Colors.grey.withOpacity(0.2) : Colors.blue[100]!,
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 3,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.notifications,
+                      color: isRead ? Colors.grey : Colors.blue[700],
+                    ),
+                    title: Text(
+                      notification.Notification?.Title ?? 'Thông báo',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: isRead ? Colors.grey[700] : Colors.black,
+                      ),
+                    ),
+                    subtitle: _buildNotificationSubtitle(notification),
+                    onTap: () => _handleNotificationTap(context, notification),
+                  ),
+                ),
+              ),
             ),
           ],
-        ),
-        child: ListTile(
-          leading: Icon(
-            Icons.notifications,
-            color: isRead ? Colors.grey : Colors.blue[700],
-          ),
-          title: Text(
-            notification.Notification?.Title ?? 'Thông báo',
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: isRead ? Colors.grey[700] : Colors.black,
-            ),
-          ),
-          subtitle: _buildNotificationSubtitle(notification),
-          onTap: () => _handleNotificationTap(context, notification),
-        ),
-      ),
+        );
+      },
+
+
     );
   }
 
@@ -159,7 +220,7 @@ class _NotificationViewState extends State<NotificationView> with WidgetsBinding
     );
   }
 
-  Widget _buildDismissibleBackground() {
+/*  Widget _buildDismissibleBackground() {
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
     decoration: BoxDecoration(
@@ -170,25 +231,59 @@ class _NotificationViewState extends State<NotificationView> with WidgetsBinding
     padding: const EdgeInsets.only(right: 20),
     child: const Icon(Icons.delete, color: Colors.white),
     );
-  }
+  }*/
 
   Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
     return showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Xác nhận'),
-        content: const Text('Bạn có chắc muốn xóa thông báo này?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Hủy', style: TextStyle(color: Colors.blue)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Xóa', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+        context: context,
+        builder: (context) =>
+            AlertDialog(
+              backgroundColor: Colors.white,
+              title: Text(
+                "Xác nhận",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                    fontFamily: 'Poppins'
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: const Text('Bạn có chắc muốn xóa thông báo này?', style: TextStyle(fontFamily: 'Poppins'),),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  style: TextButton.styleFrom(
+                    overlayColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    'Hủy',
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                        fontFamily: 'Poppins'
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Color(0xee65c29c),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    'Đồng ý',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        fontFamily: 'Poppins'
+                    ),
+                  ),
+                ),
+              ],
+            )
     );
   }
 
