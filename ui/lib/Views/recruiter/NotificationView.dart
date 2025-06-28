@@ -180,22 +180,55 @@ Widget _buildNotificationSubtitle(UserNotification notification) {
 
 Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
   return showDialog<bool>(
-    context: context,
-    builder: (context) =>
-        AlertDialog(
-          title: const Text('Xác nhận'),
-          content: const Text('Bạn có chắc muốn xóa thông báo này?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Hủy', style: TextStyle(color: Colors.blue)),
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            backgroundColor: Colors.white,
+            title: Text(
+              "Xác nhận",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                fontFamily: 'Poppins'
+              ),
+              textAlign: TextAlign.center,
             ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Xóa', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        ),
+            content: const Text('Bạn có chắc muốn xóa thông báo này?', style: TextStyle(fontFamily: 'Poppins')),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                style: TextButton.styleFrom(
+                  overlayColor: Colors.transparent,
+                ),
+                child: Text(
+                  'Hủy',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontFamily: 'Poppins'
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(
+                  backgroundColor: Color(0xee65c29c),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'Đồng ý',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          )
   );
 }
 

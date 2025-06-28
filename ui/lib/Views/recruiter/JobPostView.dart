@@ -626,37 +626,91 @@ Widget PostJobScreen(BuildContext context) {
                   ),
                 ),
                 Builder(
-                    builder: (context) =>
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            elevation: 0,
-                            shape: CircleBorder(
-                              side: BorderSide(color: Colors.grey.shade300),
+                  builder: (context) => ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      shape: CircleBorder(
+                        side: BorderSide(color: Colors.grey.shade300),
+                      ),
+                    ),
+                    onPressed: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        locale: Locale('vi', 'VN'),
+                        context: context,
+                        initialDate: viewModel.selectedDate ?? DateTime.now(),
+                        firstDate: DateTime(2024),
+                        lastDate: DateTime(2100),
+                        builder: (BuildContext context, Widget? child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: Theme.of(context).colorScheme.copyWith(
+                                primary: Colors.blue,
+                                onPrimary: Colors.white,
+                                surface: Colors.white,
+                                onSurface: Colors.black,
+                              ),
+                              datePickerTheme: DatePickerThemeData(
+                                backgroundColor: Colors.white,
+                                headerBackgroundColor: Colors.blue,
+                                headerForegroundColor: Colors.white,
+                                weekdayStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                dayStyle: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 14,
+                                ),
+                                todayBackgroundColor: MaterialStateProperty.all(
+                                  Colors.blue.withOpacity(0.1),
+                                ),
+                                todayForegroundColor: MaterialStateProperty.all(
+                                  Colors.blue.shade600,
+                                ),
+                                dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+                                  if (states.contains(MaterialState.selected)) {
+                                    return Colors.blue;
+                                  }
+                                  return null;
+                                }),
+                                dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                                  if (states.contains(MaterialState.selected)) {
+                                    return Colors.white;
+                                  }
+                                  return Colors.black87;
+                                }),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                dayShape: MaterialStateProperty.all(
+                                  CircleBorder(),
+                                ),
+                                cancelButtonStyle: ButtonStyle(
+                                  foregroundColor: MaterialStateProperty.all(
+                                    Colors.grey,
+                                  ),
+                                )
+                              ),
                             ),
-                          ),
-                          onPressed: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                              locale: Locale('vi', 'VN'),
-                              context: context,
-                              initialDate: viewModel.selectedDate ?? DateTime.now(),
-                              firstDate: DateTime(2024),
-                              lastDate: DateTime(2100),
-                            );
+                            child: child!,
+                          );
+                        },
+                      );
 
-                            if (pickedDate != null) {
-                              viewModel.setSelectedDate(pickedDate);
-                            }
-                          },
-                          child: Center(
-                            child: Icon(
-                              Icons.calendar_month_outlined,
-                              color: Colors.grey,
-                              size: 20,
-                            ),
-                          ),
-                        )
-                ),
+                      if (pickedDate != null) {
+                        viewModel.setSelectedDate(pickedDate);
+                      }
+                    },
+                    child: Center(
+                      child: Icon(
+                        Icons.calendar_month_outlined,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                )
               ],
             ),
 

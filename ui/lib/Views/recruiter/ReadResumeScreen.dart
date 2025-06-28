@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:ui/Constants/color_constants.dart';
 import 'package:ui/Helpers/toastification.dart';
 import 'package:ui/Models/Applications.dart';
@@ -32,6 +33,9 @@ class ReadResumeScreen extends StatefulWidget {
 }
 
 class _ReadResumeScreenState extends State<ReadResumeScreen> {
+  late PdfViewerController _pdfViewerController;
+  bool _isLoading = true;
+
   @override
   Widget build(BuildContext context) {
     var viewModel = widget.viewModel;
@@ -141,10 +145,47 @@ class _ReadResumeScreenState extends State<ReadResumeScreen> {
         ),
       ),
       body: SafeArea(
-        child: SfPdfViewer.network(
-          widget.resumeUrl,
-          canShowScrollStatus: true,
-          canShowPaginationDialog: true,
+        child: Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Colors.white,
+              child: SfPdfViewerTheme(
+                data: SfPdfViewerThemeData(
+                  backgroundColor: (_isLoading) ? Colors.white : Colors.blue.shade50,
+                  progressBarColor: Colors.blue,
+                  scrollHeadStyle: PdfScrollHeadStyle(
+                    backgroundColor: Colors.white,
+                    pageNumberTextStyle: TextStyle(color: Colors.black)
+                  ),
+                  paginationDialogStyle: PdfPaginationDialogStyle(
+                    backgroundColor: Colors.white,
+                    okTextStyle: TextStyle(color: ColorConstants.appbarColor),
+                    cancelTextStyle: TextStyle(color: Colors.grey),
+                  ),
+                  scrollStatusStyle: PdfScrollStatusStyle(
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+                child: SfPdfViewer.network(
+                  widget.resumeUrl,
+                  canShowScrollStatus: true,
+                  canShowPaginationDialog: true,
+                  onDocumentLoaded: (PdfDocumentLoadedDetails details) {
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  },
+                  onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
