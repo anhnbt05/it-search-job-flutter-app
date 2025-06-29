@@ -80,7 +80,7 @@ class AppliedJobsViewModel extends ChangeNotifier {
 
       if (success) {
         _appliedJobs.removeWhere((job) => job.application.ID == applicationId);
-
+        _filteredJobs.removeWhere((job) => job.application.ID == applicationId);
         filterByStatus(_statusFilter);
       } else {
         _errorMessage = "Không thể xóa đơn ứng tuyển";

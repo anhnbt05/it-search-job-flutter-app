@@ -76,7 +76,7 @@ class AppliedJobsView extends StatelessWidget {
                   ),
                   DropdownMenuItem<String>(
                     value: "rejected",
-                    child: Text("Đã từ chối", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                    child: Text("Đã bị từ chối", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
                   ),
                 ],
                 onChanged: (value) {
@@ -247,7 +247,6 @@ class JobCard extends StatelessWidget {
                       context: context,
                       applicationId: application.ID,
                     );
-                    await viewModel.fetchAllAppliedJobs(context);
                   },
                   icon: const Icon(Icons.cancel),
                   label: const Text('Xoá đơn'),
