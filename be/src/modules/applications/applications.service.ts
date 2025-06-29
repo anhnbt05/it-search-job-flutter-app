@@ -291,7 +291,6 @@ export class ApplicationsService {
         .update([
           {
             DeletedAt: new Date(),
-            Status: ApplicationStatus.rejected,
           },
         ])
         .eq('ID', id);

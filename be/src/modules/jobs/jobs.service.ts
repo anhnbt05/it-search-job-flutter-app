@@ -1420,7 +1420,9 @@ export class JobsService {
         );
 
       return (
-        job?.Applications.map((application: any) => ({
+        job?.Applications.filter(
+          (application: any) => application.DeletedAt === null,
+        ).map((application: any) => ({
           ...omit(application, 'CandidateID', 'Candidates'),
           Candidate: {
             ...this.usersService.handleFormattedProfileCandidateResponse(
