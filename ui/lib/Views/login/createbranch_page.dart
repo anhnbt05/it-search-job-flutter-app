@@ -85,6 +85,7 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
           style: TextStyle(
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
         ),
         backgroundColor: ColorConstants.primaryColor,

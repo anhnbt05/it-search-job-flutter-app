@@ -68,19 +68,15 @@ class AppliedJobsView extends StatelessWidget {
                   ),
                   DropdownMenuItem<String>(
                     value: "pending",
-                    child: Text("Đang chờ", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                    child: Text("Đang chờ xử lý", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
                   ),
                   DropdownMenuItem<String>(
-                    value: "approved",
+                    value: "accepted",
                     child: Text("Đã chấp nhận", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
                   ),
                   DropdownMenuItem<String>(
-                    value: "interview",
-                    child: Text("Mời phỏng vấn", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
-                  ),
-                  DropdownMenuItem<String>(
                     value: "rejected",
-                    child: Text("Đã từ chối", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
+                    child: Text("Đã bị từ chối", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal),),
                   ),
                 ],
                 onChanged: (value) {
@@ -251,7 +247,6 @@ class JobCard extends StatelessWidget {
                       context: context,
                       applicationId: application.ID,
                     );
-                    await viewModel.fetchAllAppliedJobs(context);
                   },
                   icon: const Icon(Icons.cancel),
                   label: const Text('Xoá đơn'),

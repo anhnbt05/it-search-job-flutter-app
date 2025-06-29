@@ -217,50 +217,53 @@ class _PostWorkExperiencesViewState extends State<PostWorkExperiencesView> {
                 fontFamily: 'Poppins',
               ),
               children: [
-                if (isRequired) const TextSpan(
-                  text: '*',
-                  style: TextStyle(color: Colors.red),
-                ),
-                const TextSpan(
-                  text: ':',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                if (isRequired)
+                  const TextSpan(text: '*', style: TextStyle(color: Colors.red)),
+                const TextSpan(text: ':', style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
           ),
           const SizedBox(height: 6),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade400),
-            ),
-            child: TextFormField(
-              controller: controller,
-              maxLines: maxLines,
-              keyboardType: keyboardType,
-              decoration: InputDecoration(
-                hintText: hintText,
-                hintStyle: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 12,
-                ),
-                border: InputBorder.none,
+          TextFormField(
+            controller: controller,
+            maxLines: maxLines,
+            keyboardType: keyboardType,
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade400),
               ),
-              validator: isRequired
-                  ? (value) => (value == null || value.trim().isEmpty)
-                  ? 'Vui lòng nhập $label'
-                  : null
-                  : null,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade400),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.blue),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.red),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.red),
+              ),
             ),
+            validator: isRequired
+                ? (value) => (value == null || value.trim().isEmpty)
+                ? 'Vui lòng nhập $label'
+                : null
+                : null,
           ),
         ],
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

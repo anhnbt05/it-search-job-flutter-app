@@ -1,5 +1,8 @@
   import 'dart:convert';
+import 'dart:io';
   import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:ui/Helpers/toastification.dart';
   import 'package:ui/Constants/api_constants.dart';
   import '../Helpers/helpers.dart';
@@ -12,40 +15,55 @@ import '../Models/Applications.dart';
     Future<bool> applyForJob({
       required BuildContext context,
       required String jobId,
+      File? cvFile,
+      bool useProfileCV = true,
     }) async {
       try {
         final validToken = await getValidAccessToken(context);
-        final response = await _apiService.postWithToken(
-          endpoint: APIConstants.postApplication_endpoint,
-          body: {
-            "JobId": jobId,
-          },
-          accessToken: validToken!,
+        final request = http.MultipartRequest(
+          'POST',
+          Uri.parse("${APIConstants.baseUrl}/${APIConstants.postApplication_endpoint}"),
         );
+        request.headers['Authorization'] = 'Bearer $validToken';
+        request.headers['Accept'] = 'application/json';
 
-        final statusCode = response.statusCode;
-        final body = response.body;
-        print("📤 [applyForJob] Status code: $statusCode");
-        print("📤 [applyForJob] Raw response body: $body");
+        request.fields['JobId'] = jobId;
 
-        final decodedData = jsonDecode(body);
-        print("📤 [applyForJob] Decoded data: $decodedData (${decodedData.runtimeType})");
-        if (statusCode == 201 || statusCode == 200) {
+
+          if (cvFile != null && cvFile.existsSync()) {
+            request.files.add(
+              await http.MultipartFile.fromPath(
+                'resumeFile',
+                cvFile.path,
+                contentType: MediaType('docx', 'pdf'),
+              ),
+            );
+          }
+
+        final response = await request.send();
+        final responseBody = await response.stream.bytesToString();
+
+        print("📤 [applyForJob] Status code: ${response.statusCode}");
+        print("📤 [applyForJob] Raw response body: $responseBody");
+
+        if (response.statusCode == 201 || response.statusCode == 200) {
           showSuccessToastification(
             message: "Ứng tuyển công việc thành công",
             title: "Thành công",
           );
           return true;
         } else {
+          final errorMsg = jsonDecode(responseBody)['message'] ??
+              "Không thể ứng tuyển. Vui lòng thử lại sau";
           showErrorToastification(
-            message: "Không thể ứng tuyển. Vui lòng thử lại sau",
+            message: errorMsg,
             title: "Lỗi",
           );
           return false;
         }
       } catch (e) {
         showErrorToastification(
-          message: "Có lỗi xảy ra khi ứng tuyển. Vui lòng kiểm tra kết nối",
+          message: "Có lỗi xảy ra khi ứng tuyển: ${e.toString()}",
           title: "Lỗi",
         );
         return false;

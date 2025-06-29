@@ -25,19 +25,14 @@ class FindJobsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final userId = await _storage.read(key: 'userID');
+      final candidateId = await _storage.read(key: 'candidateID');
 
-      if (userId == null) {
-        error = "Không tìm thấy userID";
-        isLoading = false;
-        notifyListeners();
-        return;
-      }
 
       recommendedjobs = await _jobService.getRecommendedJobs(
         context: context,
-        candidateID: userId,
+        candidateID: candidateId!,
       );
+      jobs = recommendedjobs;
     } catch (e) {
       error = "Đã xảy ra lỗi khi tải danh sách công việc: $e";
     } finally {
