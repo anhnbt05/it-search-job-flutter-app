@@ -32,6 +32,7 @@ class FindJobsViewModel extends ChangeNotifier {
         context: context,
         candidateID: candidateId!,
       );
+      jobs = recommendedjobs;
     } catch (e) {
       error = "Đã xảy ra lỗi khi tải danh sách công việc: $e";
     } finally {

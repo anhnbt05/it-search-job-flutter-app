@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Models/JobFavorites.dart';
@@ -5,8 +8,10 @@ import 'package:ui/Models/Jobs.dart';
 
 import '../../Constants/api_constants.dart';
 import '../../Helpers/helpers.dart';
+import '../../Helpers/toastification.dart';
 import '../../Services/application_candidate_service.dart';
 import '../../ViewModels/candidate/FavoritesJobsViewModel.dart';
+import '../../ViewModels/candidate/FindJobsViewModel.dart';
 import 'JobDetailView.dart';
 
 class FavoritesJobsView extends StatelessWidget {
@@ -207,11 +212,7 @@ class JobCard extends StatelessWidget {
               const SizedBox(width: 12),
               ElevatedButton.icon(
                 onPressed: () async {
-                  final applicationService = ApplicationCandidateService();
-                  await applicationService.applyForJob(
-                    jobId: favoritejob.Job!.ID,
-                    context: context,
-                  );
+                  _showApplyDialog(context);
                 },
                 icon: const Icon(Icons.send),
                 label: const Text('Nộp đơn'),
@@ -258,6 +259,340 @@ class JobCard extends StatelessWidget {
         text,
         style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
       ),
+    );
+  }
+  void _showApplyDialog(BuildContext context) {
+    bool? useProfileCV;
+    File? cvFile;
+    bool isSubmitting = false;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Text(
+                'Nộp đơn ứng tuyển',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Vui lòng chọn phương thức nộp CV',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          useProfileCV = true;
+                          cvFile = null;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: useProfileCV == true
+                              ? const Color(0xFF2563EB).withOpacity(0.1)
+                              : Colors.transparent,
+                          border: Border.all(
+                            color: useProfileCV == true
+                                ? const Color(0xFF2563EB)
+                                : Colors.grey.shade300,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Radio<bool>(
+                              value: true,
+                              groupValue: useProfileCV,
+                              onChanged: (value) {
+                                setState(() {
+                                  useProfileCV = value;
+                                  cvFile = null;
+                                });
+                              },
+                              activeColor: const Color(0xFF2563EB),
+                            ),
+                            const SizedBox(width: 8),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Sử dụng CV từ hồ sơ',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Chúng tôi sẽ sử dụng CV bạn đã tải lên trong hồ sơ cá nhân',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          useProfileCV = false;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: useProfileCV == false
+                              ? const Color(0xFF2563EB).withOpacity(0.1)
+                              : Colors.transparent,
+                          border: Border.all(
+                            color: useProfileCV == false
+                                ? const Color(0xFF2563EB)
+                                : Colors.grey.shade300,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Radio<bool>(
+                                  value: false,
+                                  groupValue: useProfileCV,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      useProfileCV = value;
+                                    });
+                                  },
+                                  activeColor: const Color(0xFF2563EB),
+                                ),
+                                const SizedBox(width: 8),
+                                const Expanded(
+                                  child: Text(
+                                    'Tải lên CV mới',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            if (useProfileCV == false) ...[
+                              const SizedBox(height: 8),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final XFile? file = await openFile(
+                                    acceptedTypeGroups: [
+                                      XTypeGroup(
+                                        label: 'Documents',
+                                        extensions: ['pdf', 'doc', 'docx'],
+                                      ),
+                                    ],
+                                  );
+                                  if (file != null) {
+                                    setState(() {
+                                      cvFile = File(file.path);
+                                    });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: const Color(0xFF2563EB),
+                                  side: const BorderSide(
+                                    color: Color(0xFF2563EB),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.upload_file, size: 18),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      cvFile == null
+                                          ? 'Chọn file CV'
+                                          : 'Thay đổi file',
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              if (cvFile != null) ...[
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.check_circle,
+                                        color: Colors.green,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          cvFile!.path.split('/').last,
+                                          style: const TextStyle(
+                                            fontFamily: 'Poppins',
+                                            fontSize: 12,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.close,
+                                          size: 18,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            cvFile = null;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    if (useProfileCV == false && cvFile == null) ...[
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Vui lòng chọn file CV để tiếp tục',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 12,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSubmitting ? null : () => Navigator.pop(context),
+                  child: const Text(
+                    'Hủy',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: isSubmitting ? null : () async {
+                    if (useProfileCV == null) {
+                      showErrorToastification(
+                        message: "Vui lòng chọn phương thức nộp CV",
+                        title: "Lỗi",
+                      );
+                      return;
+                    }
+
+                    if (useProfileCV == false && cvFile == null) {
+                      showErrorToastification(
+                        message: "Vui lòng chọn file CV để tiếp tục",
+                        title: "Lỗi",
+                      );
+                      return;
+                    }
+
+                    setState(() => isSubmitting = true);
+
+                    try {
+                      final applicationService = ApplicationCandidateService();
+                      final success = await applicationService.applyForJob(
+                        jobId: favoritejob.Job!.ID,
+                        context: context,
+                        cvFile: useProfileCV! ? null : cvFile,
+                        useProfileCV: useProfileCV!,
+                      );
+
+                      if (success) {
+                        Navigator.pop(context);
+                      }
+                    } finally {
+                      setState(() => isSubmitting = false);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2563EB),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: isSubmitting
+                      ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                      : const Text(
+                    'Xác nhận',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
