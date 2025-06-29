@@ -210,6 +210,8 @@ export class ApplicationsService {
               ResumeUrl: resumeFileUrl,
               JobID: JobId,
               DeletedAt: null,
+              Status: ApplicationStatus.pending,
+              AppliedAt: new Date(),
             },
           ],
           { onConflict: 'CandidateID,JobID' },
