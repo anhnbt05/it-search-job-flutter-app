@@ -13,35 +13,47 @@ import 'FindJobsView.dart';
 List<Widget> pageView_candidate(BuildContext context) {
   return [
     FindJobsView(),
-    JobListScreen(context),
+    JobListScreen(),
     NotificationView(),
     ProfileCandidateView(),
   ];
 }
 
-Widget HomeScreen() {
-  // TODO: Modify section below
-  return Container(
-    color: Colors.blue.shade100,
-    child: Center(child: Text("Trang chủ", style: TextStyle(fontSize: 24))),
-  );
+class JobListScreen extends StatefulWidget {
+  const JobListScreen({super.key});
+
+  @override
+  State<JobListScreen> createState() => _JobListScreenState();
 }
 
-Widget JobListScreen(BuildContext context) {
-  var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(
-    context,
-  );
-  return Container(
-    color: Colors.orange.shade100,
-    child: PageView(
+class _JobListScreenState extends State<JobListScreen> {
+  late JoblistNavigationViewModel joblistNavigationProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (joblistNavigationProvider.pageController.hasClients) {
+        joblistNavigationProvider.pageController.jumpToPage(joblistNavigationProvider.index);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PageView(
       controller: joblistNavigationProvider.pageController,
+      physics: NeverScrollableScrollPhysics(),
       children: [
         AppliedJobsView(),
         FavoritesJobsView(),
       ],
-    ),
-  );
+    );
+  }
 }
+
 
 List<BottomNavigationBarItem> bottomNavigationItem_candidate(
     BuildContext context,

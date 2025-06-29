@@ -41,17 +41,24 @@ class _EditCandidateInformationScreenState
             child: Scaffold(
               appBar: AppBar(
                 toolbarHeight: 45,
+                leading: IconButton(
+                  icon: Icon(Icons.chevron_left, color: Colors.white, size: 30),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
                 automaticallyImplyLeading: false,
                 backgroundColor: ColorConstants.appbarColor,
-                centerTitle: true,
-                title: Center(
-                  child: Text(
+                centerTitle: false,
+                title: Row(
+                  children:[ Text(
                     "Chỉnh sửa hồ sơ cá nhân",
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
+                ]
                 ),
               ),
               body: LayoutBuilder(
@@ -103,7 +110,10 @@ class _EditCandidateInformationScreenState
                                                       height: 140,
                                                     ),
                                                   )
-                                                      : const CircularProgressIndicator(color: Colors.blue),
+                                                      : CircleAvatar(
+                                                    radius: 50,
+                                                    backgroundImage: NetworkImage(profileViewModel.candidate?.AvatarUrl ?? ""),
+                                                  ),
                                                 ),
                                               ),
                                               const SizedBox(height: 8),

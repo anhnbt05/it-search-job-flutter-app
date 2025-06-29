@@ -86,6 +86,7 @@ class _CreateCompanyPageState extends State<CreateCompanyPage> {
           style: TextStyle(
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
         ),
         backgroundColor: ColorConstants.primaryColor,

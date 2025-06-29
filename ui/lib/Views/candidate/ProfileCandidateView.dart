@@ -263,6 +263,7 @@ class ProfileCandidateView extends StatelessWidget {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
+                            backgroundColor: Colors.white,
                             title: const Text(
                                 "Xác nhận xóa",
                                 style: TextStyle(fontFamily: 'Poppins')
@@ -276,7 +277,7 @@ class ProfileCandidateView extends StatelessWidget {
                                 onPressed: () => Navigator.pop(context),
                                 child: const Text(
                                     "Hủy",
-                                    style: TextStyle(fontFamily: 'Poppins')
+                                    style: TextStyle(fontFamily: 'Poppins', color: Colors.grey)
                                 ),
                               ),
                               TextButton(
