@@ -155,6 +155,7 @@ export class JobsController {
                 'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//logo-fpt-software_043151683.png',
             },
           },
+          Categories: ['Front End'],
         },
         {
           ID: 'e9a4b957-3e7e-48c8-b88e-fd26d83ea76c',
@@ -204,6 +205,7 @@ export class JobsController {
                 'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//logo-fpt-software_043151683.png',
             },
           },
+          Categories: ['Front End'],
         },
         {
           ID: '55f8a244-3056-424c-98cc-9c15a89c0234',
@@ -253,6 +255,7 @@ export class JobsController {
                 'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//logo-fpt-software_043151683.png',
             },
           },
+          Categories: ['Front End'],
         },
         {
           ID: '12bfb97c-a3d1-404c-8002-045e5417ef39',
@@ -302,6 +305,7 @@ export class JobsController {
                 'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//logo-fpt-software_043151683.png',
             },
           },
+          Categories: ['Front End'],
         },
         {
           ID: '15e09a20-11da-416f-a6b7-5789f55c8522',
@@ -348,6 +352,7 @@ export class JobsController {
                 'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//logo-fpt-software_043151683.png',
             },
           },
+          Categories: ['Front End'],
         },
       ],
     },

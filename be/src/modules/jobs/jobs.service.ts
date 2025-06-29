@@ -1200,33 +1200,35 @@ export class JobsService {
       const candidateLevel = data.Level;
 
       const jobs = await this.prismaService.$queryRaw<any[]>`
-        SELECT 
-          j.*, 
-          json_agg(DISTINCT r) AS recruiter, 
-          json_agg(DISTINCT u) AS user, 
-          json_agg(DISTINCT jb) AS job_benefits,
-          json_agg(DISTINCT jd) AS job_descriptions,
-          json_agg(DISTINCT jr) AS job_requirements,
-          json_agg(DISTINCT c) AS company
-        FROM "Jobs" j
-          LEFT JOIN "Recruiters" r ON r."ID" = j."RecruiterID"
-          LEFT JOIN "Users" u ON u."ID" = r."UserID"
-          LEFT JOIN "CompanyLocations" cl ON cl."ID" = r."CompanyLocationID"
-          LEFT JOIN "Companies" c ON c."ID" = cl."CompanyID"
-          LEFT JOIN "JobBenefits" jb ON jb."JobID" = j."ID"
-          LEFT JOIN "JobDescriptions" jd ON jd."JobID" = j."ID"
-          LEFT JOIN "JobRequirements" jr ON jr."JobID" = j."ID"
-        GROUP BY j."ID", r."ID"
-        ORDER BY
-          CASE 
-            WHEN j."Level" = ${Prisma.sql`CAST(${candidateLevel} AS "Level")`} THEN 0
-            WHEN ${Prisma.sql`CAST(${candidateLevel} AS "Level")`} = ${Prisma.sql`CAST(${Level.senior} AS "Level")`} AND j."Level" = ${Prisma.sql`CAST(${Level.senior} AS "Level")`} THEN 1
-            WHEN ${Prisma.sql`CAST(${candidateLevel} AS "Level")`} = ${Prisma.sql`CAST(${Level.mid} AS "Level")`} AND j."Level" = ${Prisma.sql`CAST(${Level.mid} AS "Level")`} THEN 1
-            WHEN ${Prisma.sql`CAST(${candidateLevel} AS "Level")`} = ${Prisma.sql`CAST(${Level.junior} AS "Level")`} AND j."Level" = ${Prisma.sql`CAST(${Level.junior} AS "Level")`} THEN 1
-            ELSE 2
-          END,
-          j."PostedAt" DESC
-      `;
+    SELECT 
+      j.*, 
+      json_agg(DISTINCT r) AS recruiter, 
+      json_agg(DISTINCT u) AS user, 
+      json_agg(DISTINCT jb) AS job_benefits,
+      json_agg(DISTINCT jd) AS job_descriptions,
+      json_agg(DISTINCT jr) AS job_requirements,
+      json_agg(DISTINCT c) AS company,
+      json_agg(DISTINCT jc) AS job_categories,
+      json_agg(DISTINCT cg) AS categories
+    FROM "Jobs" j
+        LEFT JOIN "Recruiters" r ON r."ID" = j."RecruiterID"
+        LEFT JOIN "Users" u ON u."ID" = r."UserID"
+        LEFT JOIN "CompanyLocations" cl ON cl."ID" = r."CompanyLocationID"
+        LEFT JOIN "Companies" c ON c."ID" = cl."CompanyID"
+        LEFT JOIN "JobBenefits" jb ON jb."JobID" = j."ID"
+        LEFT JOIN "JobDescriptions" jd ON jd."JobID" = j."ID"
+        LEFT JOIN "JobRequirements" jr ON jr."JobID" = j."ID"
+        LEFT JOIN "JobCategories" jc ON jc."JobID" = j."ID"
+        LEFT JOIN "Categories" cg ON cg."ID" = jc."CategoryID"
+      WHERE j."Level" = ${Prisma.sql`CAST(${candidateLevel} AS "Level")`}
+      GROUP BY j."ID", r."ID"
+      ORDER BY j."PostedAt" DESC
+    `;
+
+      if (!jobs.length)
+        throw new NotFoundException(
+          'Hiện tại không có công việc nào phù hợp với trình độ của bạn.',
+        );
 
       return (
         jobs
@@ -1236,12 +1238,14 @@ export class JobsService {
               'job_benefits',
               'job_descriptions',
               'job_requirements',
+              'job_categories',
               'CompanyLocationID',
               'UserID',
               'user',
               'recruiter',
               'company',
               'RecruiterID',
+              'categories',
             ]),
             JobBenefits: job.job_benefits.map((jb: any) => jb.Benefit),
             JobDescriptions: job.job_descriptions.map(
@@ -1262,6 +1266,7 @@ export class JobsService {
                 LogoUrl: job.company[0].LogoUrl,
               },
             },
+            Categories: job.categories.map((j: any) => j.CategoryName),
           })) ?? []
       );
     } catch (err) {

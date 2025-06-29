@@ -32,6 +32,7 @@ class RecruiterProfileViewModel extends ChangeNotifier {
         UserService().getRecruiterInfo(Id: userId, context: context).then((
             value) {
           _recruiterInfo = value;
+          notifyListeners();
           AuthCompaniesService().fetchBranches(
               (recruiterInfo == null) ? "" : recruiterInfo!.Company.ID).then((
               value) {

@@ -10,28 +10,16 @@ import 'PostedJobsManagementView.dart';
 import 'JobPostView.dart';
 import 'ProfileView.dart';
 import '../../Models/Applications.dart';
+import '../../Views/recruiter/NotificationView.dart';
 
 List<Widget> pageView_recruiter(BuildContext context) {
   return [
     PostedJobsManagementScreen(context),
     CandidatesAppliedScreen(context),
     PostJobScreen(context),
-    NotificationsScreen(),
+    NotificationScreen(context),
     ProfileScreen(context),
   ];
-}
-
-Widget NotificationsScreen() {
-  // TODO: Modify section below
-  return Container(
-    color: Colors.red.shade100,
-    child: Center(
-      child: Text(
-        "Thông báo",
-        style: TextStyle(fontSize: 24),
-      ),
-    ),
-  );
 }
 
 List<BottomNavigationBarItem> bottomNavigationItem_recruiter(BuildContext context) {

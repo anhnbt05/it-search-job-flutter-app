@@ -36,10 +36,6 @@ class JobPostViewModel extends ChangeNotifier {
         print("Error fetching categories: $error");
       });
     }
-
-    if (!postedJobsManagementViewModel.isLoaded) {
-      postedJobsManagementViewModel.loadFuture;
-    }
   }
 
   bool _check = false;

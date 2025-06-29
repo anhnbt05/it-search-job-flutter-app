@@ -182,7 +182,7 @@ class JobDetailView extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       backgroundColor: const Color(0xFFF9FAFB),
-      body: body,
+      body: SafeArea(child: body),
     );
   }
 

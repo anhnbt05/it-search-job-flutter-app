@@ -57,6 +57,7 @@ class APIConstants {
 
   static final String getUser_admin_endpoint = 'users';
   static final String deleteUser_endpoint = 'users';
+  static final String unlockUser_endpoint = 'users/unlock';
   static final String postCategory_endpoint = 'auth/categories';
 
   static final getStatistic_endpoint = "dashboards/summary";

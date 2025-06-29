@@ -61,7 +61,8 @@ class _EditCandidateInformationScreenState
                 ]
                 ),
               ),
-              body: LayoutBuilder(
+                body: SafeArea(
+              child: LayoutBuilder(
                 builder: (context, constraints) {
                   return SingleChildScrollView(
                     child: ConstrainedBox(
@@ -396,765 +397,654 @@ class _EditCandidateInformationScreenState
                                       itemCount: viewModel.certificationControllers.length,
                                       itemBuilder: (context, index) {
                                         return Row(
-                                          children: [
-                                            Expanded(
-                                              child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                child: customTextField(
-                                                  hintText: "Nhập chứng chỉ...",
-                                                  height: 40,
-                                                  textInputType: TextInputType.text,
-                                                  controller: viewModel.certificationControllers[index],
-                                                ),
-                                              ),
-                                            ),
-                                            IconButton(
-                                              icon: Icon(Icons.close, size: 18, color: Colors.black),
-                                              onPressed: () => viewModel.removeCertification(index),
-                                              style: IconButton.styleFrom(
-                                                backgroundColor: Colors.red[100],
-                                                side: BorderSide(color: Colors.grey, width: 1),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(5),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 8, right: 8, top: 0, bottom: 8),
-                                      child: ElevatedButton.icon(
-                                        onPressed: viewModel.addCertification,
-                                        icon: Icon(Icons.add, size: 18, color: Colors.grey),
-                                        label: Text(
-                                          "Thêm chứng chỉ",
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.white,
-                                          elevation: 0,
-                                          side: BorderSide(color: Colors.grey),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(5),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Thêm padding bên trong button
-                                        ),
-                                      ),
-                                    ),
-
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 10,
-                                      offset: Offset(0, 0),
-                                    ),
-                                  ],
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: Colors.white,
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    viewModel.otpController.clear();
-                                    await AuthForgetPasswordService()
-                                        .forgotPassword(
-                                        profileViewModel.candidate!.Email);
-                                    showDialog(
-                                      barrierDismissible: false,
-                                      context: context,
-                                      builder: (context) {
-                                        bool isSendingOTP = false;
-
-                                        return StatefulBuilder(
-                                            builder: (conext, setState) {
-                                              return Dialog(
-                                                backgroundColor: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius
-                                                      .circular(
-                                                      10),
-                                                ),
-                                                insetPadding: EdgeInsets.all(9),
-                                                child: Container(
-                                                  width: MediaQuery
-                                                      .of(context)
-                                                      .size
-                                                      .width - 20,
-                                                  padding: EdgeInsets.all(10),
-                                                  child: Column(
-                                                    mainAxisSize: MainAxisSize
-                                                        .min,
-                                                    children: [
-                                                      Text(
-                                                        'Xác thực OTP',
-                                                        style: TextStyle(
-                                                          fontWeight: FontWeight
-                                                              .bold,
-                                                          fontSize: 25,
-                                                        ),
-                                                      ),
-                                                      SizedBox(height: 5),
-                                                      Text(
-                                                        'Mã xác thực (OTP) gồm 6 chữ số đã được gửi đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư và nhập mã OTP để tiếp tục.',
-                                                        style: TextStyle(
-                                                          fontSize: 13,
-                                                        ),
-                                                        textAlign: TextAlign
-                                                            .justify,),
-                                                      Align(
-                                                        alignment: Alignment
-                                                            .centerLeft,
-                                                        child: Padding(
-                                                          padding: const EdgeInsets
-                                                              .only(
-                                                              left: 5, top: 20),
-                                                          child: Text(
-                                                            'Mã OTP:',
-                                                            style: TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight: FontWeight
-                                                                  .w500,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      SizedBox(height: 5),
-                                                      Container(
-                                                        height: 50,
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                          horizontal: 5,
-                                                        ),
-                                                        child: SizedBox.expand(
-                                                          child: TextField(
-                                                            controller: viewModel
-                                                                .otpController,
-                                                            textAlignVertical:
-                                                            TextAlignVertical
-                                                                .top,
-                                                            keyboardType: TextInputType
-                                                                .text,
-                                                            style: TextStyle(
-                                                                fontSize: 14),
-                                                            decoration: InputDecoration(
-                                                              hintText: 'Ví dụ: 123456...',
-                                                              hintStyle: TextStyle(
-                                                                color: Colors
-                                                                    .grey,
-                                                              ),
-                                                              border: OutlineInputBorder(
-                                                                borderRadius: BorderRadius
-                                                                    .circular(
-                                                                  5,
-                                                                ),
-                                                              ),
-                                                              isDense: true,
-                                                              enabledBorder: OutlineInputBorder(
-                                                                borderRadius: BorderRadius
-                                                                    .circular(
-                                                                  5,
-                                                                ),
-                                                                borderSide: BorderSide(
-                                                                  color: Colors
-                                                                      .grey,
-                                                                  width: 0.5,
-                                                                ),
-                                                              ),
-                                                              focusedBorder: OutlineInputBorder(
-                                                                borderRadius: BorderRadius
-                                                                    .circular(
-                                                                  5,
-                                                                ),
-                                                                borderSide: BorderSide(
-                                                                  color: Colors
-                                                                      .blue,
-                                                                  width: 1,
-                                                                ),
-                                                              ),
-                                                              contentPadding: EdgeInsets
-                                                                  .symmetric(
-                                                                horizontal: 10,
-                                                                vertical: 6,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment
-                                                            .end,
-                                                        children: [
-                                                          TextButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            style: TextButton
-                                                                .styleFrom(
-                                                              overlayColor: Colors
-                                                                  .transparent,
-                                                            ),
-                                                            child: Text(
-                                                              'Hủy',
-                                                              style: TextStyle(
-                                                                fontSize: 14,
-                                                                color: Colors
-                                                                    .grey,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          (!isSendingOTP)
-                                                              ? TextButton(
-                                                            onPressed: () async {
-                                                              if (viewModel
-                                                                  .otpController
-                                                                  .text
-                                                                  .isEmpty) {
-                                                                showErrorToastification(
-                                                                    title: "Lỗi",
-                                                                    message: "Vui lòng nhập mã OTP");
-                                                                return;
-                                                              }
-                                                              if (viewModel
-                                                                  .otpController
-                                                                  .text
-                                                                  .length !=
-                                                                  6) {
-                                                                showErrorToastification(
-                                                                    title: "Lỗi",
-                                                                    message: "Mã OTP phải có 6 chữ số");
-                                                                return;
-                                                              }
-                                                              setState(() {
-                                                                isSendingOTP =
-                                                                true;
-                                                              });
-                                                              await viewModel
-                                                                  .verifyOTP(
-                                                                  context)
-                                                                  .then((
-                                                                  value) {
-                                                                setState(() {
-                                                                  isSendingOTP =
-                                                                  false;
-                                                                });
-                                                                if (value
-                                                                    .success ==
-                                                                    true) {
-                                                                  viewModel
-                                                                      .newPasswordController
-                                                                      .clear();
-                                                                  viewModel
-                                                                      .confirmNewPasswordController
-                                                                      .clear();
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                  showDialog(
-                                                                    context: context,
-                                                                    builder: (
-                                                                        context) {
-                                                                      bool obscureText = true;
-                                                                      return StatefulBuilder(
-                                                                          builder: (
-                                                                              conext,
-                                                                              setState) {
-                                                                            return Dialog(
-                                                                              backgroundColor: Colors
-                                                                                  .white,
-                                                                              shape: RoundedRectangleBorder(
-                                                                                borderRadius: BorderRadius
-                                                                                    .circular(
-                                                                                    10),
-                                                                              ),
-                                                                              insetPadding: EdgeInsets
-                                                                                  .all(
-                                                                                  9),
-                                                                              child: Container(
-                                                                                width: MediaQuery
-                                                                                    .of(
-                                                                                    context)
-                                                                                    .size
-                                                                                    .width -
-                                                                                    20,
-                                                                                padding: EdgeInsets
-                                                                                    .all(
-                                                                                    10),
-                                                                                child: Column(
-                                                                                  mainAxisSize: MainAxisSize
-                                                                                      .min,
-                                                                                  children: [
-                                                                                    Text(
-                                                                                      'Đặt lại mật khẩu',
-                                                                                      style: TextStyle(
-                                                                                        fontWeight: FontWeight
-                                                                                            .bold,
-                                                                                        fontSize: 25,
-                                                                                      ),
-                                                                                    ),
-                                                                                    Align(
-                                                                                      alignment: Alignment
-                                                                                          .centerLeft,
-                                                                                      child: Padding(
-                                                                                        padding: const EdgeInsets
-                                                                                            .only(
-                                                                                            left: 5,
-                                                                                            top: 20),
-                                                                                        child: Text(
-                                                                                          'Mật khẩu mới: ',
-                                                                                          style: TextStyle(
-                                                                                            fontSize: 14,
-                                                                                            fontWeight: FontWeight
-                                                                                                .w500,
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                    ),
-                                                                                    SizedBox(
-                                                                                        height: 5),
-                                                                                    Container(
-                                                                                      height: 35,
-                                                                                      padding: EdgeInsets
-                                                                                          .symmetric(
-                                                                                        horizontal: 5,
-                                                                                      ),
-                                                                                      child: SizedBox
-                                                                                          .expand(
-                                                                                        child: TextField(
-                                                                                          autofocus: true,
-                                                                                          obscureText: obscureText,
-                                                                                          controller: viewModel
-                                                                                              .newPasswordController,
-                                                                                          textAlignVertical:
-                                                                                          TextAlignVertical
-                                                                                              .top,
-                                                                                          keyboardType: TextInputType
-                                                                                              .text,
-                                                                                          style: TextStyle(
-                                                                                              fontSize: 14),
-                                                                                          decoration: InputDecoration(
-                                                                                            suffixIcon: IconButton(
-                                                                                              icon: Icon(
-                                                                                                obscureText
-                                                                                                    ? Icons
-                                                                                                    .visibility_off
-                                                                                                    : Icons
-                                                                                                    .visibility,
-                                                                                                size: 15,
-                                                                                              ),
-                                                                                              onPressed: () {
-                                                                                                setState(() {
-                                                                                                  obscureText =
-                                                                                                  !obscureText;
-                                                                                                });
-                                                                                              },
-                                                                                            ),
-                                                                                            hintText: 'Nhập mật khẩu mới...',
-                                                                                            hintStyle: TextStyle(
-                                                                                              color: Colors
-                                                                                                  .grey,
-                                                                                            ),
-                                                                                            border: OutlineInputBorder(
-                                                                                              borderRadius: BorderRadius
-                                                                                                  .circular(
-                                                                                                5,
-                                                                                              ),
-                                                                                            ),
-                                                                                            isDense: true,
-                                                                                            enabledBorder: OutlineInputBorder(
-                                                                                              borderRadius: BorderRadius
-                                                                                                  .circular(
-                                                                                                5,
-                                                                                              ),
-                                                                                              borderSide: BorderSide(
-                                                                                                color: Colors
-                                                                                                    .grey,
-                                                                                                width: 0.5,
-                                                                                              ),
-                                                                                            ),
-                                                                                            focusedBorder: OutlineInputBorder(
-                                                                                              borderRadius: BorderRadius
-                                                                                                  .circular(
-                                                                                                5,
-                                                                                              ),
-                                                                                              borderSide: BorderSide(
-                                                                                                color: Colors
-                                                                                                    .blue,
-                                                                                                width: 1,
-                                                                                              ),
-                                                                                            ),
-                                                                                            contentPadding: EdgeInsets
-                                                                                                .symmetric(
-                                                                                              horizontal: 10,
-                                                                                              vertical: 6,
-                                                                                            ),
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                    ),
-                                                                                    Align(
-                                                                                      alignment: Alignment
-                                                                                          .centerLeft,
-                                                                                      child: Padding(
-                                                                                        padding: const EdgeInsets
-                                                                                            .only(
-                                                                                            left: 5,
-                                                                                            top: 10),
-                                                                                        child: Text(
-                                                                                          'Nhập lại mật khẩu mới: ',
-                                                                                          style: TextStyle(
-                                                                                            fontSize: 14,
-                                                                                            fontWeight: FontWeight
-                                                                                                .w500,
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                    ),
-                                                                                    SizedBox(
-                                                                                        height: 5),
-                                                                                    Container(
-                                                                                      height: 35,
-                                                                                      padding: EdgeInsets
-                                                                                          .symmetric(
-                                                                                        horizontal: 5,
-                                                                                      ),
-                                                                                      child: SizedBox
-                                                                                          .expand(
-                                                                                        child: TextField(
-                                                                                          obscureText: obscureText,
-                                                                                          controller: viewModel
-                                                                                              .confirmNewPasswordController,
-                                                                                          textAlignVertical:
-                                                                                          TextAlignVertical
-                                                                                              .top,
-                                                                                          keyboardType: TextInputType
-                                                                                              .text,
-                                                                                          style: TextStyle(
-                                                                                              fontSize: 14),
-                                                                                          decoration: InputDecoration(
-                                                                                            suffixIcon: IconButton(
-                                                                                              icon: Icon(
-                                                                                                obscureText
-                                                                                                    ? Icons
-                                                                                                    .visibility_off
-                                                                                                    : Icons
-                                                                                                    .visibility,
-                                                                                                size: 15,
-                                                                                              ),
-                                                                                              onPressed: () {
-                                                                                                setState(() {
-                                                                                                  obscureText =
-                                                                                                  !obscureText;
-                                                                                                });
-                                                                                              },
-                                                                                            ),
-                                                                                            hintText: 'Nhập lại mật khẩu mới...',
-                                                                                            hintStyle: TextStyle(
-                                                                                              color: Colors
-                                                                                                  .grey,
-                                                                                            ),
-                                                                                            border: OutlineInputBorder(
-                                                                                              borderRadius: BorderRadius
-                                                                                                  .circular(
-                                                                                                5,
-                                                                                              ),
-                                                                                            ),
-                                                                                            isDense: true,
-                                                                                            enabledBorder: OutlineInputBorder(
-                                                                                              borderRadius: BorderRadius
-                                                                                                  .circular(
-                                                                                                5,
-                                                                                              ),
-                                                                                              borderSide: BorderSide(
-                                                                                                color: Colors
-                                                                                                    .grey,
-                                                                                                width: 0.5,
-                                                                                              ),
-                                                                                            ),
-                                                                                            focusedBorder: OutlineInputBorder(
-                                                                                              borderRadius: BorderRadius
-                                                                                                  .circular(
-                                                                                                5,
-                                                                                              ),
-                                                                                              borderSide: BorderSide(
-                                                                                                color: Colors
-                                                                                                    .blue,
-                                                                                                width: 1,
-                                                                                              ),
-                                                                                            ),
-                                                                                            contentPadding: EdgeInsets
-                                                                                                .symmetric(
-                                                                                              horizontal: 10,
-                                                                                              vertical: 6,
-                                                                                            ),
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                    ),
-                                                                                    SizedBox(
-                                                                                      height: 10,),
-                                                                                    Row(
-                                                                                      mainAxisAlignment: MainAxisAlignment
-                                                                                          .end,
-                                                                                      children: [
-                                                                                        TextButton(
-                                                                                          onPressed: () {
-                                                                                            Navigator
-                                                                                                .pop(
-                                                                                                context);
-                                                                                          },
-                                                                                          style: TextButton
-                                                                                              .styleFrom(
-                                                                                            overlayColor: Colors
-                                                                                                .transparent,
-                                                                                          ),
-                                                                                          child: Text(
-                                                                                            'Hủy',
-                                                                                            style: TextStyle(
-                                                                                              fontSize: 14,
-                                                                                              color: Colors
-                                                                                                  .grey,
-                                                                                            ),
-                                                                                          ),
-                                                                                        ),
-                                                                                        TextButton(
-                                                                                          onPressed: () async {
-                                                                                            if (viewModel
-                                                                                                .newPasswordController
-                                                                                                .text !=
-                                                                                                viewModel
-                                                                                                    .confirmNewPasswordController
-                                                                                                    .text) {
-                                                                                              showErrorToastification(
-                                                                                                  title: "Lỗi",
-                                                                                                  message: "Mật khẩu nhập lại không khớp với mật khẩu mới");
-                                                                                              return;
-                                                                                            }
-                                                                                            showDialog(
-                                                                                              context: context,
-                                                                                              barrierColor: Colors
-                                                                                                  .black
-                                                                                                  .withOpacity(
-                                                                                                  0.5),
-                                                                                              barrierDismissible: false,
-                                                                                              builder: (
-                                                                                                  BuildContext context) {
-                                                                                                return Center(
-                                                                                                  child: CircularProgressIndicator(
-                                                                                                    color: Colors
-                                                                                                        .blue,
-                                                                                                  ),
-                                                                                                );
-                                                                                              },
-                                                                                            );
-                                                                                            await viewModel
-                                                                                                .resetPassword(
-                                                                                                context)
-                                                                                                .then((
-                                                                                                value) {
-                                                                                              Navigator
-                                                                                                  .pop(
-                                                                                                  context);
-                                                                                              if (value
-                                                                                                  .success ==
-                                                                                                  true) {
-                                                                                                Navigator
-                                                                                                    .pop(
-                                                                                                    context);
-                                                                                              }
-                                                                                            });
-                                                                                          },
-                                                                                          style: TextButton
-                                                                                              .styleFrom(
-                                                                                            backgroundColor: Color(
-                                                                                                0xee65c29c),
-                                                                                            foregroundColor: Colors
-                                                                                                .white,
-                                                                                            shape: RoundedRectangleBorder(
-                                                                                              borderRadius: BorderRadius
-                                                                                                  .circular(
-                                                                                                  10),
-                                                                                            ),
-                                                                                          ),
-                                                                                          child: Text(
-                                                                                            'Lưu thay đổi',
-                                                                                            style: TextStyle(
-                                                                                              fontWeight: FontWeight
-                                                                                                  .bold,
-                                                                                              fontSize: 16,
-                                                                                            ),
-                                                                                          ),
-                                                                                        )
-                                                                                      ],
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                            );
-                                                                          }
-                                                                      );
-                                                                    },
-                                                                  );
-                                                                }
-                                                              });
-                                                            },
-                                                            style: TextButton
-                                                                .styleFrom(
-                                                              backgroundColor: Color(
-                                                                  0xee65c29c),
-                                                              foregroundColor: Colors
-                                                                  .white,
-                                                              shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius
-                                                                    .circular(
-                                                                    10),
-                                                              ),
-                                                            ),
-                                                            child: Text(
-                                                              'Tiếp tục',
-                                                              style: TextStyle(
-                                                                fontWeight: FontWeight
-                                                                    .bold,
-                                                                fontSize: 16,
-                                                              ),
-                                                            ),
-                                                          )
-                                                              : Container(
-                                                            height: 40,
-                                                            width: 90,
-                                                            alignment: Alignment
-                                                                .center,
-                                                            child: SizedBox(
-                                                              height: 24,
-                                                              width: 24,
-                                                              child: CircularProgressIndicator(
-                                                                color: Colors
-                                                                    .blue,
-                                                              ),
-                                                            ),
-                                                          )
-
-                                                        ],
-                                                      ),
-                                                    ],
+                                            children: [
+                                              Expanded(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                  child: customTextField(
+                                                    hintText: "Nhập chứng chỉ...",
+                                                    height: 40,
+                                                    textInputType: TextInputType.text,
+                                                    controller: viewModel.certificationControllers[index],
                                                   ),
                                                 ),
-                                              );
-                                            }
-                                        );
-                                      },
-                                    );
-                                  },
-                                  style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(
-                                      Colors.white,
-                                    ),
-                                    elevation: WidgetStateProperty.all(0),
-                                    splashFactory: NoSplash.splashFactory,
-                                    shadowColor: MaterialStateProperty.all(
-                                      Colors.transparent,
-                                    ),
-                                    overlayColor: WidgetStateProperty.all(
-                                      Colors.transparent,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Thay đổi mật khẩu",
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black,
+                                              ),
+                                              IconButton(
+                                                icon: Icon(Icons.close, size: 18, color: Colors.black),
+                                                onPressed: () => viewModel.removeCertification(index),
+                                                style: IconButton.styleFrom(
+                                                  backgroundColor: Colors.red[100],
+                                                  side: BorderSide(color: Colors.grey, width: 1),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(5),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8, right: 8, top: 0, bottom: 8),
+                                        child: ElevatedButton.icon(
+                                          onPressed: viewModel.addCertification,
+                                          icon: Icon(Icons.add, size: 18, color: Colors.grey),
+                                          label: Text(
+                                            "Thêm chứng chỉ",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.white,
+                                            elevation: 0,
+                                            side: BorderSide(color: Colors.grey),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(5),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Thêm padding bên trong button
+                                          ),
                                         ),
                                       ),
-                                      Icon(
-                                        Icons.chevron_right,
-                                        size: 20,
-                                        color: Colors.black,
-                                      ),
+
                                     ],
                                   ),
                                 ),
                               ),
-                            ),
-                            Align(
-                              alignment: Alignment.bottomRight,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: Offset(0, 0),
+                              ),
+                            ],
+                            borderRadius: BorderRadius.circular(5),
+                            color: Colors.white,
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              viewModel.otpController.clear();
+                              await AuthForgetPasswordService().forgotPassword(profileViewModel.candidate!.Email);
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  bool isSendingOTP = false;
 
-                              child: Padding(
-                                padding: EdgeInsets.only(right: 10),
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    showDialog(
-                                      context: context,
-                                      barrierColor: Colors.black.withOpacity(
-                                          0.5),
-                                      barrierDismissible: false,
-                                      builder: (BuildContext context) {
-                                        return Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.blue,
+                                  return StatefulBuilder(
+                                      builder: (context, setState) {
+                                        return Dialog(
+                                          backgroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                10),
+                                          ),
+                                          insetPadding: EdgeInsets.all(9),
+                                          child: Container(
+                                            width: MediaQuery
+                                                .of(context)
+                                                .size
+                                                .width - 20,
+                                            padding: EdgeInsets.all(10),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  'Xác thực OTP',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 25,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 5),
+                                                Text(
+                                                  'Mã xác thực (OTP) gồm 6 chữ số đã được gửi đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư và nhập mã OTP để tiếp tục.',
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                  ),
+                                                  textAlign: TextAlign
+                                                      .justify,),
+                                                Align(
+                                                  alignment: Alignment
+                                                      .centerLeft,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .only(left: 5, top: 20),
+                                                    child: Text(
+                                                      'Mã OTP:',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight
+                                                            .w500,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 5),
+                                                Container(
+                                                  height: 50,
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 5,
+                                                  ),
+                                                  child: SizedBox.expand(
+                                                    child: TextField(
+                                                      controller: viewModel
+                                                          .otpController,
+                                                      textAlignVertical:
+                                                      TextAlignVertical.top,
+                                                      keyboardType: TextInputType
+                                                          .text,
+                                                      style: TextStyle(
+                                                          fontSize: 14),
+                                                      decoration: InputDecoration(
+                                                        hintText: 'Ví dụ: 123456...',
+                                                        hintStyle: TextStyle(
+                                                          color: Colors.grey,
+                                                        ),
+                                                        border: OutlineInputBorder(
+                                                          borderRadius: BorderRadius
+                                                              .circular(
+                                                            5,
+                                                          ),
+                                                        ),
+                                                        isDense: true,
+                                                        enabledBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius
+                                                              .circular(
+                                                            5,
+                                                          ),
+                                                          borderSide: BorderSide(
+                                                            color: Colors.grey,
+                                                            width: 0.5,
+                                                          ),
+                                                        ),
+                                                        focusedBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius
+                                                              .circular(
+                                                            5,
+                                                          ),
+                                                          borderSide: BorderSide(
+                                                            color: Colors.blue,
+                                                            width: 1,
+                                                          ),
+                                                        ),
+                                                        contentPadding: EdgeInsets
+                                                            .symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 6,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment
+                                                      .end,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      style: TextButton
+                                                          .styleFrom(
+                                                        overlayColor: Colors
+                                                            .transparent,
+                                                      ),
+                                                      child: Text(
+                                                        'Hủy',
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    (!isSendingOTP)
+                                                        ? TextButton(
+                                                      onPressed: () async {
+                                                        if (viewModel.otpController.text.isEmpty) {
+                                                          showErrorToastification(title: "Lỗi", message: "Vui lòng nhập mã OTP");
+                                                          return;
+                                                        }
+                                                        if (viewModel.otpController.text.length != 6) {
+                                                          showErrorToastification(title: "Lỗi", message: "Mã OTP phải có 6 chữ số");
+                                                          return;
+                                                        }
+                                                        setState((){isSendingOTP = true;});
+                                                        await viewModel.verifyOTP(context).then((value) {
+                                                          setState(() {
+                                                            isSendingOTP =false;
+                                                          });
+                                                          if (value.success == true) {
+                                                            viewModel.newPasswordController.clear();
+                                                            viewModel.confirmNewPasswordController.clear();
+                                                            Navigator.pop(context);
+                                                            showDialog(
+                                                              context: context,
+                                                              builder: (context) {
+                                                                bool obscureText = true;
+                                                                return StatefulBuilder(
+                                                                    builder: (conext, setState) {
+                                                                      return Dialog(
+                                                                        backgroundColor: Colors.white,
+                                                                        shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              10),
+                                                                        ),
+                                                                        insetPadding: EdgeInsets.all(9),
+                                                                        child: Container(
+                                                                          width: MediaQuery
+                                                                              .of(context)
+                                                                              .size
+                                                                              .width - 20,
+                                                                          padding: EdgeInsets.all(10),
+                                                                          child: Column(
+                                                                            mainAxisSize: MainAxisSize.min,
+                                                                            children: [
+                                                                              Text(
+                                                                                'Đặt lại mật khẩu',
+                                                                                style: TextStyle(
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  fontSize: 25,
+                                                                                ),
+                                                                              ),
+                                                                              Align(
+                                                                                alignment: Alignment
+                                                                                    .centerLeft,
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets
+                                                                                      .only(left: 5, top: 20),
+                                                                                  child: Text(
+                                                                                    'Mật khẩu mới: ',
+                                                                                    style: TextStyle(
+                                                                                      fontSize: 14,
+                                                                                      fontWeight: FontWeight
+                                                                                          .w500,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              SizedBox(height: 5),
+                                                                              Container(
+                                                                                height: 35,
+                                                                                padding: EdgeInsets.symmetric(
+                                                                                  horizontal: 5,
+                                                                                ),
+                                                                                child: SizedBox.expand(
+                                                                                  child: TextField(
+                                                                                    autofocus: true,
+                                                                                    obscureText: obscureText,
+                                                                                    controller: viewModel
+                                                                                        .newPasswordController,
+                                                                                    textAlignVertical:
+                                                                                    TextAlignVertical.top,
+                                                                                    keyboardType: TextInputType
+                                                                                        .text,
+                                                                                    style: TextStyle(
+                                                                                        fontSize: 14),
+                                                                                    decoration: InputDecoration(
+                                                                                      suffixIcon: IconButton(
+                                                                                        icon: Icon(
+                                                                                          obscureText ? Icons.visibility_off : Icons.visibility,
+                                                                                          size: 15,
+                                                                                        ),
+                                                                                        onPressed: () {
+                                                                                          setState(() {
+                                                                                            obscureText = !obscureText;
+                                                                                          });
+                                                                                        },
+                                                                                      ),
+                                                                                      hintText: 'Nhập mật khẩu mới...',
+                                                                                      hintStyle: TextStyle(
+                                                                                        color: Colors.grey,
+                                                                                      ),
+                                                                                      border: OutlineInputBorder(
+                                                                                        borderRadius: BorderRadius
+                                                                                            .circular(
+                                                                                          5,
+                                                                                        ),
+                                                                                      ),
+                                                                                      isDense: true,
+                                                                                      enabledBorder: OutlineInputBorder(
+                                                                                        borderRadius: BorderRadius
+                                                                                            .circular(
+                                                                                          5,
+                                                                                        ),
+                                                                                        borderSide: BorderSide(
+                                                                                          color: Colors.grey,
+                                                                                          width: 0.5,
+                                                                                        ),
+                                                                                      ),
+                                                                                      focusedBorder: OutlineInputBorder(
+                                                                                        borderRadius: BorderRadius
+                                                                                            .circular(
+                                                                                          5,
+                                                                                        ),
+                                                                                        borderSide: BorderSide(
+                                                                                          color: Colors.blue,
+                                                                                          width: 1,
+                                                                                        ),
+                                                                                      ),
+                                                                                      contentPadding: EdgeInsets
+                                                                                          .symmetric(
+                                                                                        horizontal: 10,
+                                                                                        vertical: 6,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              Align(
+                                                                                alignment: Alignment
+                                                                                    .centerLeft,
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets
+                                                                                      .only(left: 5, top: 10),
+                                                                                  child: Text(
+                                                                                    'Nhập lại mật khẩu mới: ',
+                                                                                    style: TextStyle(
+                                                                                      fontSize: 14,
+                                                                                      fontWeight: FontWeight
+                                                                                          .w500,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              SizedBox(height: 5),
+                                                                              Container(
+                                                                                height: 35,
+                                                                                padding: EdgeInsets.symmetric(
+                                                                                  horizontal: 5,
+                                                                                ),
+                                                                                child: SizedBox.expand(
+                                                                                  child: TextField(
+                                                                                    obscureText: obscureText,
+                                                                                    controller: viewModel
+                                                                                        .confirmNewPasswordController,
+                                                                                    textAlignVertical:
+                                                                                    TextAlignVertical.top,
+                                                                                    keyboardType: TextInputType
+                                                                                        .text,
+                                                                                    style: TextStyle(
+                                                                                        fontSize: 14),
+                                                                                    decoration: InputDecoration(
+                                                                                      suffixIcon: IconButton(
+                                                                                        icon: Icon(
+                                                                                          obscureText ? Icons.visibility_off : Icons.visibility,
+                                                                                          size: 15,
+                                                                                        ),
+                                                                                        onPressed: () {
+                                                                                          setState(() {
+                                                                                            obscureText = !obscureText;
+                                                                                          });
+                                                                                        },
+                                                                                      ),
+                                                                                      hintText: 'Nhập lại mật khẩu mới...',
+                                                                                      hintStyle: TextStyle(
+                                                                                        color: Colors.grey,
+                                                                                      ),
+                                                                                      border: OutlineInputBorder(
+                                                                                        borderRadius: BorderRadius
+                                                                                            .circular(
+                                                                                          5,
+                                                                                        ),
+                                                                                      ),
+                                                                                      isDense: true,
+                                                                                      enabledBorder: OutlineInputBorder(
+                                                                                        borderRadius: BorderRadius
+                                                                                            .circular(
+                                                                                          5,
+                                                                                        ),
+                                                                                        borderSide: BorderSide(
+                                                                                          color: Colors.grey,
+                                                                                          width: 0.5,
+                                                                                        ),
+                                                                                      ),
+                                                                                      focusedBorder: OutlineInputBorder(
+                                                                                        borderRadius: BorderRadius
+                                                                                            .circular(
+                                                                                          5,
+                                                                                        ),
+                                                                                        borderSide: BorderSide(
+                                                                                          color: Colors.blue,
+                                                                                          width: 1,
+                                                                                        ),
+                                                                                      ),
+                                                                                      contentPadding: EdgeInsets
+                                                                                          .symmetric(
+                                                                                        horizontal: 10,
+                                                                                        vertical: 6,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              SizedBox(height: 10,),
+                                                                              Row(
+                                                                                mainAxisAlignment: MainAxisAlignment
+                                                                                    .end,
+                                                                                children: [
+                                                                                  TextButton(
+                                                                                    onPressed: () {
+                                                                                      Navigator.pop(context);
+                                                                                    },
+                                                                                    style: TextButton
+                                                                                        .styleFrom(
+                                                                                      overlayColor: Colors
+                                                                                          .transparent,
+                                                                                    ),
+                                                                                    child: Text(
+                                                                                      'Hủy',
+                                                                                      style: TextStyle(
+                                                                                        fontSize: 14,
+                                                                                        color: Colors.grey,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                  TextButton(
+                                                                                    onPressed: () async {
+                                                                                      if (viewModel.newPasswordController.text != viewModel.confirmNewPasswordController.text) {
+                                                                                        showErrorToastification(title: "Lỗi", message: "Mật khẩu nhập lại không khớp với mật khẩu mới");
+                                                                                        return;
+                                                                                      }
+                                                                                      showDialog(
+                                                                                        context: context,
+                                                                                        barrierColor: Colors.black.withOpacity(0.5),
+                                                                                        barrierDismissible: false,
+                                                                                        builder: (BuildContext context) {
+                                                                                          return Center(
+                                                                                            child: CircularProgressIndicator(
+                                                                                              color: Colors.blue,
+                                                                                            ),
+                                                                                          );
+                                                                                        },
+                                                                                      );
+                                                                                      await viewModel.resetPassword(context).then((value) {
+                                                                                        Navigator.pop(context);
+                                                                                        if (value.success == true) {
+                                                                                          Navigator.pop(context);
+                                                                                        }
+                                                                                      });
+                                                                                    },
+                                                                                    style: TextButton
+                                                                                        .styleFrom(
+                                                                                      backgroundColor: Color(
+                                                                                          0xee65c29c),
+                                                                                      foregroundColor: Colors
+                                                                                          .white,
+                                                                                      shape: RoundedRectangleBorder(
+                                                                                        borderRadius: BorderRadius
+                                                                                            .circular(10),
+                                                                                      ),
+                                                                                    ),
+                                                                                    child: Text(
+                                                                                      'Lưu thay đổi',
+                                                                                      style: TextStyle(
+                                                                                        fontWeight: FontWeight
+                                                                                            .bold,
+                                                                                        fontSize: 16,
+                                                                                      ),
+                                                                                    ),
+                                                                                  )
+                                                                                ],
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      );
+                                                                    }
+                                                                );
+                                                              },
+                                                            );
+                                                          }
+                                                        });
+                                                      },
+                                                      style: TextButton
+                                                          .styleFrom(
+                                                        backgroundColor: Color(
+                                                            0xee65c29c),
+                                                        foregroundColor: Colors
+                                                            .white,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius
+                                                              .circular(10),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'Tiếp tục',
+                                                        style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    )
+                                                        : Container(
+                                                      height: 40,
+                                                      width: 90,
+                                                      alignment: Alignment.center,
+                                                      child: SizedBox(
+                                                        height: 24,
+                                                        width: 24,
+                                                        child: CircularProgressIndicator(
+                                                          color: Colors.blue,
+                                                        ),
+                                                      ),
+                                                    )
+
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         );
-                                      },
-                                    );
+                                      }
+                                  );
+                                },
+                              );
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(
+                                Colors.white,
+                              ),
+                              elevation: WidgetStateProperty.all(0),
+                              splashFactory: NoSplash.splashFactory,
+                              shadowColor: MaterialStateProperty.all(
+                                Colors.transparent,
+                              ),
+                              overlayColor: WidgetStateProperty.all(
+                                Colors.transparent,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Thay đổi mật khẩu",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.chevron_right,
+                                  size: 20,
+                                  color: Colors.black,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                  padding: EdgeInsets.only(right: 10),
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      showDialog(
+                                        context: context,
+                                        barrierColor: Colors.black.withOpacity(
+                                            0.5),
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.blue,
+                                            ),
+                                          );
+                                        },
+                                      );
 
-                                   await viewModel.updateCandidateInfo(
-                                        context);
-                                    Navigator.of(context, rootNavigator: true).pop();
-                                    Navigator.pop(context);
-                                  },
-                                  style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(
-                                      Colors.blue,
-                                    ),
-                                    shape: WidgetStateProperty.all(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(5),
-                                        side: BorderSide(
-                                            color: Colors.transparent),
+                                     await viewModel.updateCandidateInfo(
+                                          context);
+                                      Navigator.of(context, rootNavigator: true).pop();
+                                      Navigator.pop(context);
+                                    },
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all(
+                                        Colors.blue,
+                                      ),
+                                      shape: WidgetStateProperty.all(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(5),
+                                          side: BorderSide(
+                                              color: Colors.transparent),
+                                        ),
+                                      ),
+                                      elevation: WidgetStateProperty.all(0),
+                                      splashFactory: NoSplash.splashFactory,
+                                      shadowColor: MaterialStateProperty.all(
+                                        Colors.transparent,
+                                      ),
+                                      overlayColor: WidgetStateProperty.all(
+                                        Colors.transparent,
                                       ),
                                     ),
-                                    elevation: WidgetStateProperty.all(0),
-                                    splashFactory: NoSplash.splashFactory,
-                                    shadowColor: MaterialStateProperty.all(
-                                      Colors.transparent,
-                                    ),
-                                    overlayColor: WidgetStateProperty.all(
-                                      Colors.transparent,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    "Lưu thay đổi",
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                    child: Text(
+                                      "Lưu thay đổi",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),

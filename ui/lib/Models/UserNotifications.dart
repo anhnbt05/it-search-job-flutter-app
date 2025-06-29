@@ -4,7 +4,7 @@ import 'Users.dart';
 
 class UserNotification {
   final String ID;
-  late final bool IsRead;
+  bool? IsRead;
   final List<String> Content;
   final Map<String, dynamic> Metadata;
   final DateTime CreatedAt;

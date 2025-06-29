@@ -236,7 +236,7 @@ class UserService {
     return r;
   }
 
-  Future<bool> deleteUser(String userId, BuildContext context) async {
+  Future<bool> lockUser(String userId, BuildContext context) async {
     var validToken = await getValidAccessToken(context);
 
     final url = Uri.parse('${APIConstants.baseUrl}/${APIConstants.deleteUser_endpoint}/$userId');
@@ -252,6 +252,29 @@ class UserService {
       return true;
     } else {
       showErrorToastification(title: "Lỗi", message: jsonDecode(response.body)["message"]);
+      return false;
+    }
+  }
+
+  Future<bool> unlockUser(String userId, BuildContext context) async {
+    var validToken = await getValidAccessToken(context);
+
+    final url = Uri.parse(
+        '${APIConstants.baseUrl}/${APIConstants.unlockUser_endpoint}/$userId');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $validToken',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 201) {
+      showSuccessToastification(
+          title: "Hoàn tất", message: jsonDecode(response.body)['message']);
+      return true;
+    } else {
+      showErrorToastification(
+          title: "Lỗi", message: jsonDecode(response.body)["message"]);
       return false;
     }
   }

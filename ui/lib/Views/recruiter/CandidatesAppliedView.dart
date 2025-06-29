@@ -15,59 +15,57 @@ import 'ReadResumeScreen.dart';
 
 Widget CandidatesAppliedScreen(BuildContext context) {
   var viewModel = Provider.of<CandidatesAppliesViewModel>(context);
-  if (viewModel.jobs != null && viewModel.applications != null) {
-    return ListView.builder(
-        padding: EdgeInsets.only(bottom: 7),
-        itemCount: viewModel.jobs!.length,
-        itemBuilder: (context, index) {
-          if (viewModel.applications == null) {
-            return SizedBox.shrink();
-          }
-          return JobItem(context, index, viewModel.jobs!,
-              viewModel.applications![index]);
-        }
+
+  if (viewModel.jobs == null || viewModel.jobs!.isEmpty) {
+    return Container(
+      color: Colors.white,
+      child: const Center(
+        child: CircularProgressIndicator(
+          color: Colors.blue,
+        ),
+      ),
     );
   }
-  return Container(
-    color: Colors.white,
-    child: Center(
-      child: FutureBuilder<List<cJobs_recruiter?>?>(
-          future: viewModel.postedJobsManagementViewModel.jobsFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(
-                color: Colors.blue,
-              ));
-            }
 
-            if (viewModel.jobs == null || viewModel.jobs!.isEmpty) {
-              return const Center(child: Text('Bạn chưa có bài đăng nào'));
-            }
-
-            return FutureBuilder(
-                future: viewModel.applicationsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(
-                      color: Colors.blue,
-                    ));
-                  }
-                  return ListView.builder(
-                      padding: EdgeInsets.only(bottom: 7),
-                      itemCount: viewModel.jobs!.length,
-                      itemBuilder: (context, index) {
-                        if (viewModel.applications == null) {
-                          return SizedBox.shrink();
-                        }
-                        return JobItem(context, index, viewModel.jobs!,
-                            viewModel.applications![index]);
-                      }
-                  );
-                }
-            );
-          }
+  if (viewModel.applications == null) {
+    return Container(
+      color: Colors.white,
+      child: const Center(
+        child: CircularProgressIndicator(
+          color: Colors.blue,
+        ),
       ),
-    ),
+    );
+  }
+
+  return _buildJobsList(viewModel);
+}
+
+Widget _buildJobsList(CandidatesAppliesViewModel viewModel) {
+  if (viewModel.jobs == null ||
+      viewModel.applications == null ||
+      viewModel.jobs!.length != viewModel.applications!.length) {
+    return Container(
+      color: Colors.white,
+      child: const Center(
+        child: CircularProgressIndicator(
+          color: Colors.blue,
+        ),
+      ),
+    );
+  }
+
+  return ListView.builder(
+    padding: const EdgeInsets.only(bottom: 7),
+    itemCount: viewModel.jobs!.length,
+    itemBuilder: (context, index) {
+      return JobItem(
+          context,
+          index,
+          viewModel.jobs!,
+          viewModel.applications![index]
+      );
+    },
   );
 }
 

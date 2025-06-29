@@ -14,6 +14,7 @@ import '../../Models/Jobs.dart';
 import '../../Services/job_service.dart';
 
 class CandidatesAppliesViewModel extends ChangeNotifier {
+  late BuildContext context;
   final PostedJobsManagementViewModel postedJobsManagementViewModel;
   late Future<List<List<cApplications_recruiter>?>>? _applicationsFuture;
   TextEditingController _rejectReason = new TextEditingController();
@@ -48,6 +49,17 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
 
 
   CandidatesAppliesViewModel({required this.postedJobsManagementViewModel, required BuildContext context}) {
+    this.context = context;
+    if (postedJobsManagementViewModel.isLoaded) {
+      initFutures(context);
+    } else {
+      postedJobsManagementViewModel.loadFuture.then((_) {
+        initFutures(context);
+      });
+    }
+  }
+
+  Future<void> loadWithoutContext() async {
     if (postedJobsManagementViewModel.isLoaded) {
       initFutures(context);
     } else {
@@ -74,6 +86,7 @@ class CandidatesAppliesViewModel extends ChangeNotifier {
     });
 
     if (isLoad == false) isLoad = true;
+    notifyListeners();
   }
 
   DownloadViewModel() {
