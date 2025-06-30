@@ -5,12 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  Notifications,
-  UserDevices,
-  UserNotifications,
-  Users,
-} from '@prisma/client';
+import { Notifications, UserDevices, Users } from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { omit } from 'lodash';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
@@ -45,6 +40,8 @@ export class UserNotificationsService {
         throw new NotFoundException(
           `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
         );
+
+      console.log('User ID: ', userId);
 
       const { data: userDevices } = await this.anonSupabaseClient
         .from('UserDevices')

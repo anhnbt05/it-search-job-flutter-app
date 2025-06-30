@@ -52,7 +52,11 @@ BottomNavigationBarItem hiddenTabItem() {
   return BottomNavigationBarItem(icon: SizedBox.shrink(), label: '');
 }
 
-PreferredSize? candidateBottomBar(String Role, int index, BuildContext context) {
+PreferredSize? candidateBottomBar(
+  String Role,
+  int index,
+  BuildContext context,
+) {
   var joblistNavigationProvider = Provider.of<JoblistNavigationViewModel>(
     context,
   );
@@ -93,9 +97,7 @@ PreferredSize? candidateBottomBar(String Role, int index, BuildContext context) 
 }
 
 PreferredSize? adminBottomBar(String Role, int index, BuildContext context) {
-  var joblistNavigationProvider = Provider.of<UserNavigationViewModel>(
-    context,
-  );
+  var joblistNavigationProvider = Provider.of<UserNavigationViewModel>(context);
   if (index != 1)
     return null;
   else if (index == 1) {
@@ -195,7 +197,7 @@ Future<Map<String, String>> getDeviceInfo() async {
 
 Future<String?> getOneSignalPlayerId() async {
   try {
-    final playerId = await OneSignal.User.getOnesignalId();
+    final playerId = await OneSignal.User.pushSubscription.id;
 
     if (playerId != null && playerId.isNotEmpty) return playerId;
 
@@ -217,6 +219,8 @@ Future<void> initializeOneSignal() async {
     await OneSignal.Notifications.clearAll();
 
     await OneSignal.Notifications.requestPermission(true);
+
+    OneSignal.User.pushSubscription.optIn();
   } catch (e) {
     print('Error initializing OneSignal: $e');
   }
@@ -249,7 +253,7 @@ extension LevelExtension on eLevel {
   static eLevel? fromString(String level) {
     try {
       return eLevel.values.firstWhere(
-            (e) => e.toString().split('.').last == level.toLowerCase(),
+        (e) => e.toString().split('.').last == level.toLowerCase(),
       );
     } catch (e) {
       return null;
@@ -274,7 +278,7 @@ extension JobTypeExtension on eJobType {
   static eJobType? fromString(String jobtype) {
     try {
       return eJobType.values.firstWhere(
-            (e) => e.toString().split('.').last == jobtype.toLowerCase(),
+        (e) => e.toString().split('.').last == jobtype.toLowerCase(),
       );
     } catch (e) {
       return null;
@@ -297,7 +301,7 @@ extension ApplicationExtension on eApplicationStatus {
   static eApplicationStatus? fromString(String applicationstatus) {
     try {
       return eApplicationStatus.values.firstWhere(
-            (e) => e.toString().split('.').last == applicationstatus.toLowerCase(),
+        (e) => e.toString().split('.').last == applicationstatus.toLowerCase(),
       );
     } catch (e) {
       return null;

@@ -9,9 +9,9 @@ import { JobsModule } from 'src/modules/jobs/jobs.module';
 import { JobsService } from 'src/modules/jobs/jobs.service';
 import { UploadsModule } from 'src/modules/uploads/uploads.module';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
+import { UsersModule } from 'src/modules/users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UsersModule } from 'src/modules/users/users.module';
 
 @Module({
   imports: [
