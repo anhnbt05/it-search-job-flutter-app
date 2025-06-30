@@ -229,6 +229,9 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
 
   Future<ResponseModel> verifyOTP(BuildContext context) async {
     final profileVM = Provider.of<ProfileCandidateViewModel>(context, listen: false);
+    if (profileVM.candidate == null) {
+      profileVM.fetchCandidateInfo(context: context);
+    }
     return await AuthVerifyResetPasswordOtpService().verifyResetPasswordOtp(
       profileVM.candidate!.Email,
       otpController.text,
