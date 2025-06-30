@@ -41,8 +41,6 @@ export class UserNotificationsService {
           `Không tìm thấy người dùng có id '${userId}' trong hệ thống.`,
         );
 
-      console.log('User ID: ', userId);
-
       const { data: userDevices } = await this.anonSupabaseClient
         .from('UserDevices')
         .select('*')
