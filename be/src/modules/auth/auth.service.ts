@@ -14,6 +14,7 @@ import { SupabaseClient, User } from '@supabase/supabase-js';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import {
   DEFAULT_MAX_ATTEMPTS,
+  DEFAULT_STATUS_USER_ONLINE,
   DEFAULT_TTL_OTP_EXPIRED,
   DEFAULT_VERIFIED_OTP_RESET_PASSWORD,
   EmailTemplateNameEnum,
@@ -223,6 +224,8 @@ export class AuthService {
   }
 
   async signIn(signInDto: SignInDto) {
+    console.log(signInDto);
+
     try {
       const { email, password, playerId, platform, deviceInfo } = signInDto;
 
@@ -305,6 +308,12 @@ export class AuthService {
           data.user.id,
         );
 
+      await this.cacheManager.set(
+        `user:${findUser.ID}:status`,
+        'online',
+        DEFAULT_STATUS_USER_ONLINE,
+      );
+
       return {
         accessToken: data?.session?.access_token,
         refreshToken: data?.session?.refresh_token,
@@ -317,7 +326,24 @@ export class AuthService {
 
   public signOut = async () => {
     try {
-      await this.adminSupabaseClient.auth.signOut();
+      const { data, error } = await this.adminSupabaseClient.auth.getSession();
+
+      if (error) {
+        console.error(error);
+
+        throw new InternalServerErrorException(
+          'Đã xảy ra lỗi khi lấy phiên làm việc hiện tại của bạn.',
+        );
+      }
+
+      if (!data || !data?.session)
+        throw new UnauthorizedException(
+          'Không tìm thấy phiên làm việc hiện tại của bạn.',
+        );
+
+      await this.adminSupabaseClient.auth.signOut({});
+
+      await this.cacheManager.del(`user:${data.session.user.id}:status`);
 
       return { success: true, message: 'Đăng xuất tài khoản thành công.' };
     } catch (err) {
