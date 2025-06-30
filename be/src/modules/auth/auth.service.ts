@@ -224,8 +224,6 @@ export class AuthService {
   }
 
   async signIn(signInDto: SignInDto) {
-    console.log(signInDto);
-
     try {
       const { email, password, playerId, platform, deviceInfo } = signInDto;
 
@@ -336,14 +334,10 @@ export class AuthService {
         );
       }
 
-      if (!data || !data?.session)
-        throw new UnauthorizedException(
-          'Không tìm thấy phiên làm việc hiện tại của bạn.',
-        );
-
       await this.adminSupabaseClient.auth.signOut({});
 
-      await this.cacheManager.del(`user:${data.session.user.id}:status`);
+      if (data?.session?.user?.id)
+        await this.cacheManager.del(`user:${data.session.user.id}:status`);
 
       return { success: true, message: 'Đăng xuất tài khoản thành công.' };
     } catch (err) {
