@@ -6,9 +6,7 @@ import { collectMessages } from 'src/libs/common/utils';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: ['debug'],
-  });
+  const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(
     new ValidationPipe({
