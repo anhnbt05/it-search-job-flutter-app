@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/ViewModels/login/LoginNavigationViewModel.dart';
 import 'package:ui/ViewModels/login/SignInViewModel.dart';
@@ -22,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
 
     return ChangeNotifierProvider(
       create: (context) => SignInViewModel(),
@@ -38,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
                         height: screenHeight * 0.25,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: NetworkImage('https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//job-search-background.jpg'),
+                            image: NetworkImage('https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//job-background.png'),
                             fit: BoxFit.cover,
                             colorFilter: ColorFilter.mode(
                               Colors.black.withOpacity(0.2),
@@ -163,6 +165,19 @@ class _LoginPageState extends State<LoginPage> {
                                 onPressed: signInViewModel.isLoading
                                     ? null
                                     : () async {
+                                  final email = _usernameController.text.trim();
+                                  final password = _passwordController.text.trim();
+
+                                  if (email.isEmpty || password.isEmpty) {
+                                    showTopToastification(
+                                      title: "Lỗi",
+                                      content: "Vui lòng nhập đầy đủ email và mật khẩu",
+                                      color: Colors.red,
+                                      icon: Icons.warning_amber_rounded,
+                                    );
+                                    return;
+                                  }
+
                                   final Map<String, dynamic>? payload =
                                   await signInViewModel.signIn(
                                     context,

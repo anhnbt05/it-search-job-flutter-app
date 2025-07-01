@@ -162,7 +162,7 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
 
                 _buildMultilineField(
                   controller: _bioController,
-                  label: "GIỚI THIỆU BẢN THÂN",
+                  label: "GIỚI THIỆU BẢN THÂN (NẾU CÓ)",
                   icon: Icons.info,
                 ),
                 SizedBox(height: screenHeight * 0.025),
@@ -194,7 +194,7 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
                     fontSize: screenHeight * 0.02,
                     color: Colors.black87,
                   ),
-                  hint: Text("Chọn trình độ", style: TextStyle(fontFamily: 'Poppins')),
+                  hint: Text("Chọn trình độ", style: TextStyle(fontFamily: 'Poppins', fontSize: 16)),
                   items: [
                     DropdownMenuItem(
                       value: "intern",
@@ -224,7 +224,7 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
 
                 _buildTextField(
                   controller: _certificationsController,
-                  label: "CHỨNG CHỈ (NGĂN CÁCH BỞI DẤU PHẨY)",
+                  label: "CHỨNG CHỈ NẾU CÓ (NGĂN CÁCH BỞI DẤU ,)",
                   icon: Icons.workspace_premium,
                   hint: "Ví dụ: AWS Certified Developer, Google Cloud Associate",
                 ),
@@ -308,7 +308,7 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
         labelStyle: TextStyle(
           fontFamily: 'Poppins',
           color: Colors.grey.shade600,
-          fontSize: screenHeight * 0.016,
+          fontSize: screenHeight * 0.012,
         ),
         prefixIcon: Icon(icon, color: Colors.grey.shade600),
         filled: true,
@@ -322,7 +322,7 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
           horizontal: 20,
         ),
       ),
-      validator: (value) => value == null || value.isEmpty ? "Không được để trống" : null,
+      validator: null,
     );
   }
 
@@ -346,7 +346,7 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
         labelStyle: TextStyle(
           fontFamily: 'Poppins',
           color: Colors.grey.shade600,
-          fontSize: screenHeight * 0.016,
+          fontSize: screenHeight * 0.014,
         ),
         prefixIcon: Icon(icon, color: Colors.grey.shade600),
         filled: true,
@@ -360,7 +360,7 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
           horizontal: 20,
         ),
       ),
-      validator: (value) => value == null || value.isEmpty ? "Không được để trống" : null,
+      validator: null,
     );
   }
 

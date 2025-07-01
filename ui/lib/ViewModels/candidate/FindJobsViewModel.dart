@@ -34,10 +34,12 @@ class FindJobsViewModel extends ChangeNotifier {
         candidateID: candidateId!,
       );
       jobs = recommendedjobs;
-      showErrorToastification(
-        message: "Hiện tại không có công việc nào phù hợp với trình độ của bạn.",
-        title: "Lỗi",
-      );
+      if (jobs.isEmpty) {
+        showErrorToastification(
+          message: "Hiện tại không có công việc nào phù hợp với trình độ của bạn.",
+          title: "Lỗi",
+        );
+      }
     } catch (e) {
       error = "Đã xảy ra lỗi khi tải danh sách công việc: $e";
     } finally {

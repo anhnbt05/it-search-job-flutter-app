@@ -57,6 +57,9 @@ class _EditCandidateInformationScreenState
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    softWrap: false,
                   ),
                 ]
                 ),
@@ -1004,6 +1007,8 @@ class _EditCandidateInformationScreenState
 
                                      await viewModel.updateCandidateInfo(
                                           context);
+                                      final profileViewModel = Provider.of<ProfileCandidateViewModel>(context, listen: false);
+                                      await profileViewModel.fetchCandidateInfo(context: context);
                                       Navigator.of(context, rootNavigator: true).pop();
                                       Navigator.pop(context);
                                     },

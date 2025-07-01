@@ -5,6 +5,7 @@ import 'package:ui/ViewModels/candidate/ProfileCandidateViewModel.dart';
 import 'package:ui/Views/candidate/EditWorkExperienceView.dart';
 import 'package:ui/Views/candidate/PostWorkExperiencesView.dart';
 import '../../Helpers/helpers.dart';
+import '../../Helpers/toastification.dart';
 import '../../Models/WorkExperiences.dart';
 import '../../ViewModels/candidate/EditCandidateInformationViewModel.dart';
 import '../../ViewModels/candidate/WorkExperiencesViewModel.dart';
@@ -92,8 +93,8 @@ class ProfileCandidateView extends StatelessWidget {
                                             ChangeNotifierProvider(
                                               create: (_) => EditCandidateInformationViewModel(context, candidate.ID),
                                             ),
-                                            ChangeNotifierProvider(
-                                              create: (_) => ProfileCandidateViewModel()..fetchCandidateInfo(context: context),
+                                            ChangeNotifierProvider.value(
+                                              value: viewModel,
                                             ),
                                           ],
                                           child: EditCandidateInformationScreen(),
@@ -196,7 +197,20 @@ class ProfileCandidateView extends StatelessWidget {
                         _sectionTitle('Kinh nghiệm làm việc'),
                         IconButton(
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => PostWorkExperiencesView()));
+                            Navigator.push(context, MaterialPageRoute(
+                                builder: (context) => MultiProvider(
+                              providers: [
+                                ChangeNotifierProvider.value(
+                                  value: Provider.of<WorkExperiencesViewModel>(context, listen: false),
+                                ),
+                                ChangeNotifierProvider.value(
+                                  value: viewModel,
+                                ),
+                              ],
+                              child: PostWorkExperiencesView(),
+                            ),
+                            ),
+                            );
                           },
                           icon: const Icon(Icons.add_circle_outline, size: 28),
                           color: Colors.blueAccent,
@@ -211,39 +225,113 @@ class ProfileCandidateView extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => EditWorkExperienceView(workExperience: exp),
+                              builder: (context) => MultiProvider(
+                                providers: [
+                                  ChangeNotifierProvider.value(
+                                    value: Provider.of<WorkExperiencesViewModel>(context, listen: false),
+                                  ),
+                                  ChangeNotifierProvider.value(
+                                    value: viewModel,
+                                  ),
+                                ],
+                                child: EditWorkExperienceView(workExperience: exp),
+                              ),
                             ),
                           );
                         },
-                        onDelete: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text("Xác nhận xóa", style: TextStyle(fontFamily: 'Poppins')),
-                              content: const Text("Bạn có chắc chắn muốn xóa kinh nghiệm làm việc này?", style: TextStyle(fontFamily: 'Poppins')),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text("Hủy", style: TextStyle(fontFamily: 'Poppins')),
+                          onDelete: () async {
+                            final confirmed = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: Colors.white,
+                                title: const Text(
+                                  "Xác nhận",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 22,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                TextButton(
-                                  onPressed: () async {
-                                    Navigator.pop(context);
-                                    final workExpViewModel = Provider.of<WorkExperiencesViewModel>(context, listen: false);
-                                    final profileViewModel = Provider.of<ProfileCandidateViewModel>(context, listen: false);
-
-                                    final success = await workExpViewModel.deleteWorkExperience(id: exp.ID!, context: context);
-
-                                    if (success) {
-                                      await profileViewModel.fetchCandidateInfo(context: context);
-                                    }
-                                  },
-                                  child: const Text("Xóa", style: TextStyle(color: Colors.red, fontFamily: 'Poppins')),
+                                content: const Text(
+                                  'Bạn có chắc muốn xóa kinh nghiệm làm việc này?',
+                                  style: TextStyle(fontFamily: 'Poppins'),
                                 ),
-                              ],
-                            ),
-                          );
-                        },
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, false),
+                                    style: TextButton.styleFrom(
+                                      overlayColor: Colors.transparent,
+                                    ),
+                                    child: const Text(
+                                      'Hủy',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                        fontFamily: 'Poppins',
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, true),
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Color(0xee65c29c),
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Đồng ý',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        fontFamily: 'Poppins',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (confirmed != true) return;
+
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (_) => const Center(child: CircularProgressIndicator()),
+                            );
+
+                            try {
+                              final workExpViewModel = Provider.of<WorkExperiencesViewModel>(context, listen: false);
+                              final profileViewModel = Provider.of<ProfileCandidateViewModel>(context, listen: false);
+
+                              final success = await workExpViewModel.deleteWorkExperience(id: exp.ID!, context: context);
+
+                              Navigator.of(context, rootNavigator: true).pop();
+
+                              if (success) {
+                                await profileViewModel.fetchCandidateInfo(context: context);
+
+                              } else {
+                                showTopToastification(
+                                  title: "Lỗi",
+                                  content: "Không thể xóa kinh nghiệm làm việc",
+                                  color: Colors.red,
+                                  icon: Icons.error,
+                                );
+                              }
+                            } catch (e) {
+                              Navigator.of(context, rootNavigator: true).pop();
+                              showTopToastification(
+                                title: "Lỗi",
+                                content: "Đã xảy ra lỗi khi xóa kinh nghiệm",
+                                color: Colors.red,
+                                icon: Icons.error,
+                              );
+                            }
+                          }
+
                       );
                     }).toList(),
                   ],
