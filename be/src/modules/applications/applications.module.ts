@@ -13,6 +13,7 @@ import { WebsocketGateway } from 'src/modules/websockets/websockets.gateway';
 import { WebsocketsModule } from 'src/modules/websockets/websockets.module';
 import { ApplicationsController } from './applications.controller';
 import { ApplicationsService } from './applications.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ApplicationsService } from './applications.service';
     UsersModule,
     EmailsModule,
     WebsocketsModule,
+    HttpModule,
   ],
   controllers: [ApplicationsController],
   providers: [

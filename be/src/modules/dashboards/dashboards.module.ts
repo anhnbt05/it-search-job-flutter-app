@@ -32,6 +32,7 @@ import { UsersService } from 'src/modules/users/users.service';
 import { WebsocketGateway } from 'src/modules/websockets/websockets.gateway';
 import { DashboardsController } from './dashboards.controller';
 import { DashboardsService } from './dashboards.service';
+import { OneSignalProvider } from 'src/libs/common/providers';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { DashboardsService } from './dashboards.service';
     EmailsProducer,
     ReportContext,
     WebsocketGateway,
+    OneSignalProvider,
   ],
 })
 export class DashboardsModule {}

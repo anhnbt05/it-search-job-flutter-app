@@ -1192,10 +1192,7 @@ export class JobsService {
           `Không tìm thấy ứng viên mà liên kết với người dùng có id '${userId}'`,
         );
 
-      if (data.ID !== candidateId)
-        throw new NotFoundException(
-          'Hiện tại không có công việc nào phù hợp với trình độ của bạn.',
-        );
+      if (data.ID !== candidateId) return [];
 
       const candidateLevel = data.Level;
 
@@ -1225,10 +1222,7 @@ export class JobsService {
       ORDER BY j."PostedAt" DESC
     `;
 
-      if (!jobs.length)
-        throw new NotFoundException(
-          'Hiện tại không có công việc nào phù hợp với trình độ của bạn.',
-        );
+      if (!jobs.length) return [];
 
       return (
         jobs

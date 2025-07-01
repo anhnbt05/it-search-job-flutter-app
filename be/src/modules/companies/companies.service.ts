@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ApplicationStatus, Recruiters } from '@prisma/client';
+import { ApplicationStatus, Companies, Recruiters } from '@prisma/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
 import { UpdateCompanyDto } from 'src/modules/companies/dtos';
@@ -66,7 +66,7 @@ export class CompaniesService {
         if (url) logoFileUrl = url;
       }
 
-      const { error } = await this.adminSupabaseClient
+      const { data, error } = await this.adminSupabaseClient
         .from('Companies')
         .update([
           {
@@ -74,7 +74,9 @@ export class CompaniesService {
             ...(logoFileUrl && { LogoUrl: logoFileUrl }),
           },
         ])
-        .eq('ID', companyId);
+        .eq('ID', companyId)
+        .select('*')
+        .maybeSingle<Companies>();
 
       if (error) {
         console.error(error);
@@ -84,10 +86,7 @@ export class CompaniesService {
         );
       }
 
-      return {
-        success: true,
-        message: 'Đã cập nhật thành công thông tin mới về công ty của bạn.',
-      };
+      return data;
     } catch (err) {
       console.error(err);
       throw err;
