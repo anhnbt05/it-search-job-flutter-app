@@ -19,6 +19,45 @@ class AppliedJobsView extends StatelessWidget {
           builder: (context, viewModel, _) {
             return Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(32),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.search, color: Colors.grey),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            onChanged: (value) {
+                              viewModel.filterJobsByTitle(value);
+                            },
+                            cursorColor: Colors.grey,
+                            decoration: const InputDecoration(
+                              hintText: 'Tìm kiếm công việc...',
+                              hintStyle: TextStyle(
+                                color: Colors.grey,
+                              ),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
                 _buildStatusFilter(viewModel),
                 Expanded(
                   child: viewModel.isLoading
@@ -45,8 +84,9 @@ class AppliedJobsView extends StatelessWidget {
 
   Widget _buildStatusFilter(AppliedJobsViewModel viewModel) {
     return Padding(
-      padding: const EdgeInsets.only(top: 5, left: 5, right: 5),
+      padding: const EdgeInsets.only(top: 5, right: 5),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text('Hiển thị:',
@@ -56,7 +96,7 @@ class AppliedJobsView extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 7),
+            padding: const EdgeInsets.only(left: 0),
             child: DropdownButtonHideUnderline(
               child: DropdownButton2<String>(
                 isDense: true,
@@ -85,6 +125,7 @@ class AppliedJobsView extends StatelessWidget {
                 buttonStyleData: ButtonStyleData(
                   width: 150,
                   overlayColor: MaterialStateProperty.all(Colors.transparent),
+                    padding: EdgeInsets.only(left: 15, right: 8)
                 ),
                 dropdownStyleData: DropdownStyleData(
                   elevation: 1,
@@ -249,7 +290,7 @@ class JobCard extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.cancel),
-                  label: const Text('Xoá đơn'),
+                  label: const Text('Huỷ đơn'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFDC2626),
                     foregroundColor: Colors.white,

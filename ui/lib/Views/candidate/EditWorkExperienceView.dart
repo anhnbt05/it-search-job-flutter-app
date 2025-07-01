@@ -139,6 +139,61 @@ class _EditWorkExperienceViewState extends State<EditWorkExperienceView> {
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
                       locale: const Locale('vi', 'VN'),
+                      builder: (BuildContext context, Widget? child) {
+                        return Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: Theme.of(context).colorScheme.copyWith(
+                              primary: Colors.blue,
+                              onPrimary: Colors.white,
+                              surface: Colors.white,
+                              onSurface: Colors.black,
+                            ),
+                            datePickerTheme: DatePickerThemeData(
+                                backgroundColor: Colors.white,
+                                headerBackgroundColor: Colors.blue,
+                                headerForegroundColor: Colors.white,
+                                weekdayStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                dayStyle: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 14,
+                                ),
+                                todayBackgroundColor: MaterialStateProperty.all(
+                                  Colors.blue.withOpacity(0.1),
+                                ),
+                                todayForegroundColor: MaterialStateProperty.all(
+                                  Colors.blue.shade600,
+                                ),
+                                dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+                                  if (states.contains(MaterialState.selected)) {
+                                    return Colors.blue;
+                                  }
+                                  return null;
+                                }),
+                                dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                                  if (states.contains(MaterialState.selected)) {
+                                    return Colors.white;
+                                  }
+                                  return Colors.black87;
+                                }),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                dayShape: MaterialStateProperty.all(
+                                  CircleBorder(),
+                                ),
+                                cancelButtonStyle: ButtonStyle(
+                                  foregroundColor: MaterialStateProperty.all(
+                                    Colors.grey,
+                                  ),
+                                )
+                            ),
+                          ),
+                          child: child!,
+                        );
+                      },
                     );
                     if (pickedDate != null) {
                       onDateSelected(pickedDate);
