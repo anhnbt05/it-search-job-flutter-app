@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import '../../Constants/color_constants.dart';
 import '../../Models/WorkExperiences.dart';
+import '../../ViewModels/candidate/ProfileCandidateViewModel.dart';
 import '../../ViewModels/candidate/WorkExperiencesViewModel.dart';
 
 class EditWorkExperienceView extends StatefulWidget {
@@ -548,6 +549,7 @@ class _EditWorkExperienceViewState extends State<EditWorkExperienceView> {
                             setState(() => _isLoading = true);
 
                             final viewModel = Provider.of<WorkExperiencesViewModel>(context, listen: false);
+                            final profileViewModel = Provider.of<ProfileCandidateViewModel>(context, listen: false);
                             final jobTypeApiValue = viewModel.jobTypeApiMapping[_selectedJobType] ?? '';
 
                             try {
@@ -567,6 +569,7 @@ class _EditWorkExperienceViewState extends State<EditWorkExperienceView> {
                               );
 
                               if (success && mounted) {
+                                await profileViewModel.fetchCandidateInfo(context: context);
                                 Navigator.of(context).pop(true);
                               }
                             } catch (e) {
