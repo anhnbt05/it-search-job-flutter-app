@@ -25,6 +25,34 @@ class AppliedJobsViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String get statusFilter => _statusFilter;
+  String _searchQuery = '';
+
+  void _applyFilters() {
+    if (_searchQuery.isEmpty && _statusFilter == 'all') {
+      _filteredJobs = List.from(_appliedJobs);
+    } else {
+      _filteredJobs = _appliedJobs.where((job) {
+        final statusMatch = _statusFilter == 'all' ||
+            job.application.Status.toLowerCase() == _statusFilter.toLowerCase();
+
+        final searchMatch = _searchQuery.isEmpty ||
+            (job.application.Job?.Title.toLowerCase().contains(_searchQuery.toLowerCase()) == true);
+
+                return statusMatch && searchMatch;
+            }).toList();
+    }
+    notifyListeners();
+  }
+
+  void filterByStatus(String status) {
+    _statusFilter = status;
+    _applyFilters();
+  }
+
+  void filterJobsByTitle(String query) {
+    _searchQuery = query.trim();
+    _applyFilters();
+  }
 
   Future<void> fetchAllAppliedJobs(BuildContext context) async {
     _isLoading = true;
@@ -49,19 +77,6 @@ class AppliedJobsViewModel extends ChangeNotifier {
     }
 
     _isLoading = false;
-    notifyListeners();
-  }
-
-  void filterByStatus(String status) {
-    _statusFilter = status;
-
-    if (status == 'all') {
-      _filteredJobs = _appliedJobs;
-    } else {
-      _filteredJobs = _appliedJobs.where((job) =>
-      job.application.Status.toLowerCase() == status.toLowerCase()
-      ).toList();
-    }
     notifyListeners();
   }
 
