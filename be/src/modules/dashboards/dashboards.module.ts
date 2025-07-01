@@ -3,7 +3,6 @@ import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { SupabaseModule } from 'nestjs-supabase-js';
 import {
-  EMAIL_QUEUE_NAME,
   GENERATE_REPORT_QUEUE_NAME,
   REPORT_FLOW_PRODUCER,
   UPLOAD_REPORT_QUEUE_NAME,
@@ -30,6 +29,7 @@ import { UploadsModule } from 'src/modules/uploads/uploads.module';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
 import { UsersModule } from 'src/modules/users/users.module';
 import { UsersService } from 'src/modules/users/users.service';
+import { WebsocketGateway } from 'src/modules/websockets/websockets.gateway';
 import { DashboardsController } from './dashboards.controller';
 import { DashboardsService } from './dashboards.service';
 
@@ -71,6 +71,7 @@ import { DashboardsService } from './dashboards.service';
     ReportProducer,
     EmailsProducer,
     ReportContext,
+    WebsocketGateway,
   ],
 })
 export class DashboardsModule {}

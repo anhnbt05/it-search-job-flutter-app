@@ -95,4 +95,14 @@ export class WebsocketGateway
       `Đã gửi thông báo real time đến người dùng có tên '${user.FullName}'`,
     );
   };
+
+  public handleSendDeleteApplicationNotificationRealTime = (user: any) => {
+    this.server
+      .to(user.ID as string)
+      .emit('candidate_delete_application', null);
+
+    console.log(
+      `Đã gửi thông báo real time đến người dùng có tên '${user.FullName}'`,
+    );
+  };
 }
