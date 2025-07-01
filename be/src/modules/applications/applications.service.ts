@@ -1,6 +1,8 @@
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -33,6 +35,7 @@ import { EmailsProducer } from 'src/modules/emails/producers';
 import { JobsService } from 'src/modules/jobs/jobs.service';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
 import { UserNotificationsService } from 'src/modules/user-notifications/user-notifications.service';
+import { WebsocketGateway } from 'src/modules/websockets/websockets.gateway';
 
 @Injectable()
 export class ApplicationsService {
@@ -46,6 +49,8 @@ export class ApplicationsService {
     private readonly userNotificationsService: UserNotificationsService,
     private readonly emailsProducer: EmailsProducer,
     private readonly configService: ConfigService,
+    private readonly websocketGateway: WebsocketGateway,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   public handleGetApplications = async (userId: string) => {
@@ -186,7 +191,9 @@ export class ApplicationsService {
       const resumeFile = files?.find((file) => file.fieldname === 'resumeFile');
 
       if (!resumeFile && !candidate.ResumeUrl)
-        throw new BadRequestException(`Bạn vui lòng nộp file CV.`);
+        throw new BadRequestException(
+          `Hồ sơ hiện tại của bạn không có file CV mặc định.`,
+        );
 
       let resumeFileUrl = candidate.ResumeUrl;
 
@@ -271,10 +278,10 @@ export class ApplicationsService {
 
       const { data: application } = await this.anonSupabaseClient
         .from('Applications')
-        .select('*, Jobs(*)')
+        .select('*, Jobs(*, Recruiters(*, Users(*)))')
         .eq('ID', id)
         .is('DeletedAt', null)
-        .maybeSingle<Applications>();
+        .maybeSingle<any>();
 
       if (!application)
         throw new NotFoundException(
@@ -300,6 +307,22 @@ export class ApplicationsService {
 
         throw new InternalServerErrorException(
           'Đã xảy ra lỗi trong quá trình xoá đơn ứng tuyển của bạn. Vui lòng thử lại.',
+        );
+      }
+
+      const recruiterId = application.Jobs.Recruiters.UserID as string;
+
+      const statusOfRecruiter = await this.cacheManager.get(
+        `user:${recruiterId}:status`,
+      );
+
+      if (
+        statusOfRecruiter &&
+        typeof statusOfRecruiter === 'string' &&
+        statusOfRecruiter === 'online'
+      ) {
+        this.websocketGateway.handleSendDeleteApplicationNotificationRealTime(
+          application.Jobs.Recruiters.Users,
         );
       }
 
