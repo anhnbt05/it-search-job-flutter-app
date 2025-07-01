@@ -103,7 +103,6 @@ class EditRecruiterInformationViewModel extends ChangeNotifier {
   }
 
   Future<void> updateRecruiterInfo(BuildContext context, String userId) async {
-    var authViewModel = Provider.of<SignInViewModel>(context, listen: false);
     var recruiterVM = Provider.of<RecruiterProfileViewModel>(context, listen: false);
     String? newAvtUrl = await UserService().patchRecruiterInfo(
       userId: userId,
