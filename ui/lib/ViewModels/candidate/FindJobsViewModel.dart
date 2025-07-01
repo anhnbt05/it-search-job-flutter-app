@@ -5,6 +5,7 @@ import 'package:ui/Helpers/helpers.dart';
 import 'package:ui/Models/Jobs.dart';
 
 import '../../Constants/api_constants.dart';
+import '../../Helpers/toastification.dart';
 import '../../Services/job_service.dart';
 
 class FindJobsViewModel extends ChangeNotifier {
@@ -33,6 +34,10 @@ class FindJobsViewModel extends ChangeNotifier {
         candidateID: candidateId!,
       );
       jobs = recommendedjobs;
+      showErrorToastification(
+        message: "Hiện tại không có công việc nào phù hợp với trình độ của bạn.",
+        title: "Lỗi",
+      );
     } catch (e) {
       error = "Đã xảy ra lỗi khi tải danh sách công việc: $e";
     } finally {

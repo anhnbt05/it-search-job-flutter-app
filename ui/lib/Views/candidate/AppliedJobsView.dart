@@ -346,12 +346,12 @@ class JobCard extends StatelessWidget {
             ),
           ],
         );
-      case 'approved':
+      case 'accepted':
         return Row(
           children: [
             Icon(Icons.check_circle, size: 14, color: Colors.green),
             const SizedBox(width: 4),
-            Text('Đã được chấp nhận',
+            Text('Đã chấp nhận',
               style: TextStyle(
                   color: Colors.green,
                   fontSize: 13,
@@ -368,34 +368,6 @@ class JobCard extends StatelessWidget {
             Text('Đã bị từ chối',
               style: TextStyle(
                   color: Colors.red,
-                  fontSize: 13,
-                  fontWeight: FontWeight.normal
-              ),
-            ),
-          ],
-        );
-      case 'interview':
-        return Row(
-          children: [
-            Icon(Icons.calendar_today, size: 14, color: Colors.blue),
-            const SizedBox(width: 4),
-            Text('Được mời phỏng vấn',
-              style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 13,
-                  fontWeight: FontWeight.normal
-              ),
-            ),
-          ],
-        );
-      case 'hired':
-        return Row(
-          children: [
-            Icon(Icons.work, size: 14, color: Colors.green.shade800),
-            const SizedBox(width: 4),
-            Text('Đã được tuyển dụng',
-              style: TextStyle(
-                  color: Colors.green.shade800,
                   fontSize: 13,
                   fontWeight: FontWeight.normal
               ),
