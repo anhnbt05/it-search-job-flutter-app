@@ -84,26 +84,76 @@ class _EditCompanyInformationScreenState
                                             width: 2,
                                           ),
                                         ),
-                                        child:
-                                            profileViewModel
-                                                        .recruiterInfo!
-                                                        .Company
-                                                        .LogoUrl !=
-                                                    null
-                                                ? ClipOval(
-                                                  child: Image.network(
-                                                    profileViewModel
-                                                        .recruiterInfo!
-                                                        .Company
-                                                        .LogoUrl!,
-                                                    fit: BoxFit.cover,
-                                                    width: 140,
-                                                    height: 140,
-                                                  ),
-                                                )
-                                                : CircularProgressIndicator(
-                                                  color: Colors.blue,
-                                                ),
+                                        clipBehavior: Clip.hardEdge,
+                                        child: viewModel.logoImage != null
+                                            ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(10),
+                                          child: Image.file(
+                                            viewModel.logoImage!,
+                                            fit: BoxFit.cover,
+                                            width: 140,
+                                            height: 140,
+                                          ),
+                                        )
+                                            : Center(
+                                          child: CircularProgressIndicator(color: Colors.blue,),
+                                        ),
+                                      )
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 15),
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          viewModel.pickImage();
+                                        },
+                                        style: ButtonStyle(
+                                          backgroundColor:
+                                          WidgetStateProperty.all(
+                                            Colors.white,
+                                          ),
+                                          elevation: WidgetStateProperty.all(0),
+                                          splashFactory: NoSplash.splashFactory,
+                                          shadowColor: MaterialStateProperty.all(
+                                            Colors.transparent,
+                                          ),
+                                          overlayColor: WidgetStateProperty.all(
+                                            Colors.transparent,
+                                          ),
+                                          minimumSize: WidgetStateProperty.all(
+                                            Size(120, 32),
+                                          ),
+                                          shape: WidgetStateProperty.all(
+                                            RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                5,
+                                              ),
+                                              side: BorderSide(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.camera_alt,
+                                              color: Colors.grey,
+                                            ),
+                                            SizedBox(width: 5),
+                                            Text(
+                                              "Đổi ảnh logo",
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -274,7 +324,7 @@ class _EditCompanyInformationScreenState
                                       },
                                     ),
                                   ),
-                                  SizedBox(height: 10),
+                                  SizedBox(height: 7),
                                 ],
                               ),
                             ),

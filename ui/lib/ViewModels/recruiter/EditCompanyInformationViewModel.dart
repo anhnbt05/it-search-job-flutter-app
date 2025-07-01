@@ -1,7 +1,14 @@
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/Helpers/helpers.dart';
+import 'package:ui/Models/ResponseModel.dart';
 import 'package:ui/Services/auth_provinces_service.dart';
+import '../../Models/Companies.dart';
 import '../../Models/CompanyLocations.dart';
 import '../../Models/Provinces.dart';
 import '../../Services/auth_companies_service.dart';
@@ -31,6 +38,47 @@ class EditCompanyInformationViewModel extends ChangeNotifier {
   List<cProvinces> get provinceList => _provinceList;
 
   String? get provinceSelected => _provinceSelected;
+
+  File? _logoImage;
+  File? _oldLogoImage;
+  Uint8List? _imageBytes;
+
+  File? get logoImage => _logoImage;
+  Uint8List? get imageBytes => _imageBytes;
+  File? get oldLogoImage => _oldLogoImage;
+
+  Future<File> downloadImageAsFile(String imageUrl, String fileName) async {
+    final response = await http.get(Uri.parse(imageUrl));
+
+    if (response.statusCode == 200) {
+      final dir = await getTemporaryDirectory();
+      final filePath = '${dir.path}/$fileName';
+      final file = File(filePath);
+      await file.writeAsBytes(response.bodyBytes);
+      return file;
+    } else {
+      throw Exception('Tải ảnh thất bại: ${response.statusCode}');
+    }
+  }
+
+  void downloadImage(String imageUrl) async {
+    try {
+      _logoImage = await downloadImageAsFile(imageUrl, imageUrl.split('/').last);
+      print('Đã tải và lưu tại: ${_logoImage!.path}');
+      notifyListeners();
+    } catch (e) {
+      print('Lỗi khi tải ảnh: $e');
+    }
+  }
+
+  Future<void> pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      _logoImage = File(pickedFile.path);
+      notifyListeners();
+    }
+  }
 
   EditCompanyInformationViewModel(BuildContext context) {
     var profileViewModel = Provider.of<RecruiterProfileViewModel>(context);
@@ -63,6 +111,10 @@ class EditCompanyInformationViewModel extends ChangeNotifier {
     );
     _branchAddressController = TextEditingController();
     _branchNameController = TextEditingController();
+    if (profileViewModel.recruiterInfo!.Company.LogoUrl != null) {
+      downloadImage(profileViewModel.recruiterInfo!.Company.LogoUrl!);
+    }
+    _oldLogoImage = _logoImage;
   }
 
   void setSelectedProvince(String? value) {
@@ -80,15 +132,16 @@ class EditCompanyInformationViewModel extends ChangeNotifier {
       context,
       listen: false,
     );
-    var success = await CompanyService().editCompany(
-      companyId: profileViewModel.recruiterInfo!.Company.ID,
+    cCompany_RecruiterInfo? response = await CompanyService().editCompany(
+      companyId: profileViewModel.recruiterInfo!.Company.ID!,
       newName: nameController.text,
       newDescription: descriptionController.text,
       newWebsiteUrl: websiteURLController.text,
       context: context,
+      file: logoImage!
     );
-    if (success) {
-      profileViewModel.recruiterInfo!.Company = profileViewModel.recruiterInfo!.Company.copyWith(newDescription: descriptionController.text, newName: nameController.text, newWebsiteUrl: websiteURLController.text);
+    if (response != null) {
+      profileViewModel.recruiterInfo!.Company = response;
       profileViewModel.notifyListeners();
     }
   }
@@ -99,7 +152,7 @@ class EditCompanyInformationViewModel extends ChangeNotifier {
       listen: false,
     );
     var response = await AuthCompaniesService().addBranch(
-      companyId: profileViewModel.recruiterInfo!.Company.ID,
+      companyId: profileViewModel.recruiterInfo!.Company.ID!,
       branchName: branchNameController.text,
       address: branchAddressController.text,
       locationId: provinceSelected ?? "",
@@ -112,7 +165,7 @@ class EditCompanyInformationViewModel extends ChangeNotifier {
           .fetchBranches(
             (profileViewModel.recruiterInfo == null)
                 ? ""
-                : profileViewModel.recruiterInfo!.Company.ID,
+                : profileViewModel.recruiterInfo!.Company.ID!,
           )
           .then((value) {
             profileViewModel.branches = value.data;

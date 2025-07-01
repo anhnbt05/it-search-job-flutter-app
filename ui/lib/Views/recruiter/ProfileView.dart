@@ -81,6 +81,7 @@ Widget RecruiterInfo(BuildContext context) {
               children: [
                 CircleAvatar(
                   radius: 50,
+                  backgroundColor: Colors.white,
                   child: (viewModel.recruiterInfo?.AvatarUrl != null &&
                       viewModel.recruiterInfo!.AvatarUrl.isNotEmpty)
                       ? ClipOval(
@@ -248,35 +249,56 @@ Widget CompanyInfo(BuildContext context) {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(width: 1, color: Colors.black12),
-                  ),
-                  child: (viewModel.recruiterInfo?.Company.LogoUrl != null)
-                      ? Image.network(
-                    viewModel.recruiterInfo!.Company.LogoUrl!,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: SizedBox(
                     width: 100,
                     height: 100,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(color: Colors.blue),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(
+                          viewModel.recruiterInfo!.Company.LogoUrl!,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container();
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
+                              child: Icon(Icons.broken_image, color: Colors.grey),
+                            );
+                          },
                         ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Center(
-                        child: Icon(Icons.broken_image, color: Colors.grey),
-                      );
-                    },
-                  )
-                      : Center(
-                    child: Icon(Icons.business, color: Colors.grey),
+                        if (viewModel.recruiterInfo!.Company.LogoUrl != null)
+                          Positioned.fill(
+                            child: Builder(
+                              builder: (context) {
+                                return FutureBuilder(
+                                  future: precacheImage(
+                                    NetworkImage(viewModel.recruiterInfo!.Company.LogoUrl!),
+                                    context,
+                                  ),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.done) {
+                                      return SizedBox.shrink();
+                                    } else {
+                                      return Container(
+                                        color: Colors.white.withOpacity(0.5),
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.blue
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 5),

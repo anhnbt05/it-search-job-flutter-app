@@ -30,17 +30,22 @@ class WebSocketService {
     });
 
     _socket.on('candidate_notification', (data) {
-      print('📩 Nhận notification từ candidate: $data');
+      print('📩 Nhận notification cho candidate: $data');
       onNotificationReceived(data);
     });
 
     _socket.on('recruiter_notification', (data) {
-      print('📩 Nhận notification từ recruiter: $data');
+      print('📩 Nhận notification cho recruiter: $data');
       onNotificationReceived(data);
     });
 
     _socket.on('admin_notification', (data) {
-      print('📩 Nhận notification từ admin: $data');
+      print('📩 Nhận notification cho admin: $data');
+      onNotificationReceived(data);
+    });
+
+    _socket.on('candidate_delete_application', (data) {
+      print('$data');
       onNotificationReceived(data);
     });
   }

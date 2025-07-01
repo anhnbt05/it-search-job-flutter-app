@@ -26,15 +26,24 @@ class RecruiterNotificationViewModel extends ChangeNotifier {
   RecruiterNotificationViewModel(BuildContext context) {
     var loginVM = Provider.of<AuthViewModel>(context, listen: false);
     webSocketService.connect("${APIConstants.baseUrl}/websockets/gateway", loginVM.userId!, (data) {
-      var newNoti = UserNotification.fromJson(data);
-      _notifications!.insert(0, newNoti);
-      notifyListeners();
-      if (newNoti.Notification.Type == 'recruiter_job_approved' || newNoti.Notification.Type == 'recruiter_job_rejected' || newNoti.Notification.Type == 'recruiter_job_expired') {
-        var jobVM = Provider.of<PostedJobsManagementViewModel>(context, listen: false);
-        jobVM.loadWithoutContext();
-      } else if (newNoti.Notification.Type == 'recruiter_new_application') {
+      if (data == null) {
         var applicationVM = Provider.of<CandidatesAppliesViewModel>(context, listen: false);
         applicationVM.loadWithoutContext();
+      } else {
+      UserNotification newNoti = UserNotification.fromJson(data);
+        _notifications!.insert(0, newNoti);
+        notifyListeners();
+        if (newNoti.Notification.Type == 'recruiter_job_approved' ||
+            newNoti.Notification.Type == 'recruiter_job_rejected' ||
+            newNoti.Notification.Type == 'recruiter_job_expired') {
+          var jobVM = Provider.of<PostedJobsManagementViewModel>(
+              context, listen: false);
+          jobVM.loadWithoutContext();
+        } else if (newNoti.Notification.Type == 'recruiter_new_application') {
+          var applicationVM = Provider.of<CandidatesAppliesViewModel>(
+              context, listen: false);
+          applicationVM.loadWithoutContext();
+        }
       }
     },);
     notificationsF = NotificationService().getNotifications(context, loginVM.userId!).then((value) {
