@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
                         height: screenHeight * 0.25,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage('assets/job-search-background.jpg'),
+                            image: NetworkImage('https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//job-search-background.jpg'),
                             fit: BoxFit.cover,
                             colorFilter: ColorFilter.mode(
                               Colors.black.withOpacity(0.2),
@@ -221,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                                     "ĐĂNG KÝ TÀI KHOẢN",
                                     style: TextStyle(
                                       fontFamily: 'Poppins',
-                                      fontSize: screenHeight * 0.016,
+                                      fontSize: screenHeight * 0.015,
                                       color: Colors.grey.shade600,
                                     ),
                                   ),
@@ -232,7 +232,7 @@ class _LoginPageState extends State<LoginPage> {
                                     "QUÊN MẬT KHẨU",
                                     style: TextStyle(
                                       fontFamily: 'Poppins',
-                                      fontSize: screenHeight * 0.016,
+                                      fontSize: screenHeight * 0.015,
                                       color: ColorConstants.primaryColor,
                                       fontWeight: FontWeight.w500,
                                     ),
