@@ -9,6 +9,7 @@ import {
   Candidates,
   Recruiters,
   Role,
+  UserDevices,
   UserNotifications,
   Users,
   UserStatus,
@@ -16,6 +17,7 @@ import {
 import { SupabaseClient } from '@supabase/supabase-js';
 import { omit } from 'lodash';
 import { InjectSupabaseClient } from 'nestjs-supabase-js';
+import { OneSignalProvider } from 'src/libs/common/providers';
 import { RoleEnum } from 'src/libs/common/utils';
 import { UploadsService } from 'src/modules/uploads/uploads.service';
 import {
@@ -32,6 +34,7 @@ export class UsersService {
     private readonly adminSupabaseClient: SupabaseClient,
     @InjectSupabaseClient('anonClient')
     private readonly anonSupabaseClient: SupabaseClient,
+    private readonly oneSignalProvider: OneSignalProvider,
   ) {}
 
   public handleGetUsers = async (searchUsersDto?: SearchUsersDto) => {
@@ -797,5 +800,33 @@ export class UsersService {
       success: true,
       message: `Tài khoản của người dùng '${user.Users.FullName}' đã được mở khoá.`,
     };
+  };
+
+  public handleCleanupInvalidPlayerIds = async () => {
+    const { data: storedDevices, error: storedDevicesError } =
+      await this.anonSupabaseClient
+        .from('UserDevices')
+        .select('*')
+        .overrideTypes<UserDevices[], { merge: false }>();
+
+    if (storedDevicesError) {
+      console.error(storedDevicesError);
+
+      throw new InternalServerErrorException(
+        'Đã xảy ra lỗi khi lấy danh sách thiết bị người dùng.',
+      );
+    }
+
+    const storedPlayerIds = storedDevices.map((st) => st.PlayerID);
+
+    const invalidPlayerIds =
+      await this.oneSignalProvider.getInvalidPlayerIds(storedPlayerIds);
+
+    if (invalidPlayerIds?.length) {
+      await this.adminSupabaseClient
+        .from('UserDevices')
+        .delete()
+        .in('PlayerID', invalidPlayerIds);
+    }
   };
 }

@@ -7,6 +7,7 @@ import { PushNotificationProcessor } from 'src/modules/user-notifications/proces
 import { PushNotificaitonProducer } from 'src/modules/user-notifications/producers';
 import { WebsocketsModule } from 'src/modules/websockets/websockets.module';
 import { UserNotificationsService } from './user-notifications.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Global()
 @Module({
@@ -16,6 +17,7 @@ import { UserNotificationsService } from './user-notifications.service';
       name: PUSH_NOTIFICATION_QUEUE_NAME,
     }),
     WebsocketsModule,
+    HttpModule,
   ],
   providers: [
     UserNotificationsService,

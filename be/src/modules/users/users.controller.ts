@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -15,13 +14,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { Cron } from '@nestjs/schedule';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiExtraModels,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -46,6 +45,13 @@ import { UsersService } from './users.service';
 @ApiTags(API_TAGS.USER)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Cron('0 0 * * *', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+  })
+  async handleCleanupInvalidPlayerIds() {
+    return this.usersService.handleCleanupInvalidPlayerIds();
+  }
 
   @Get()
   @Roles(RoleEnum.ADMIN)
