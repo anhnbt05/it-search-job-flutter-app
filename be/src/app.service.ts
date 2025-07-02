@@ -58,6 +58,7 @@ export class AppService {
     const dbUrls = await this.collectUrlsFromDb([
       { table: 'companies', column: 'LogoUrl' },
       { table: 'users', column: 'AvatarUrl' },
+      { table: 'workExperiences', column: 'CompanyLogoUrl' },
     ]);
 
     const urlsToDelete = allStorageUrls.filter((url) => !dbUrls.has(url));
