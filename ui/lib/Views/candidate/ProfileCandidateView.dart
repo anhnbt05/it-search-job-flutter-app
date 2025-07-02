@@ -413,10 +413,29 @@ class __WorkExperienceItemState extends State<_WorkExperienceItem> {
               children: [
 
                 if (widget.exp.CompanyLogoUrl != null && widget.exp.CompanyLogoUrl!.isNotEmpty)
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundImage: NetworkImage(widget.exp.CompanyLogoUrl!),
-                    backgroundColor: Colors.grey.shade100,
+                  ClipOval(
+                    child: Image.network(
+                      widget.exp.CompanyLogoUrl ?? '',
+                      fit: BoxFit.cover,
+                      width: 56,
+                      height: 56,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 56,
+                          height: 56,
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: Icon(Icons.business, size: 28, color: Colors.grey),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 const SizedBox(width: 12),
 

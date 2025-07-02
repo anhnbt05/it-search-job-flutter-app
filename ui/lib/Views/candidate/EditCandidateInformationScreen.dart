@@ -51,15 +51,17 @@ class _EditCandidateInformationScreenState
                 backgroundColor: ColorConstants.appbarColor,
                 centerTitle: false,
                 title: Row(
-                  children:[ Text(
-                    "Chỉnh sửa hồ sơ cá nhân",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
+                  children:[ Flexible(
+                    child: Text(
+                      "Chỉnh sửa hồ sơ cá nhân",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      softWrap: false,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    softWrap: false,
                   ),
                 ]
                 ),

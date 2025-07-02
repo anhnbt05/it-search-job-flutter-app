@@ -123,13 +123,13 @@ class AppliedJobsView extends StatelessWidget {
                   viewModel.filterByStatus(value!);
                 },
                 buttonStyleData: ButtonStyleData(
-                  width: 150,
+                  width: 165,
                   overlayColor: MaterialStateProperty.all(Colors.transparent),
                     padding: EdgeInsets.only(left: 15, right: 8)
                 ),
                 dropdownStyleData: DropdownStyleData(
                   elevation: 1,
-                  width: 150,
+                  width: 165,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color: Colors.white
