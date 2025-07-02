@@ -103,6 +103,8 @@ export class DashboardsService {
 
   public handleUploadReport = async (reportFilePath: string) => {
     try {
+      console.log(reportFilePath);
+
       return this.uploadsService.handleUploadFilePath(reportFilePath, 'files');
     } catch (err) {
       console.error(err);

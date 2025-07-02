@@ -1,6 +1,7 @@
 import { NotificationType } from '@prisma/client';
 import * as bcryptjs from 'bcryptjs';
 import { format } from 'date-fns';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 
 export const hashPassword = (password: string) => {
@@ -146,3 +147,33 @@ export const handleGetNotificationEventByType = (type: NotificationType) => {
 
   return 'user_notification';
 };
+
+export function normalizeUrl(url: string): string {
+  return url.replace(/([^:]\/)\/+/g, '$1');
+}
+
+export async function fixInvalidUrls(prisma: PrismaService) {
+  const updates = [
+    { table: 'users', column: 'AvatarUrl' },
+    { table: 'companies', column: 'LogoUrl' },
+    { table: 'applications', column: 'ResumeUrl' },
+  ];
+
+  for (const { table, column } of updates) {
+    const records = await prisma[table].findMany();
+
+    for (const record of records) {
+      const oldUrl = record[column];
+
+      if (!oldUrl) continue;
+
+      const newUrl = normalizeUrl(oldUrl as string);
+      if (newUrl !== oldUrl) {
+        await prisma[table].update({
+          where: { ID: record.ID },
+          data: { [column]: newUrl },
+        });
+      }
+    }
+  }
+}
