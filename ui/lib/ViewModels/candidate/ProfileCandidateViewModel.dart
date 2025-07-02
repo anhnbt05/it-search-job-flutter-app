@@ -18,22 +18,20 @@ class ProfileCandidateViewModel extends ChangeNotifier {
   String? _error;
 
   cCandidates_cApplication_recruiter? get candidate => _candidate;
-  set candidate(cCandidates_cApplication_recruiter? value)
-  {
-     _candidate = value;
+  set candidate(cCandidates_cApplication_recruiter? value) {
+    _candidate = value;
   }
+
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> fetchCandidateInfo({
-    required BuildContext context,
-  }) async {
+  Future<void> fetchCandidateInfo({required BuildContext context}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      userId= await _storage.read(key: 'userID');
+      userId = await _storage.read(key: 'userID');
       final result = await _userService.getCandidateInfo(
         Id: userId!,
         context: context,
@@ -51,6 +49,7 @@ class ProfileCandidateViewModel extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+
   Future<void> signOut(BuildContext context) async {
     await AuthSignOutService().signOut(context);
     final authService = Provider.of<AuthViewModel>(context, listen: false);
