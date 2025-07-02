@@ -53,13 +53,13 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
 
     if (response.success) {
       await vm.fetchBranches(widget.companyId);
-      showTopToastification(
-        title: 'Thành công',
-        content: response.message,
-        color: Colors.green,
-        icon: Icons.check_circle,
-      );
-      Navigator.pop(context);
+      // showTopToastification(
+      //   title: 'Thành công',
+      //   content: response.message,
+      //   color: Colors.green,
+      //   icon: Icons.check_circle,
+      // );
+      Navigator.pop(context, vm.branches.last);
     } else {
       showTopToastification(
         title: 'Lỗi',

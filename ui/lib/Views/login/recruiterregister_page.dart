@@ -77,24 +77,31 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
 
   void addCompany() async {
     final newCompany = await Navigator.push<cCompanies>(
-      context, MaterialPageRoute(
-      builder: (_) => Builder(
-        builder: (context) => MultiProvider(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (_) => CompaniesViewModel()),
-            ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
+            ChangeNotifierProvider.value(
+              value: Provider.of<CompaniesViewModel>(context, listen: false),
+            ),
+            ChangeNotifierProvider.value(
+              value: Provider.of<ProvincesViewModel>(context, listen: false),
+            ),
           ],
           child: CreateCompanyPage(),
         ),
       ),
-      ),
     );
 
     if (newCompany != null && newCompany.ID != null) {
+      final companyVM = Provider.of<CompaniesViewModel>(context, listen: false);
+      await companyVM.fetchCompanies();
+
       final newCompanyId = newCompany.ID!;
       final newBranch = newCompany.CompanyLocations?.isNotEmpty == true
           ? newCompany.CompanyLocations!.first
           : null;
+
       if (mounted) {
         setState(() {
           selectedCompanyId = newCompanyId;
@@ -125,7 +132,9 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
     if (newBranch != null) {
       if (!mounted) return;
       setState(() {
-        locations.add(newBranch);
+        if (!locations.any((loc) => loc.LocationID == newBranch.LocationID)) {
+          locations.add(newBranch);
+        }
         selectedLocationId = newBranch.LocationID;
       });
     }

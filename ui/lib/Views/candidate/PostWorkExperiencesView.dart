@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import '../../Constants/color_constants.dart';
+import '../../ViewModels/candidate/ProfileCandidateViewModel.dart';
 import '../../ViewModels/candidate/WorkExperiencesViewModel.dart';
 
 class PostWorkExperiencesView extends StatefulWidget {
@@ -478,10 +479,17 @@ class _PostWorkExperiencesViewState extends State<PostWorkExperiencesView> {
                         // Xác nhận button
                         ElevatedButton(
                           onPressed: () async {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => const Center(child: CircularProgressIndicator()),
+                            );
+
                             if (_formKey.currentState!.validate()) {
                               final viewModel = Provider.of<WorkExperiencesViewModel>(
                                   context,
                                   listen: false);
+                              final profileViewModel = Provider.of<ProfileCandidateViewModel>(context, listen: false);
                               final jobTypeApiValue =
                                   viewModel.jobTypeApiMapping[_selectedJobType] ?? '';
           
@@ -498,9 +506,14 @@ class _PostWorkExperiencesViewState extends State<PostWorkExperiencesView> {
                                 logoFile: _logoFile,
                                 context: context,
                               );
-          
+
                               if (success && mounted) {
+                                await profileViewModel.fetchCandidateInfo(context: context);
+                                Navigator.of(context, rootNavigator: true).pop();
                                 Navigator.of(context).pop();
+                              } else {
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop();
                               }
                             }
                           },
