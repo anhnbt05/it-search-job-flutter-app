@@ -59,6 +59,8 @@ export class AppService {
       { table: 'companies', column: 'LogoUrl' },
       { table: 'users', column: 'AvatarUrl' },
       { table: 'workExperiences', column: 'CompanyLogoUrl' },
+      { table: 'applications', column: 'ResumeUrl' },
+      { table: 'candidates', column: 'ResumeUrl' },
     ]);
 
     const urlsToDelete = allStorageUrls.filter((url) => !dbUrls.has(url));
