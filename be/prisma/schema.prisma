@@ -32,7 +32,7 @@ model Recruiters {
   Position          String           @db.VarChar(255)
   DeletedAt         DateTime?
   UserID            String           @unique @db.Uuid
-  CompanyLocationID String           @unique @db.Uuid
+  CompanyLocationID String           @db.Uuid
   Jobs              Jobs[]
   CompanyLocations  CompanyLocations @relation(fields: [CompanyLocationID], references: [ID], onDelete: Cascade)
   User              Users            @relation(fields: [UserID], references: [ID], onDelete: Cascade)
@@ -64,17 +64,18 @@ model Companies {
 }
 
 model CompanyLocations {
-  ID         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  BranchName String      @db.VarChar(255)
-  Address    String      @db.VarChar(255)
-  CreatedAt  DateTime    @default(now())
-  UpdatedAt  DateTime    @default(now())
+  ID         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  BranchName String    @db.VarChar(255)
+  Address    String    @db.VarChar(255)
+  CreatedAt  DateTime  @default(now())
+  UpdatedAt  DateTime  @default(now())
   DeletedAt  DateTime?
-  CompanyID  String      @db.Uuid
-  LocationID String      @db.Uuid
-  Company    Companies   @relation(fields: [CompanyID], references: [ID], onDelete: Cascade)
-  Location   Locations   @relation(fields: [LocationID], references: [ID], onDelete: Cascade)
-  Recruiters Recruiters?
+  CompanyID  String    @db.Uuid
+  LocationID String    @db.Uuid
+  Company    Companies @relation(fields: [CompanyID], references: [ID], onDelete: Cascade)
+  Location   Locations @relation(fields: [LocationID], references: [ID], onDelete: Cascade)
+
+  Recruiters Recruiters[]
 
   @@unique([BranchName, CompanyID])
 }

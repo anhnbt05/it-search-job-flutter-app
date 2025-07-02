@@ -19,7 +19,6 @@ import '../../Services/auth_verifyresetpasswordotp_service.dart';
 import '../AuthViewModel.dart';
 import 'ProfileCandidateViewModel.dart';
 
-
 class EditCandidateInformationViewModel extends ChangeNotifier {
   String getLevelName(eLevel? level) {
     switch (level) {
@@ -37,6 +36,7 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
         return level.toString().split('.').last;
     }
   }
+
   late String userId;
   late final TextEditingController _fullNameController;
   late final TextEditingController _phoneNumberController;
@@ -57,10 +57,12 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
   TextEditingController get phoneNumberController => _phoneNumberController;
   TextEditingController get bioController => _bioController;
   TextEditingController get levelController => _levelController;
-  List<TextEditingController> get certificationControllers => _certificationControllers;
+  List<TextEditingController> get certificationControllers =>
+      _certificationControllers;
   TextEditingController get otpController => _otpController;
   TextEditingController get newPasswordController => _newPasswordController;
-  TextEditingController get confirmNewPasswordController => _confirmNewPasswordController;
+  TextEditingController get confirmNewPasswordController =>
+      _confirmNewPasswordController;
 
   File? get avtImage => _avtImage;
   File? get CVFile => _CVFile;
@@ -69,22 +71,30 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
   File? get oldCVFile => _oldCVFile;
 
   EditCandidateInformationViewModel(BuildContext context, this.userId) {
-    final profileVM = Provider.of<ProfileCandidateViewModel>(context, listen: false);
+    final profileVM = Provider.of<ProfileCandidateViewModel>(
+      context,
+      listen: false,
+    );
     final info = profileVM.candidate;
     if (info?.Level != null) {
       levelSelected = eLevel.values.firstWhere(
-            (e) => getLevelName(e).toLowerCase() == info?.Level?.toLowerCase(),
+        (e) => getLevelName(e).toLowerCase() == info?.Level?.toLowerCase(),
         orElse: () => eLevel.intern,
       );
     }
     if (info == null) {
-      throw Exception('Candidate info is null. Make sure it is loaded before using this ViewModel.');
+      throw Exception(
+        'Candidate info is null. Make sure it is loaded before using this ViewModel.',
+      );
     }
     _fullNameController = TextEditingController(text: info.FullName);
     _phoneNumberController = TextEditingController(text: info.PhoneNumber);
     _bioController = TextEditingController(text: info.Bio ?? '');
     _levelController = TextEditingController(text: info.Level ?? '');
-    _certificationControllers = (info.Certifications ?? []).map((cert) => TextEditingController(text: cert)).toList();
+    _certificationControllers =
+        (info.Certifications ?? [])
+            .map((cert) => TextEditingController(text: cert))
+            .toList();
     _newPasswordController = TextEditingController();
     _confirmNewPasswordController = TextEditingController();
     _otpController = TextEditingController();
@@ -116,19 +126,19 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
   }
 
   Future<void> pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
     if (pickedFile != null) {
       _avtImage = File(pickedFile.path);
       notifyListeners();
     }
   }
+
   Future<void> pickCVFile() async {
     final result = await openFile(
       acceptedTypeGroups: [
-        XTypeGroup(
-          label: 'Documents',
-          extensions: ['pdf', 'docx'],
-        ),
+        XTypeGroup(label: 'Documents', extensions: ['pdf', 'docx']),
       ],
     );
     if (result != null) {
@@ -138,7 +148,10 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
   }
 
   Future<void> updateCandidateInfo(BuildContext context) async {
-    final profileVM = Provider.of<ProfileCandidateViewModel>(context, listen: false);
+    final profileVM = Provider.of<ProfileCandidateViewModel>(
+      context,
+      listen: false,
+    );
     final currentCandidate = profileVM.candidate!;
 
     try {
@@ -153,10 +166,11 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
       }
 
       final currentCerts = currentCandidate.Certifications ?? [];
-      final newCerts = _certificationControllers
-          .map((c) => c.text.trim())
-          .where((c) => c.isNotEmpty)
-          .toList();
+      final newCerts =
+          _certificationControllers
+              .map((c) => c.text.trim())
+              .where((c) => c.isNotEmpty)
+              .toList();
 
       if (!_areListsEqual(currentCerts, newCerts)) {
         updateData['Certifications'] = newCerts;
@@ -164,11 +178,16 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
 
       bool hasAvatarChanged = avtImage?.path != _oldAvtImage?.path;
       bool hasCVChanged = CVFile?.path != _oldCVFile?.path;
-      bool hasBasicChanged = fullNameController.text != currentCandidate.FullName ||
+      bool hasBasicChanged =
+          fullNameController.text != currentCandidate.FullName ||
           phoneNumberController.text != currentCandidate.PhoneNumber;
 
-      if (updateData.isNotEmpty || hasAvatarChanged || hasCVChanged || hasBasicChanged) {
-        final currentUserId = Provider.of<AuthViewModel>(context, listen: false).userId;
+      if (updateData.isNotEmpty ||
+          hasAvatarChanged ||
+          hasCVChanged ||
+          hasBasicChanged) {
+        final currentUserId =
+            Provider.of<AuthViewModel>(context, listen: false).userId;
         String? response = await UserService().patchCandidateInfo(
           userId: currentUserId!,
           updateCandidateDto: updateData,
@@ -185,8 +204,10 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
             newPhoneNumber: phoneNumberController.text,
             newBio: updateData['Bio'] ?? currentCandidate.Bio,
             newLevel: updateData['Level'] ?? currentCandidate.Level,
-            newCertifications: updateData['Certifications'] ?? currentCandidate.Certifications,
-            newAvatarUrl: hasAvatarChanged ? response : currentCandidate.AvatarUrl,
+            newCertifications:
+                updateData['Certifications'] ?? currentCandidate.Certifications,
+            newAvatarUrl:
+                hasAvatarChanged ? response : currentCandidate.AvatarUrl,
             newResumeUrl: hasCVChanged ? response : currentCandidate.ResumeUrl,
           );
 
@@ -219,8 +240,12 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
     }
     return true;
   }
+
   Future<ResponseModel> resetPassword(BuildContext context) async {
-    final profileVM = Provider.of<ProfileCandidateViewModel>(context, listen: false);
+    final profileVM = Provider.of<ProfileCandidateViewModel>(
+      context,
+      listen: false,
+    );
     return await AuthResetpasswordService().resetPassword(
       profileVM.candidate!.Email,
       newPasswordController.text,
@@ -228,7 +253,10 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
   }
 
   Future<ResponseModel> verifyOTP(BuildContext context) async {
-    final profileVM = Provider.of<ProfileCandidateViewModel>(context, listen: false);
+    final profileVM = Provider.of<ProfileCandidateViewModel>(
+      context,
+      listen: false,
+    );
     if (profileVM.candidate == null) {
       profileVM.fetchCandidateInfo(context: context);
     }
@@ -237,6 +265,7 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
       otpController.text,
     );
   }
+
   void addCertification() {
     _certificationControllers.add(TextEditingController());
     notifyListeners();
@@ -248,6 +277,7 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   eLevel? levelSelected;
   Color levelBorderColor = Colors.grey.shade400;
 
@@ -260,5 +290,4 @@ class EditCandidateInformationViewModel extends ChangeNotifier {
     levelBorderColor = color;
     notifyListeners();
   }
-
 }

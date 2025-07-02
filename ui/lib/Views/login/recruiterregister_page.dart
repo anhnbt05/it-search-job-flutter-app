@@ -59,9 +59,10 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
     final query = _searchController.text.toLowerCase();
 
     setState(() {
-      filteredCompanies = vm.companies.where((company) {
-        return company.Name?.toLowerCase().contains(query) ?? false;
-      }).toList();
+      filteredCompanies =
+          vm.companies.where((company) {
+            return company.Name?.toLowerCase().contains(query) ?? false;
+          }).toList();
     });
   }
 
@@ -79,17 +80,24 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
     final newCompany = await Navigator.push<cCompanies>(
       context,
       MaterialPageRoute(
-        builder: (_) => MultiProvider(
-          providers: [
-            ChangeNotifierProvider.value(
-              value: Provider.of<CompaniesViewModel>(context, listen: false),
+        builder:
+            (_) => MultiProvider(
+              providers: [
+                ChangeNotifierProvider.value(
+                  value: Provider.of<CompaniesViewModel>(
+                    context,
+                    listen: false,
+                  ),
+                ),
+                ChangeNotifierProvider.value(
+                  value: Provider.of<ProvincesViewModel>(
+                    context,
+                    listen: false,
+                  ),
+                ),
+              ],
+              child: CreateCompanyPage(),
             ),
-            ChangeNotifierProvider.value(
-              value: Provider.of<ProvincesViewModel>(context, listen: false),
-            ),
-          ],
-          child: CreateCompanyPage(),
-        ),
       ),
     );
 
@@ -98,9 +106,10 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
       await companyVM.fetchCompanies();
 
       final newCompanyId = newCompany.ID!;
-      final newBranch = newCompany.CompanyLocations?.isNotEmpty == true
-          ? newCompany.CompanyLocations!.first
-          : null;
+      final newBranch =
+          newCompany.CompanyLocations?.isNotEmpty == true
+              ? newCompany.CompanyLocations!.first
+              : null;
 
       if (mounted) {
         setState(() {
@@ -116,17 +125,24 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
     if (selectedCompanyId == null) return;
 
     final newBranch = await Navigator.push<cCompanyLocations>(
-      context, MaterialPageRoute(
-      builder: (_) => Builder(
-        builder: (context) => MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => CompaniesViewModel()),
-            ChangeNotifierProvider(create: (_) => ProvincesViewModel()),
-          ],
-          child: CreateBranchPage(companyId: selectedCompanyId!),
-        ),
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => Builder(
+              builder:
+                  (context) => MultiProvider(
+                    providers: [
+                      ChangeNotifierProvider(
+                        create: (_) => CompaniesViewModel(),
+                      ),
+                      ChangeNotifierProvider(
+                        create: (_) => ProvincesViewModel(),
+                      ),
+                    ],
+                    child: CreateBranchPage(companyId: selectedCompanyId!),
+                  ),
+            ),
       ),
-    ),
     );
 
     if (newBranch != null) {
@@ -165,7 +181,7 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
         "Position": _positionController.text,
         "companyID": selectedCompanyId,
         "companyLocationID": selectedLocationId,
-      }
+      },
     };
 
     final response = await signUpVM.register(payload);
@@ -179,10 +195,11 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => ChangeNotifierProvider(
-            create: (_) => VerifyEmailViewModel(),
-            child: VerifyemailPage(email: widget.email),
-          ),
+          builder:
+              (_) => ChangeNotifierProvider(
+                create: (_) => VerifyEmailViewModel(),
+                child: VerifyemailPage(email: widget.email),
+              ),
         ),
       );
     } else {
@@ -202,9 +219,8 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
     if (vm.isLoading) return Center(child: CircularProgressIndicator());
     if (vm.errorMessage != null) return Text("Lỗi: ${vm.errorMessage}");
 
-    final companiesToShow = _searchController.text.isEmpty
-        ? vm.companies
-        : filteredCompanies;
+    final companiesToShow =
+        _searchController.text.isEmpty ? vm.companies : filteredCompanies;
 
     return Container(
       height: screenHeight * 0.3,
@@ -212,32 +228,33 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: companiesToShow.isEmpty
-          ? Center(child: Text("Không tìm thấy công ty phù hợp"))
-          : ListView.builder(
-        itemCount: companiesToShow.length,
-        itemBuilder: (context, index) {
-          final company = companiesToShow[index];
-          final id = company.ID ?? "";
-          return RadioListTile<String>(
-            value: id,
-            groupValue: selectedCompanyId,
-            title: Text(
-              company.Name ?? "Không tên",
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: screenHeight * 0.018,
+      child:
+          companiesToShow.isEmpty
+              ? Center(child: Text("Không tìm thấy công ty phù hợp"))
+              : ListView.builder(
+                itemCount: companiesToShow.length,
+                itemBuilder: (context, index) {
+                  final company = companiesToShow[index];
+                  final id = company.ID ?? "";
+                  return RadioListTile<String>(
+                    value: id,
+                    groupValue: selectedCompanyId,
+                    title: Text(
+                      company.Name ?? "Không tên",
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: screenHeight * 0.018,
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedCompanyId = value;
+                      });
+                      if (value != null) fetchLocations(value);
+                    },
+                  );
+                },
               ),
-            ),
-            onChanged: (value) {
-              setState(() {
-                selectedCompanyId = value;
-              });
-              if (value != null) fetchLocations(value);
-            },
-          );
-        },
-      ),
     );
   }
 
@@ -246,7 +263,8 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final signUpVM = Provider.of<SignUpViewModel>(context);
-    final showBranchDropdown = selectedCompanyId != null && locations.isNotEmpty;
+    final showBranchDropdown =
+        selectedCompanyId != null && locations.isNotEmpty;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -270,7 +288,7 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
                       gradient: LinearGradient(
                         colors: [
                           ColorConstants.primaryColor,
-                          ColorConstants.primaryColor.withOpacity(0.8)
+                          ColorConstants.primaryColor.withOpacity(0.8),
                         ],
                       ),
                     ),
@@ -336,8 +354,11 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
                       horizontal: 20,
                     ),
                   ),
-                  validator: (value) =>
-                  value == null || value.isEmpty ? "Không được để trống" : null,
+                  validator:
+                      (value) =>
+                          value == null || value.isEmpty
+                              ? "Không được để trống"
+                              : null,
                 ),
                 SizedBox(height: screenHeight * 0.04),
 
@@ -356,15 +377,19 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
                       fontSize: screenHeight * 0.016,
                     ),
                     prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                      icon: Icon(Icons.clear, color: Colors.grey.shade600),
-                      onPressed: () {
-                        _searchController.clear();
-                        _filterCompanies();
-                      },
-                    )
-                        : null,
+                    suffixIcon:
+                        _searchController.text.isNotEmpty
+                            ? IconButton(
+                              icon: Icon(
+                                Icons.clear,
+                                color: Colors.grey.shade600,
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                _filterCompanies();
+                              },
+                            )
+                            : null,
                     filled: true,
                     fillColor: Colors.grey.shade100,
                     border: OutlineInputBorder(
@@ -421,7 +446,10 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
                         color: Colors.grey.shade600,
                         fontSize: screenHeight * 0.016,
                       ),
-                      prefixIcon: Icon(Icons.location_city, color: Colors.grey.shade600),
+                      prefixIcon: Icon(
+                        Icons.location_city,
+                        color: Colors.grey.shade600,
+                      ),
                       filled: true,
                       fillColor: Colors.grey.shade100,
                       border: OutlineInputBorder(
@@ -442,17 +470,19 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
                       "Chọn chi nhánh",
                       style: TextStyle(fontFamily: 'Poppins'),
                     ),
-                    items: locations.map((loc) {
-                      final id = loc.LocationID ?? "";
-                      return DropdownMenuItem<String>(
-                        value: id,
-                        child: Text(
-                          loc.BranchName ?? "Không tên",
-                          style: TextStyle(fontFamily: 'Poppins'),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) => setState(() => selectedLocationId = value),
+                    items:
+                        locations.map((loc) {
+                          final id = loc.ID ?? "";
+                          return DropdownMenuItem<String>(
+                            value: id,
+                            child: Text(
+                              loc.BranchName ?? "Không tên",
+                              style: TextStyle(fontFamily: 'Poppins'),
+                            ),
+                          );
+                        }).toList(),
+                    onChanged:
+                        (value) => setState(() => selectedLocationId = value),
                   ),
                   SizedBox(height: screenHeight * 0.01),
                   TextButton(
@@ -480,24 +510,25 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
                       ),
                       elevation: 0,
                     ),
-                    child: signUpVM.isLoading
-                        ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                        : Text(
-                      "ĐĂNG KÝ",
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: Colors.white,
-                        fontSize: screenHeight * 0.018,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child:
+                        signUpVM.isLoading
+                            ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                            : Text(
+                              "ĐĂNG KÝ",
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                color: Colors.white,
+                                fontSize: screenHeight * 0.018,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                   ),
                 ),
 

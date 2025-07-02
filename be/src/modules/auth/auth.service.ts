@@ -163,7 +163,7 @@ export class AuthService {
           );
 
         if (
-          company.CompanyLocations.map((cl: any) => cl.ID)?.includes(
+          !company.CompanyLocations.map((cl: any) => cl.ID)?.includes(
             companyLocationID,
           )
         )

@@ -13,14 +13,10 @@ class AuthVerifyResetPasswordOtpService {
     print("Email: $email");
     print("Body: ${json.encode({"email": email, "otp": otp})}");
 
-
     final response = await http.post(
-        Uri.parse('$_baseUrl/auth/verify-reset-password-otp'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(
-            {"email": email,
-            "otp": otp},
-        ),
+      Uri.parse('$_baseUrl/auth/verify-reset-password-otp'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({"email": email, "otp": otp}),
     );
     final responseData = json.decode(response.body);
     if (response.statusCode != 201) {
@@ -28,5 +24,4 @@ class AuthVerifyResetPasswordOtpService {
     }
     return ResponseModel.fromJson(responseData);
   }
-
 }
