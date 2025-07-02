@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/ViewModels/login/ProvincesViewModel.dart';
 import 'package:ui/Views/login/verifyemail_page.dart';
@@ -265,6 +266,7 @@ class _RecruiterRegisterPageState extends State<RecruiterRegisterPage> {
     final signUpVM = Provider.of<SignUpViewModel>(context);
     final showBranchDropdown =
         selectedCompanyId != null && locations.isNotEmpty;
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
 
     return Scaffold(
       backgroundColor: Colors.white,

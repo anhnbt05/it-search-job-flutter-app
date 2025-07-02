@@ -257,7 +257,7 @@ Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel, R
                 child: const Center(
                   child: Text(
                     'Bạn hiện không có bài đăng tuyển dụng nào',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -268,7 +268,7 @@ Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel, R
                 child: const Center(
                   child: Text(
                     'Bạn hiện không có bài đăng tuyển dụng nào đang mở',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -279,7 +279,7 @@ Widget JobsList(BuildContext context, PostedJobsManagementViewModel viewModel, R
                   child: const Center(
                     child: Text(
                       'Bạn hiện không có bài đăng tuyển dụng nào đang chờ duyệt',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
                   ),

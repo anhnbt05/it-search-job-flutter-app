@@ -16,7 +16,7 @@ import 'ReadResumeScreen.dart';
 Widget CandidatesAppliedScreen(BuildContext context) {
   var viewModel = Provider.of<CandidatesAppliesViewModel>(context);
 
-  if (viewModel.jobs == null || viewModel.jobs!.isEmpty) {
+  if (viewModel.jobs == null) {
     return Container(
       color: Colors.white,
       child: const Center(
@@ -24,6 +24,12 @@ Widget CandidatesAppliedScreen(BuildContext context) {
           color: Colors.blue,
         ),
       ),
+    );
+  }
+  
+  if (viewModel.jobs!.isEmpty) {
+    return Center(
+      child: Text("Hiện tại bạn chưa có bài đăng tuyển dụng nào đang mở", textAlign: TextAlign.center,),
     );
   }
 

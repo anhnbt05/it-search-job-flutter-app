@@ -88,7 +88,7 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: ColorConstants.primaryColor,
+        backgroundColor: ColorConstants.appbarColor,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.white),
       ),
@@ -185,7 +185,7 @@ class _CreateBranchPageState extends State<CreateBranchPage> {
                       value: prov.id,
                       child: Text(
                         prov.name,
-                        style: TextStyle(fontFamily: 'Poppins'),
+                        style: TextStyle(fontFamily: 'Poppins', fontSize: 17),
                       ),
                     );
                   }).toList(),
