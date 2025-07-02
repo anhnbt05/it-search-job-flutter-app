@@ -28,4 +28,5 @@ export default () => ({
     app_id: process.env.ONESIGNAL_APP_ID,
     api_key: process.env.ONESIGNAL_API_KEY,
   },
+  storage_excluded_paths: process.env.STORAGE_EXCLUDED_PATHS,
 });

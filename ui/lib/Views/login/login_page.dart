@@ -38,7 +38,9 @@ class _LoginPageState extends State<LoginPage> {
                         height: screenHeight * 0.25,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: NetworkImage('https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//job-search-background.jpg'),
+                            image: NetworkImage(
+                              'https://qwilddaqnrznqbhuskzx.supabase.co/storage/v1/object/public/files//job-background.png',
+                            ),
                             fit: BoxFit.cover,
                             colorFilter: ColorFilter.mode(
                               Colors.black.withOpacity(0.2),
@@ -65,11 +67,17 @@ class _LoginPageState extends State<LoginPage> {
                                 gradient: LinearGradient(
                                   colors: [
                                     ColorConstants.primaryColor,
-                                    ColorConstants.primaryColor.withOpacity(0.8)
+                                    ColorConstants.primaryColor.withOpacity(
+                                      0.8,
+                                    ),
                                   ],
                                 ),
                               ),
-                              child: Icon(Icons.key, size: 45, color: Colors.white),
+                              child: Icon(
+                                Icons.key,
+                                size: 45,
+                                color: Colors.white,
+                              ),
                             ),
 
                             SizedBox(height: screenHeight * 0.03),
@@ -87,9 +95,9 @@ class _LoginPageState extends State<LoginPage> {
                             TextField(
                               controller: _usernameController,
                               style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: screenHeight * 0.02,
-                                  color: Colors.black87
+                                fontFamily: 'Poppins',
+                                fontSize: screenHeight * 0.02,
+                                color: Colors.black87,
                               ),
                               decoration: InputDecoration(
                                 labelText: "EMAIL",
@@ -99,7 +107,10 @@ class _LoginPageState extends State<LoginPage> {
                                   fontSize: screenHeight * 0.018,
                                   fontWeight: FontWeight.w500,
                                 ),
-                                prefixIcon: Icon(Icons.email, color: Colors.grey.shade600),
+                                prefixIcon: Icon(
+                                  Icons.email,
+                                  color: Colors.grey.shade600,
+                                ),
                                 filled: true,
                                 fillColor: Colors.grey.shade100,
                                 border: OutlineInputBorder(
@@ -107,8 +118,8 @@ class _LoginPageState extends State<LoginPage> {
                                   borderSide: BorderSide.none,
                                 ),
                                 contentPadding: EdgeInsets.symmetric(
-                                    vertical: screenHeight * 0.02,
-                                    horizontal: 20
+                                  vertical: screenHeight * 0.02,
+                                  horizontal: 20,
                                 ),
                               ),
                             ),
@@ -117,9 +128,9 @@ class _LoginPageState extends State<LoginPage> {
                             TextField(
                               controller: _passwordController,
                               style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: screenHeight * 0.02,
-                                  color: Colors.black87
+                                fontFamily: 'Poppins',
+                                fontSize: screenHeight * 0.02,
+                                color: Colors.black87,
                               ),
                               obscureText: _obscureText,
                               decoration: InputDecoration(
@@ -130,10 +141,15 @@ class _LoginPageState extends State<LoginPage> {
                                   fontSize: screenHeight * 0.018,
                                   fontWeight: FontWeight.w500,
                                 ),
-                                prefixIcon: Icon(Icons.lock, color: Colors.grey.shade600),
+                                prefixIcon: Icon(
+                                  Icons.lock,
+                                  color: Colors.grey.shade600,
+                                ),
                                 suffixIcon: IconButton(
                                   icon: Icon(
-                                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                                    _obscureText
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
                                     color: Colors.grey.shade600,
                                   ),
                                   onPressed: () {
@@ -149,8 +165,8 @@ class _LoginPageState extends State<LoginPage> {
                                   borderSide: BorderSide.none,
                                 ),
                                 contentPadding: EdgeInsets.symmetric(
-                                    vertical: screenHeight * 0.02,
-                                    horizontal: 20
+                                  vertical: screenHeight * 0.02,
+                                  horizontal: 20,
                                 ),
                               ),
                             ),
@@ -160,29 +176,33 @@ class _LoginPageState extends State<LoginPage> {
                               width: double.infinity,
                               height: screenHeight * 0.065,
                               child: ElevatedButton(
-                                onPressed: signInViewModel.isLoading
-                                    ? null
-                                    : () async {
-                                  final Map<String, dynamic>? payload =
-                                  await signInViewModel.signIn(
-                                    context,
-                                    _usernameController.text,
-                                    _passwordController.text,
-                                  );
-                                  if (signInViewModel.errorMessage != null) {
-                                    showTopToastification(
-                                      content: signInViewModel.errorMessage!,
-                                      title: "Thất bại",
-                                      color: Colors.red,
-                                      icon: Icons.error_outline,
-                                    );
-                                  } else if (payload != null) {
-                                    final String role =
-                                    payload['app_metadata']['role'];
-                                    final String userId = payload['sub'];
-                                    widget.onLoginSuccess(role, userId);
-                                  }
-                                },
+                                onPressed:
+                                    signInViewModel.isLoading
+                                        ? null
+                                        : () async {
+                                          final Map<String, dynamic>? payload =
+                                              await signInViewModel.signIn(
+                                                context,
+                                                _usernameController.text,
+                                                _passwordController.text,
+                                              );
+                                          if (signInViewModel.errorMessage !=
+                                              null) {
+                                            showTopToastification(
+                                              content:
+                                                  signInViewModel.errorMessage!,
+                                              title: "Thất bại",
+                                              color: Colors.red,
+                                              icon: Icons.error_outline,
+                                            );
+                                          } else if (payload != null) {
+                                            final String role =
+                                                payload['app_metadata']['role'];
+                                            final String userId =
+                                                payload['sub'];
+                                            widget.onLoginSuccess(role, userId);
+                                          }
+                                        },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: ColorConstants.primaryColor,
                                   shape: RoundedRectangleBorder(
@@ -190,24 +210,25 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   elevation: 0,
                                 ),
-                                child: signInViewModel.isLoading
-                                    ? SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                                    : Text(
-                                  "ĐĂNG NHẬP",
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    color: Colors.white,
-                                    fontSize: screenHeight * 0.02,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                child:
+                                    signInViewModel.isLoading
+                                        ? SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                        : Text(
+                                          "ĐĂNG NHẬP",
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            color: Colors.white,
+                                            fontSize: screenHeight * 0.02,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.03),
@@ -216,7 +237,9 @@ class _LoginPageState extends State<LoginPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 TextButton(
-                                  onPressed: () => LoginNavigationViewModel().goToRegister(context),
+                                  onPressed:
+                                      () => LoginNavigationViewModel()
+                                          .goToRegister(context),
                                   child: Text(
                                     "ĐĂNG KÝ TÀI KHOẢN",
                                     style: TextStyle(
@@ -227,7 +250,9 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                                 TextButton(
-                                  onPressed: () => LoginNavigationViewModel().goToForgotPassword(context),
+                                  onPressed:
+                                      () => LoginNavigationViewModel()
+                                          .goToForgotPassword(context),
                                   child: Text(
                                     "QUÊN MẬT KHẨU",
                                     style: TextStyle(
