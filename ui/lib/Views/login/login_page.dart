@@ -24,7 +24,10 @@ class _LoginPageState extends State<LoginPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-
+    bool isValidEmail(String email) {
+      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+      return emailRegex.hasMatch(email);
+    }
     return ChangeNotifierProvider(
       create: (context) => SignInViewModel(),
       child: Scaffold(
@@ -172,6 +175,15 @@ class _LoginPageState extends State<LoginPage> {
                                     showTopToastification(
                                       title: "Lỗi",
                                       content: "Vui lòng nhập đầy đủ email và mật khẩu",
+                                      color: Colors.red,
+                                      icon: Icons.warning_amber_rounded,
+                                    );
+                                    return;
+                                  }
+                                  if (!isValidEmail(email)) {
+                                    showTopToastification(
+                                      title: "Lỗi",
+                                      content: "Định dạng email không hợp lệ",
                                       color: Colors.red,
                                       icon: Icons.warning_amber_rounded,
                                     );
