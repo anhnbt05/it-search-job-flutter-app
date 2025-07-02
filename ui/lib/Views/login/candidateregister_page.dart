@@ -41,17 +41,25 @@ class _CandidateRegisterPageState extends State<CandidateRegisterPage> {
           .where((e) => e.isNotEmpty)
           .toList();
 
+      final Map<String, dynamic> createCandidateDto = {
+        "Level": level,
+      };
+
+      if (bio.isNotEmpty) {
+        createCandidateDto["Bio"] = bio;
+      }
+
+      if (certifications.isNotEmpty) {
+        createCandidateDto["Certifications"] = certifications;
+      }
+
       final payload = {
         "Email": widget.email,
         "Password": widget.password,
         "FullName": widget.fullName,
         "PhoneNumber": widget.phone,
         "Role": "candidate",
-        "createCandidateDto": {
-          "Bio": bio,
-          "Level": level,
-          "Certifications": certifications,
-        },
+        "createCandidateDto": createCandidateDto,
       };
 
       final viewModel = Provider.of<SignUpViewModel>(context, listen: false);
