@@ -257,7 +257,8 @@ Widget CompanyInfo(BuildContext context) {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.network(
+                        viewModel.recruiterInfo?.Company.LogoUrl != null && viewModel.recruiterInfo!.Company.LogoUrl!.isNotEmpty
+                            ? Image.network(
                           viewModel.recruiterInfo!.Company.LogoUrl!,
                           fit: BoxFit.cover,
                           loadingBuilder: (context, child, loadingProgress) {
@@ -269,6 +270,9 @@ Widget CompanyInfo(BuildContext context) {
                               child: Icon(Icons.broken_image, color: Colors.grey),
                             );
                           },
+                        )
+                            : Center(
+                          child: Icon(Icons.business, color: Colors.grey, size: 50,),
                         ),
                         if (viewModel.recruiterInfo!.Company.LogoUrl != null)
                           Positioned.fill(
@@ -344,6 +348,8 @@ Widget CompanyInfo(BuildContext context) {
                       child: Text(
                         viewModel.recruiterInfo!.Company.WebsiteUrl,
                         style: TextStyle(fontSize: 14, color: Colors.blue),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
