@@ -537,7 +537,11 @@ export class AuthService {
           `Không tìm thấy người dùng có email '${email}' trong hệ thống.`,
         );
 
-      await this.cacheManager.set(`${email}:otp-reset-password`, otp);
+      await this.cacheManager.set(
+        `${email}:otp-reset-password`,
+        otp,
+        DEFAULT_TTL_OTP_EXPIRED,
+      );
 
       await this.emailsProducer.sendEmail(
         email,
@@ -611,6 +615,9 @@ export class AuthService {
       DEFAULT_VERIFIED_OTP_RESET_PASSWORD,
     );
 
+    await this.cacheManager.del(`${email}:otp-reset-password`);
+    await this.cacheManager.del(`${email}:otp-attempts`);
+
     return {
       success: true,
       message: 'OTP hợp lệ. Bạn có thể chuyển đến bưỡc tiếp theo.',
@@ -645,10 +652,6 @@ export class AuthService {
         );
 
       await this.updatePassword(email, newPassword);
-
-      await this.cacheManager.del(`${email}:otp-reset-password`);
-
-      await this.cacheManager.del(`${email}:otp-attempts`);
 
       await this.cacheManager.del(`${email}:otp-verified-reset-password`);
 
