@@ -150,11 +150,12 @@ class ProfileCandidateView extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    _sectionTitle('Giới thiệu'),
-                    Text(candidate.Bio ?? "", style: const TextStyle(fontFamily: 'Poppins')),
-
-                    const SizedBox(height: 24),
-
+                    if (candidate.Bio != null && candidate.Bio!.isNotEmpty) ...[
+                      _sectionTitle('Giới thiệu'),
+                      Text(candidate.Bio!, style: const TextStyle(fontFamily: 'Poppins')),
+                      const SizedBox(height: 24),
+                    ],
+          if (candidate.Certifications != null && candidate.Certifications!.isNotEmpty) ...[
                     _sectionTitle('Chứng chỉ'),
                     Wrap(
                       spacing: 8,
@@ -335,6 +336,7 @@ class ProfileCandidateView extends StatelessWidget {
                       );
                     }).toList(),
                   ],
+          ],
                 ),
               ),
             ),
