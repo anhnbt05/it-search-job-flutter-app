@@ -80,16 +80,6 @@ Ensure you have the following installed on your local machine:
    flutter run
    ```
 
-## 📸 Screenshots
-
-> **Note to developer**: Replace this section with actual screenshots of your app (e.g., Login Screen, Home/Job List, Chat Screen, Profile) to make your portfolio highly impressive to recruiters.
-
-<p align="center">
-  <img src="https://via.placeholder.com/250x500.png?text=Home+Screen" width="250" />
-  <img src="https://via.placeholder.com/250x500.png?text=Job+Detail" width="250" />
-  <img src="https://via.placeholder.com/250x500.png?text=Chat/Messages" width="250" />
-</p>
-
 ## 💡 Architecture & Design Patterns
 
 *   **Modular Monolith (Backend)**: The NestJS backend is structured into distinct feature modules, ensuring clear separation of concerns and maintainability.
